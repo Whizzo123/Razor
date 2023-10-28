@@ -10,6 +10,10 @@ workspace "Razor"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+group "Dependencies"
+	include "Razor/vendor/GLFW"
+	include "Razor/vendor/Assimp"
+
 project "Razor"
 	location "Razor"
 	kind "SharedLib"
@@ -21,12 +25,28 @@ project "Razor"
 	files
 	{
 		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/vendor/Glad/src/glad.c",
+		"%{prj.name}/vendor/stb_image/src/stb_image.h",
+		"%{prj.name}/vendor/glm/glm/**.hpp",
+		"%{prj.name}/vendor/glm/glm/**.inl"
 	}
 
 	includedirs 
 	{
-		"%{prj.name}/vendor/spdlog/include"
+		"%{prj.name}/vendor/spdlog/include",
+		"%{prj.name}/vendor/GLFW/include",
+		"%{prj.name}/vendor/assimp/include",
+		"%{prj.name}/vendor/Glad/include",
+		"%{prj.name}/vendor/stb_image/include",
+		"%{prj.name}/vendor/glm"
+	}
+
+	links
+	{
+		"GLFW",
+		"opengl32.lib",
+		"Assimp"
 	}
 
 	filter "system:windows"
@@ -75,6 +95,11 @@ project "Sandbox"
 	includedirs 
 	{
 		"Razor/vendor/spdlog/include",
+		"Razor/vendor/GLFW/include",
+		"Razor/vendor/assimp/include",
+		"Razor/vendor/Glad/include",
+		"Razor/vendor/stb_image/include",
+		"Razor/vendor/glm",
 		"Razor/src"
 	}
 
