@@ -8,15 +8,25 @@
 
 namespace Razor
 {
-	class Engine
+	class RAZOR_API Engine
 	{
 	
 	public:
+		static Engine* GetInstance()
+		{
+			if (GEngine == nullptr)
+			{
+				Init();
+			}
+			return GEngine;
+		}
+
+	private:
 		Engine()
 		{
-			Init();
+			
 		}
-		
+	public:
 		void Run();
 
 		Entity CreateEntity();
@@ -29,12 +39,13 @@ namespace Razor
 		void ProcessInput(GLFWwindow* window);
 	public:
 		std::shared_ptr<IRenderer> Renderer;
-	private:
-		void Init();
+	public:
+		static void Init();
 	private:
 		std::unique_ptr<Window> window;
 		std::shared_ptr<Coordinator> Coordinator;
 		float DeltaTime = 0.0f;
 		float LastFrame = 0.0f;
+		static Engine* GEngine;
 	};
 }

@@ -1,69 +1,74 @@
 #pragma once
+#include "Core.h"
 #include "EntityManager.h"
 
-class ComponentManager
+
+namespace Razor
 {
-public:
-
-	ComponentManager() {};
-
-	template<typename T>
-	void RegisterComponent()
+	class RAZOR_API ComponentManager
 	{
-		const char* typeName = typeid(T).name();
-		assert(ComponentTypes.find(typeName) == ComponentTypes.end() && "Registering component type more than once");
-		ComponentTypes.insert({ typeName, NextComponentType });
-		ComponentArrays.insert({ typeName, std::make_shared<ComponentArray<T>>() });
-		++NextComponentType;
-	}
+	public:
 
-	template<typename T>
-	ComponentType GetComponentType()
-	{
-		const char* typeName = typeid(T).name();
-		assert(ComponentTypes.find(typeName) != ComponentTypes.end() && "Component does not exist");
-		return ComponentTypes[typeName];
-	}
+		ComponentManager() {};
 
-	template<typename T>
-	void AddComponent(Entity InEntity, T InComponent)
-	{
-		GetComponentArray<T>()->InsertData(InEntity, InComponent);
-	}
+		template<typename T>
+		void RegisterComponent()
+		{
+			const char* typeName = typeid(T).name();
+			assert(ComponentTypes.find(typeName) == ComponentTypes.end() && "Registering component type more than once");
+			ComponentTypes.insert({ typeName, NextComponentType });
+			ComponentArrays.insert({ typeName, std::make_shared<ComponentArray<T>>() });
+			++NextComponentType;
+		}
 
-	template<typename T>
-	void RemoveComponent(Entity InEntity)
-	{
-		GetComponentArray<T>()->RemoveData(InEntity);
-	}
+		template<typename T>
+		ComponentType GetComponentType()
+		{
+			const char* typeName = typeid(T).name();
+			assert(ComponentTypes.find(typeName) != ComponentTypes.end() && "Component does not exist");
+			return ComponentTypes[typeName];
+		}
 
-	template<typename T>
-	T& GetComponent(Entity InEntity)
-	{
-		return GetComponentArray<T>()->GetData(InEntity);
-	}
+		template<typename T>
+		void AddComponent(Entity InEntity, T InComponent)
+		{
+			GetComponentArray<T>()->InsertData(InEntity, InComponent);
+		}
 
-	void EntityDestroyed(Entity InEntity);
+		template<typename T>
+		void RemoveComponent(Entity InEntity)
+		{
+			GetComponentArray<T>()->RemoveData(InEntity);
+		}
 
-private:
-	// Map from type string pointer to a component type
-	std::unordered_map<const char*, ComponentType> ComponentTypes{};
+		template<typename T>
+		T& GetComponent(Entity InEntity)
+		{
+			return GetComponentArray<T>()->GetData(InEntity);
+		}
 
-	// Map from type string pointer to a component array
-	std::unordered_map<const char*, std::shared_ptr<IComponentArray>> ComponentArrays{};
+		void EntityDestroyed(Entity InEntity);
 
-	// The component type to be assigned to the next registered component - starting at 0
-	ComponentType NextComponentType{};
+	private:
+		// Map from type string pointer to a component type
+		std::unordered_map<const char*, ComponentType> ComponentTypes{};
 
-	// Convenience function to get the statically casted pointer to the ComponentArray of type T.
-	template<typename T>
-	std::shared_ptr<ComponentArray<T>> GetComponentArray()
-	{
-		const char* TypeName = typeid(T).name();
+		// Map from type string pointer to a component array
+		std::unordered_map<const char*, std::shared_ptr<IComponentArray>> ComponentArrays{};
 
-		assert(ComponentTypes.find(TypeName) != ComponentTypes.end() && "Component not registered before use.");
+		// The component type to be assigned to the next registered component - starting at 0
+		ComponentType NextComponentType{};
 
-		return std::static_pointer_cast<ComponentArray<T>>(ComponentArrays[TypeName]);
-	}
-};
+		// Convenience function to get the statically casted pointer to the ComponentArray of type T.
+		template<typename T>
+		std::shared_ptr<ComponentArray<T>> GetComponentArray()
+		{
+			const char* TypeName = typeid(T).name();
 
+			assert(ComponentTypes.find(TypeName) != ComponentTypes.end() && "Component not registered before use.");
+
+			return std::static_pointer_cast<ComponentArray<T>>(ComponentArrays[TypeName]);
+		}
+	};
+
+}

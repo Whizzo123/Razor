@@ -6,7 +6,7 @@
 namespace Razor
 {
 
-	class Coordinator
+	class RAZOR_API Coordinator
 	{
 	public:
 		static std::shared_ptr<Coordinator> GetInstance()

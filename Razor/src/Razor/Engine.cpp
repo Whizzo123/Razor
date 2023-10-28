@@ -6,24 +6,27 @@
 namespace Razor
 {
 
+	Engine* Engine::GEngine = nullptr;
+
 	void Engine::Init()
 	{
+		GEngine = new Engine();
 		glfwInit();
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-		window = std::make_unique<Window>(800, 600);
+		GEngine->window = std::make_unique<Window>(800, 600);
 		glEnable(GL_DEPTH_TEST);
-		Coordinator = Coordinator::GetInstance();
-		Renderer = std::make_shared<OpenGLRenderer>();
-		Renderer->RendererCamera.CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-		Renderer->RendererCamera.CameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-		Renderer->RendererCamera.CameraDirection = glm::normalize(Renderer->RendererCamera.CameraPos - Renderer->RendererCamera.CameraTarget);
+		GEngine->Coordinator = Coordinator::GetInstance();
+		GEngine->Renderer = std::make_shared<OpenGLRenderer>();
+		GEngine->Renderer->RendererCamera.CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+		GEngine->Renderer->RendererCamera.CameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+		GEngine->Renderer->RendererCamera.CameraDirection = glm::normalize(GEngine->Renderer->RendererCamera.CameraPos - GEngine->Renderer->RendererCamera.CameraTarget);
 
-		Renderer->RendererCamera.Up = glm::vec3(0.0f, 1.0f, 0.0f);
-		Renderer->RendererCamera.CameraRight = glm::normalize(glm::cross(Renderer->RendererCamera.Up, Renderer->RendererCamera.CameraDirection));
-		Renderer->RendererCamera.CameraUp = glm::cross(Renderer->RendererCamera.CameraDirection, Renderer->RendererCamera.CameraRight);
-		Renderer->RendererCamera.CameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+		GEngine->Renderer->RendererCamera.Up = glm::vec3(0.0f, 1.0f, 0.0f);
+		GEngine->Renderer->RendererCamera.CameraRight = glm::normalize(glm::cross(GEngine->Renderer->RendererCamera.Up, GEngine->Renderer->RendererCamera.CameraDirection));
+		GEngine->Renderer->RendererCamera.CameraUp = glm::cross(GEngine->Renderer->RendererCamera.CameraDirection, GEngine->Renderer->RendererCamera.CameraRight);
+		GEngine->Renderer->RendererCamera.CameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 	}
 
 	void Engine::ProcessInput(GLFWwindow* window)

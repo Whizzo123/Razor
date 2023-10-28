@@ -6,7 +6,7 @@
 #include "Core.h"
 
 
-class Window
+class RAZOR_API Window
 {
 public:
     Window(int width, int height);

@@ -1,11 +1,14 @@
 #include "ComponentManager.h"
 
-void ComponentManager::EntityDestroyed(Entity InEntity)
+namespace Razor
 {
-	for (auto const& Pair : ComponentArrays)
+	void ComponentManager::EntityDestroyed(Entity InEntity)
 	{
-		auto const& Component = Pair.second;
+		for (auto const& Pair : ComponentArrays)
+		{
+			auto const& Component = Pair.second;
 
-		Component->EntityDestroyed(InEntity);
+			Component->EntityDestroyed(InEntity);
+		}
 	}
 }

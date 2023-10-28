@@ -1,20 +1,25 @@
 #pragma once
 
+#include "../Core.h"
 #include "System.h"
 #include "../Coordinator.h"
 
-class SpinSystem : public System
+namespace Razor
 {
 
-public:
-
-	SpinSystem()
+	class RAZOR_API SpinSystem : public System
 	{
-		Coordinator = Razor::Coordinator::GetInstance();
-	}
-	void Run(float dt) override;
 
-private:
-	std::shared_ptr<Razor::Coordinator> Coordinator;
-};
+	public:
 
+		SpinSystem()
+		{
+			Coordinator = Razor::Coordinator::GetInstance();
+		}
+		void Run(float dt) override;
+
+	private:
+		std::shared_ptr<Razor::Coordinator> Coordinator;
+	};
+
+}

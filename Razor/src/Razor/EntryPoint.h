@@ -10,8 +10,8 @@ int main(int argc, char** argv)
 	Razor::Log::Init();
 	RZ_CORE_ERROR("Initalising Engine!");
 	RZ_INFO("Hello App!");
+	Razor::Engine::Init();
 
-	printf("Razor Engine\n");
 	auto App = Razor::CreateApplication();
 	App->Run();
 	delete App;

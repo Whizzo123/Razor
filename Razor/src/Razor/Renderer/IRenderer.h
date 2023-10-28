@@ -1,4 +1,6 @@
 #pragma once
+
+#include "../Core.h"
 #include "../Component.h"
 #include "Shader.h"
 #include <memory>
@@ -22,7 +24,7 @@ struct Camera
 	glm::vec3 CameraFront;
 };
 
-class IRenderer
+class RAZOR_API IRenderer
 {
 public:
 	virtual void Draw(RendererInfo Info) = 0;
