@@ -12,7 +12,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 group "Dependencies"
 	include "Razor/vendor/GLFW"
-	include "Razor/vendor/Assimp"
+	include "Razor/vendor/assimp"
 
 project "Razor"
 	location "Razor"
@@ -46,7 +46,7 @@ project "Razor"
 	{
 		"GLFW",
 		"opengl32.lib",
-		"Assimp"
+		"assimp"
 	}
 
 	filter "system:windows"
