@@ -2,11 +2,51 @@
 #include "MeshRenderer.h"
 #include "Component.h"
 #include "Renderer/OpenGLRenderer.h"
+#include "Renderer/Model.h"
+#include "Systems/LightRenderer.h"
 
 namespace Razor
 {
 
 	Engine* Engine::GEngine = nullptr;
+	std::shared_ptr<Coordinator> Engine::Coordinator = nullptr;
+	std::shared_ptr<IRenderer> Engine::Renderer = nullptr;
+
+	float MouseLastX = 400;
+	float MouseLastY = 300;
+	float Yaw = -90.0f;
+	float Pitch = 0.0f;
+	bool bIsFirstMouse;
+	glm::vec3 CameraDirection;
+
+	void Mouse_Callback(GLFWwindow* window, double Xpos, double Ypos)
+	{
+		if (bIsFirstMouse)
+		{
+			MouseLastX = Xpos;
+			MouseLastY = Ypos;
+			bIsFirstMouse = false;
+		}
+
+		float Xoffset = Xpos - MouseLastX;
+		float Yoffset = Ypos - MouseLastY;
+		MouseLastX = Xpos;
+		MouseLastY = Ypos;
+
+		const float MouseSensitivity = 0.1f;
+		Xoffset *= MouseSensitivity;
+		Yoffset *= MouseSensitivity;
+
+		Yaw += Xoffset;
+		Pitch += Yoffset;
+
+		Pitch = Pitch > 89.0f ? 89.0f : ((Pitch  < -89.0f) ? -89.0f : Pitch);
+
+		CameraDirection.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+		CameraDirection.y = sin(glm::radians(Pitch));
+		CameraDirection.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+
+	}
 
 	void Engine::Init()
 	{
@@ -17,8 +57,12 @@ namespace Razor
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		GEngine->window = std::make_unique<Window>(800, 600);
 		glEnable(GL_DEPTH_TEST);
-		GEngine->Coordinator = Coordinator::GetInstance();
+		Coordinator = Coordinator::GetInstance();
 		GEngine->Renderer = std::make_shared<OpenGLRenderer>();
+		//glfwSetInputMode(GEngine->window->GetWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		glfwSetCursorPosCallback(GEngine->window->GetWindowPtr(), Mouse_Callback);
+
+		//Seperate this into a camera component and camera system
 		GEngine->Renderer->RendererCamera.CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 		GEngine->Renderer->RendererCamera.CameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 		GEngine->Renderer->RendererCamera.CameraDirection = glm::normalize(GEngine->Renderer->RendererCamera.CameraPos - GEngine->Renderer->RendererCamera.CameraTarget);
@@ -27,6 +71,32 @@ namespace Razor
 		GEngine->Renderer->RendererCamera.CameraRight = glm::normalize(glm::cross(GEngine->Renderer->RendererCamera.Up, GEngine->Renderer->RendererCamera.CameraDirection));
 		GEngine->Renderer->RendererCamera.CameraUp = glm::cross(GEngine->Renderer->RendererCamera.CameraDirection, GEngine->Renderer->RendererCamera.CameraRight);
 		GEngine->Renderer->RendererCamera.CameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+
+		// Seperate into some sort of all component/system registration
+		Coordinator->RegisterComponent<Mesh>();
+		Coordinator->RegisterComponent<Material>();
+		Coordinator->RegisterComponent<Transform>();
+		Coordinator->RegisterSystem<MeshRenderer>(MeshRenderer(GEngine->Renderer));
+		Signature sig;
+		sig.set(Coordinator->GetComponentType<Mesh>());
+		sig.set(Coordinator->GetComponentType<Material>());
+		sig.set(Coordinator->GetComponentType<Transform>());
+		Coordinator->SetSystemSignature<MeshRenderer>(sig);
+		//Light
+		Coordinator->RegisterComponent<Light>();
+		Coordinator->RegisterSystem<LightRenderer>(LightRenderer(GEngine->Renderer));
+		Signature LightSig;
+		LightSig.set(Coordinator->GetComponentType<Light>());
+		LightSig.set(Coordinator->GetComponentType<Mesh>());
+		LightSig.set(Coordinator->GetComponentType <Transform>());
+		Coordinator->SetSystemSignature<LightRenderer>(LightSig);
+
+	}
+
+	ModelInfo Engine::ProcessModel(const char* Path)
+	{
+		Model Tmp = Model();
+		return Tmp.LoadMesh(Path);
 	}
 
 	void Engine::ProcessInput(GLFWwindow* window)
@@ -56,30 +126,31 @@ namespace Razor
 
 	Entity Engine::CreateEntity()
 	{
-		return Coordinator->CreateEntity();
+		return GEngine->Coordinator->CreateEntity();
 	}
 	
 
 	void Engine::Run()
 	{
 		Coordinator->InitSystems();
-		while (!glfwWindowShouldClose(window->GetWindowPtr()))
+		while (!glfwWindowShouldClose(GEngine->window->GetWindowPtr()))
 		{
+			GEngine->Renderer->RendererCamera.CameraFront = CameraDirection;
 			float CurrentFrame = glfwGetTime();
-			DeltaTime = CurrentFrame - LastFrame;
-			LastFrame = CurrentFrame;
+			GEngine->DeltaTime = CurrentFrame - GEngine->LastFrame;
+			GEngine->LastFrame = CurrentFrame;
 
-			ProcessInput(window->GetWindowPtr());
+			GEngine->ProcessInput(GEngine->window->GetWindowPtr());
 
 			glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			Coordinator->RunSystems(DeltaTime);
+			Coordinator->RunSystems(GEngine->DeltaTime);
 
-			glfwSwapBuffers(window->GetWindowPtr());
+			glfwSwapBuffers(GEngine->window->GetWindowPtr());
 			glfwPollEvents();
 		}
-
+		delete GEngine;
 		glfwTerminate();
 	}
 }

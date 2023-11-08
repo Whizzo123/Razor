@@ -1,5 +1,6 @@
 #pragma once
 #include "Core.h"
+#include "Log.h"
 #include "EntityManager.h"
 
 
@@ -65,9 +66,20 @@ namespace Razor
 		{
 			const char* TypeName = typeid(T).name();
 
-			assert(ComponentTypes.find(TypeName) != ComponentTypes.end() && "Component not registered before use.");
-
-			return std::static_pointer_cast<ComponentArray<T>>(ComponentArrays[TypeName]);
+			if (ComponentTypes.find(TypeName) == ComponentTypes.end())
+			{
+				RZ_CORE_ERROR("Component %s not registered before use", TypeName);
+			}
+			//assert(ComponentTypes.find(TypeName) != ComponentTypes.end() && "Component not registered before use.");
+			//Swap const char* for string as DLL and exe do not have same locations for types
+			std::shared_ptr <IComponentArray> IArray = ComponentArrays[TypeName];
+			std::shared_ptr<ComponentArray<T>> Array = std::dynamic_pointer_cast<ComponentArray<T>>(IArray);
+			if (Array)
+			{
+				return Array;
+			}
+			RZ_CORE_ERROR("Could not find an array for the component being set on this entity");
+			return nullptr;
 		}
 	};
 

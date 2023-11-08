@@ -6,43 +6,48 @@
 #include <unordered_map>
 #include <glm/ext/quaternion_float.hpp>
 #include <glm/gtx/quaternion.hpp>
+#include "Core.h"
+#include "Renderer/Shaders/Shader.h"
+#include <memory>
 
-struct Transform
+namespace Razor
 {
-	glm::vec3 Position;
-	glm::vec3 Scale;
-	
-public:
-	glm::vec3 GetRotation()
+
+	struct RAZOR_API Transform
 	{
-		return Rotation;
-	}
-	void Rotate(glm::vec3 EulerAngles)
-	{
-		Rotation = EulerAngles;
-		RotationQ = glm::quat(glm::radians(EulerAngles));
-	}
-	glm::mat4 Get()
-	{
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, Position);
-		model = model * glm::toMat4(RotationQ);
-		return model;
-	}
+		glm::vec3 Position;
+		glm::vec3 Scale;
 
-private:
-	glm::vec3 Rotation;
-	glm::quat RotationQ;
+	public:
+		glm::vec3 GetRotation()
+		{
+			return Rotation;
+		}
+		void Rotate(glm::vec3 EulerAngles)
+		{
+			Rotation = EulerAngles;
+			RotationQ = glm::quat(glm::radians(EulerAngles));
+		}
+		glm::mat4 Get()
+		{
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, Position);
+			model = model * glm::toMat4(RotationQ);
+			return model;
+		}
 
-	void Move(glm::vec3 MoveVector)
-	{
-		Position += MoveVector;
-	}
+	private:
+		glm::vec3 Rotation;
+		glm::quat RotationQ;
 
-};
+		void Move(glm::vec3 MoveVector)
+		{
+			Position += MoveVector;
+		}
 
+	};
 
-	struct Mesh
+	struct MeshData
 	{
 		struct Vertex
 		{
@@ -59,25 +64,54 @@ private:
 			std::string Path;
 		};
 
-		Mesh()
+		MeshData()
 		{
 
 		}
 
-		Mesh(std::vector<Vertex> Vertices, std::vector<unsigned int> Indices, std::vector<Texture> Textures)
+		MeshData(std::vector<Vertex> Vertices, std::vector<unsigned int> Indices, std::vector<Texture> Textures, unsigned int MaterialID)
 		{
 			this->Vertices = Vertices;
 			this->Indices = Indices;
 			this->Textures = Textures;
+			MaterialId = MaterialID;
 		}
 
 		std::vector<Vertex> Vertices;
-		std::vector<Mesh> Meshes;
+		std::vector<MeshData> Meshes;
 		std::vector<unsigned int> Indices;
 		std::vector<Texture> Textures;
 		unsigned int VAO, VBO, EBO;
+		unsigned int MaterialId;
 		bool bHasIndices = true;
 	};
 
+	struct Light
+	{
+		unsigned int VAO, VBO, EBO;
+	};
 
 
+	struct RAZOR_API Mesh
+	{
+		std::vector<MeshData> Data;
+		std::shared_ptr<Shader> MeshShader;
+	};
+
+	struct MaterialData
+	{
+		std::string MaterialName;
+		glm::vec3 Ambient;
+		glm::vec3 Diffuse;
+		glm::vec3 Specular;
+		float Shininess;
+		MaterialData(glm::vec3 A, glm::vec3 D, glm::vec3 S, float SH) : Ambient(A), Diffuse(D), Specular(S), Shininess(SH) {}
+	};
+
+	struct Material
+	{
+		std::vector<MaterialData> Materials;
+	};
+
+	
+}

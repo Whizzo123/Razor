@@ -2,13 +2,18 @@
 
 #include "IRenderer.h"
 
-class OpenGLRenderer : public IRenderer
+namespace Razor
 {
 
-public:
-	void Draw(RendererInfo Info) override;
+	class OpenGLRenderer : public IRenderer
+	{
 
-private:
-	void DrawMesh(Mesh& MeshToDraw, Shader& MeshShader, Transform& MeshTransform);
-};
+	public:
+		CameraInfo GetCameraInfo() override;
+		void DrawMesh(RendererInfo Info) override;
+		void DrawCube(MeshData Data, Shader CubeShader) override;
+	private:
+		
+	};
 
+}

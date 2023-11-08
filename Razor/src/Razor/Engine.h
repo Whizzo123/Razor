@@ -5,6 +5,7 @@
 #include "Coordinator.h"
 #include "Core.h"
 #include "Renderer/IRenderer.h"
+#include "Renderer/Model.h"
 
 namespace Razor
 {
@@ -12,38 +13,49 @@ namespace Razor
 	{
 	
 	public:
-		static Engine* GetInstance()
+		static std::shared_ptr<IRenderer> GetRenderer()
 		{
-			if (GEngine == nullptr)
-			{
-				Init();
-			}
-			return GEngine;
+			return Renderer;
 		}
-
-	private:
+		~Engine()
+		{
+			RZ_CORE_INFO("Destroying razor");
+			
+		}
+	protected:
 		Engine()
 		{
 			
 		}
+		
 	public:
-		void Run();
+		static void Run();
 
-		Entity CreateEntity();
+		std::shared_ptr<Coordinator> GetCoordinator()
+		{
+			return Coordinator;
+		}
+
+		static Entity CreateEntity();
+
+		template<typename T>
+		static void AddComponentToEntity(Entity InEntity, T Component)
+		{
+			GEngine->AddComponent<T>(InEntity, Component);
+		}
+		void ProcessInput(GLFWwindow* window);
+		// TODO move this
+		static ModelInfo ProcessModel(const char* Path);
+		static std::shared_ptr<IRenderer> Renderer;
+		static void Init();
+	private:
 		template<typename T>
 		void AddComponent(Entity InEntity, T Component)
 		{
 			Coordinator->AddComponent<T>(InEntity, Component);
 		}
-
-		void ProcessInput(GLFWwindow* window);
-	public:
-		std::shared_ptr<IRenderer> Renderer;
-	public:
-		static void Init();
-	private:
 		std::unique_ptr<Window> window;
-		std::shared_ptr<Coordinator> Coordinator;
+		static std::shared_ptr<Coordinator> Coordinator;
 		float DeltaTime = 0.0f;
 		float LastFrame = 0.0f;
 		static Engine* GEngine;

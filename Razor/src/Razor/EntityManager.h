@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core.h"
+#include "Log.h"
 #include <cstdint>
 #include <queue>
 #include <memory>
@@ -32,10 +33,10 @@ namespace Razor
 	private:
 		std::queue<Entity> AvaliableEntities;
 		std::array<Signature, MAX_ENTITIES> Signatures{};
-		uint32_t LivingEntityCount;
+		uint32_t LivingEntityCount = 0;
 	};
 
-	class RAZOR_API IComponentArray
+	class IComponentArray
 	{
 	public:
 		virtual ~IComponentArray() = default;
@@ -44,7 +45,7 @@ namespace Razor
 
 
 	template<typename T>
-	class RAZOR_API ComponentArray : public  IComponentArray
+	class ComponentArray : public  IComponentArray
 	{
 	public:
 		void RemoveData(Entity InEntity)
@@ -69,7 +70,10 @@ namespace Razor
 
 		void InsertData(Entity InEntity, T Component)
 		{
-			assert(EntityToIndexMap.find(InEntity) == EntityToIndexMap.end() && "Trying to insert data twice");
+			if (EntityToIndexMap.find(InEntity) != EntityToIndexMap.end())
+			{
+				RZ_CORE_ERROR("Trying to insert data twice for component");
+			}
 			size_t NewIndex = Size;
 			EntityToIndexMap[InEntity] = NewIndex;
 			IndexToEntityMap[NewIndex] = InEntity;
@@ -79,7 +83,10 @@ namespace Razor
 
 		T& GetData(Entity InEntity)
 		{
-			assert(EntityToIndexMap.find(InEntity) != EntityToIndexMap.end() && "Retrieving non-existent component.");
+			if (EntityToIndexMap.find(InEntity) == EntityToIndexMap.end())
+			{
+				RZ_CORE_ERROR("Retrieving non-existent component.");
+			}
 
 			// Return a reference to the entity's component
 			return Components[EntityToIndexMap[InEntity]];

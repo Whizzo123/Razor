@@ -19,23 +19,23 @@
     <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Razor</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v143</PlatformToolset>
@@ -54,25 +54,22 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
     <OutDir>..\bin\Debug-windows-x86_64\Razor\</OutDir>
     <IntDir>..\intermediate\Debug-windows-x86_64\Razor\</IntDir>
     <TargetName>Razor</TargetName>
-    <TargetExt>.dll</TargetExt>
+    <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
     <OutDir>..\bin\Release-windows-x86_64\Razor\</OutDir>
     <IntDir>..\intermediate\Release-windows-x86_64\Razor\</IntDir>
     <TargetName>Razor</TargetName>
-    <TargetExt>.dll</TargetExt>
+    <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
-    <LinkIncremental>false</LinkIncremental>
     <OutDir>..\bin\Dist-windows-x86_64\Razor\</OutDir>
     <IntDir>..\intermediate\Dist-windows-x86_64\Razor\</IntDir>
     <TargetName>Razor</TargetName>
-    <TargetExt>.dll</TargetExt>
+    <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -83,18 +80,17 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary>..\bin\Debug-windows-x86_64\Razor\Razor.lib</ImportLibrary>
     </Link>
-    <PostBuildEvent>
-      <Command>IF EXIST ..\bin\Debug-windows-x86_64\Razor\Razor.dll\ (xcopy /Q /E /Y /I ..\bin\Debug-windows-x86_64\Razor\Razor.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Debug-windows-x86_64\Razor\Razor.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul)</Command>
-    </PostBuildEvent>
+    <Lib>
+      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -108,6 +104,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
@@ -115,12 +112,10 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary>..\bin\Release-windows-x86_64\Razor\Razor.lib</ImportLibrary>
     </Link>
-    <PostBuildEvent>
-      <Command>IF EXIST ..\bin\Release-windows-x86_64\Razor\Razor.dll\ (xcopy /Q /E /Y /I ..\bin\Release-windows-x86_64\Razor\Razor.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Release-windows-x86_64\Razor\Razor.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul)</Command>
-    </PostBuildEvent>
+    <Lib>
+      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
     <ClCompile>
@@ -134,6 +129,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
@@ -141,14 +137,15 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary>..\bin\Dist-windows-x86_64\Razor\Razor.lib</ImportLibrary>
     </Link>
-    <PostBuildEvent>
-      <Command>IF EXIST ..\bin\Dist-windows-x86_64\Razor\Razor.dll\ (xcopy /Q /E /Y /I ..\bin\Dist-windows-x86_64\Razor\Razor.dll ..\bin\Dist-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Dist-windows-x86_64\Razor\Razor.dll ..\bin\Dist-windows-x86_64\Sandbox &gt; nul)</Command>
-    </PostBuildEvent>
+    <Lib>
+      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Razor\Renderer\Shaders\DebugLightShader.h" />
+    <ClInclude Include="src\Razor\Renderer\Shaders\DefaultMeshShader.h" />
+    <ClInclude Include="src\Razor\Systems\LightRenderer.h" />
     <ClInclude Include="src\Razor.h" />
     <ClInclude Include="src\Razor\Application.h" />
     <ClInclude Include="src\Razor\Component.h" />
@@ -159,13 +156,11 @@
     <ClInclude Include="src\Razor\EntityManager.h" />
     <ClInclude Include="src\Razor\EntryPoint.h" />
     <ClInclude Include="src\Razor\Log.h" />
-    <ClInclude Include="src\Razor\Materials\BaseMaterial.h" />
-    <ClInclude Include="src\Razor\Materials\Material.h" />
     <ClInclude Include="src\Razor\MeshRenderer.h" />
     <ClInclude Include="src\Razor\Renderer\IRenderer.h" />
     <ClInclude Include="src\Razor\Renderer\Model.h" />
     <ClInclude Include="src\Razor\Renderer\OpenGLRenderer.h" />
-    <ClInclude Include="src\Razor\Renderer\Shader.h" />
+    <ClInclude Include="src\Razor\Renderer\Shaders\Shader.h" />
     <ClInclude Include="src\Razor\ShaderReader.h" />
     <ClInclude Include="src\Razor\Systems\SpinSystem.h" />
     <ClInclude Include="src\Razor\Systems\System.h" />
@@ -590,18 +585,19 @@
     <ClInclude Include="vendor\stb_image\src\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Razor\Renderer\Shaders\DebugLightShader.cpp" />
+    <ClCompile Include="src\Razor\Renderer\Shaders\DefaultMeshShader.cpp" />
+    <ClCompile Include="src\Razor\Systems\LightRenderer.cpp" />
     <ClCompile Include="src\Razor\Application.cpp" />
     <ClCompile Include="src\Razor\ComponentManager.cpp" />
     <ClCompile Include="src\Razor\Coordinator.cpp" />
     <ClCompile Include="src\Razor\Engine.cpp" />
     <ClCompile Include="src\Razor\EntityManager.cpp" />
     <ClCompile Include="src\Razor\Log.cpp" />
-    <ClCompile Include="src\Razor\Materials\BaseMaterial.cpp" />
-    <ClCompile Include="src\Razor\Materials\Material.cpp" />
     <ClCompile Include="src\Razor\MeshRenderer.cpp" />
     <ClCompile Include="src\Razor\Renderer\Model.cpp" />
     <ClCompile Include="src\Razor\Renderer\OpenGLRenderer.cpp" />
-    <ClCompile Include="src\Razor\Renderer\Shader.cpp" />
+    <ClCompile Include="src\Razor\Renderer\Shaders\Shader.cpp" />
     <ClCompile Include="src\Razor\ShaderReader.cpp" />
     <ClCompile Include="src\Razor\Systems\SpinSystem.cpp" />
     <ClCompile Include="src\Razor\Systems\System.cpp" />

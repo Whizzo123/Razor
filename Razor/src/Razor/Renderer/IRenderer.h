@@ -2,33 +2,44 @@
 
 #include "../Core.h"
 #include "../Component.h"
-#include "Shader.h"
+#include "Shaders/Shader.h"
 #include <memory>
-struct RendererInfo
+
+namespace Razor
 {
-	Mesh ObjMesh;
-	Shader ObjShader;
-	Transform ObjTransform;
-	bool bHasIndices;
-};
 
-struct Camera
-{
-	glm::vec3 CameraPos;
-	glm::vec3 CameraTarget;
-	glm::vec3 CameraDirection;
+	struct RendererInfo
+	{
+		MeshData ObjMesh;
+		Shader ObjShader;
+	};
 
-	glm::vec3 Up;
-	glm::vec3 CameraRight;
-	glm::vec3 CameraUp;
-	glm::vec3 CameraFront;
-};
+	struct Camera
+	{
+		glm::vec3 CameraPos;
+		glm::vec3 CameraTarget;
+		glm::vec3 CameraDirection;
 
-class RAZOR_API IRenderer
-{
-public:
-	virtual void Draw(RendererInfo Info) = 0;
-	Camera RendererCamera;
-	
-};
+		glm::vec3 Up;
+		glm::vec3 CameraRight;
+		glm::vec3 CameraUp;
+		glm::vec3 CameraFront;
+	};
 
+	struct CameraInfo
+	{
+		glm::mat4 CameraView;
+		glm::mat4 CameraProjection;
+		glm::vec3 CameraPosition;
+	};
+
+	class RAZOR_API IRenderer
+	{
+	public:
+		virtual void DrawMesh(RendererInfo Info) = 0;
+		virtual void DrawCube(MeshData Data, Shader CubeShader) = 0;
+		virtual CameraInfo GetCameraInfo() = 0;
+		Camera RendererCamera;
+	};
+
+}

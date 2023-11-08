@@ -141,6 +141,9 @@
       <Project>{F31F020E-5F34-2ABF-28B6-CD1E948926F0}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\shaders\lightvertex.vert" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

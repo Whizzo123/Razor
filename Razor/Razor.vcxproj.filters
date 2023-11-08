@@ -7,9 +7,6 @@
     <Filter Include="src\Razor">
       <UniqueIdentifier>{4A2EBFB3-B698-732A-FFD6-24D06B80517F}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Razor\Materials">
-      <UniqueIdentifier>{9B157405-0777-5113-90E4-97C5FC4488D2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\Razor\Renderer">
       <UniqueIdentifier>{30254CE2-1C09-0D38-8569-078B716CF7B9}</UniqueIdentifier>
     </Filter>
@@ -81,12 +78,6 @@
     <ClInclude Include="src\Razor\Log.h">
       <Filter>src\Razor</Filter>
     </ClInclude>
-    <ClInclude Include="src\Razor\Materials\BaseMaterial.h">
-      <Filter>src\Razor\Materials</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Razor\Materials\Material.h">
-      <Filter>src\Razor\Materials</Filter>
-    </ClInclude>
     <ClInclude Include="src\Razor\MeshRenderer.h">
       <Filter>src\Razor</Filter>
     </ClInclude>
@@ -99,7 +90,7 @@
     <ClInclude Include="src\Razor\Renderer\OpenGLRenderer.h">
       <Filter>src\Razor\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="src\Razor\Renderer\Shader.h">
+    <ClInclude Include="src\Razor\Renderer\Shaders\Shader.h">
       <Filter>src\Razor\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Razor\ShaderReader.h">
@@ -1368,6 +1359,9 @@
     <ClInclude Include="vendor\stb_image\src\stb_image.h">
       <Filter>vendor\stb_image\src</Filter>
     </ClInclude>
+    <ClInclude Include="src\Razor\Systems\LightRenderer.h" />
+    <ClInclude Include="src\Razor\Renderer\Shaders\DefaultMeshShader.h" />
+    <ClInclude Include="src\Razor\Renderer\Shaders\DebugLightShader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Razor\Application.cpp">
@@ -1388,12 +1382,6 @@
     <ClCompile Include="src\Razor\Log.cpp">
       <Filter>src\Razor</Filter>
     </ClCompile>
-    <ClCompile Include="src\Razor\Materials\BaseMaterial.cpp">
-      <Filter>src\Razor\Materials</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Razor\Materials\Material.cpp">
-      <Filter>src\Razor\Materials</Filter>
-    </ClCompile>
     <ClCompile Include="src\Razor\MeshRenderer.cpp">
       <Filter>src\Razor</Filter>
     </ClCompile>
@@ -1403,7 +1391,7 @@
     <ClCompile Include="src\Razor\Renderer\OpenGLRenderer.cpp">
       <Filter>src\Razor\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="src\Razor\Renderer\Shader.cpp">
+    <ClCompile Include="src\Razor\Renderer\Shaders\Shader.cpp">
       <Filter>src\Razor\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Razor\ShaderReader.cpp">
@@ -1424,5 +1412,8 @@
     <ClCompile Include="vendor\Glad\src\glad.c">
       <Filter>vendor\Glad\src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Razor\Systems\LightRenderer.cpp" />
+    <ClCompile Include="src\Razor\Renderer\Shaders\DefaultMeshShader.cpp" />
+    <ClCompile Include="src\Razor\Renderer\Shaders\DebugLightShader.cpp" />
   </ItemGroup>
 </Project>

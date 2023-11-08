@@ -4,7 +4,7 @@
 #include "Coordinator.h"
 #include "Component.h"
 #include "ShaderReader.h"
-#include "Renderer/Shader.h"
+#include "Renderer/Shaders/Shader.h"
 #include "Engine.h"
 
 namespace Razor
@@ -21,10 +21,11 @@ namespace Razor
 		void Init() override;
 
 	private:
-		void InitMesh(Mesh& MeshToInit);
+		void InitMesh(MeshData& MeshToInit);
 
 	private:
 		std::shared_ptr<Razor::Coordinator> Coordinator;
 		std::shared_ptr<IRenderer> Renderer;
+		std::shared_ptr<Shader> MeshShader;
 	};
 }

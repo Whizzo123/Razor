@@ -10,7 +10,7 @@ namespace Razor
 		Application();
 		virtual ~Application();
 
-		void Run();
+		virtual void Run();
 	};
 
 	// DEFINED IN CLIENT

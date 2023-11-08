@@ -85,7 +85,7 @@ namespace Razor
 		}
 
 	private:
-		std::unique_ptr<EntityManager> EntityMgr;;
+		std::unique_ptr<EntityManager> EntityMgr;
 		std::unique_ptr<ComponentManager> ComponentMgr;
 		std::unique_ptr<SystemManager> SystemMgr;
 		static std::shared_ptr<Coordinator> Instance;
