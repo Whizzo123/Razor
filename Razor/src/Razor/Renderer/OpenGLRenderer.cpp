@@ -23,15 +23,13 @@ namespace Razor
 
     void OpenGLRenderer::DrawMesh(RendererInfo Info)
     {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBindVertexArray(Info.ObjMesh.VAO);
         glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(Info.ObjMesh.Indices.size()), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
-    }
-
-    void OpenGLRenderer::DrawCube(MeshData Data, Shader CubeShader)
-    {
-        glBindVertexArray(Data.VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
     }
 
 }

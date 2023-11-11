@@ -6,6 +6,7 @@
 #include "Core.h"
 #include "Renderer/IRenderer.h"
 #include "Renderer/Model.h"
+#include "Renderer/Shaders/Shader.h"
 
 namespace Razor
 {
@@ -48,6 +49,8 @@ namespace Razor
 		static ModelInfo ProcessModel(const char* Path);
 		static std::shared_ptr<IRenderer> Renderer;
 		static void Init();
+		static std::shared_ptr<Shader> GetShaderForID(uint8_t ID);
+		static std::shared_ptr<Shader> GetShaderForType(const char* Type);
 	private:
 		template<typename T>
 		void AddComponent(Entity InEntity, T Component)
@@ -56,6 +59,9 @@ namespace Razor
 		}
 		std::unique_ptr<Window> window;
 		static std::shared_ptr<Coordinator> Coordinator;
+		std::unordered_map<uint8_t, std::shared_ptr<Shader>> ShaderIDMap;
+		std::unordered_map<const char*, std::shared_ptr<Shader>> ShaderTypeMap;
+		std::shared_ptr<std::vector<Light>> SceneLights;
 		float DeltaTime = 0.0f;
 		float LastFrame = 0.0f;
 		static Engine* GEngine;

@@ -7,7 +7,6 @@
 #include <glm/ext/quaternion_float.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include "Core.h"
-#include "Renderer/Shaders/Shader.h"
 #include <memory>
 
 namespace Razor
@@ -88,14 +87,17 @@ namespace Razor
 
 	struct Light
 	{
-		unsigned int VAO, VBO, EBO;
+		glm::vec3 Position;
+		glm::vec3 Diffuse;
+		glm::vec3 Ambient;
+		glm::vec3 Specular;
+		float Shininess;
 	};
 
 
 	struct RAZOR_API Mesh
 	{
 		std::vector<MeshData> Data;
-		std::shared_ptr<Shader> MeshShader;
 	};
 
 	struct MaterialData
@@ -111,6 +113,7 @@ namespace Razor
 	struct Material
 	{
 		std::vector<MaterialData> Materials;
+		uint8_t ShaderID;
 	};
 
 	

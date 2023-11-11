@@ -8,7 +8,8 @@ namespace Razor
 	{
 		for (const Entity& Entity : Entities)
 		{
-			
+			Light& EntityLight = Coordinator->GetComponent<Light>(Entity);
+			SceneLights->push_back(EntityLight);
 		}
 	}
 

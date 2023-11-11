@@ -7,13 +7,14 @@ namespace Razor
 
 	class DebugLightShader : public Shader
 	{
+	public:
 		DebugLightShader() : Shader()
 		{
 			ID = ShaderReader::CreateShaderProgram("lightvertex.vert", "lightfragment.frag");
 		}
 		~DebugLightShader() {}
 
-		void Setup(glm::mat4 projection, glm::mat4 view, glm::mat4 model, glm::vec3 lightColor) override;
+		void Setup(CameraInfo* CameraInfo, glm::mat4 Model, MaterialData Mat, std::shared_ptr<std::vector<Light>> Lights) override;
 	};
 
 }

@@ -13,7 +13,7 @@ namespace Razor
 		}
 		~DefaultMeshShader(){}
 
-		void Setup(glm::mat4 projection, glm::mat4 view, glm::mat4 model, glm::vec3 lightColor) override;
+		void Setup(CameraInfo* CamInfo, glm::mat4 model, MaterialData Mat, std::shared_ptr<std::vector<Light>> Light) override;
 
 	};
 

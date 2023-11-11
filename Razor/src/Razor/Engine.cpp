@@ -4,6 +4,8 @@
 #include "Renderer/OpenGLRenderer.h"
 #include "Renderer/Model.h"
 #include "Systems/LightRenderer.h"
+#include "Renderer/Shaders/DefaultMeshShader.h"
+#include "Renderer/Shaders/DebugLightShader.h"
 
 namespace Razor
 {
@@ -40,7 +42,7 @@ namespace Razor
 		Yaw += Xoffset;
 		Pitch += Yoffset;
 
-		Pitch = Pitch > 89.0f ? 89.0f : ((Pitch  < -89.0f) ? -89.0f : Pitch);
+		Pitch = Pitch > 89.0f ? 89.0f : ((Pitch < -89.0f) ? -89.0f : Pitch);
 
 		CameraDirection.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
 		CameraDirection.y = sin(glm::radians(Pitch));
@@ -62,6 +64,14 @@ namespace Razor
 		//glfwSetInputMode(GEngine->window->GetWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		glfwSetCursorPosCallback(GEngine->window->GetWindowPtr(), Mouse_Callback);
 
+		//CREATE SHADERS
+		std::shared_ptr<Shader> D_MeshShader = std::make_shared<DefaultMeshShader>();
+		GEngine->ShaderIDMap[D_MeshShader->ID] = D_MeshShader;
+		GEngine->ShaderTypeMap[typeid(DefaultMeshShader).name()] = D_MeshShader;
+		std::shared_ptr<Shader> D_DebugShader = std::make_shared<DebugLightShader>();
+		GEngine->ShaderIDMap[D_DebugShader->ID] = D_DebugShader;
+		GEngine->ShaderTypeMap[typeid(DebugLightShader).name()] = D_DebugShader;
+
 		//Seperate this into a camera component and camera system
 		GEngine->Renderer->RendererCamera.CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 		GEngine->Renderer->RendererCamera.CameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -76,7 +86,8 @@ namespace Razor
 		Coordinator->RegisterComponent<Mesh>();
 		Coordinator->RegisterComponent<Material>();
 		Coordinator->RegisterComponent<Transform>();
-		Coordinator->RegisterSystem<MeshRenderer>(MeshRenderer(GEngine->Renderer));
+		GEngine->SceneLights = std::make_shared<std::vector<Light>>();
+		Coordinator->RegisterSystem<MeshRenderer>(MeshRenderer(GEngine->Renderer, GEngine->ShaderIDMap, GEngine->SceneLights));
 		Signature sig;
 		sig.set(Coordinator->GetComponentType<Mesh>());
 		sig.set(Coordinator->GetComponentType<Material>());
@@ -84,7 +95,7 @@ namespace Razor
 		Coordinator->SetSystemSignature<MeshRenderer>(sig);
 		//Light
 		Coordinator->RegisterComponent<Light>();
-		Coordinator->RegisterSystem<LightRenderer>(LightRenderer(GEngine->Renderer));
+		Coordinator->RegisterSystem<LightRenderer>(LightRenderer(GEngine->Renderer, GEngine->SceneLights));
 		Signature LightSig;
 		LightSig.set(Coordinator->GetComponentType<Light>());
 		LightSig.set(Coordinator->GetComponentType<Mesh>());
@@ -128,7 +139,7 @@ namespace Razor
 	{
 		return GEngine->Coordinator->CreateEntity();
 	}
-	
+
 
 	void Engine::Run()
 	{
@@ -152,5 +163,16 @@ namespace Razor
 		}
 		delete GEngine;
 		glfwTerminate();
+	}
+
+	// This is fine to have no checks as it would return 0 anyway if there was no shader for that ID meaning we always get a shader
+	std::shared_ptr<Shader> Engine::GetShaderForID(uint8_t ID)
+	{
+		return GEngine->ShaderIDMap[ID];
+	}
+
+	std::shared_ptr<Shader> Engine::GetShaderForType(const char* Type)
+	{
+		return GEngine->ShaderTypeMap[Type];
 	}
 }

@@ -2,7 +2,6 @@
 
 #include "../Core.h"
 #include "../Component.h"
-#include "Shaders/Shader.h"
 #include <memory>
 
 namespace Razor
@@ -11,7 +10,6 @@ namespace Razor
 	struct RendererInfo
 	{
 		MeshData ObjMesh;
-		Shader ObjShader;
 	};
 
 	struct Camera
@@ -37,7 +35,6 @@ namespace Razor
 	{
 	public:
 		virtual void DrawMesh(RendererInfo Info) = 0;
-		virtual void DrawCube(MeshData Data, Shader CubeShader) = 0;
 		virtual CameraInfo GetCameraInfo() = 0;
 		Camera RendererCamera;
 	};
