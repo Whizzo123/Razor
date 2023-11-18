@@ -34,37 +34,54 @@ namespace Razor
 			std::string Name;
 			int Value;
 		};
+		struct PropertySlot
+		{
+			void AddFloatProperty(std::string Name, float Value)
+			{
+				FProperties.push_back({ Name, Value });
+			}
+
+			void AddIntProperty(std::string Name, int Value)
+			{
+				IProperties.push_back({ Name, Value });
+			}
+
+			void AddBoolProperty(std::string Name, bool Value)
+			{
+				BProperties.push_back({ Name, Value });
+			}
+
+			void AddVec3Property(std::string Name, glm::vec3 Value)
+			{
+				VProperties.push_back({ Name, Value });
+			}
+
+			void AddMat4Property(std::string Name, glm::mat4 Value)
+			{
+				MProperties.push_back({ Name, Value });
+			}
+		private:
+			std::vector<FProperty> FProperties;
+			std::vector<VProperty> VProperties;
+			std::vector<MProperty> MProperties;
+			std::vector<BProperty> BProperties;
+			std::vector<IProperty> IProperties;
+		};
+		void GeneratePropertySlots(uint8_t NumberOfSlots)
+		{
+			Slots.reserve(NumberOfSlots);
+		}
 	private:
-		std::vector<FProperty> FProperties;
-		std::vector<VProperty> VProperties;
-		std::vector<MProperty> MProperties;
-		std::vector<BProperty> BProperties;
-		std::vector<IProperty> IProperties;
+		std::vector<PropertySlot> Slots;
+		
 
 	public:
-		void AddFloatProperty(std::string Name, float Value)
+		PropertySlot& GetPropertySlot(uint8_t SlotIndex)
 		{
-			FProperties.push_back({ Name, Value });
-		}
-
-		void AddIntProperty(std::string Name, int Value)
-		{
-			IProperties.push_back({ Name, Value });
-		}
-
-		void AddBoolProperty(std::string Name, bool Value)
-		{
-			BProperties.push_back({ Name, Value });
-		}
-
-		void AddVec3Property(std::string Name, glm::vec3 Value)
-		{
-			VProperties.push_back({ Name, Value });
-		}
-
-		void AddMat4Property(std::string Name, glm::mat4 Value)
-		{
-			MProperties.push_back({ Name, Value });
+			if (SlotIndex > 0 && SlotIndex < Slots.size())
+			{
+				Slots[SlotIndex];
+			}
 		}
 	};
 	struct RenderSystemPipeline

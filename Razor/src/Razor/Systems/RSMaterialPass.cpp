@@ -11,17 +11,21 @@ namespace Razor
 			Material& EntityMat = Coordinator->GetComponent<Material>(RenderingEntity);
 			
 			RenderPipelineEntityProperties Property = Properties[RenderingEntity];
-
+			Property.GeneratePropertySlots(EntityMat.Materials.size());
 			// TODO get mesh index through here also add textures to material component
-			Property.AddIntProperty("material.texture_diffuse", 0);
-			Property.AddIntProperty("material.texture_normal", 0);
-			Property.AddIntProperty("material.texture_specular", 0);
-			Property.AddIntProperty("material.texture_height", 0);
-			Property.AddVec3Property("material.diffuse", EntityMat.Materials[0].Diffuse);
-			Property.AddVec3Property("material.ambient", EntityMat.Materials[0].Ambient);
-			Property.AddVec3Property("material.specular", EntityMat.Materials[0].Specular);
-			Property.AddVec3Property("material.shininess", EntityMat.Materials[0].Shininess);
-			Property.AddBoolProperty("material.bUseTextures", 0);
+			for (int i = 0; i < EntityMat.Materials.size(); i++)
+			{
+				RenderPipelineEntityProperties::PropertySlot Slot = Property.GetPropertySlot(i);
+				Slot.AddIntProperty("material.texture_diffuse", 0);
+				Slot.AddIntProperty("material.texture_normal", 0);
+				Slot.AddIntProperty("material.texture_specular", 0);
+				Slot.AddIntProperty("material.texture_height", 0);
+				Slot.AddVec3Property("material.diffuse", EntityMat.Materials[0].Diffuse);
+				Slot.AddVec3Property("material.ambient", EntityMat.Materials[0].Ambient);
+				Slot.AddVec3Property("material.specular", EntityMat.Materials[0].Specular);
+				Slot.AddFloatProperty("material.shininess", EntityMat.Materials[0].Shininess);
+				Slot.AddBoolProperty("material.bUseTextures", 0);
+			}
 		}
 	}
 
