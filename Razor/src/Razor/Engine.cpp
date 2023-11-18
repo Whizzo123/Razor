@@ -86,7 +86,7 @@ namespace Razor
 		Coordinator->RegisterComponent<Mesh>();
 		Coordinator->RegisterComponent<Material>();
 		Coordinator->RegisterComponent<Transform>();
-		GEngine->SceneLights = std::make_shared<std::vector<Light>>();
+		GEngine->SceneLights = std::make_shared<std::vector<Light*>>();
 		Coordinator->RegisterSystem<MeshRenderer>(MeshRenderer(GEngine->Renderer, GEngine->ShaderIDMap, GEngine->SceneLights));
 		Signature sig;
 		sig.set(Coordinator->GetComponentType<Mesh>());
@@ -95,11 +95,11 @@ namespace Razor
 		Coordinator->SetSystemSignature<MeshRenderer>(sig);
 		//Light
 		Coordinator->RegisterComponent<Light>();
+		Coordinator->RegisterComponent<DirectionalLight>();
 		Coordinator->RegisterSystem<LightRenderer>(LightRenderer(GEngine->Renderer, GEngine->SceneLights));
 		Signature LightSig;
 		LightSig.set(Coordinator->GetComponentType<Light>());
-		LightSig.set(Coordinator->GetComponentType<Mesh>());
-		LightSig.set(Coordinator->GetComponentType <Transform>());
+		LightSig.set(Coordinator->GetComponentType<DirectionalLight>());
 		Coordinator->SetSystemSignature<LightRenderer>(LightSig);
 
 	}

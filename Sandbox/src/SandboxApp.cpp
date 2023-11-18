@@ -34,12 +34,12 @@ public:
 		LightTransform.Position = glm::vec3(-15.2f, 1.0f, -1.0f);
 		LightTransform.Rotate(glm::vec3(0.0f, 0.0f, 0.0f));
 		LightTransform.Scale = glm::vec3(1.0f, 1.0f, 1.0f);
-		Razor::Light LightComp = Razor::Light();
+		Razor::DirectionalLight LightComp = Razor::DirectionalLight();
 		LightComp.Position = LightTransform.Position;
 		LightComp.Diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
 		LightComp.Ambient = glm::vec3(1.0f, 1.0f, 1.0f);
 		LightComp.Specular = glm::vec3(1.0f, 1.0f, 1.0f);
-		LightComp.Shininess = 0.1f;
+		LightComp.Direction = glm::vec3(-1.0f, 0.0f, 0.0f);
 		Razor::Entity LightEntity = Razor::Engine::CreateEntity();
 		Razor::Engine::AddComponentToEntity<Razor::Mesh>(LightEntity, LightMesh);
 		Razor::Engine::AddComponentToEntity<Razor::Material>(LightEntity, LightMeshMaterial);

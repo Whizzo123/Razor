@@ -79,6 +79,11 @@ namespace Razor
 			SystemMgr->RunSystems(dt);
 		}
 
+		void RunRenderSystems()
+		{
+			SystemMgr->RunRenderSystems();
+		}
+
 		void InitSystems()
 		{
 			SystemMgr->InitSystems();

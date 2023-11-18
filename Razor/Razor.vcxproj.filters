@@ -1362,6 +1362,7 @@
     <ClInclude Include="src\Razor\Systems\LightRenderer.h" />
     <ClInclude Include="src\Razor\Renderer\Shaders\DefaultMeshShader.h" />
     <ClInclude Include="src\Razor\Renderer\Shaders\DebugLightShader.h" />
+    <ClInclude Include="src\Razor\Systems\RSMaterialPass.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Razor\Application.cpp">
@@ -1415,5 +1416,6 @@
     <ClCompile Include="src\Razor\Systems\LightRenderer.cpp" />
     <ClCompile Include="src\Razor\Renderer\Shaders\DefaultMeshShader.cpp" />
     <ClCompile Include="src\Razor\Renderer\Shaders\DebugLightShader.cpp" />
+    <ClCompile Include="src\Razor\Systems\RSMaterialPass.cpp" />
   </ItemGroup>
 </Project>

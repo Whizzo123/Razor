@@ -43,6 +43,15 @@ namespace Razor
 		}
 	}
 
+	void SystemManager::RunRenderSystems()
+	{
+		//RENDER_STAGE_MATERIALS
+		RenderPipeline.RunSystemsFor(RenderStage::RENDER_STAGE_MATERIAL_PASS);
+		//RENDER_STAGE_LIGHTING
+		//RENDER_STAGE_TRANSFORMATIONS
+		//RENDER_STAGE_CAMERA
+	}
+
 	void SystemManager::InitSystems()
 	{
 		for (auto const& Pair : Systems)

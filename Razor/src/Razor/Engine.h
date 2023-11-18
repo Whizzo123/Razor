@@ -61,7 +61,7 @@ namespace Razor
 		static std::shared_ptr<Coordinator> Coordinator;
 		std::unordered_map<uint8_t, std::shared_ptr<Shader>> ShaderIDMap;
 		std::unordered_map<const char*, std::shared_ptr<Shader>> ShaderTypeMap;
-		std::shared_ptr<std::vector<Light>> SceneLights;
+		std::shared_ptr<std::vector<Light*>> SceneLights;
 		float DeltaTime = 0.0f;
 		float LastFrame = 0.0f;
 		static Engine* GEngine;

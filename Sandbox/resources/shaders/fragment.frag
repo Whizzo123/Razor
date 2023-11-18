@@ -19,6 +19,8 @@ struct Light
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
+	vec3 Direction;
+	int LightType;
 };
 
 out vec4 FragColor;
@@ -37,7 +39,15 @@ void main()
 	vec3 diffuse;
 	vec3 specular;
 	vec3 norm = normalize(Normal);
-	vec3 lightDir = normalize(light.position - FragPos);
+	vec3 lightDir;
+	switch(light.LightType)
+		{
+			case(0):
+				lightDir = normalize(-light.Direction);
+			break;
+			default:
+				lightDir = normalize(light.position - FragPos);
+		}
 	float diff = max(dot(norm, lightDir), 0.0);
 	vec3 viewDir = normalize(viewPos - FragPos);
 	vec3 reflectDir = reflect(-lightDir, norm);

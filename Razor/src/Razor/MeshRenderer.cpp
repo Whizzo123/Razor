@@ -24,6 +24,7 @@ namespace Razor
 
     void MeshRenderer::InitMesh(MeshData& MeshToInit)
     {
+        // TODO Needs moved to inside RendererAPI
         glGenVertexArrays(1, &MeshToInit.VAO);
         glGenBuffers(1, &MeshToInit.VBO);
         glGenBuffers(1, &MeshToInit.EBO);

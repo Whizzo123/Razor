@@ -47,7 +47,7 @@ namespace Razor
 		Shader(){};
 		virtual ~Shader() {};
 
-		virtual void Setup(CameraInfo* CamInfo, glm::mat4 model, MaterialData Mat, std::shared_ptr<std::vector<Light>> Light) {};
+		virtual void Setup(CameraInfo* CamInfo, glm::mat4 model, MaterialData Mat, std::shared_ptr<std::vector<Light*>> Light) {};
 
 		unsigned int ID;
 
