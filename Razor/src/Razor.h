@@ -5,6 +5,7 @@
 #include "Razor/Application.h"
 #include "Razor/Log.h"
 #include "Razor/Engine.h"
+#include "Razor/Systems/System.h"
 #include "Razor/Renderer/Model.h"
 #include "Razor/Renderer/Shaders/DefaultMeshShader.h"
 #include "Razor/Renderer/Shaders/DebugLightShader.h"

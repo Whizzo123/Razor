@@ -95,8 +95,12 @@ namespace Razor
 		virtual ~Light() {}
 	};
 
-	struct DirectionalLight : public Light
+	struct DirectionalLight
 	{
+		glm::vec3 Position;
+		glm::vec3 Diffuse;
+		glm::vec3 Ambient;
+		glm::vec3 Specular;
 		glm::vec3 Direction;
 	};
 

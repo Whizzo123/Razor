@@ -69,9 +69,21 @@ namespace Razor
 		}
 
 		template<typename T>
+		std::shared_ptr<T> RegisterRenderSystem(T System)
+		{
+			return SystemMgr->RegisterRenderSystem<T>(System);
+		}
+
+		template<typename T>
 		void SetSystemSignature(Signature Signature)
 		{
 			SystemMgr->SetSignature<T>(Signature);
+		}
+
+		template<typename T>
+		void SetRenderSystemSignature(RenderStage Stage, Signature Signature)
+		{
+			SystemMgr->SetRenderSignature<T>(Stage, Signature);
 		}
 
 		void RunSystems(float dt)

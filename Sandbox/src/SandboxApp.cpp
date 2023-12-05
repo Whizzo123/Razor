@@ -44,7 +44,7 @@ public:
 		Razor::Engine::AddComponentToEntity<Razor::Mesh>(LightEntity, LightMesh);
 		Razor::Engine::AddComponentToEntity<Razor::Material>(LightEntity, LightMeshMaterial);
 		Razor::Engine::AddComponentToEntity<Razor::Transform>(LightEntity, LightTransform);
-		Razor::Engine::AddComponentToEntity<Razor::Light>(LightEntity, LightComp);
+		Razor::Engine::AddComponentToEntity<Razor::DirectionalLight>(LightEntity, LightComp);
 	}
 	~Sandbox() {}
 	void Run() override;

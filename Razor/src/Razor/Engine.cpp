@@ -6,6 +6,11 @@
 #include "Systems/LightRenderer.h"
 #include "Renderer/Shaders/DefaultMeshShader.h"
 #include "Renderer/Shaders/DebugLightShader.h"
+#include "Systems/RSMaterialPass.h"
+#include "Systems/RSTransformationsPass.h"
+#include "Systems/RSDirectionalLightingPass.h"
+#include "Systems/RSCameraPass.h"
+#include "Systems/RSRenderPass.h"
 
 namespace Razor
 {
@@ -98,9 +103,29 @@ namespace Razor
 		Coordinator->RegisterComponent<DirectionalLight>();
 		Coordinator->RegisterSystem<LightRenderer>(LightRenderer(GEngine->Renderer, GEngine->SceneLights));
 		Signature LightSig;
-		LightSig.set(Coordinator->GetComponentType<Light>());
+		//LightSig.set(Coordinator->GetComponentType<Light>());
 		LightSig.set(Coordinator->GetComponentType<DirectionalLight>());
 		Coordinator->SetSystemSignature<LightRenderer>(LightSig);
+		//Render Systems
+		Coordinator->RegisterSystem<RSMaterialPass>(RSMaterialPass());
+		Signature RSMaterialPassSig;
+		RSMaterialPassSig.set(Coordinator->GetComponentType<Material>());
+		Coordinator->SetSystemSignature<RSMaterialPass>(RSMaterialPassSig);
+		Coordinator->RegisterSystem<RSTransformationsPass>(RSTransformationsPass());
+		Signature RSTransformationsPassSig;
+		RSTransformationsPassSig.set(Coordinator->GetComponentType<Transform>());
+		Coordinator->SetSystemSignature<RSTransformationsPass>(RSTransformationsPassSig);
+		Coordinator->RegisterSystem<RSDirectionalLightingPass>(RSDirectionalLightingPass());
+		Signature RSDirectionalLightingPassSig;
+		RSDirectionalLightingPassSig.set(Coordinator->GetComponentType<DirectionalLight>());
+		Coordinator->SetSystemSignature<RSDirectionalLightingPass>(RSDirectionalLightingPassSig);
+		// TODO refactor camera to have component on entity so this system can function as intended
+		Coordinator->RegisterSystem<RSCameraPass>(RSCameraPass(GEngine->Renderer));
+		Coordinator->RegisterSystem<RSRenderPass>(RSRenderPass(GEngine->Renderer, GEngine->ShaderIDMap));
+		Signature RSRenderPassSig;
+		RSRenderPassSig.set(Coordinator->GetComponentType<Mesh>());
+		RSRenderPassSig.set(Coordinator->GetComponentType<Material>());
+		Coordinator->SetSystemSignature<RSRenderPass>(RSRenderPassSig);
 
 	}
 
@@ -157,6 +182,7 @@ namespace Razor
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			Coordinator->RunSystems(GEngine->DeltaTime);
+			Coordinator->RunRenderSystems();
 
 			glfwSwapBuffers(GEngine->window->GetWindowPtr());
 			glfwPollEvents();

@@ -4,10 +4,11 @@
 
 namespace Razor
 {
-	class RSMaterialPass : public RenderSystem
+
+	class RSDirectionalLightingPass : public RenderSystem
 	{
 	public:
-		RSMaterialPass()
+		RSDirectionalLightingPass()
 		{
 			Coordinator = Coordinator::GetInstance();
 			SystemRenderStage = RenderStage::RENDER_STAGE_MATERIAL_PASS;

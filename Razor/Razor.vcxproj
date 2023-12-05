@@ -143,6 +143,10 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Razor\Systems\RSRenderPass.h" />
+    <ClInclude Include="src\Razor\Systems\RSCameraPass.h" />
+    <ClInclude Include="src\Razor\Systems\RSTransformationsPass.h" />
+    <ClInclude Include="src\Razor\Systems\RSDirectionalLightingPass.h" />
     <ClInclude Include="src\Razor\Systems\RSMaterialPass.h" />
     <ClInclude Include="src\Razor\Renderer\Shaders\DebugLightShader.h" />
     <ClInclude Include="src\Razor\Renderer\Shaders\DefaultMeshShader.h" />
@@ -586,6 +590,10 @@
     <ClInclude Include="vendor\stb_image\src\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Razor\Systems\RSRenderPass.cpp" />
+    <ClCompile Include="src\Razor\Systems\RSCameraPass.cpp" />
+    <ClCompile Include="src\Razor\Systems\RSTransformationsPass.cpp" />
+    <ClCompile Include="src\Razor\Systems\RSDirectionalLightingPass.cpp" />
     <ClCompile Include="src\Razor\Systems\RSMaterialPass.cpp" />
     <ClCompile Include="src\Razor\Renderer\Shaders\DebugLightShader.cpp" />
     <ClCompile Include="src\Razor\Renderer\Shaders\DefaultMeshShader.cpp" />

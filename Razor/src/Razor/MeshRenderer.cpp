@@ -56,7 +56,7 @@ namespace Razor
 
     void MeshRenderer::Run(float dt)
     {
-        CameraInfo CamInfo = Renderer->GetCameraInfo();
+       /* CameraInfo CamInfo = Renderer->GetCameraInfo();
         for (auto const& Entity : Entities)
         {
             Mesh EntityMesh = Coordinator->GetComponent<Mesh>(Entity);
@@ -70,6 +70,6 @@ namespace Razor
                 ShaderMap[EntityMat.ShaderID]->Setup(&CamInfo, EntityTransform.Get(), MeshMaterial, Lights);
                 Renderer->DrawMesh({Child});
             }   
-        }
+        }*/
     }
 }
