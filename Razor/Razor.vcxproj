@@ -143,14 +143,6 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\Razor\Systems\RSRenderPass.h" />
-    <ClInclude Include="src\Razor\Systems\RSCameraPass.h" />
-    <ClInclude Include="src\Razor\Systems\RSTransformationsPass.h" />
-    <ClInclude Include="src\Razor\Systems\RSDirectionalLightingPass.h" />
-    <ClInclude Include="src\Razor\Systems\RSMaterialPass.h" />
-    <ClInclude Include="src\Razor\Renderer\Shaders\DebugLightShader.h" />
-    <ClInclude Include="src\Razor\Renderer\Shaders\DefaultMeshShader.h" />
-    <ClInclude Include="src\Razor\Systems\LightRenderer.h" />
     <ClInclude Include="src\Razor.h" />
     <ClInclude Include="src\Razor\Application.h" />
     <ClInclude Include="src\Razor\Component.h" />
@@ -165,8 +157,16 @@
     <ClInclude Include="src\Razor\Renderer\IRenderer.h" />
     <ClInclude Include="src\Razor\Renderer\Model.h" />
     <ClInclude Include="src\Razor\Renderer\OpenGLRenderer.h" />
+    <ClInclude Include="src\Razor\Renderer\Shaders\DebugLightShader.h" />
+    <ClInclude Include="src\Razor\Renderer\Shaders\DefaultMeshShader.h" />
     <ClInclude Include="src\Razor\Renderer\Shaders\Shader.h" />
     <ClInclude Include="src\Razor\ShaderReader.h" />
+    <ClInclude Include="src\Razor\Systems\LightRenderer.h" />
+    <ClInclude Include="src\Razor\Systems\RSCameraPass.h" />
+    <ClInclude Include="src\Razor\Systems\RSDirectionalLightingPass.h" />
+    <ClInclude Include="src\Razor\Systems\RSMaterialPass.h" />
+    <ClInclude Include="src\Razor\Systems\RSRenderPass.h" />
+    <ClInclude Include="src\Razor\Systems\RSTransformationsPass.h" />
     <ClInclude Include="src\Razor\Systems\SpinSystem.h" />
     <ClInclude Include="src\Razor\Systems\System.h" />
     <ClInclude Include="src\Razor\TextureReader.h" />
@@ -590,14 +590,6 @@
     <ClInclude Include="vendor\stb_image\src\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Razor\Systems\RSRenderPass.cpp" />
-    <ClCompile Include="src\Razor\Systems\RSCameraPass.cpp" />
-    <ClCompile Include="src\Razor\Systems\RSTransformationsPass.cpp" />
-    <ClCompile Include="src\Razor\Systems\RSDirectionalLightingPass.cpp" />
-    <ClCompile Include="src\Razor\Systems\RSMaterialPass.cpp" />
-    <ClCompile Include="src\Razor\Renderer\Shaders\DebugLightShader.cpp" />
-    <ClCompile Include="src\Razor\Renderer\Shaders\DefaultMeshShader.cpp" />
-    <ClCompile Include="src\Razor\Systems\LightRenderer.cpp" />
     <ClCompile Include="src\Razor\Application.cpp" />
     <ClCompile Include="src\Razor\ComponentManager.cpp" />
     <ClCompile Include="src\Razor\Coordinator.cpp" />
@@ -607,8 +599,16 @@
     <ClCompile Include="src\Razor\MeshRenderer.cpp" />
     <ClCompile Include="src\Razor\Renderer\Model.cpp" />
     <ClCompile Include="src\Razor\Renderer\OpenGLRenderer.cpp" />
+    <ClCompile Include="src\Razor\Renderer\Shaders\DebugLightShader.cpp" />
+    <ClCompile Include="src\Razor\Renderer\Shaders\DefaultMeshShader.cpp" />
     <ClCompile Include="src\Razor\Renderer\Shaders\Shader.cpp" />
     <ClCompile Include="src\Razor\ShaderReader.cpp" />
+    <ClCompile Include="src\Razor\Systems\LightRenderer.cpp" />
+    <ClCompile Include="src\Razor\Systems\RSCameraPass.cpp" />
+    <ClCompile Include="src\Razor\Systems\RSDirectionalLightingPass.cpp" />
+    <ClCompile Include="src\Razor\Systems\RSMaterialPass.cpp" />
+    <ClCompile Include="src\Razor\Systems\RSRenderPass.cpp" />
+    <ClCompile Include="src\Razor\Systems\RSTransformationsPass.cpp" />
     <ClCompile Include="src\Razor\Systems\SpinSystem.cpp" />
     <ClCompile Include="src\Razor\Systems\System.cpp" />
     <ClCompile Include="src\Razor\TextureReader.cpp" />

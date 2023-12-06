@@ -4,3 +4,6 @@
 [submodule "Razor/vendor/assimp"]
 	path = Razor/vendor/assimp
 	url = https://github.com/AminAliari/assimp
+[submodule "Razor/vendor/ImGui"]
+	path = Razor/vendor/ImGui
+	url = https://github.com/TheCherno/imgui.git

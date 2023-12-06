@@ -13,6 +13,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 group "Dependencies"
 	include "Razor/vendor/GLFW"
 	include "Razor/vendor/assimp"
+	include "Razor/vendor/ImGui"
 
 project "Razor"
 	location "Razor"
