@@ -7,7 +7,8 @@ class Sandbox : public Razor::Application
 public:
 	Sandbox() 
 	{
-		Razor::Entity entity = Razor::Engine::CreateEntity();
+		Razor::Engine& GEngine = Razor::Engine::Get();
+		Razor::Entity entity = GEngine.CreateEntity();
 		Razor::Transform EntityTransform;
 		EntityTransform.Position = glm::vec3(0.0f, 0.0f, -20.0f);
 		EntityTransform.Rotate(glm::vec3(0.0f, 10.0f, 0.0f));
@@ -16,20 +17,20 @@ public:
 		Razor::Shader NewShader;
 
 		
-
+		
 		//// TODO include resources/model path in ProcessModel so we only supply name
-		Razor::ModelInfo WormModel = Razor::Engine::ProcessModel("resources/models/Articulated_Worm.obj");
+		Razor::ModelInfo WormModel = GEngine.ProcessModel("resources/models/Articulated_Worm.obj");
 		Razor::Mesh TestMesh = WormModel.ModelMesh;
 		Razor::Material WormMat = WormModel.ModelMaterial;
-		WormMat.ShaderID = Razor::Engine::GetShaderForType(typeid(Razor::DefaultMeshShader).name())->ID;
-		Razor::Engine::AddComponentToEntity<Razor::Mesh>(entity, TestMesh);
-		Razor::Engine::AddComponentToEntity<Razor::Transform>(entity, EntityTransform);
-		Razor::Engine::AddComponentToEntity<Razor::Material>(entity, WormMat);
+		WormMat.ShaderID = GEngine.GetShaderForType(typeid(Razor::DefaultMeshShader).name())->ID;
+		GEngine.AddComponentToEntity<Razor::Mesh>(entity, TestMesh);
+		GEngine.AddComponentToEntity<Razor::Transform>(entity, EntityTransform);
+		GEngine.AddComponentToEntity<Razor::Material>(entity, WormMat);
 		// LIGHT
-		Razor::ModelInfo LightModel = Razor::Engine::ProcessModel("resources/models/Cube.obj");
+		Razor::ModelInfo LightModel = GEngine.ProcessModel("resources/models/Cube.obj");
 		Razor::Mesh LightMesh = LightModel.ModelMesh;
 		Razor::Material LightMeshMaterial = LightModel.ModelMaterial;
-		LightMeshMaterial.ShaderID = Razor::Engine::GetShaderForType(typeid(Razor::DebugLightShader).name())->ID;
+		LightMeshMaterial.ShaderID = GEngine.GetShaderForType(typeid(Razor::DebugLightShader).name())->ID;
 		Razor::Transform LightTransform;
 		LightTransform.Position = glm::vec3(-15.2f, 1.0f, -1.0f);
 		LightTransform.Rotate(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -40,11 +41,11 @@ public:
 		LightComp.Ambient = glm::vec3(1.0f, 1.0f, 1.0f);
 		LightComp.Specular = glm::vec3(1.0f, 1.0f, 1.0f);
 		LightComp.Direction = glm::vec3(-1.0f, 0.0f, 0.0f);
-		Razor::Entity LightEntity = Razor::Engine::CreateEntity();
-		Razor::Engine::AddComponentToEntity<Razor::Mesh>(LightEntity, LightMesh);
-		Razor::Engine::AddComponentToEntity<Razor::Material>(LightEntity, LightMeshMaterial);
-		Razor::Engine::AddComponentToEntity<Razor::Transform>(LightEntity, LightTransform);
-		Razor::Engine::AddComponentToEntity<Razor::DirectionalLight>(LightEntity, LightComp);
+		Razor::Entity LightEntity = GEngine.CreateEntity();
+		GEngine.AddComponentToEntity<Razor::Mesh>(LightEntity, LightMesh);
+		GEngine.AddComponentToEntity<Razor::Material>(LightEntity, LightMeshMaterial);
+		GEngine.AddComponentToEntity<Razor::Transform>(LightEntity, LightTransform);
+		GEngine.AddComponentToEntity<Razor::DirectionalLight>(LightEntity, LightComp);
 	}
 	~Sandbox() {}
 	void Run() override;
@@ -57,5 +58,5 @@ Razor::Application* Razor::CreateApplication()
 
 void Sandbox::Run()
 {
-	Razor::Engine::Run();
+	Razor::Engine::Get().Run();
 }

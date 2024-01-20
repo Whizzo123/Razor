@@ -43,14 +43,16 @@ project "Razor"
 		"%{prj.name}/vendor/assimp/include",
 		"%{prj.name}/vendor/Glad/include",
 		"%{prj.name}/vendor/stb_image/include",
-		"%{prj.name}/vendor/glm"
+		"%{prj.name}/vendor/glm",
+		"%{prj.name}/vendor/ImGui"
 	}
 
 	links
 	{
 		"GLFW",
 		"opengl32.lib",
-		"assimp"
+		"assimp",
+		"ImGui"
 	}
 
 	rtti("On")

@@ -11,13 +11,13 @@
 #include "Systems/RSDirectionalLightingPass.h"
 #include "Systems/RSCameraPass.h"
 #include "Systems/RSRenderPass.h"
+#include <imgui.h>
+#include "../Platform/OpenGL/imgui_impl_opengl3.h"
 
 namespace Razor
 {
 
 	Engine* Engine::GEngine = nullptr;
-	std::shared_ptr<Coordinator> Engine::Coordinator = nullptr;
-	std::shared_ptr<IRenderer> Engine::Renderer = nullptr;
 
 	float MouseLastX = 400;
 	float MouseLastY = 300;
@@ -57,42 +57,49 @@ namespace Razor
 
 	void Engine::Init()
 	{
-		GEngine = new Engine();
 		glfwInit();
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-		GEngine->window = std::make_unique<Window>(800, 600);
+		window = std::make_unique<Window>(800, 600);
 		glEnable(GL_DEPTH_TEST);
 		Coordinator = Coordinator::GetInstance();
-		GEngine->Renderer = std::make_shared<OpenGLRenderer>();
+		Renderer = std::make_shared<OpenGLRenderer>();
 		//glfwSetInputMode(GEngine->window->GetWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-		glfwSetCursorPosCallback(GEngine->window->GetWindowPtr(), Mouse_Callback);
+		glfwSetCursorPosCallback(window->GetWindowPtr(), Mouse_Callback);
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& IO = ImGui::GetIO();
+		IO.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+		IO.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
+		IO.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
+		ImGui_ImplOpenGL3_Init();
+		// imgui_impl_glfw for io.keymap :) -> switch to own
 
 		//CREATE SHADERS
 		std::shared_ptr<Shader> D_MeshShader = std::make_shared<DefaultMeshShader>();
-		GEngine->ShaderIDMap[D_MeshShader->ID] = D_MeshShader;
-		GEngine->ShaderTypeMap[typeid(DefaultMeshShader).name()] = D_MeshShader;
+		ShaderIDMap[D_MeshShader->ID] = D_MeshShader;
+		ShaderTypeMap[typeid(DefaultMeshShader).name()] = D_MeshShader;
 		std::shared_ptr<Shader> D_DebugShader = std::make_shared<DebugLightShader>();
-		GEngine->ShaderIDMap[D_DebugShader->ID] = D_DebugShader;
-		GEngine->ShaderTypeMap[typeid(DebugLightShader).name()] = D_DebugShader;
+		ShaderIDMap[D_DebugShader->ID] = D_DebugShader;
+		ShaderTypeMap[typeid(DebugLightShader).name()] = D_DebugShader;
 
 		//Seperate this into a camera component and camera system
-		GEngine->Renderer->RendererCamera.CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-		GEngine->Renderer->RendererCamera.CameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-		GEngine->Renderer->RendererCamera.CameraDirection = glm::normalize(GEngine->Renderer->RendererCamera.CameraPos - GEngine->Renderer->RendererCamera.CameraTarget);
+		Renderer->RendererCamera.CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+		Renderer->RendererCamera.CameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+		Renderer->RendererCamera.CameraDirection = glm::normalize(Renderer->RendererCamera.CameraPos - Renderer->RendererCamera.CameraTarget);
 
-		GEngine->Renderer->RendererCamera.Up = glm::vec3(0.0f, 1.0f, 0.0f);
-		GEngine->Renderer->RendererCamera.CameraRight = glm::normalize(glm::cross(GEngine->Renderer->RendererCamera.Up, GEngine->Renderer->RendererCamera.CameraDirection));
-		GEngine->Renderer->RendererCamera.CameraUp = glm::cross(GEngine->Renderer->RendererCamera.CameraDirection, GEngine->Renderer->RendererCamera.CameraRight);
-		GEngine->Renderer->RendererCamera.CameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+		Renderer->RendererCamera.Up = glm::vec3(0.0f, 1.0f, 0.0f);
+		Renderer->RendererCamera.CameraRight = glm::normalize(glm::cross(Renderer->RendererCamera.Up, Renderer->RendererCamera.CameraDirection));
+		Renderer->RendererCamera.CameraUp = glm::cross(Renderer->RendererCamera.CameraDirection, Renderer->RendererCamera.CameraRight);
+		Renderer->RendererCamera.CameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 
 		// Seperate into some sort of all component/system registration
 		Coordinator->RegisterComponent<Mesh>();
 		Coordinator->RegisterComponent<Material>();
 		Coordinator->RegisterComponent<Transform>();
-		GEngine->SceneLights = std::make_shared<std::vector<Light*>>();
-		Coordinator->RegisterSystem<MeshRenderer>(MeshRenderer(GEngine->Renderer, GEngine->ShaderIDMap, GEngine->SceneLights));
+		SceneLights = std::make_shared<std::vector<Light*>>();
+		Coordinator->RegisterSystem<MeshRenderer>(MeshRenderer(Renderer, ShaderIDMap, SceneLights));
 		Signature sig;
 		sig.set(Coordinator->GetComponentType<Mesh>());
 		sig.set(Coordinator->GetComponentType<Material>());
@@ -101,7 +108,7 @@ namespace Razor
 		//Light
 		Coordinator->RegisterComponent<Light>();
 		Coordinator->RegisterComponent<DirectionalLight>();
-		Coordinator->RegisterSystem<LightRenderer>(LightRenderer(GEngine->Renderer, GEngine->SceneLights));
+		Coordinator->RegisterSystem<LightRenderer>(LightRenderer(Renderer, SceneLights));
 		Signature LightSig;
 		//LightSig.set(Coordinator->GetComponentType<Light>());
 		LightSig.set(Coordinator->GetComponentType<DirectionalLight>());
@@ -120,8 +127,8 @@ namespace Razor
 		RSDirectionalLightingPassSig.set(Coordinator->GetComponentType<DirectionalLight>());
 		Coordinator->SetSystemSignature<RSDirectionalLightingPass>(RSDirectionalLightingPassSig);
 		// TODO refactor camera to have component on entity so this system can function as intended
-		Coordinator->RegisterSystem<RSCameraPass>(RSCameraPass(GEngine->Renderer));
-		Coordinator->RegisterSystem<RSRenderPass>(RSRenderPass(GEngine->Renderer, GEngine->ShaderIDMap));
+		Coordinator->RegisterSystem<RSCameraPass>(RSCameraPass(Renderer));
+		Coordinator->RegisterSystem<RSRenderPass>(RSRenderPass(Renderer, ShaderIDMap));
 		Signature RSRenderPassSig;
 		RSRenderPassSig.set(Coordinator->GetComponentType<Mesh>());
 		RSRenderPassSig.set(Coordinator->GetComponentType<Material>());
@@ -162,43 +169,63 @@ namespace Razor
 
 	Entity Engine::CreateEntity()
 	{
-		return GEngine->Coordinator->CreateEntity();
+		return Coordinator->CreateEntity();
 	}
 
 
 	void Engine::Run()
 	{
 		Coordinator->InitSystems();
-		while (!glfwWindowShouldClose(GEngine->window->GetWindowPtr()))
+		while (!glfwWindowShouldClose(window->GetWindowPtr()))
 		{
-			GEngine->Renderer->RendererCamera.CameraFront = CameraDirection;
+			Renderer->RendererCamera.CameraFront = CameraDirection;
 			float CurrentFrame = glfwGetTime();
-			GEngine->DeltaTime = CurrentFrame - GEngine->LastFrame;
-			GEngine->LastFrame = CurrentFrame;
+			DeltaTime = CurrentFrame - LastFrame;
+			LastFrame = CurrentFrame;
 
-			GEngine->ProcessInput(GEngine->window->GetWindowPtr());
+			ProcessInput(window->GetWindowPtr());
 
 			glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			Coordinator->RunSystems(GEngine->DeltaTime);
+			Coordinator->RunSystems(DeltaTime);
 			Coordinator->RunRenderSystems();
+			// Will need an update tick for ImGui to handle mouse and keyboard
+			ImGui_ImplOpenGL3_NewFrame();
+			
+			ImGuiIO& io = ImGui::GetIO();
+			io.DisplaySize = ImVec2(window->GetWidth(), window->GetHeight());
+			ImGui::NewFrame();
+			float time = (float)glfwGetTime();
+			io.DeltaTime = m_Time > 0.0 ? (time - m_Time) : 1.0f / 60.0f;
+			m_Time = time;
 
-			glfwSwapBuffers(GEngine->window->GetWindowPtr());
+			CreateImGuiWindow(); 
+			ImGui::Render();
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+			glfwSwapBuffers(window->GetWindowPtr());
 			glfwPollEvents();
 		}
-		delete GEngine;
 		glfwTerminate();
 	}
 
 	// This is fine to have no checks as it would return 0 anyway if there was no shader for that ID meaning we always get a shader
 	std::shared_ptr<Shader> Engine::GetShaderForID(uint8_t ID)
 	{
-		return GEngine->ShaderIDMap[ID];
+		return ShaderIDMap[ID];
 	}
 
 	std::shared_ptr<Shader> Engine::GetShaderForType(const char* Type)
 	{
-		return GEngine->ShaderTypeMap[Type];
+		return ShaderTypeMap[Type];
+	}
+
+	void Engine::CreateImGuiWindow()
+	{
+		bool bIsOpen;
+		ImGui::Begin("Inspector", &bIsOpen, ImGuiWindowFlags_MenuBar);
+		ImGui::Text("Hello Inspector, %d", 123);
+		ImGui::End();
 	}
 }
