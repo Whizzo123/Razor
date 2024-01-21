@@ -143,6 +143,9 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Razor\IO\RazorIO.h" />
+    <ClInclude Include="src\Razor\Utils\Delegates.h" />
+    <ClInclude Include="src\Razor\ImGui\RazorImGui.h" />
     <ClInclude Include="src\Platform\OpenGL\imgui_impl_opengl3.h" />
     <ClInclude Include="src\Platform\OpenGL\imgui_impl_opengl3_loader.h" />
     <ClInclude Include="src\Razor.h" />
@@ -593,6 +596,9 @@
     <ClInclude Include="vendor\stb_image\src\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Razor\IO\RazorIO.cpp" />
+    <ClCompile Include="src\Razor\Utils\Delegates.cpp" />
+    <ClCompile Include="src\Razor\ImGui\RazorImGui.cpp" />
     <ClCompile Include="src\Platform\OpenGL\imgui_impl_opengl3.cpp" />
     <ClCompile Include="src\Razor\Application.cpp" />
     <ClCompile Include="src\Razor\ComponentManager.cpp" />

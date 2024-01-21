@@ -11,8 +11,6 @@
 #include "Systems/RSDirectionalLightingPass.h"
 #include "Systems/RSCameraPass.h"
 #include "Systems/RSRenderPass.h"
-#include <imgui.h>
-#include "../Platform/OpenGL/imgui_impl_opengl3.h"
 
 namespace Razor
 {
@@ -67,14 +65,8 @@ namespace Razor
 		Renderer = std::make_shared<OpenGLRenderer>();
 		//glfwSetInputMode(GEngine->window->GetWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		glfwSetCursorPosCallback(window->GetWindowPtr(), Mouse_Callback);
-		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
-		ImGuiIO& IO = ImGui::GetIO();
-		IO.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-		IO.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
-		IO.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
-		ImGui_ImplOpenGL3_Init();
-		// imgui_impl_glfw for io.keymap :) -> switch to own
+		RazorGUI = std::make_unique<RazorImGui>();
+		RazorGUI->Setup();
 
 		//CREATE SHADERS
 		std::shared_ptr<Shader> D_MeshShader = std::make_shared<DefaultMeshShader>();
@@ -190,19 +182,9 @@ namespace Razor
 
 			Coordinator->RunSystems(DeltaTime);
 			Coordinator->RunRenderSystems();
-			// Will need an update tick for ImGui to handle mouse and keyboard
-			ImGui_ImplOpenGL3_NewFrame();
 			
-			ImGuiIO& io = ImGui::GetIO();
-			io.DisplaySize = ImVec2(window->GetWidth(), window->GetHeight());
-			ImGui::NewFrame();
-			float time = (float)glfwGetTime();
-			io.DeltaTime = m_Time > 0.0 ? (time - m_Time) : 1.0f / 60.0f;
-			m_Time = time;
-
-			CreateImGuiWindow(); 
-			ImGui::Render();
-			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+			// Have a think around how we are gonna pass the ownership here from engine to RazorGUI of the window temporarly ;) have fun with that
+			// RazorGUI->Render(window);
 
 			glfwSwapBuffers(window->GetWindowPtr());
 			glfwPollEvents();
@@ -219,13 +201,5 @@ namespace Razor
 	std::shared_ptr<Shader> Engine::GetShaderForType(const char* Type)
 	{
 		return ShaderTypeMap[Type];
-	}
-
-	void Engine::CreateImGuiWindow()
-	{
-		bool bIsOpen;
-		ImGui::Begin("Inspector", &bIsOpen, ImGuiWindowFlags_MenuBar);
-		ImGui::Text("Hello Inspector, %d", 123);
-		ImGui::End();
 	}
 }

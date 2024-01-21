@@ -13,8 +13,8 @@ public:
     ~Window();
     GLFWwindow* GetWindowPtr() const;
 
-    int GetWidth() { return Width; }
-    int GetHeight() { return Height; }
+    int GetWidth() const{ return Width; }
+    int GetHeight() const{ return Height; }
 
 protected:
     GLFWwindow* window;
