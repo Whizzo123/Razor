@@ -8,6 +8,7 @@
 #include "Renderer/Model.h"
 #include "Renderer/Shaders/Shader.h"
 #include "ImGui/RazorImGui.h"
+#include "../Platform/Generic/IPlatformIO.h"
 // TODO note to self remove all of this static ness in favour of better ideally unique_ptr system pls :) 
 namespace Razor
 {
@@ -75,6 +76,6 @@ namespace Razor
 		float DeltaTime = 0.0f;
 		float LastFrame = 0.0f;
 		static Engine* GEngine;
-		
+		std::unique_ptr<IPlatformIO> PlatformIO;
 	};
 }

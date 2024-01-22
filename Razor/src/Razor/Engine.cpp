@@ -11,6 +11,7 @@
 #include "Systems/RSDirectionalLightingPass.h"
 #include "Systems/RSCameraPass.h"
 #include "Systems/RSRenderPass.h"
+#include "../Platform/OpenGL/OpenGLIO.h"
 
 namespace Razor
 {
@@ -67,7 +68,9 @@ namespace Razor
 		glfwSetCursorPosCallback(window->GetWindowPtr(), Mouse_Callback);
 		RazorGUI = std::make_unique<RazorImGui>();
 		RazorGUI->Setup();
-
+		RazorGUI->RegisterImGuiEvents();
+		PlatformIO = std::make_unique<OpenGLIO>(window->GetWindowPtr());
+		PlatformIO->RegisterInputCallbacks();
 		//CREATE SHADERS
 		std::shared_ptr<Shader> D_MeshShader = std::make_shared<DefaultMeshShader>();
 		ShaderIDMap[D_MeshShader->ID] = D_MeshShader;
@@ -157,6 +160,7 @@ namespace Razor
 		{
 			Renderer->RendererCamera.CameraPos += glm::normalize(glm::cross(Renderer->RendererCamera.CameraFront, Renderer->RendererCamera.CameraUp)) * CameraSpeed;
 		}
+		
 	}
 
 	Entity Engine::CreateEntity()
@@ -183,8 +187,7 @@ namespace Razor
 			Coordinator->RunSystems(DeltaTime);
 			Coordinator->RunRenderSystems();
 			
-			// Have a think around how we are gonna pass the ownership here from engine to RazorGUI of the window temporarly ;) have fun with that
-			// RazorGUI->Render(window);
+			RazorGUI->Render(*std::move(window));
 
 			glfwSwapBuffers(window->GetWindowPtr());
 			glfwPollEvents();

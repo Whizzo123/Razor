@@ -50,6 +50,7 @@ namespace Razor
 	{
 		RazorIO& EngineIO = RazorIO::Get();
 		EngineIO.OnMouseButtonPressed().BindRaw(this, &RazorImGui::OnMouseButtonPressedEvent);
+		EngineIO.OnMouseButtonReleased().BindRaw(this, &RazorImGui::OnMouseButtonReleasedEvent);
 	}
 
 	bool RazorImGui::OnMouseButtonPressedEvent(int MouseButton)
@@ -58,6 +59,12 @@ namespace Razor
 		// Pass in index of mouse button
 		IO.MouseDown[MouseButton] = true;
 
+		return false;
+	}
+	bool RazorImGui::OnMouseButtonReleasedEvent(int MouseButton)
+	{
+		ImGuiIO& IO = ImGui::GetIO();
+		IO.MouseDown[MouseButton] = false;
 		return false;
 	}
 }

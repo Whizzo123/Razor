@@ -16,7 +16,7 @@ namespace Razor
 		// Function to hook our on such and such events to GLFW key events
 		void RegisterImGuiEvents();
 		bool OnMouseButtonPressedEvent(int MouseButton);
-		bool OnMouseButtonReleasedEvent();
+		bool OnMouseButtonReleasedEvent(int MouseButton);
 		bool OnMouseMovedEvent();
 		bool OnMouseScrolledEvent();
 

@@ -1392,6 +1392,8 @@
     <ClInclude Include="src\Razor\ImGui\RazorImGui.h" />
     <ClInclude Include="src\Razor\Utils\Delegates.h" />
     <ClInclude Include="src\Razor\IO\RazorIO.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLIO.h" />
+    <ClInclude Include="src\Platform\Generic\IPlatformIO.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Razor\Application.cpp">
@@ -1471,5 +1473,6 @@
     <ClCompile Include="src\Razor\ImGui\RazorImGui.cpp" />
     <ClCompile Include="src\Razor\Utils\Delegates.cpp" />
     <ClCompile Include="src\Razor\IO\RazorIO.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLIO.cpp" />
   </ItemGroup>
 </Project>

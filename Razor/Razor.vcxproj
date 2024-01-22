@@ -143,6 +143,8 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Platform\Generic\IPlatformIO.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLIO.h" />
     <ClInclude Include="src\Razor\IO\RazorIO.h" />
     <ClInclude Include="src\Razor\Utils\Delegates.h" />
     <ClInclude Include="src\Razor\ImGui\RazorImGui.h" />
@@ -596,6 +598,7 @@
     <ClInclude Include="vendor\stb_image\src\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLIO.cpp" />
     <ClCompile Include="src\Razor\IO\RazorIO.cpp" />
     <ClCompile Include="src\Razor\Utils\Delegates.cpp" />
     <ClCompile Include="src\Razor\ImGui\RazorImGui.cpp" />
