@@ -67,7 +67,7 @@ namespace Razor
 		//glfwSetInputMode(GEngine->window->GetWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		glfwSetCursorPosCallback(window->GetWindowPtr(), Mouse_Callback);
 		RazorGUI = std::make_unique<RazorImGui>();
-		RazorGUI->Setup();
+		RazorGUI->Setup(window->GetWindowPtr());
 		RazorGUI->RegisterImGuiEvents();
 		PlatformIO = std::make_unique<OpenGLIO>(window->GetWindowPtr());
 		PlatformIO->RegisterInputCallbacks();
@@ -187,10 +187,9 @@ namespace Razor
 			Coordinator->RunSystems(DeltaTime);
 			Coordinator->RunRenderSystems();
 			
+			glfwPollEvents(); 
 			RazorGUI->Render(*std::move(window));
-
 			glfwSwapBuffers(window->GetWindowPtr());
-			glfwPollEvents();
 		}
 		glfwTerminate();
 	}

@@ -9,7 +9,7 @@ namespace Razor
 	public:
 		RazorImGui() {}
 		~RazorImGui() {}
-		void Setup();
+		void Setup(GLFWwindow* window);
 		void Render(const Window& RenderWindow);
 		void CreateImGuiWindow();
 	public:
