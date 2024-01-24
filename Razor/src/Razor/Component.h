@@ -138,5 +138,10 @@ namespace Razor
 		uint8_t ShaderID;
 	};
 
+	struct Collider
+	{
+		float Radius;
+	};
+
 	
 }

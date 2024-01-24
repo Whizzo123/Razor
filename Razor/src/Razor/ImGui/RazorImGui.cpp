@@ -44,6 +44,7 @@ namespace Razor
 	{
 		bool bIsOpen;
 		ImGui::Begin("Inspector", &bIsOpen, ImGuiWindowFlags_MenuBar);
+		ImGui::SetWindowSize(ImVec2(100.0f, 200.0f));
 		ImGui::Text("Hello Inspector, %d", 123);
 		ImGui::Button("Button", ImVec2(50.f, 25.f));
 		ImGui::End();

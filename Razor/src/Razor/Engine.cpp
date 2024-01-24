@@ -12,6 +12,7 @@
 #include "Systems/RSCameraPass.h"
 #include "Systems/RSRenderPass.h"
 #include "../Platform/OpenGL/OpenGLIO.h"
+#include "Systems/CollisionSystem.h"
 
 namespace Razor
 {
@@ -93,21 +94,29 @@ namespace Razor
 		Coordinator->RegisterComponent<Mesh>();
 		Coordinator->RegisterComponent<Material>();
 		Coordinator->RegisterComponent<Transform>();
+		Coordinator->RegisterComponent<Collider>();
+		Coordinator->RegisterComponent<Light>();
+		Coordinator->RegisterComponent<DirectionalLight>();
+
 		SceneLights = std::make_shared<std::vector<Light*>>();
 		Coordinator->RegisterSystem<MeshRenderer>(MeshRenderer(Renderer, ShaderIDMap, SceneLights));
+		Coordinator->RegisterSystem<LightRenderer>(LightRenderer(Renderer, SceneLights));
+		Coordinator->RegisterSystem<CollisionSystem>(CollisionSystem());
+
 		Signature sig;
 		sig.set(Coordinator->GetComponentType<Mesh>());
 		sig.set(Coordinator->GetComponentType<Material>());
 		sig.set(Coordinator->GetComponentType<Transform>());
-		Coordinator->SetSystemSignature<MeshRenderer>(sig);
-		//Light
-		Coordinator->RegisterComponent<Light>();
-		Coordinator->RegisterComponent<DirectionalLight>();
-		Coordinator->RegisterSystem<LightRenderer>(LightRenderer(Renderer, SceneLights));
 		Signature LightSig;
-		//LightSig.set(Coordinator->GetComponentType<Light>());
 		LightSig.set(Coordinator->GetComponentType<DirectionalLight>());
+		Signature ColliderSig;
+		ColliderSig.set(Coordinator->GetComponentType<Transform>());
+		ColliderSig.set(Coordinator->GetComponentType<Collider>());
+		
 		Coordinator->SetSystemSignature<LightRenderer>(LightSig);
+		Coordinator->SetSystemSignature<CollisionSystem>(ColliderSig);
+		Coordinator->SetSystemSignature<MeshRenderer>(sig);
+
 		//Render Systems
 		Coordinator->RegisterSystem<RSMaterialPass>(RSMaterialPass());
 		Signature RSMaterialPassSig;

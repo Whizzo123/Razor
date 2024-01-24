@@ -22,10 +22,13 @@ public:
 		Razor::ModelInfo WormModel = GEngine.ProcessModel("resources/models/Articulated_Worm.obj");
 		Razor::Mesh TestMesh = WormModel.ModelMesh;
 		Razor::Material WormMat = WormModel.ModelMaterial;
+		Razor::Collider WormCollider;
+		WormCollider.Radius = 10.0f;
 		WormMat.ShaderID = GEngine.GetShaderForType(typeid(Razor::DefaultMeshShader).name())->ID;
 		GEngine.AddComponentToEntity<Razor::Mesh>(entity, TestMesh);
 		GEngine.AddComponentToEntity<Razor::Transform>(entity, EntityTransform);
 		GEngine.AddComponentToEntity<Razor::Material>(entity, WormMat);
+		GEngine.AddComponentToEntity<Razor::Collider>(entity, WormCollider);
 		// LIGHT
 		Razor::ModelInfo LightModel = GEngine.ProcessModel("resources/models/Cube.obj");
 		Razor::Mesh LightMesh = LightModel.ModelMesh;
