@@ -49,6 +49,9 @@ public:
 		GEngine.AddComponentToEntity<Razor::Material>(LightEntity, LightMeshMaterial);
 		GEngine.AddComponentToEntity<Razor::Transform>(LightEntity, LightTransform);
 		GEngine.AddComponentToEntity<Razor::DirectionalLight>(LightEntity, LightComp);
+		Razor::Entity Camera = GEngine.CreateEntity();
+		Razor::Camera GameCamera;
+		GEngine.AddComponentToEntity<Razor::Camera>(Camera, GameCamera);
 	}
 	~Sandbox() {}
 	void Run() override;

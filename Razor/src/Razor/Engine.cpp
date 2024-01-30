@@ -13,47 +13,15 @@
 #include "Systems/RSRenderPass.h"
 #include "../Platform/OpenGL/OpenGLIO.h"
 #include "Systems/CollisionSystem.h"
+#include "Systems/CameraController.h"
 
 namespace Razor
 {
 
 	Engine* Engine::GEngine = nullptr;
 
-	float MouseLastX = 400;
-	float MouseLastY = 300;
-	float Yaw = -90.0f;
-	float Pitch = 0.0f;
-	bool bIsFirstMouse;
+	
 	glm::vec3 CameraDirection;
-
-	void Mouse_Callback(GLFWwindow* window, double Xpos, double Ypos)
-	{
-		if (bIsFirstMouse)
-		{
-			MouseLastX = Xpos;
-			MouseLastY = Ypos;
-			bIsFirstMouse = false;
-		}
-
-		float Xoffset = Xpos - MouseLastX;
-		float Yoffset = Ypos - MouseLastY;
-		MouseLastX = Xpos;
-		MouseLastY = Ypos;
-
-		const float MouseSensitivity = 0.1f;
-		Xoffset *= MouseSensitivity;
-		Yoffset *= MouseSensitivity;
-
-		Yaw += Xoffset;
-		Pitch += Yoffset;
-
-		Pitch = Pitch > 89.0f ? 89.0f : ((Pitch < -89.0f) ? -89.0f : Pitch);
-
-		CameraDirection.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-		CameraDirection.y = sin(glm::radians(Pitch));
-		CameraDirection.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-
-	}
 
 	void Engine::Init()
 	{
@@ -66,7 +34,6 @@ namespace Razor
 		Coordinator = Coordinator::GetInstance();
 		Renderer = std::make_shared<OpenGLRenderer>();
 		//glfwSetInputMode(GEngine->window->GetWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-		glfwSetCursorPosCallback(window->GetWindowPtr(), Mouse_Callback);
 		RazorGUI = std::make_unique<RazorImGui>();
 		RazorGUI->Setup(window->GetWindowPtr());
 		RazorGUI->RegisterImGuiEvents();
@@ -80,16 +47,6 @@ namespace Razor
 		ShaderIDMap[D_DebugShader->ID] = D_DebugShader;
 		ShaderTypeMap[typeid(DebugLightShader).name()] = D_DebugShader;
 
-		//Seperate this into a camera component and camera system
-		Renderer->RendererCamera.CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-		Renderer->RendererCamera.CameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-		Renderer->RendererCamera.CameraDirection = glm::normalize(Renderer->RendererCamera.CameraPos - Renderer->RendererCamera.CameraTarget);
-
-		Renderer->RendererCamera.Up = glm::vec3(0.0f, 1.0f, 0.0f);
-		Renderer->RendererCamera.CameraRight = glm::normalize(glm::cross(Renderer->RendererCamera.Up, Renderer->RendererCamera.CameraDirection));
-		Renderer->RendererCamera.CameraUp = glm::cross(Renderer->RendererCamera.CameraDirection, Renderer->RendererCamera.CameraRight);
-		Renderer->RendererCamera.CameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-
 		// Seperate into some sort of all component/system registration
 		Coordinator->RegisterComponent<Mesh>();
 		Coordinator->RegisterComponent<Material>();
@@ -97,11 +54,13 @@ namespace Razor
 		Coordinator->RegisterComponent<Collider>();
 		Coordinator->RegisterComponent<Light>();
 		Coordinator->RegisterComponent<DirectionalLight>();
+		Coordinator->RegisterComponent<Camera>();
 
 		SceneLights = std::make_shared<std::vector<Light*>>();
 		Coordinator->RegisterSystem<MeshRenderer>(MeshRenderer(Renderer, ShaderIDMap, SceneLights));
 		Coordinator->RegisterSystem<LightRenderer>(LightRenderer(Renderer, SceneLights));
 		Coordinator->RegisterSystem<CollisionSystem>(CollisionSystem());
+		Coordinator->RegisterSystem<CameraController>(CameraController());
 
 		Signature sig;
 		sig.set(Coordinator->GetComponentType<Mesh>());
@@ -112,10 +71,13 @@ namespace Razor
 		Signature ColliderSig;
 		ColliderSig.set(Coordinator->GetComponentType<Transform>());
 		ColliderSig.set(Coordinator->GetComponentType<Collider>());
+		Signature CameraControllerSig;
+		CameraControllerSig.set(Coordinator->GetComponentType<Camera>());
 		
 		Coordinator->SetSystemSignature<LightRenderer>(LightSig);
 		Coordinator->SetSystemSignature<CollisionSystem>(ColliderSig);
 		Coordinator->SetSystemSignature<MeshRenderer>(sig);
+		Coordinator->SetSystemSignature<CameraController>(CameraControllerSig);
 
 		//Render Systems
 		Coordinator->RegisterSystem<RSMaterialPass>(RSMaterialPass());
@@ -130,8 +92,10 @@ namespace Razor
 		Signature RSDirectionalLightingPassSig;
 		RSDirectionalLightingPassSig.set(Coordinator->GetComponentType<DirectionalLight>());
 		Coordinator->SetSystemSignature<RSDirectionalLightingPass>(RSDirectionalLightingPassSig);
-		// TODO refactor camera to have component on entity so this system can function as intended
 		Coordinator->RegisterSystem<RSCameraPass>(RSCameraPass(Renderer));
+		Signature RSCameraPassSig;
+		RSCameraPassSig.set(Coordinator->GetComponentType<Camera>());
+		Coordinator->SetSystemSignature<RSCameraPass>(RSCameraPassSig);
 		Coordinator->RegisterSystem<RSRenderPass>(RSRenderPass(Renderer, ShaderIDMap));
 		Signature RSRenderPassSig;
 		RSRenderPassSig.set(Coordinator->GetComponentType<Mesh>());
@@ -148,57 +112,47 @@ namespace Razor
 
 	void Engine::ProcessInput(GLFWwindow* window)
 	{
-		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		if (RazorIO::Get().GetStateForKey(RazorKey::Escape) == KEY_PRESSED)
 		{
 			glfwSetWindowShouldClose(window, true);
 		}
-		const float CameraSpeed = 5.0f * DeltaTime; // adjust accordingly
-		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		{
-			Renderer->RendererCamera.CameraPos += CameraSpeed * Renderer->RendererCamera.CameraFront;
-		}
-		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		{
-			Renderer->RendererCamera.CameraPos -= CameraSpeed * Renderer->RendererCamera.CameraFront;
-		}
-		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		{
-			Renderer->RendererCamera.CameraPos -= glm::normalize(glm::cross(Renderer->RendererCamera.CameraFront, Renderer->RendererCamera.CameraUp)) * CameraSpeed;
-		}
-		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		{
-			Renderer->RendererCamera.CameraPos += glm::normalize(glm::cross(Renderer->RendererCamera.CameraFront, Renderer->RendererCamera.CameraUp)) * CameraSpeed;
-		}
-		
 	}
 
 	Entity Engine::CreateEntity()
 	{
 		return Coordinator->CreateEntity();
 	}
-
+	// Also just leaving this here we are doing the two render function for detecting what's selected so each entity rendered in framebuffer will have different colour
+	// And we will sample from that called GPU picking
 
 	void Engine::Run()
 	{
+		std::vector<RenderStage> Stages = { RenderStage::RENDER_STAGE_MATERIAL_PASS, RenderStage::RENDER_STAGE_LIGHTING_PASS,
+				RenderStage::RENDER_STAGE_TRANSFORMATION_PASS, RenderStage::RENDER_STAGE_CAMERA_PASS, RenderStage::RENDER_STAGE_RENDER };
+		RenderPipelineConfig PipelineConfig;
+		PipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_MATERIAL_PASS, std::vector<const char*> { typeid(RSMaterialPass).name() } });
+		PipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_LIGHTING_PASS, std::vector<const char*> { typeid(RSDirectionalLightingPass).name() } });
+		PipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_TRANSFORMATION_PASS, std::vector<const char*> { typeid(RSTransformationsPass).name() } });
+		PipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_CAMERA_PASS, std::vector<const char*> { typeid(RSCameraPass).name() } });
+		PipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_RENDER, std::vector<const char*> { typeid(RSRenderPass).name() } });
 		Coordinator->InitSystems();
 		while (!glfwWindowShouldClose(window->GetWindowPtr()))
 		{
-			Renderer->RendererCamera.CameraFront = CameraDirection;
 			float CurrentFrame = glfwGetTime();
 			DeltaTime = CurrentFrame - LastFrame;
 			LastFrame = CurrentFrame;
 
 			ProcessInput(window->GetWindowPtr());
 
-			glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			Renderer->ClearBuffer();
 
 			Coordinator->RunSystems(DeltaTime);
-			Coordinator->RunRenderSystems();
+			
+			Coordinator->RunRenderSystems(PipelineConfig);
 			
 			glfwPollEvents(); 
 			RazorGUI->Render(*std::move(window));
-			glfwSwapBuffers(window->GetWindowPtr());
+			Renderer->SwapBuffer(*window);
 		}
 		glfwTerminate();
 	}

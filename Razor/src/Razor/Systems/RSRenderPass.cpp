@@ -27,11 +27,11 @@ namespace Razor
 				}
 				for (const BProperty& BoolProperty : Slot.GetBoolProperties())
 				{
-					MeshShader->SetFloat(BoolProperty.Name, BoolProperty.Value);
+					MeshShader->SetBool(BoolProperty.Name, BoolProperty.Value);
 				}
 				for (const IProperty& IntProperty : Slot.GetIntProperties())
 				{
-					MeshShader->SetFloat(IntProperty.Name, IntProperty.Value);
+					MeshShader->SetInt(IntProperty.Name, IntProperty.Value);
 				}
 				Renderer->DrawMesh({ Child });
 			}

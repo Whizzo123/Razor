@@ -48,18 +48,15 @@ namespace Razor
 		}
 	}
 
-	void SystemManager::RunRenderSystems()
+	void SystemManager::RunRenderSystems(RenderPipelineConfig PipelineConfig)
 	{
-		//RENDER_STAGE_MATERIALS
-		RenderPipeline.RunSystemsFor(RenderStage::RENDER_STAGE_MATERIAL_PASS);
-		//RENDER_STAGE_LIGHTING
-		RenderPipeline.RunSystemsFor(RenderStage::RENDER_STAGE_LIGHTING_PASS);
-		//RENDER_STAGE_TRANSFORMATIONS
-		RenderPipeline.RunSystemsFor(RenderStage::RENDER_STAGE_TRANSFORMATION_PASS);
-		//RENDER_STAGE_CAMERA
-		RenderPipeline.RunSystemsFor(RenderStage::RENDER_STAGE_CAMERA_PASS);
-		// Final render from IRenderer piecing together properties with shader
-		RenderPipeline.RunSystemsFor(RenderStage::RENDER_STAGE_RENDER);
+		for (RenderStageConfig StageConfig : PipelineConfig.Configuration)
+		{
+			for (const char* SystemType : StageConfig.StageSystemsToRun)
+			{
+				RenderPipeline.PipelineSystems[StageConfig.Stage][SystemType]->Render(RenderPipeline.EntityRenderProperties);
+			}
+		}
 	}
 
 	void SystemManager::InitSystems()

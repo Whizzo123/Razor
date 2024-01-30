@@ -1397,6 +1397,7 @@
     <ClInclude Include="src\Platform\OpenGL\imgui_impl_glfw.h" />
     <ClInclude Include="src\Razor\Systems\CollisionSystem.h" />
     <ClInclude Include="src\Razor\Utils\RazorMaths.h" />
+    <ClInclude Include="src\Razor\Systems\CameraController.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Razor\Application.cpp">
@@ -1480,5 +1481,6 @@
     <ClCompile Include="src\Platform\OpenGL\imgui_impl_glfw.cpp" />
     <ClCompile Include="src\Razor\Systems\CollisionSystem.cpp" />
     <ClCompile Include="src\Razor\Utils\RazorMaths.cpp" />
+    <ClCompile Include="src\Razor\Systems\CameraController.cpp" />
   </ItemGroup>
 </Project>

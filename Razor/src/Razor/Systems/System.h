@@ -11,6 +11,15 @@ namespace Razor
 	#define ENUM_RENDERSTAGE
 	enum class RenderStage { RENDER_STAGE_MATERIAL_PASS, RENDER_STAGE_LIGHTING_PASS, RENDER_STAGE_TRANSFORMATION_PASS, RENDER_STAGE_CAMERA_PASS, RENDER_STAGE_RENDER };
 	#endif
+	struct RenderStageConfig
+	{
+		RenderStage Stage;
+		std::vector<const char*> StageSystemsToRun;
+	};
+	struct RenderPipelineConfig
+	{
+		std::vector<RenderStageConfig> Configuration;
+	};
 	struct FProperty
 	{
 		std::string Name;
@@ -192,7 +201,7 @@ namespace Razor
 		void EntityDestroyed(Entity InEntity);
 		void EntitySignatureChanged(Entity InEntity, Signature EntitySignature);
 		void RunSystems(float dt);
-		void RunRenderSystems();
+		void RunRenderSystems(RenderPipelineConfig PipelineConfig);
 		void InitSystems();
 	private:
 		std::unordered_map<const char*, Signature> Signatures{};

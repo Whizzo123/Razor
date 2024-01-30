@@ -8,6 +8,7 @@
 #include <glm/gtx/quaternion.hpp>
 #include "Core.h"
 #include <memory>
+#include "IO/RazorIO.h"
 
 namespace Razor
 {
@@ -143,5 +144,42 @@ namespace Razor
 		float Radius;
 	};
 
-	
+	struct Camera
+	{
+		// TODO Potentially move this and pass responsiblity onto the developer
+		Camera()
+		{
+			CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+			CameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+			CameraDirection = glm::normalize(CameraPos - CameraTarget);
+
+			Up = glm::vec3(0.0f, 1.0f, 0.0f);
+			CameraRight = glm::normalize(glm::cross(Up, CameraDirection));
+			CameraUp = glm::cross(CameraDirection, CameraRight);
+			CameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+		}
+		glm::vec3 CameraPos;
+		glm::vec3 CameraTarget;
+		glm::vec3 CameraDirection;
+
+		glm::vec3 Up;
+		glm::vec3 CameraRight;
+		glm::vec3 CameraUp;
+		glm::vec3 CameraFront;
+	};
+
+	struct CameraInfo
+	{
+		glm::mat4 CameraView;
+		glm::mat4 CameraProjection;
+		glm::vec3 CameraPosition;
+	};
+
+	struct Input
+	{
+		// KeyMap [Key] -> State (0, 1)
+		RazorKey Keyboard;
+		// MouseBut [Key] -> State (0, 1)
+		// MousePos -> Pos
+	};
 }

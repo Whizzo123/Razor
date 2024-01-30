@@ -11,3 +11,13 @@ OnMouseButtonReleasedDelegate& RazorIO::OnMouseButtonReleased()
 {
 	return OnMouseButtonReleasedDelegate;
 }
+
+OnKeyStateChangedDelegate& RazorIO::OnKeyStateChanged()
+{
+	return OnKeyStateChangedDelegate;
+}
+
+OnMousePosChangedDelegate& RazorIO::OnMousePosChanged()
+{
+	return OnMousePosChangedDelegate;
+}

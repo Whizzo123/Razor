@@ -32,4 +32,16 @@ namespace Razor
         glBindVertexArray(0);
     }
 
+    void OpenGLRenderer::ClearBuffer()
+    {
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
+    void OpenGLRenderer::SwapBuffer(Window& window)
+    {
+        glfwSwapBuffers(window.GetWindowPtr());
+    }
+    // A way to swap render targets and to somehow re-run render but with just colour so need to disable some parts of render system pipeline but not others
+    // That's gonna be interesting :) 
 }

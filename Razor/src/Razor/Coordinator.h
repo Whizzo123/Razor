@@ -91,9 +91,9 @@ namespace Razor
 			SystemMgr->RunSystems(dt);
 		}
 
-		void RunRenderSystems()
+		void RunRenderSystems(RenderPipelineConfig PipelineConfig)
 		{
-			SystemMgr->RunRenderSystems();
+			SystemMgr->RunRenderSystems(PipelineConfig);
 		}
 
 		void InitSystems()

@@ -9,7 +9,7 @@
 #include "Renderer/Shaders/Shader.h"
 #include "ImGui/RazorImGui.h"
 #include "../Platform/Generic/IPlatformIO.h"
-// TODO note to self remove all of this static ness in favour of better ideally unique_ptr system pls :) 
+
 namespace Razor
 {
 	class RAZOR_API Engine

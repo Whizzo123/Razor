@@ -11,6 +11,8 @@ namespace Razor
 	public:
 		CameraInfo GetCameraInfo() override;
 		void DrawMesh(RendererInfo Info) override;
+		void ClearBuffer() override;
+		void SwapBuffer(Window& window) override;
 	private:
 		
 	};

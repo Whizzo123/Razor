@@ -11,7 +11,7 @@ namespace Razor
 		RSDirectionalLightingPass()
 		{
 			Coordinator = Coordinator::GetInstance();
-			SystemRenderStage = RenderStage::RENDER_STAGE_MATERIAL_PASS;
+			SystemRenderStage = RenderStage::RENDER_STAGE_LIGHTING_PASS;
 		}
 		void Render(RenderPipelineEntityProperties& Properties) override;
 
