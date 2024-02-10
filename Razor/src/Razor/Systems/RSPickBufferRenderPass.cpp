@@ -1,8 +1,10 @@
-#include "RSRenderPass.h"
+#include "RSPickBufferRenderPass.h"
+#include "../Renderer/Shaders/PickBufferShader.h"
+#include "../Engine.h"
 
 namespace Razor
 {
-	void RSRenderPass::Render(RenderPipelineEntityProperties& Properties)
+	void RSPickBufferRenderPass::Render(RenderPipelineEntityProperties& Properties)
 	{
 		for (const Entity& EntityToRender : Entities)
 		{
@@ -11,9 +13,9 @@ namespace Razor
 			for (const MeshData& Child : EntityMesh.Data)
 			{
 				//TODO remove in place of IRenderer alternative
-				glUseProgram(EntityMaterial.ShaderID);
+				glUseProgram(Engine::Get().GetShaderForType(typeid(PickBufferShader).name())->ID);
 				PropertySlot Slot = Properties.Properties[EntityToRender].GetPropertySlot(Child.MaterialId);
-				std::shared_ptr<Shader> MeshShader = ShaderMap[EntityMaterial.ShaderID];
+				std::shared_ptr<Shader> MeshShader = ShaderMap[Engine::Get().GetShaderForType(typeid(PickBufferShader).name())->ID];
 				for (const FProperty& FloatProperty : Slot.GetFloatProperties())
 				{
 					MeshShader->SetFloat(FloatProperty.Name, FloatProperty.Value);

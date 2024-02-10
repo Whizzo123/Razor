@@ -14,6 +14,9 @@
 #include "../Platform/OpenGL/OpenGLIO.h"
 #include "Systems/CollisionSystem.h"
 #include "Systems/CameraController.h"
+#include "Systems/RSPickBufferMaterialPass.h"
+#include "Renderer/Shaders/PickBufferShader.h"
+#include "Systems/RSPickBufferRenderPass.h"
 
 namespace Razor
 {
@@ -46,6 +49,9 @@ namespace Razor
 		std::shared_ptr<Shader> D_DebugShader = std::make_shared<DebugLightShader>();
 		ShaderIDMap[D_DebugShader->ID] = D_DebugShader;
 		ShaderTypeMap[typeid(DebugLightShader).name()] = D_DebugShader;
+		std::shared_ptr<Shader> PickShader = std::make_shared<PickBufferShader>();
+		ShaderIDMap[PickShader->ID] = PickShader;
+		ShaderTypeMap[typeid(PickBufferShader).name()] = PickShader;
 
 		// Seperate into some sort of all component/system registration
 		Coordinator->RegisterComponent<Mesh>();
@@ -101,6 +107,16 @@ namespace Razor
 		RSRenderPassSig.set(Coordinator->GetComponentType<Mesh>());
 		RSRenderPassSig.set(Coordinator->GetComponentType<Material>());
 		Coordinator->SetSystemSignature<RSRenderPass>(RSRenderPassSig);
+		Coordinator->RegisterSystem<RSPickBufferMaterialPass>(RSPickBufferMaterialPass());
+		Signature RSPickBufferMaterialPassSig;
+		RSPickBufferMaterialPassSig.set(Coordinator->GetComponentType<Material>());
+		Coordinator->SetSystemSignature<RSPickBufferMaterialPass>(RSPickBufferMaterialPassSig);
+		Coordinator->RegisterSystem<RSPickBufferRenderPass>(RSPickBufferRenderPass(Renderer, ShaderIDMap));
+		Signature RSPickBufferRenderPassSig;
+		// Need this to work for all visible types
+		RSPickBufferRenderPassSig.set(Coordinator->GetComponentType<Mesh>());
+		RSPickBufferRenderPassSig.set(Coordinator->GetComponentType<Material>());
+		Coordinator->SetSystemSignature<RSPickBufferRenderPass>(RSPickBufferRenderPassSig);
 
 	}
 
@@ -127,14 +143,18 @@ namespace Razor
 
 	void Engine::Run()
 	{
-		std::vector<RenderStage> Stages = { RenderStage::RENDER_STAGE_MATERIAL_PASS, RenderStage::RENDER_STAGE_LIGHTING_PASS,
-				RenderStage::RENDER_STAGE_TRANSFORMATION_PASS, RenderStage::RENDER_STAGE_CAMERA_PASS, RenderStage::RENDER_STAGE_RENDER };
 		RenderPipelineConfig PipelineConfig;
 		PipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_MATERIAL_PASS, std::vector<const char*> { typeid(RSMaterialPass).name() } });
 		PipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_LIGHTING_PASS, std::vector<const char*> { typeid(RSDirectionalLightingPass).name() } });
 		PipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_TRANSFORMATION_PASS, std::vector<const char*> { typeid(RSTransformationsPass).name() } });
 		PipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_CAMERA_PASS, std::vector<const char*> { typeid(RSCameraPass).name() } });
 		PipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_RENDER, std::vector<const char*> { typeid(RSRenderPass).name() } });
+		RenderPipelineConfig PickPipelineConfig;
+		PickPipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_MATERIAL_PASS, std::vector<const char*> { typeid(RSPickBufferMaterialPass).name() } });
+		PickPipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_LIGHTING_PASS, std::vector<const char*> { typeid(RSDirectionalLightingPass).name() } });
+		PickPipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_TRANSFORMATION_PASS, std::vector<const char*> { typeid(RSTransformationsPass).name() } });
+		PickPipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_CAMERA_PASS, std::vector<const char*> { typeid(RSCameraPass).name() } });
+		PickPipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_RENDER, std::vector<const char*> { typeid(RSPickBufferRenderPass).name() } });
 		Coordinator->InitSystems();
 		while (!glfwWindowShouldClose(window->GetWindowPtr()))
 		{
@@ -148,7 +168,7 @@ namespace Razor
 
 			Coordinator->RunSystems(DeltaTime);
 			
-			Coordinator->RunRenderSystems(PipelineConfig);
+			Coordinator->RunRenderSystems(PickPipelineConfig);
 			
 			glfwPollEvents(); 
 			RazorGUI->Render(*std::move(window));

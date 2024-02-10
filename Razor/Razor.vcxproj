@@ -143,6 +143,9 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Razor\Systems\RSPickBufferRenderPass.h" />
+    <ClInclude Include="src\Razor\Renderer\Shaders\PickBufferShader.h" />
+    <ClInclude Include="src\Razor\Systems\RSPickBufferMaterialPass.h" />
     <ClInclude Include="src\Razor\Systems\CameraController.h" />
     <ClInclude Include="src\Razor\Utils\RazorMaths.h" />
     <ClInclude Include="src\Razor\Systems\CollisionSystem.h" />
@@ -602,6 +605,9 @@
     <ClInclude Include="vendor\stb_image\src\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Razor\Systems\RSPickBufferRenderPass.cpp" />
+    <ClCompile Include="src\Razor\Renderer\Shaders\PickBufferShader.cpp" />
+    <ClCompile Include="src\Razor\Systems\RSPickBufferMaterialPass.cpp" />
     <ClCompile Include="src\Razor\Systems\CameraController.cpp" />
     <ClCompile Include="src\Razor\Utils\RazorMaths.cpp" />
     <ClCompile Include="src\Razor\Systems\CollisionSystem.cpp" />
