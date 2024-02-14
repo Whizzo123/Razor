@@ -12,7 +12,7 @@ namespace Razor
 	class RAZOR_API MeshRenderer : public System
 	{
 	public:
-		MeshRenderer(std::shared_ptr<IRenderer> Renderer, std::unordered_map<uint8_t, std::shared_ptr<Shader>>& IDToShaderMap, std::shared_ptr<std::vector<Light>> SceneLights)
+		MeshRenderer(std::shared_ptr<IRenderer> Renderer, std::unordered_map<uint8_t, std::shared_ptr<Shader>>& IDToShaderMap, std::shared_ptr<std::vector<Light*>> SceneLights)
 		{
 			Coordinator = Razor::Coordinator::GetInstance();
 			this->Renderer = Renderer;
@@ -29,6 +29,6 @@ namespace Razor
 		std::shared_ptr<Razor::Coordinator> Coordinator;
 		std::shared_ptr<IRenderer> Renderer;
 		std::unordered_map<uint8_t, std::shared_ptr<Shader>> ShaderMap;
-		std::shared_ptr<std::vector<Light>> Lights;
+		std::shared_ptr<std::vector<Light*>> Lights;
 	};
 }

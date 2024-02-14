@@ -10,6 +10,9 @@
     <Filter Include="src\Razor\Renderer">
       <UniqueIdentifier>{30254CE2-1C09-0D38-8569-078B716CF7B9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Razor\Renderer\Shaders">
+      <UniqueIdentifier>{097ADA90-F589-8661-5E43-EB7F4A7275FA}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Razor\Systems">
       <UniqueIdentifier>{512EE082-BD44-DE18-06BC-693A7211AFA0}</UniqueIdentifier>
     </Filter>
@@ -90,11 +93,35 @@
     <ClInclude Include="src\Razor\Renderer\OpenGLRenderer.h">
       <Filter>src\Razor\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Razor\Renderer\Shaders\DebugLightShader.h">
+      <Filter>src\Razor\Renderer\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Razor\Renderer\Shaders\DefaultMeshShader.h">
+      <Filter>src\Razor\Renderer\Shaders</Filter>
+    </ClInclude>
     <ClInclude Include="src\Razor\Renderer\Shaders\Shader.h">
-      <Filter>src\Razor\Renderer</Filter>
+      <Filter>src\Razor\Renderer\Shaders</Filter>
     </ClInclude>
     <ClInclude Include="src\Razor\ShaderReader.h">
       <Filter>src\Razor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Razor\Systems\LightRenderer.h">
+      <Filter>src\Razor\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Razor\Systems\RSCameraPass.h">
+      <Filter>src\Razor\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Razor\Systems\RSDirectionalLightingPass.h">
+      <Filter>src\Razor\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Razor\Systems\RSMaterialPass.h">
+      <Filter>src\Razor\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Razor\Systems\RSRenderPass.h">
+      <Filter>src\Razor\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Razor\Systems\RSTransformationsPass.h">
+      <Filter>src\Razor\Systems</Filter>
     </ClInclude>
     <ClInclude Include="src\Razor\Systems\SpinSystem.h">
       <Filter>src\Razor\Systems</Filter>
@@ -1359,9 +1386,21 @@
     <ClInclude Include="vendor\stb_image\src\stb_image.h">
       <Filter>vendor\stb_image\src</Filter>
     </ClInclude>
-    <ClInclude Include="src\Razor\Systems\LightRenderer.h" />
-    <ClInclude Include="src\Razor\Renderer\Shaders\DefaultMeshShader.h" />
-    <ClInclude Include="src\Razor\Renderer\Shaders\DebugLightShader.h" />
+    <ClInclude Include="vendor\ImGui\backends\imgui_impl_opengl3.h" />
+    <ClInclude Include="src\Platform\OpenGL\imgui_impl_opengl3.h" />
+    <ClInclude Include="src\Platform\OpenGL\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="src\Razor\ImGui\RazorImGui.h" />
+    <ClInclude Include="src\Razor\Utils\Delegates.h" />
+    <ClInclude Include="src\Razor\IO\RazorIO.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLIO.h" />
+    <ClInclude Include="src\Platform\Generic\IPlatformIO.h" />
+    <ClInclude Include="src\Platform\OpenGL\imgui_impl_glfw.h" />
+    <ClInclude Include="src\Razor\Systems\CollisionSystem.h" />
+    <ClInclude Include="src\Razor\Utils\RazorMaths.h" />
+    <ClInclude Include="src\Razor\Systems\CameraController.h" />
+    <ClInclude Include="src\Razor\Systems\RSPickBufferMaterialPass.h" />
+    <ClInclude Include="src\Razor\Renderer\Shaders\PickBufferShader.h" />
+    <ClInclude Include="src\Razor\Systems\RSPickBufferRenderPass.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Razor\Application.cpp">
@@ -1391,11 +1430,35 @@
     <ClCompile Include="src\Razor\Renderer\OpenGLRenderer.cpp">
       <Filter>src\Razor\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Razor\Renderer\Shaders\DebugLightShader.cpp">
+      <Filter>src\Razor\Renderer\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Razor\Renderer\Shaders\DefaultMeshShader.cpp">
+      <Filter>src\Razor\Renderer\Shaders</Filter>
+    </ClCompile>
     <ClCompile Include="src\Razor\Renderer\Shaders\Shader.cpp">
-      <Filter>src\Razor\Renderer</Filter>
+      <Filter>src\Razor\Renderer\Shaders</Filter>
     </ClCompile>
     <ClCompile Include="src\Razor\ShaderReader.cpp">
       <Filter>src\Razor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Razor\Systems\LightRenderer.cpp">
+      <Filter>src\Razor\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Razor\Systems\RSCameraPass.cpp">
+      <Filter>src\Razor\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Razor\Systems\RSDirectionalLightingPass.cpp">
+      <Filter>src\Razor\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Razor\Systems\RSMaterialPass.cpp">
+      <Filter>src\Razor\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Razor\Systems\RSRenderPass.cpp">
+      <Filter>src\Razor\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Razor\Systems\RSTransformationsPass.cpp">
+      <Filter>src\Razor\Systems</Filter>
     </ClCompile>
     <ClCompile Include="src\Razor\Systems\SpinSystem.cpp">
       <Filter>src\Razor\Systems</Filter>
@@ -1412,8 +1475,18 @@
     <ClCompile Include="vendor\Glad\src\glad.c">
       <Filter>vendor\Glad\src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Razor\Systems\LightRenderer.cpp" />
-    <ClCompile Include="src\Razor\Renderer\Shaders\DefaultMeshShader.cpp" />
-    <ClCompile Include="src\Razor\Renderer\Shaders\DebugLightShader.cpp" />
+    <ClCompile Include="vendor\ImGui\backends\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="src\Razor\ImGui\RazorImGui.cpp" />
+    <ClCompile Include="src\Razor\Utils\Delegates.cpp" />
+    <ClCompile Include="src\Razor\IO\RazorIO.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLIO.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\imgui_impl_glfw.cpp" />
+    <ClCompile Include="src\Razor\Systems\CollisionSystem.cpp" />
+    <ClCompile Include="src\Razor\Utils\RazorMaths.cpp" />
+    <ClCompile Include="src\Razor\Systems\CameraController.cpp" />
+    <ClCompile Include="src\Razor\Systems\RSPickBufferMaterialPass.cpp" />
+    <ClCompile Include="src\Razor\Renderer\Shaders\PickBufferShader.cpp" />
+    <ClCompile Include="src\Razor\Systems\RSPickBufferRenderPass.cpp" />
   </ItemGroup>
 </Project>

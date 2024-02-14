@@ -23,8 +23,9 @@ Window::Window(int width, int height)
     {
         std::cout << "Failed to initialise GLAD" << std::endl;
     }
-
-    glViewport(0, 0, 800, 600);
+    Width = width;
+    Height = height;
+    glViewport(0, 0, Width, Height);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 }
 

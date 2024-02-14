@@ -1,0 +1,44 @@
+#include "RSPickBufferRenderPass.h"
+#include "../Renderer/Shaders/PickBufferShader.h"
+#include "../Engine.h"
+
+namespace Razor
+{
+	void RSPickBufferRenderPass::Render(RenderPipelineEntityProperties& Properties)
+	{
+		for (const Entity& EntityToRender : Entities)
+		{
+			Mesh& EntityMesh = Coordinator->GetComponent<Mesh>(EntityToRender);
+			Material& EntityMaterial = Coordinator->GetComponent<Material>(EntityToRender);
+			for (const MeshData& Child : EntityMesh.Data)
+			{
+				//TODO remove in place of IRenderer alternative
+				glUseProgram(Engine::Get().GetShaderForType(typeid(PickBufferShader).name())->ID);
+				PropertySlot Slot = Properties.Properties[EntityToRender].GetPropertySlot(Child.MaterialId);
+				std::shared_ptr<Shader> MeshShader = ShaderMap[Engine::Get().GetShaderForType(typeid(PickBufferShader).name())->ID];
+				for (const FProperty& FloatProperty : Slot.GetFloatProperties())
+				{
+					MeshShader->SetFloat(FloatProperty.Name, FloatProperty.Value);
+				}
+				for (const VProperty& Vec3Property : Slot.GetVec3Properties())
+				{
+					MeshShader->SetVec3(Vec3Property.Name, Vec3Property.Value);
+				}
+				for (const MProperty& Mat4Property : Slot.GetMat4Properties())
+				{
+					MeshShader->SetMat4Float(Mat4Property.Name, Mat4Property.Value);
+				}
+				for (const BProperty& BoolProperty : Slot.GetBoolProperties())
+				{
+					MeshShader->SetBool(BoolProperty.Name, BoolProperty.Value);
+				}
+				for (const IProperty& IntProperty : Slot.GetIntProperties())
+				{
+					MeshShader->SetInt(IntProperty.Name, IntProperty.Value);
+				}
+				Renderer->DrawMesh({ Child });
+			}
+			Properties.Properties[EntityToRender].Clear();
+		}
+	}
+}

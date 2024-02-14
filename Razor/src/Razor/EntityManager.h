@@ -83,7 +83,7 @@ namespace Razor
 
 		T& GetData(Entity InEntity)
 		{
-			if (EntityToIndexMap.find(InEntity) == EntityToIndexMap.end())
+			if (!EntityToIndexMap.count(InEntity))
 			{
 				RZ_CORE_ERROR("Retrieving non-existent component.");
 			}

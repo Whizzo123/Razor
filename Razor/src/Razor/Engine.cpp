@@ -6,101 +6,117 @@
 #include "Systems/LightRenderer.h"
 #include "Renderer/Shaders/DefaultMeshShader.h"
 #include "Renderer/Shaders/DebugLightShader.h"
+#include "Systems/RSMaterialPass.h"
+#include "Systems/RSTransformationsPass.h"
+#include "Systems/RSDirectionalLightingPass.h"
+#include "Systems/RSCameraPass.h"
+#include "Systems/RSRenderPass.h"
+#include "../Platform/OpenGL/OpenGLIO.h"
+#include "Systems/CollisionSystem.h"
+#include "Systems/CameraController.h"
+#include "Systems/RSPickBufferMaterialPass.h"
+#include "Renderer/Shaders/PickBufferShader.h"
+#include "Systems/RSPickBufferRenderPass.h"
 
 namespace Razor
 {
 
 	Engine* Engine::GEngine = nullptr;
-	std::shared_ptr<Coordinator> Engine::Coordinator = nullptr;
-	std::shared_ptr<IRenderer> Engine::Renderer = nullptr;
 
-	float MouseLastX = 400;
-	float MouseLastY = 300;
-	float Yaw = -90.0f;
-	float Pitch = 0.0f;
-	bool bIsFirstMouse;
+	
 	glm::vec3 CameraDirection;
-
-	void Mouse_Callback(GLFWwindow* window, double Xpos, double Ypos)
-	{
-		if (bIsFirstMouse)
-		{
-			MouseLastX = Xpos;
-			MouseLastY = Ypos;
-			bIsFirstMouse = false;
-		}
-
-		float Xoffset = Xpos - MouseLastX;
-		float Yoffset = Ypos - MouseLastY;
-		MouseLastX = Xpos;
-		MouseLastY = Ypos;
-
-		const float MouseSensitivity = 0.1f;
-		Xoffset *= MouseSensitivity;
-		Yoffset *= MouseSensitivity;
-
-		Yaw += Xoffset;
-		Pitch += Yoffset;
-
-		Pitch = Pitch > 89.0f ? 89.0f : ((Pitch < -89.0f) ? -89.0f : Pitch);
-
-		CameraDirection.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-		CameraDirection.y = sin(glm::radians(Pitch));
-		CameraDirection.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-
-	}
 
 	void Engine::Init()
 	{
-		GEngine = new Engine();
 		glfwInit();
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-		GEngine->window = std::make_unique<Window>(800, 600);
+		window = std::make_unique<Window>(800, 600);
 		glEnable(GL_DEPTH_TEST);
 		Coordinator = Coordinator::GetInstance();
-		GEngine->Renderer = std::make_shared<OpenGLRenderer>();
+		Renderer = std::make_shared<OpenGLRenderer>();
 		//glfwSetInputMode(GEngine->window->GetWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-		glfwSetCursorPosCallback(GEngine->window->GetWindowPtr(), Mouse_Callback);
-
+		RazorGUI = std::make_unique<RazorImGui>();
+		RazorGUI->Setup(window->GetWindowPtr());
+		RazorGUI->RegisterImGuiEvents();
+		PlatformIO = std::make_unique<OpenGLIO>(window->GetWindowPtr());
+		PlatformIO->RegisterInputCallbacks();
 		//CREATE SHADERS
 		std::shared_ptr<Shader> D_MeshShader = std::make_shared<DefaultMeshShader>();
-		GEngine->ShaderIDMap[D_MeshShader->ID] = D_MeshShader;
-		GEngine->ShaderTypeMap[typeid(DefaultMeshShader).name()] = D_MeshShader;
+		ShaderIDMap[D_MeshShader->ID] = D_MeshShader;
+		ShaderTypeMap[typeid(DefaultMeshShader).name()] = D_MeshShader;
 		std::shared_ptr<Shader> D_DebugShader = std::make_shared<DebugLightShader>();
-		GEngine->ShaderIDMap[D_DebugShader->ID] = D_DebugShader;
-		GEngine->ShaderTypeMap[typeid(DebugLightShader).name()] = D_DebugShader;
-
-		//Seperate this into a camera component and camera system
-		GEngine->Renderer->RendererCamera.CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-		GEngine->Renderer->RendererCamera.CameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-		GEngine->Renderer->RendererCamera.CameraDirection = glm::normalize(GEngine->Renderer->RendererCamera.CameraPos - GEngine->Renderer->RendererCamera.CameraTarget);
-
-		GEngine->Renderer->RendererCamera.Up = glm::vec3(0.0f, 1.0f, 0.0f);
-		GEngine->Renderer->RendererCamera.CameraRight = glm::normalize(glm::cross(GEngine->Renderer->RendererCamera.Up, GEngine->Renderer->RendererCamera.CameraDirection));
-		GEngine->Renderer->RendererCamera.CameraUp = glm::cross(GEngine->Renderer->RendererCamera.CameraDirection, GEngine->Renderer->RendererCamera.CameraRight);
-		GEngine->Renderer->RendererCamera.CameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+		ShaderIDMap[D_DebugShader->ID] = D_DebugShader;
+		ShaderTypeMap[typeid(DebugLightShader).name()] = D_DebugShader;
+		std::shared_ptr<Shader> PickShader = std::make_shared<PickBufferShader>();
+		ShaderIDMap[PickShader->ID] = PickShader;
+		ShaderTypeMap[typeid(PickBufferShader).name()] = PickShader;
 
 		// Seperate into some sort of all component/system registration
 		Coordinator->RegisterComponent<Mesh>();
 		Coordinator->RegisterComponent<Material>();
 		Coordinator->RegisterComponent<Transform>();
-		GEngine->SceneLights = std::make_shared<std::vector<Light>>();
-		Coordinator->RegisterSystem<MeshRenderer>(MeshRenderer(GEngine->Renderer, GEngine->ShaderIDMap, GEngine->SceneLights));
+		Coordinator->RegisterComponent<Collider>();
+		Coordinator->RegisterComponent<Light>();
+		Coordinator->RegisterComponent<DirectionalLight>();
+		Coordinator->RegisterComponent<Camera>();
+
+		SceneLights = std::make_shared<std::vector<Light*>>();
+		Coordinator->RegisterSystem<MeshRenderer>(MeshRenderer(Renderer, ShaderIDMap, SceneLights));
+		Coordinator->RegisterSystem<LightRenderer>(LightRenderer(Renderer, SceneLights));
+		Coordinator->RegisterSystem<CollisionSystem>(CollisionSystem());
+		Coordinator->RegisterSystem<CameraController>(CameraController());
+
 		Signature sig;
 		sig.set(Coordinator->GetComponentType<Mesh>());
 		sig.set(Coordinator->GetComponentType<Material>());
 		sig.set(Coordinator->GetComponentType<Transform>());
-		Coordinator->SetSystemSignature<MeshRenderer>(sig);
-		//Light
-		Coordinator->RegisterComponent<Light>();
-		Coordinator->RegisterSystem<LightRenderer>(LightRenderer(GEngine->Renderer, GEngine->SceneLights));
 		Signature LightSig;
-		LightSig.set(Coordinator->GetComponentType<Light>());
-		LightSig.set(Coordinator->GetComponentType<Mesh>());
-		LightSig.set(Coordinator->GetComponentType <Transform>());
+		LightSig.set(Coordinator->GetComponentType<DirectionalLight>());
+		Signature ColliderSig;
+		ColliderSig.set(Coordinator->GetComponentType<Transform>());
+		ColliderSig.set(Coordinator->GetComponentType<Collider>());
+		Signature CameraControllerSig;
+		CameraControllerSig.set(Coordinator->GetComponentType<Camera>());
+		
 		Coordinator->SetSystemSignature<LightRenderer>(LightSig);
+		Coordinator->SetSystemSignature<CollisionSystem>(ColliderSig);
+		Coordinator->SetSystemSignature<MeshRenderer>(sig);
+		Coordinator->SetSystemSignature<CameraController>(CameraControllerSig);
+
+		//Render Systems
+		Coordinator->RegisterSystem<RSMaterialPass>(RSMaterialPass());
+		Signature RSMaterialPassSig;
+		RSMaterialPassSig.set(Coordinator->GetComponentType<Material>());
+		Coordinator->SetSystemSignature<RSMaterialPass>(RSMaterialPassSig);
+		Coordinator->RegisterSystem<RSTransformationsPass>(RSTransformationsPass());
+		Signature RSTransformationsPassSig;
+		RSTransformationsPassSig.set(Coordinator->GetComponentType<Transform>());
+		Coordinator->SetSystemSignature<RSTransformationsPass>(RSTransformationsPassSig);
+		Coordinator->RegisterSystem<RSDirectionalLightingPass>(RSDirectionalLightingPass());
+		Signature RSDirectionalLightingPassSig;
+		RSDirectionalLightingPassSig.set(Coordinator->GetComponentType<DirectionalLight>());
+		Coordinator->SetSystemSignature<RSDirectionalLightingPass>(RSDirectionalLightingPassSig);
+		Coordinator->RegisterSystem<RSCameraPass>(RSCameraPass(Renderer));
+		Signature RSCameraPassSig;
+		RSCameraPassSig.set(Coordinator->GetComponentType<Camera>());
+		Coordinator->SetSystemSignature<RSCameraPass>(RSCameraPassSig);
+		Coordinator->RegisterSystem<RSRenderPass>(RSRenderPass(Renderer, ShaderIDMap));
+		Signature RSRenderPassSig;
+		RSRenderPassSig.set(Coordinator->GetComponentType<Mesh>());
+		RSRenderPassSig.set(Coordinator->GetComponentType<Material>());
+		Coordinator->SetSystemSignature<RSRenderPass>(RSRenderPassSig);
+		Coordinator->RegisterSystem<RSPickBufferMaterialPass>(RSPickBufferMaterialPass());
+		Signature RSPickBufferMaterialPassSig;
+		RSPickBufferMaterialPassSig.set(Coordinator->GetComponentType<Material>());
+		Coordinator->SetSystemSignature<RSPickBufferMaterialPass>(RSPickBufferMaterialPassSig);
+		Coordinator->RegisterSystem<RSPickBufferRenderPass>(RSPickBufferRenderPass(Renderer, ShaderIDMap));
+		Signature RSPickBufferRenderPassSig;
+		// Need this to work for all visible types
+		RSPickBufferRenderPassSig.set(Coordinator->GetComponentType<Mesh>());
+		RSPickBufferRenderPassSig.set(Coordinator->GetComponentType<Material>());
+		Coordinator->SetSystemSignature<RSPickBufferRenderPass>(RSPickBufferRenderPassSig);
 
 	}
 
@@ -112,67 +128,89 @@ namespace Razor
 
 	void Engine::ProcessInput(GLFWwindow* window)
 	{
-		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		if (RazorIO::Get().GetStateForKey(RazorKey::Escape) == KEY_PRESSED)
 		{
 			glfwSetWindowShouldClose(window, true);
-		}
-		const float CameraSpeed = 5.0f * DeltaTime; // adjust accordingly
-		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		{
-			Renderer->RendererCamera.CameraPos += CameraSpeed * Renderer->RendererCamera.CameraFront;
-		}
-		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		{
-			Renderer->RendererCamera.CameraPos -= CameraSpeed * Renderer->RendererCamera.CameraFront;
-		}
-		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		{
-			Renderer->RendererCamera.CameraPos -= glm::normalize(glm::cross(Renderer->RendererCamera.CameraFront, Renderer->RendererCamera.CameraUp)) * CameraSpeed;
-		}
-		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		{
-			Renderer->RendererCamera.CameraPos += glm::normalize(glm::cross(Renderer->RendererCamera.CameraFront, Renderer->RendererCamera.CameraUp)) * CameraSpeed;
 		}
 	}
 
 	Entity Engine::CreateEntity()
 	{
-		return GEngine->Coordinator->CreateEntity();
+		return Coordinator->CreateEntity();
 	}
-
+	// Also just leaving this here we are doing the two render function for detecting what's selected so each entity rendered in framebuffer will have different colour
+	// And we will sample from that called GPU picking
 
 	void Engine::Run()
 	{
+		RenderPipelineConfig PipelineConfig;
+		PipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_MATERIAL_PASS, std::vector<const char*> { typeid(RSMaterialPass).name() } });
+		PipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_LIGHTING_PASS, std::vector<const char*> { typeid(RSDirectionalLightingPass).name() } });
+		PipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_TRANSFORMATION_PASS, std::vector<const char*> { typeid(RSTransformationsPass).name() } });
+		PipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_CAMERA_PASS, std::vector<const char*> { typeid(RSCameraPass).name() } });
+		PipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_RENDER, std::vector<const char*> { typeid(RSRenderPass).name() } });
+
+		RenderPipelineConfig PickPipelineConfig;
+		PickPipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_MATERIAL_PASS, std::vector<const char*> { typeid(RSPickBufferMaterialPass).name() } });
+		PickPipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_LIGHTING_PASS, std::vector<const char*> { typeid(RSDirectionalLightingPass).name() } });
+		PickPipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_TRANSFORMATION_PASS, std::vector<const char*> { typeid(RSTransformationsPass).name() } });
+		PickPipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_CAMERA_PASS, std::vector<const char*> { typeid(RSCameraPass).name() } });
+		PickPipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_RENDER, std::vector<const char*> { typeid(RSPickBufferRenderPass).name() } });
+		unsigned int PickBuffer = Renderer->CreateFrameBuffer();
+		unsigned int PickBufferTexture = Renderer->CreateTextureForFrameBuffer(PickBuffer);
 		Coordinator->InitSystems();
-		while (!glfwWindowShouldClose(GEngine->window->GetWindowPtr()))
+		while (!glfwWindowShouldClose(window->GetWindowPtr()))
 		{
-			GEngine->Renderer->RendererCamera.CameraFront = CameraDirection;
 			float CurrentFrame = glfwGetTime();
-			GEngine->DeltaTime = CurrentFrame - GEngine->LastFrame;
-			GEngine->LastFrame = CurrentFrame;
+			DeltaTime = CurrentFrame - LastFrame;
+			LastFrame = CurrentFrame;
 
-			GEngine->ProcessInput(GEngine->window->GetWindowPtr());
+			ProcessInput(window->GetWindowPtr());
 
-			glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			Coordinator->RunSystems(DeltaTime);
 
-			Coordinator->RunSystems(GEngine->DeltaTime);
+			// Render to pick buffer - this is not performant :) 
+			Renderer->BindFrameBuffer(PickBuffer);
+			Renderer->ClearBuffer();
+			Coordinator->RunRenderSystems(PickPipelineConfig);
+			PickObject(PickBuffer);
+			// True render
+			Renderer->BindFrameBuffer();
+			Renderer->ClearBuffer();
+			Coordinator->RunRenderSystems(PipelineConfig);
+			
+			
 
-			glfwSwapBuffers(GEngine->window->GetWindowPtr());
-			glfwPollEvents();
+			glfwPollEvents(); 
+			RazorGUI->Render(*std::move(window));
+			Renderer->SwapBuffer(*window);
 		}
-		delete GEngine;
 		glfwTerminate();
+	}
+
+	void Engine::PickObject(unsigned int PickBuffer)
+	{
+		if (RazorIO::Get().GetStateForMouseButton(LEFT) == MOUSE_DOWN)
+		{
+			Vector2D MousePos = RazorIO::Get().CurrentMousePos;
+			unsigned char Pixel[4];
+			// Don't think we are decoding this correctly or decoding correctly either
+			Renderer->ReadPixels(MousePos.X, 600 - MousePos.Y, 1, 1, Pixel, PickBuffer);
+			int PickedEntity = 0;
+			// Not quite grabbing values back right yet but storing okay i think :)
+			PickedEntity = static_cast<int>(Pixel[0]) << 16 | static_cast<int>(Pixel[1]) << 8 | static_cast<int>(Pixel[2]);
+			RZ_CORE_INFO("Picked {0}", PickedEntity);
+		}
 	}
 
 	// This is fine to have no checks as it would return 0 anyway if there was no shader for that ID meaning we always get a shader
 	std::shared_ptr<Shader> Engine::GetShaderForID(uint8_t ID)
 	{
-		return GEngine->ShaderIDMap[ID];
+		return ShaderIDMap[ID];
 	}
 
 	std::shared_ptr<Shader> Engine::GetShaderForType(const char* Type)
 	{
-		return GEngine->ShaderTypeMap[Type];
+		return ShaderTypeMap[Type];
 	}
 }

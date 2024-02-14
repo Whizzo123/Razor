@@ -32,4 +32,47 @@ namespace Razor
         glBindVertexArray(0);
     }
 
+    void OpenGLRenderer::ClearBuffer()
+    {
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
+    void OpenGLRenderer::BindFrameBuffer(unsigned int BufferIndex)
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, BufferIndex);
+    }
+
+    unsigned int OpenGLRenderer::CreateFrameBuffer()
+    {
+        unsigned int Framebuffer;
+        glGenFramebuffers(1, &Framebuffer);
+        return Framebuffer;
+    }
+
+    unsigned int OpenGLRenderer::CreateTextureForFrameBuffer(unsigned int Framebuffer)
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, Framebuffer);
+        unsigned int TextureColorBuffer;
+        glGenTextures(1, &TextureColorBuffer);
+        glBindTexture(GL_TEXTURE_2D, TextureColorBuffer);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        //glBindTexture(GL_TEXTURE_2D, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, TextureColorBuffer, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        return TextureColorBuffer;
+    }
+
+    void OpenGLRenderer::SwapBuffer(Window& window)
+    {
+        glfwSwapBuffers(window.GetWindowPtr());
+    }
+    void OpenGLRenderer::ReadPixels(unsigned int X, unsigned int Y, unsigned int Width, unsigned int Height, unsigned char* Pixels, unsigned int Buffer)
+    {
+        glReadBuffer(GL_COLOR_ATTACHMENT0);
+        glReadPixels(X, Y, Width, Height, GL_RGBA, GL_UNSIGNED_BYTE, Pixels);
+    }
+    
 }

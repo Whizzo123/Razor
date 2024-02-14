@@ -13,6 +13,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 group "Dependencies"
 	include "Razor/vendor/GLFW"
 	include "Razor/vendor/assimp"
+	include "Razor/vendor/ImGui"
 
 project "Razor"
 	location "Razor"
@@ -42,14 +43,16 @@ project "Razor"
 		"%{prj.name}/vendor/assimp/include",
 		"%{prj.name}/vendor/Glad/include",
 		"%{prj.name}/vendor/stb_image/include",
-		"%{prj.name}/vendor/glm"
+		"%{prj.name}/vendor/glm",
+		"%{prj.name}/vendor/ImGui"
 	}
 
 	links
 	{
 		"GLFW",
 		"opengl32.lib",
-		"assimp"
+		"assimp",
+		"ImGui"
 	}
 
 	rtti("On")

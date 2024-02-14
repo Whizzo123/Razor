@@ -6,11 +6,19 @@ namespace Razor
 
 	void LightRenderer::Init()
 	{
-		for (const Entity& Entity : Entities)
+		/*for (const Entity& Entity : Entities)
 		{
-			Light& EntityLight = Coordinator->GetComponent<Light>(Entity);
-			SceneLights->push_back(EntityLight);
-		}
+			std::shared_ptr<Light> EntityLight = std::make_shared<Light>(Coordinator->GetComponent<Light>(Entity));
+			if (EntityLight)
+			{
+				SceneLights->push_back(EntityLight.get());
+			}
+			std::shared_ptr<DirectionalLight> EntityDirectionalLight = std::make_shared<DirectionalLight>(Coordinator->GetComponent<DirectionalLight>(Entity));
+			if (EntityDirectionalLight)
+			{
+				SceneLights->push_back(EntityDirectionalLight.get());
+			}
+		}*/
 	}
 
 	void LightRenderer::Run(float dt)

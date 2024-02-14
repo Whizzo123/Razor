@@ -24,6 +24,7 @@ namespace Razor
 
     void MeshRenderer::InitMesh(MeshData& MeshToInit)
     {
+        // TODO Needs moved to inside RendererAPI
         glGenVertexArrays(1, &MeshToInit.VAO);
         glGenBuffers(1, &MeshToInit.VBO);
         glGenBuffers(1, &MeshToInit.EBO);
@@ -55,7 +56,7 @@ namespace Razor
 
     void MeshRenderer::Run(float dt)
     {
-        CameraInfo CamInfo = Renderer->GetCameraInfo();
+       /* CameraInfo CamInfo = Renderer->GetCameraInfo();
         for (auto const& Entity : Entities)
         {
             Mesh EntityMesh = Coordinator->GetComponent<Mesh>(Entity);
@@ -69,6 +70,6 @@ namespace Razor
                 ShaderMap[EntityMat.ShaderID]->Setup(&CamInfo, EntityTransform.Get(), MeshMaterial, Lights);
                 Renderer->DrawMesh({Child});
             }   
-        }
+        }*/
     }
 }

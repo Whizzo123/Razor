@@ -142,7 +142,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\shaders\lightvertex.vert" />
+    <None Include="resources\shaders\pickbuffer.frag" />
+    <None Include="resources\shaders\pickbuffer.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

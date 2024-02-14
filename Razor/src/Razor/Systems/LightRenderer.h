@@ -10,7 +10,7 @@ namespace Razor
 	class LightRenderer : public System
 	{
 	public:
-		LightRenderer(std::shared_ptr<IRenderer> Renderer, std::shared_ptr<std::vector<Light>> SceneLights)
+		LightRenderer(std::shared_ptr<IRenderer> Renderer, std::shared_ptr<std::vector<Light*>> SceneLights)
 		{
 			Coordinator = Razor::Coordinator::GetInstance();
 			this->Renderer = Renderer;
@@ -22,7 +22,7 @@ namespace Razor
 	private:
 		std::shared_ptr<Coordinator> Coordinator;
 		std::shared_ptr<IRenderer> Renderer;
-		std::shared_ptr<std::vector<Light>> SceneLights;
+		std::shared_ptr<std::vector<Light*>> SceneLights;
 		Shader LightShader;
 	};
 }
