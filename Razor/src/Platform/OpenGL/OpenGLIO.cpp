@@ -11,6 +11,10 @@ std::unordered_map<int, RazorKeyState> OpenGLIO::GLFWToCustomStateMap = {
 		{GLFW_PRESS, KEY_PRESSED},
 		{GLFW_RELEASE, KEY_RELEASED}
 };
+std::unordered_map<int, RazorMouseButton> OpenGLIO::GLFWToCustomMouseMap = {
+	{GLFW_MOUSE_BUTTON_1, LEFT},
+	{GLFW_MOUSE_BUTTON_2, RIGHT}
+};
 
 OpenGLIO::OpenGLIO(GLFWwindow* Window) : Window(Window)
 {
@@ -36,13 +40,14 @@ void OpenGLIO::RegisterInputCallbacks()
 void OpenGLIO::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
 	RazorIO& EngineIO = RazorIO::Get();
+	// Eventually combine these delegates into one
 	if (action == GLFW_PRESS)
 	{
-		EngineIO.OnMouseButtonPressed().ExecuteIfBound(button);
+		EngineIO.OnMouseButtonPressed().ExecuteIfBound(GLFWToCustomMouseMap[button], MOUSE_DOWN);
 	}
 	else
 	{
-		EngineIO.OnMouseButtonReleased().ExecuteIfBound(button);
+		EngineIO.OnMouseButtonPressed().ExecuteIfBound(GLFWToCustomMouseMap[button], MOUSE_UP);
 	}
 }
 

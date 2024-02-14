@@ -149,12 +149,15 @@ namespace Razor
 		PipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_TRANSFORMATION_PASS, std::vector<const char*> { typeid(RSTransformationsPass).name() } });
 		PipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_CAMERA_PASS, std::vector<const char*> { typeid(RSCameraPass).name() } });
 		PipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_RENDER, std::vector<const char*> { typeid(RSRenderPass).name() } });
+
 		RenderPipelineConfig PickPipelineConfig;
 		PickPipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_MATERIAL_PASS, std::vector<const char*> { typeid(RSPickBufferMaterialPass).name() } });
 		PickPipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_LIGHTING_PASS, std::vector<const char*> { typeid(RSDirectionalLightingPass).name() } });
 		PickPipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_TRANSFORMATION_PASS, std::vector<const char*> { typeid(RSTransformationsPass).name() } });
 		PickPipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_CAMERA_PASS, std::vector<const char*> { typeid(RSCameraPass).name() } });
 		PickPipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_RENDER, std::vector<const char*> { typeid(RSPickBufferRenderPass).name() } });
+		unsigned int PickBuffer = Renderer->CreateFrameBuffer();
+		unsigned int PickBufferTexture = Renderer->CreateTextureForFrameBuffer(PickBuffer);
 		Coordinator->InitSystems();
 		while (!glfwWindowShouldClose(window->GetWindowPtr()))
 		{
@@ -164,17 +167,40 @@ namespace Razor
 
 			ProcessInput(window->GetWindowPtr());
 
-			Renderer->ClearBuffer();
-
 			Coordinator->RunSystems(DeltaTime);
-			
+
+			// Render to pick buffer - this is not performant :) 
+			Renderer->BindFrameBuffer(PickBuffer);
+			Renderer->ClearBuffer();
 			Coordinator->RunRenderSystems(PickPipelineConfig);
+			PickObject(PickBuffer);
+			// True render
+			Renderer->BindFrameBuffer();
+			Renderer->ClearBuffer();
+			Coordinator->RunRenderSystems(PipelineConfig);
 			
+			
+
 			glfwPollEvents(); 
 			RazorGUI->Render(*std::move(window));
 			Renderer->SwapBuffer(*window);
 		}
 		glfwTerminate();
+	}
+
+	void Engine::PickObject(unsigned int PickBuffer)
+	{
+		if (RazorIO::Get().GetStateForMouseButton(LEFT) == MOUSE_DOWN)
+		{
+			Vector2D MousePos = RazorIO::Get().CurrentMousePos;
+			unsigned char Pixel[4];
+			// Don't think we are decoding this correctly or decoding correctly either
+			Renderer->ReadPixels(MousePos.X, 600 - MousePos.Y, 1, 1, Pixel, PickBuffer);
+			int PickedEntity = 0;
+			// Not quite grabbing values back right yet but storing okay i think :)
+			PickedEntity = static_cast<int>(Pixel[0]) << 16 | static_cast<int>(Pixel[1]) << 8 | static_cast<int>(Pixel[2]);
+			RZ_CORE_INFO("Picked {0}", PickedEntity);
+		}
 	}
 
 	// This is fine to have no checks as it would return 0 anyway if there was no shader for that ID meaning we always get a shader

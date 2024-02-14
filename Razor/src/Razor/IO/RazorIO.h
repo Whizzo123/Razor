@@ -18,7 +18,19 @@ enum RazorKeyState
 	KEY_PRESSED
 };
 
-using OnMouseButtonPressedDelegate = Delegate<bool, int>;
+enum RazorMouseButton
+{
+	LEFT,
+	RIGHT
+};
+
+enum RazorMouseState
+{
+	MOUSE_UP, 
+	MOUSE_DOWN
+};
+
+using OnMouseButtonPressedDelegate = Delegate<void, RazorMouseButton, RazorMouseState>;
 using OnMouseButtonReleasedDelegate = Delegate<bool, int>;
 using OnKeyStateChangedDelegate = Delegate<void, RazorKey, RazorKeyState>;
 using OnMousePosChangedDelegate = Delegate<void, double, double>;
@@ -42,6 +54,7 @@ public:
 	}
 
 	RazorKeyState GetStateForKey(RazorKey Key) { return Keyboard[Key]; }
+	RazorMouseState GetStateForMouseButton(RazorMouseButton Button) { return MouseButtons[Button]; }
 
 	// Alter to be multi-cast in here multiple things might want to know if mouse button is pressed
 	OnMouseButtonPressedDelegate& OnMouseButtonPressed();
@@ -51,11 +64,15 @@ public:
 	Vector2D LastMousePos;
 	Vector2D CurrentMousePos = {400, 300};
 protected:
-	RazorIO() { OnMousePosChanged().BindRaw(this, &RazorIO::UpdateMousePositions); OnKeyStateChanged().BindRaw(this, &RazorIO::UpdateKeyStates);
+	RazorIO() 
+	{
+		OnMousePosChanged().BindRaw(this, &RazorIO::UpdateMousePositions);
+		OnKeyStateChanged().BindRaw(this, &RazorIO::UpdateKeyStates);
+		OnMouseButtonPressed().BindRaw(this, &RazorIO::UpdateMouseStates);
 	};
 	~RazorIO() {};
 	std::unordered_map<RazorKey, RazorKeyState> Keyboard;
-	
+	std::unordered_map<RazorMouseButton, RazorMouseState> MouseButtons;
 	
 private:
 	static RazorIO* GRazorIO;
@@ -76,6 +93,11 @@ private:
 	void UpdateKeyStates(RazorKey Key, RazorKeyState State)
 	{
 		Keyboard[Key] = State;
+	}
+
+	void UpdateMouseStates(RazorMouseButton MouseButton, RazorMouseState State)
+	{
+		MouseButtons[MouseButton] = State;
 	}
 	bool bIsFirstMouse = true;
 };

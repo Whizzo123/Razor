@@ -16,7 +16,10 @@ namespace Razor
 			{
 				PropertySlot& Slot = Property.GetPropertySlot(i);
 				//Red, Green, Blue
-				Slot.AddVec3Property("entitycolor", glm::vec3((RenderingEntity >> 16) & 0xff, (RenderingEntity >> 8) & 0xff, RenderingEntity & 0xff));
+				glm::vec3 EntityColor = glm::vec3(((RenderingEntity >> 16) & 0xff) / 255.0f,
+					((RenderingEntity >> 8) & 0xff) / 255.0f, 
+					(RenderingEntity & 0xff) / 255.0f);
+				Slot.AddVec3Property("entitycolor", EntityColor);
 			}
 		}
 	}

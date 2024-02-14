@@ -67,6 +67,8 @@ namespace Razor
 		{
 			Coordinator->AddComponent<T>(InEntity, Component);
 		}
+		// TODO replace this properly
+		void PickObject(unsigned int PickBuffer);
 		std::unique_ptr<Window> window;
 		std::shared_ptr<Coordinator> Coordinator;
 		std::unordered_map<uint8_t, std::shared_ptr<Shader>> ShaderIDMap;

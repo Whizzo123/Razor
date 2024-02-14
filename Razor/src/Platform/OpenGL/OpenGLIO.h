@@ -20,5 +20,6 @@ private:
 	GLFWwindow* Window;
 	static std::unordered_map<int, RazorKey> GLFWToCustomKeyMap;
 	static std::unordered_map<int, RazorKeyState> GLFWToCustomStateMap;
+	static std::unordered_map<int, RazorMouseButton> GLFWToCustomMouseMap;
 };
 
