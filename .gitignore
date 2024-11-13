@@ -38,3 +38,7 @@ intermediate/
 
 # Files
 *.user
+
+*.vcxproj
+*vcx.proj.filters
+*.sln
