@@ -27,7 +27,7 @@
 *.lib
 
 # Executables
-*.exe
+#*.exe
 *.out
 *.app
 
@@ -35,6 +35,8 @@
 .vs/
 bin/
 intermediate/
+
+!vendor/
 
 # Files
 *.user
