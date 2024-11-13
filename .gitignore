@@ -40,5 +40,5 @@ intermediate/
 *.user
 
 *.vcxproj
-*vcx.proj.filters
+*.vcxproj.filters
 *.sln
