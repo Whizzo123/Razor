@@ -138,7 +138,7 @@ namespace Razor
 	};
 	
 
-	class RAZOR_API System
+	class   System
 	{
 	public:
 		std::set<Entity> Entities;
@@ -166,14 +166,14 @@ namespace Razor
 		}
 	};
 
-	class RAZOR_API SystemManager
+	class   SystemManager
 	{
 	public:
 
 		SystemManager() {};
 
 		template<typename T>
-		std::shared_ptr<T> RegisterSystem(T SystemInst)
+		std::shared_ptr<T> RegisterSystem(T SystemInst, ComponentType* SignatureComponents, std::uint8_t Size)
 		{
 			const char* typeName = typeid(T).name();
 			assert(Systems.find(typeName) == Systems.end() && "Registering system twice");
@@ -183,6 +183,13 @@ namespace Razor
 			{
 				RenderPipeline.PipelineSystems[RndrSystem->SystemRenderStage].insert({ typeName, RndrSystem });
 			}
+			// Setup Signature
+			Signature SystemSignature;
+			for (int i = 0; i < Size; i++)
+			{
+				SystemSignature.set(SignatureComponents[i]);
+			}
+			SetSignature<T>(SystemSignature);
 			return SystemInstPtr;
 		}
 

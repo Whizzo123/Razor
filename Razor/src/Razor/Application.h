@@ -4,7 +4,7 @@
 
 namespace Razor
 {
-	class RAZOR_API Application
+	class   Application
 	{
 	public:
 		Application();

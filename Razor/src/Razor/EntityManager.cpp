@@ -42,4 +42,9 @@ namespace Razor
 		return Signatures[InEntity];
 	}
 
+	uint32_t EntityManager::GetCurrentEntityCount()
+	{
+		return LivingEntityCount;
+	}
+
 }

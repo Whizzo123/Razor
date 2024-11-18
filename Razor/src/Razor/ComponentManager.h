@@ -6,7 +6,7 @@
 
 namespace Razor
 {
-	class RAZOR_API ComponentManager
+	class   ComponentManager
 	{
 	public:
 
@@ -48,6 +48,12 @@ namespace Razor
 			return GetComponentArray<T>()->GetData(InEntity);
 		}
 
+		template<typename T>
+		bool HasComponent(Entity InEntity)
+		{
+			return GetComponentArray<T>()->HasData(InEntity);
+		}
+
 		void EntityDestroyed(Entity InEntity);
 
 	private:
@@ -70,8 +76,7 @@ namespace Razor
 			{
 				RZ_CORE_ERROR("Component %s not registered before use", TypeName);
 			}
-			//assert(ComponentTypes.find(TypeName) != ComponentTypes.end() && "Component not registered before use.");
-			//Swap const char* for string as DLL and exe do not have same locations for types
+
 			std::shared_ptr <IComponentArray> IArray = ComponentArrays[TypeName];
 			std::shared_ptr<ComponentArray<T>> Array = std::dynamic_pointer_cast<ComponentArray<T>>(IArray);
 			if (Array)

@@ -1,0 +1,7 @@
+Scene: Untitled
+Entities:
+  - Entity: 0
+    Transform:
+      Position: [0, 0, -20]
+      Rotation: [0, 10, 0]
+      Scale: [0.0500000007, 0.0500000007, 0.0500000007]

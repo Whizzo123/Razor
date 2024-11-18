@@ -43,22 +43,24 @@ void OpenGLIO::MouseButtonCallback(GLFWwindow* window, int button, int action, i
 	// Eventually combine these delegates into one
 	if (action == GLFW_PRESS)
 	{
-		EngineIO.OnMouseButtonPressed().ExecuteIfBound(GLFWToCustomMouseMap[button], MOUSE_DOWN);
+		EngineIO.OnMouseButtonPressed().Broadcast(GLFWToCustomMouseMap[button], MOUSE_DOWN);
 	}
 	else
 	{
-		EngineIO.OnMouseButtonPressed().ExecuteIfBound(GLFWToCustomMouseMap[button], MOUSE_UP);
+		EngineIO.OnMouseButtonPressed().Broadcast(GLFWToCustomMouseMap[button], MOUSE_UP);
 	}
 }
 
 void OpenGLIO::KeyCallback(GLFWwindow* window, int button, int action)
 {
 	RazorIO& EngineIO = RazorIO::Get();
-	EngineIO.OnKeyStateChanged().ExecuteIfBound(GLFWToCustomKeyMap[button], GLFWToCustomStateMap[action]);
+	EngineIO.OnKeyStateChanged().Broadcast(GLFWToCustomKeyMap[button], GLFWToCustomStateMap[action]);
 }
 
 void OpenGLIO::CursorPosCallback(GLFWwindow* window, double Xpos, double Ypos)
 {
 	RazorIO& EngineIO = RazorIO::Get();
-	EngineIO.OnMousePosChanged().ExecuteIfBound(Xpos, Ypos);
+	int WinX, WinY;
+	glfwGetWindowPos(window, &WinX, &WinY);
+	EngineIO.OnMousePosChanged().Broadcast(Xpos + WinX, Ypos + WinY);
 }

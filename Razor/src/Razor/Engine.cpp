@@ -3,7 +3,6 @@
 #include "Component.h"
 #include "Renderer/OpenGLRenderer.h"
 #include "Renderer/Model.h"
-#include "Systems/LightRenderer.h"
 #include "Renderer/Shaders/DefaultMeshShader.h"
 #include "Renderer/Shaders/DebugLightShader.h"
 #include "Systems/RSMaterialPass.h"
@@ -17,6 +16,11 @@
 #include "Systems/RSPickBufferMaterialPass.h"
 #include "Renderer/Shaders/PickBufferShader.h"
 #include "Systems/RSPickBufferRenderPass.h"
+#include "Systems/RSPointLightingPass.h"
+#include "Systems/RSSpotLightingPass.h"
+#include "../Platform/OpenGL/OpenGLWindowProvider.h"
+#include "Scene/SceneSerializer.h"
+#include <imgui.h>
 
 namespace Razor
 {
@@ -28,19 +32,20 @@ namespace Razor
 
 	void Engine::Init()
 	{
-		glfwInit();
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-		window = std::make_unique<Window>(800, 600);
-		glEnable(GL_DEPTH_TEST);
-		Coordinator = Coordinator::GetInstance();
 		Renderer = std::make_shared<OpenGLRenderer>();
-		//glfwSetInputMode(GEngine->window->GetWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		Renderer->InitRendererAPI();
+
+		std::shared_ptr<IWindowProvider> Provider = std::make_shared<OpenGLWindowProvider>();
+		EngineWindow = std::make_unique<Window>(800, 600, Provider);
+		
+		Renderer->EnableDepthTesting(/*bEnable*/true);
+
+		Coordinator = Coordinator::GetInstance();
+		
 		RazorGUI = std::make_unique<RazorImGui>();
-		RazorGUI->Setup(window->GetWindowPtr());
+		RazorGUI->Setup(EngineWindow->GetWindowProvider());
 		RazorGUI->RegisterImGuiEvents();
-		PlatformIO = std::make_unique<OpenGLIO>(window->GetWindowPtr());
+		PlatformIO = std::make_unique<OpenGLIO>(std::dynamic_pointer_cast<OpenGLWindowProvider>(EngineWindow->GetWindowProvider())->GetPlatformWindowPtr());
 		PlatformIO->RegisterInputCallbacks();
 		//CREATE SHADERS
 		std::shared_ptr<Shader> D_MeshShader = std::make_shared<DefaultMeshShader>();
@@ -54,70 +59,67 @@ namespace Razor
 		ShaderTypeMap[typeid(PickBufferShader).name()] = PickShader;
 
 		// Seperate into some sort of all component/system registration
+		//Swap out Coordinator here with Scene and we will fix this later one :)
+		// Move this to edge as well perhaps
+
+		CurrentScene = CreateRef<Scene>("Untitled.rzscn");
+
 		Coordinator->RegisterComponent<Mesh>();
 		Coordinator->RegisterComponent<Material>();
 		Coordinator->RegisterComponent<Transform>();
 		Coordinator->RegisterComponent<Collider>();
 		Coordinator->RegisterComponent<Light>();
 		Coordinator->RegisterComponent<DirectionalLight>();
+		Coordinator->RegisterComponent<PointLight>();
+		Coordinator->RegisterComponent<SpotLight>();
 		Coordinator->RegisterComponent<Camera>();
 
-		SceneLights = std::make_shared<std::vector<Light*>>();
-		Coordinator->RegisterSystem<MeshRenderer>(MeshRenderer(Renderer, ShaderIDMap, SceneLights));
-		Coordinator->RegisterSystem<LightRenderer>(LightRenderer(Renderer, SceneLights));
-		Coordinator->RegisterSystem<CollisionSystem>(CollisionSystem());
-		Coordinator->RegisterSystem<CameraController>(CameraController());
+		ComponentType MeshType = Coordinator->GetComponentType<Mesh>();
+		ComponentType MaterialType = Coordinator->GetComponentType<Material>();
+		ComponentType TransformType = Coordinator->GetComponentType<Transform>();
 
-		Signature sig;
-		sig.set(Coordinator->GetComponentType<Mesh>());
-		sig.set(Coordinator->GetComponentType<Material>());
-		sig.set(Coordinator->GetComponentType<Transform>());
-		Signature LightSig;
-		LightSig.set(Coordinator->GetComponentType<DirectionalLight>());
-		Signature ColliderSig;
-		ColliderSig.set(Coordinator->GetComponentType<Transform>());
-		ColliderSig.set(Coordinator->GetComponentType<Collider>());
-		Signature CameraControllerSig;
-		CameraControllerSig.set(Coordinator->GetComponentType<Camera>());
-		
-		Coordinator->SetSystemSignature<LightRenderer>(LightSig);
-		Coordinator->SetSystemSignature<CollisionSystem>(ColliderSig);
-		Coordinator->SetSystemSignature<MeshRenderer>(sig);
-		Coordinator->SetSystemSignature<CameraController>(CameraControllerSig);
+		SceneLights = std::make_shared<std::vector<Light*>>();
+		ComponentType MeshRendererSignature[3]{ MeshType, MaterialType, TransformType };
+		// TODO rename mesh renderer doesn't do rendering just sets up the mesh for renderering
+		Coordinator->RegisterSystem<MeshRenderer>(MeshRenderer(Renderer, ShaderIDMap, SceneLights), MeshRendererSignature, 3);
+		ComponentType CollisionSystemSignature[2]{ TransformType, Coordinator->GetComponentType<Collider>() };
+		Coordinator->RegisterSystem<CollisionSystem>(CollisionSystem(), CollisionSystemSignature, 2);
+		ComponentType CameraControllerSignature[1]{ Coordinator->GetComponentType<Camera>() };
+		Coordinator->RegisterSystem<CameraController>(CameraController(), CameraControllerSignature, 1);
 
 		//Render Systems
-		Coordinator->RegisterSystem<RSMaterialPass>(RSMaterialPass());
-		Signature RSMaterialPassSig;
-		RSMaterialPassSig.set(Coordinator->GetComponentType<Material>());
-		Coordinator->SetSystemSignature<RSMaterialPass>(RSMaterialPassSig);
-		Coordinator->RegisterSystem<RSTransformationsPass>(RSTransformationsPass());
-		Signature RSTransformationsPassSig;
-		RSTransformationsPassSig.set(Coordinator->GetComponentType<Transform>());
-		Coordinator->SetSystemSignature<RSTransformationsPass>(RSTransformationsPassSig);
-		Coordinator->RegisterSystem<RSDirectionalLightingPass>(RSDirectionalLightingPass());
-		Signature RSDirectionalLightingPassSig;
-		RSDirectionalLightingPassSig.set(Coordinator->GetComponentType<DirectionalLight>());
-		Coordinator->SetSystemSignature<RSDirectionalLightingPass>(RSDirectionalLightingPassSig);
-		Coordinator->RegisterSystem<RSCameraPass>(RSCameraPass(Renderer));
-		Signature RSCameraPassSig;
-		RSCameraPassSig.set(Coordinator->GetComponentType<Camera>());
-		Coordinator->SetSystemSignature<RSCameraPass>(RSCameraPassSig);
-		Coordinator->RegisterSystem<RSRenderPass>(RSRenderPass(Renderer, ShaderIDMap));
-		Signature RSRenderPassSig;
-		RSRenderPassSig.set(Coordinator->GetComponentType<Mesh>());
-		RSRenderPassSig.set(Coordinator->GetComponentType<Material>());
-		Coordinator->SetSystemSignature<RSRenderPass>(RSRenderPassSig);
-		Coordinator->RegisterSystem<RSPickBufferMaterialPass>(RSPickBufferMaterialPass());
-		Signature RSPickBufferMaterialPassSig;
-		RSPickBufferMaterialPassSig.set(Coordinator->GetComponentType<Material>());
-		Coordinator->SetSystemSignature<RSPickBufferMaterialPass>(RSPickBufferMaterialPassSig);
-		Coordinator->RegisterSystem<RSPickBufferRenderPass>(RSPickBufferRenderPass(Renderer, ShaderIDMap));
-		Signature RSPickBufferRenderPassSig;
-		// Need this to work for all visible types
-		RSPickBufferRenderPassSig.set(Coordinator->GetComponentType<Mesh>());
-		RSPickBufferRenderPassSig.set(Coordinator->GetComponentType<Material>());
-		Coordinator->SetSystemSignature<RSPickBufferRenderPass>(RSPickBufferRenderPassSig);
+		
+		ComponentType MaterialPassSignature[1] { MaterialType };
+		Coordinator->RegisterSystem<RSMaterialPass>(RSMaterialPass(), MaterialPassSignature, 1);
+		ComponentType TransformPassSignature[1]{ Coordinator->GetComponentType<Transform>() };
+		Coordinator->RegisterSystem<RSTransformationsPass>(RSTransformationsPass(), TransformPassSignature, 1);
+		ComponentType DirectionalLightPassSignature[1]{ Coordinator->GetComponentType<DirectionalLight>() };
+		Coordinator->RegisterSystem<RSDirectionalLightingPass>(RSDirectionalLightingPass(), DirectionalLightPassSignature, 1);
+		ComponentType CameraPassSignature[1]{ Coordinator->GetComponentType<Camera>() };
+		Coordinator->RegisterSystem<RSCameraPass>(RSCameraPass(Renderer), CameraPassSignature, 1);
+		ComponentType RenderPassSignature[2]{ MeshType, MaterialType };
+		Coordinator->RegisterSystem<RSRenderPass>(RSRenderPass(Renderer, ShaderIDMap), RenderPassSignature, 2);
+		ComponentType PickBufferMaterialPassSignature[2]{ MeshType, MaterialType };
+		Coordinator->RegisterSystem<RSPickBufferMaterialPass>(RSPickBufferMaterialPass(), PickBufferMaterialPassSignature, 2);
+		ComponentType PickBufferRenderPassSignature[2]{ MeshType, MaterialType };
+		Coordinator->RegisterSystem<RSPickBufferRenderPass>(RSPickBufferRenderPass(Renderer, ShaderIDMap), PickBufferRenderPassSignature, 2);
+		ComponentType PointLightingPassSignature[2]{ Coordinator->GetComponentType<PointLight>() };
+		Coordinator->RegisterSystem<RSPointLightingPass>(RSPointLightingPass(), PointLightingPassSignature, 2);
+		ComponentType SpotLightingPassSignature[1]{ Coordinator->GetComponentType<SpotLight>() };
+		Coordinator->RegisterSystem<RSSpotLightingPass>(RSSpotLightingPass(), SpotLightingPassSignature, 1);
+		
+	}
 
+	void Engine::InitSystems()
+	{
+		Coordinator->InitSystems();
+	}
+
+	void Engine::Step()
+	{
+		float CurrentFrame = glfwGetTime();
+		DeltaTime = CurrentFrame - LastFrame;
+		LastFrame = CurrentFrame;
 	}
 
 	ModelInfo Engine::ProcessModel(const char* Path)
@@ -126,11 +128,11 @@ namespace Razor
 		return Tmp.LoadMesh(Path);
 	}
 
-	void Engine::ProcessInput(GLFWwindow* window)
+	void Engine::ProcessInput()
 	{
 		if (RazorIO::Get().GetStateForKey(RazorKey::Escape) == KEY_PRESSED)
 		{
-			glfwSetWindowShouldClose(window, true);
+			EngineWindow->SetWindowToClose();
 		}
 	}
 
@@ -138,54 +140,10 @@ namespace Razor
 	{
 		return Coordinator->CreateEntity();
 	}
-	// Also just leaving this here we are doing the two render function for detecting what's selected so each entity rendered in framebuffer will have different colour
-	// And we will sample from that called GPU picking
 
 	void Engine::Run()
 	{
-		RenderPipelineConfig PipelineConfig;
-		PipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_MATERIAL_PASS, std::vector<const char*> { typeid(RSMaterialPass).name() } });
-		PipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_LIGHTING_PASS, std::vector<const char*> { typeid(RSDirectionalLightingPass).name() } });
-		PipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_TRANSFORMATION_PASS, std::vector<const char*> { typeid(RSTransformationsPass).name() } });
-		PipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_CAMERA_PASS, std::vector<const char*> { typeid(RSCameraPass).name() } });
-		PipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_RENDER, std::vector<const char*> { typeid(RSRenderPass).name() } });
-
-		RenderPipelineConfig PickPipelineConfig;
-		PickPipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_MATERIAL_PASS, std::vector<const char*> { typeid(RSPickBufferMaterialPass).name() } });
-		PickPipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_LIGHTING_PASS, std::vector<const char*> { typeid(RSDirectionalLightingPass).name() } });
-		PickPipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_TRANSFORMATION_PASS, std::vector<const char*> { typeid(RSTransformationsPass).name() } });
-		PickPipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_CAMERA_PASS, std::vector<const char*> { typeid(RSCameraPass).name() } });
-		PickPipelineConfig.Configuration.push_back(RenderStageConfig{ RenderStage::RENDER_STAGE_RENDER, std::vector<const char*> { typeid(RSPickBufferRenderPass).name() } });
-		unsigned int PickBuffer = Renderer->CreateFrameBuffer();
-		unsigned int PickBufferTexture = Renderer->CreateTextureForFrameBuffer(PickBuffer);
-		Coordinator->InitSystems();
-		while (!glfwWindowShouldClose(window->GetWindowPtr()))
-		{
-			float CurrentFrame = glfwGetTime();
-			DeltaTime = CurrentFrame - LastFrame;
-			LastFrame = CurrentFrame;
-
-			ProcessInput(window->GetWindowPtr());
-
-			Coordinator->RunSystems(DeltaTime);
-
-			// Render to pick buffer - this is not performant :) 
-			Renderer->BindFrameBuffer(PickBuffer);
-			Renderer->ClearBuffer();
-			Coordinator->RunRenderSystems(PickPipelineConfig);
-			PickObject(PickBuffer);
-			// True render
-			Renderer->BindFrameBuffer();
-			Renderer->ClearBuffer();
-			Coordinator->RunRenderSystems(PipelineConfig);
-			
-			
-
-			glfwPollEvents(); 
-			RazorGUI->Render(*std::move(window));
-			Renderer->SwapBuffer(*window);
-		}
-		glfwTerminate();
+		
 	}
 
 	void Engine::PickObject(unsigned int PickBuffer)
@@ -194,13 +152,16 @@ namespace Razor
 		{
 			Vector2D MousePos = RazorIO::Get().CurrentMousePos;
 			unsigned char Pixel[4];
-			// Don't think we are decoding this correctly or decoding correctly either
 			Renderer->ReadPixels(MousePos.X, 600 - MousePos.Y, 1, 1, Pixel, PickBuffer);
 			int PickedEntity = 0;
-			// Not quite grabbing values back right yet but storing okay i think :)
 			PickedEntity = static_cast<int>(Pixel[0]) << 16 | static_cast<int>(Pixel[1]) << 8 | static_cast<int>(Pixel[2]);
 			RZ_CORE_INFO("Picked {0}", PickedEntity);
 		}
+	}
+
+	void Engine::RenderImGui(uint64_t SceneTexture)
+	{
+		
 	}
 
 	// This is fine to have no checks as it would return 0 anyway if there was no shader for that ID meaning we always get a shader

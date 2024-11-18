@@ -1,24 +1,25 @@
 ﻿#pragma once
 
-#include <glad/glad.h>
-#include "GLFW/glfw3.h"
-#include <iostream>
 #include "Core.h"
+#include "../Platform/Generic/IWindowProvider.h"
 
-
-class RAZOR_API Window
+namespace Razor
 {
-public:
-    Window(int width, int height);
-    ~Window();
-    GLFWwindow* GetWindowPtr() const;
+    class   Window
+    {
+    public:
+        Window(int width, int height, std::shared_ptr<IWindowProvider> Provider);
+        ~Window();
+        std::shared_ptr<IWindowProvider> GetWindowProvider();
+        bool ShouldWindowClose() { return Provider->ShouldWindowClose(); }
+        void SetWindowToClose() { Provider->SetWindowToClose(); }
+        int GetWidth() const { return Width; }
+        int GetHeight() const { return Height; }
 
-    int GetWidth() const{ return Width; }
-    int GetHeight() const{ return Height; }
-
-protected:
-    GLFWwindow* window;
-    int Width;
-    int Height;
-};
+    protected:
+        std::shared_ptr<IWindowProvider> Provider;
+        int Width;
+        int Height;
+    };
+}
 

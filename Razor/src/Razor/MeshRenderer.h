@@ -9,7 +9,7 @@
 
 namespace Razor
 {
-	class RAZOR_API MeshRenderer : public System
+	class   MeshRenderer : public System
 	{
 	public:
 		MeshRenderer(std::shared_ptr<IRenderer> Renderer, std::unordered_map<uint8_t, std::shared_ptr<Shader>>& IDToShaderMap, std::shared_ptr<std::vector<Light*>> SceneLights)

@@ -24,4 +24,8 @@ namespace Razor
 		SystemMgr->EntityDestroyed(InEntity);
 	}
 
+	uint32_t Coordinator::GetCurrentEntityCount()
+	{
+		return EntityMgr->GetCurrentEntityCount();
+	}
 }

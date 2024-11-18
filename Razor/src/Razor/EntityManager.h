@@ -20,7 +20,7 @@ namespace Razor
 	using Signature = std::bitset<MAX_COMPONENTS>;
 
 
-	class RAZOR_API EntityManager
+	class   EntityManager
 	{
 	public:
 		EntityManager();
@@ -29,6 +29,7 @@ namespace Razor
 		void DestroyEntity(Entity InEntity);
 		void SetSignature(Entity InEntity, Signature InSignature);
 		Signature GetSignature(Entity InEntity);
+		uint32_t GetCurrentEntityCount();
 
 	private:
 		std::queue<Entity> AvaliableEntities;
@@ -79,6 +80,15 @@ namespace Razor
 			IndexToEntityMap[NewIndex] = InEntity;
 			Components[NewIndex] = Component;
 			++Size;
+		}
+
+		bool HasData(Entity InEntity)
+		{
+			if (!EntityToIndexMap.count(InEntity))
+			{
+				return false;
+			}
+			return true;
 		}
 
 		T& GetData(Entity InEntity)

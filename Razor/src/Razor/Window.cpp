@@ -1,41 +1,23 @@
 ﻿#include "Window.h"
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+namespace Razor
 {
-    glViewport(0, 0, width, height);
-}
-
-
-Window::Window(int width, int height)
-{
-    std::cout << "Creating window" << std::endl;
-    window = glfwCreateWindow(800, 600, "Smart Renderer", nullptr, nullptr);
-
-    if(window == nullptr)
+    Window::Window(int width, int height, std::shared_ptr<IWindowProvider> Provider)
     {
-        std::cout << "Failed to create window" << std::endl;
-        glfwTerminate();
+        Provider->CreateProviderWindow(width, height, "Edge");
+        this->Provider = Provider;
+        Width = width;
+        Height = height;
     }
 
-    glfwMakeContextCurrent(window);
-
-    if(!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
+    Window::~Window()
     {
-        std::cout << "Failed to initialise GLAD" << std::endl;
+
     }
-    Width = width;
-    Height = height;
-    glViewport(0, 0, Width, Height);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-}
-
-Window::~Window()
-{
-    
-}
 
 
-GLFWwindow* Window::GetWindowPtr() const
-{
-    return window;
+    std::shared_ptr<IWindowProvider> Window::GetWindowProvider()
+    {
+        return Provider;
+    }
 }

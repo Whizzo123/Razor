@@ -63,7 +63,7 @@ namespace Razor
 		void SetBool(std::string Name, bool Value);
 
 	private:
-		template<typename T>
+		/*template<typename T>
 		std::shared_ptr<ShaderParameterArray<T>> GetParameterArray()
 		{
 			const char* TypeName = typeid(T).name();
@@ -84,7 +84,7 @@ namespace Razor
 			ShaderParameterTypes.insert({ TypeName, NextShaderParameterType });
 			ShaderParametersArrays.insert({ TypeName, std::make_shared<ShaderParameterArray<T>>() });
 			++NextShaderParameterType;
-		}
+		}*/
 
 	public:
 		template<typename T>

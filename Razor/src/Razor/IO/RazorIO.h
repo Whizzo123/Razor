@@ -30,10 +30,10 @@ enum RazorMouseState
 	MOUSE_DOWN
 };
 
-using OnMouseButtonPressedDelegate = Delegate<void, RazorMouseButton, RazorMouseState>;
-using OnMouseButtonReleasedDelegate = Delegate<bool, int>;
-using OnKeyStateChangedDelegate = Delegate<void, RazorKey, RazorKeyState>;
-using OnMousePosChangedDelegate = Delegate<void, double, double>;
+using OnMouseButtonPressedDelegate = MulticastDelegate<RazorMouseButton, RazorMouseState>;
+using OnMouseButtonReleasedDelegate = MulticastDelegate<int>;
+using OnKeyStateChangedDelegate = MulticastDelegate<RazorKey, RazorKeyState>;
+using OnMousePosChangedDelegate = MulticastDelegate<double, double>;
 
 struct Vector2D
 {
@@ -66,9 +66,9 @@ public:
 protected:
 	RazorIO() 
 	{
-		OnMousePosChanged().BindRaw(this, &RazorIO::UpdateMousePositions);
-		OnKeyStateChanged().BindRaw(this, &RazorIO::UpdateKeyStates);
-		OnMouseButtonPressed().BindRaw(this, &RazorIO::UpdateMouseStates);
+		OnMousePosChanged().AddRaw(this, &RazorIO::UpdateMousePositions);
+		OnKeyStateChanged().AddRaw(this, &RazorIO::UpdateKeyStates);
+		OnMouseButtonPressed().AddRaw(this, &RazorIO::UpdateMouseStates);
 	};
 	~RazorIO() {};
 	std::unordered_map<RazorKey, RazorKeyState> Keyboard;

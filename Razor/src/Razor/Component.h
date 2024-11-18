@@ -13,16 +13,15 @@
 namespace Razor
 {
 
-	struct RAZOR_API Transform
+	struct   Transform
 	{
 		glm::vec3 Position;
 		glm::vec3 Scale;
+		glm::vec3 Rotation;
 
-	public:
-		glm::vec3 GetRotation()
-		{
-			return Rotation;
-		}
+		Transform() {}
+		Transform(glm::vec3 Pos, glm::vec3 Scl, glm::vec3 Rot) : Position(Pos), Scale(Scl), Rotation(Rot) {}
+
 		void Rotate(glm::vec3 EulerAngles)
 		{
 			Rotation = EulerAngles;
@@ -37,7 +36,6 @@ namespace Razor
 		}
 
 	private:
-		glm::vec3 Rotation;
 		glm::quat RotationQ;
 
 		void Move(glm::vec3 MoveVector)
@@ -114,11 +112,12 @@ namespace Razor
 
 	struct SpotLight : public DirectionalLight
 	{
-		float CutOff;
+		float Cutoff;
+		float OuterCutoff;
 	};
 
 
-	struct RAZOR_API Mesh
+	struct   Mesh
 	{
 		std::vector<MeshData> Data;
 	};

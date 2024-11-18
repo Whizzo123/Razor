@@ -7,7 +7,7 @@
 namespace Razor
 {
 
-	class RAZOR_API SpinSystem : public System
+	class   SpinSystem : public System
 	{
 
 	public:

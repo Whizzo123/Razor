@@ -9,10 +9,14 @@
 #include "Renderer/Shaders/Shader.h"
 #include "ImGui/RazorImGui.h"
 #include "../Platform/Generic/IPlatformIO.h"
+#include "imgui.h"
+#include "Scene/Scene.h"
 
 namespace Razor
 {
-	class RAZOR_API Engine
+	using Vec2 = ImVec2;
+
+	class   Engine
 	{
 	
 	public:
@@ -36,12 +40,19 @@ namespace Razor
 	protected:
 		Engine()
 		{
-			
+
 		}
 		
 	public:
 		void Run();
-
+		void Step();
+		void InitSystems();
+		float GetDeltaTime() { return DeltaTime; }
+		bool ShouldEngineClose() { return EngineWindow->ShouldWindowClose(); }
+		void RunSystems() { Coordinator->RunSystems(DeltaTime); }
+		void RunRenderSystems(const RenderPipelineConfig& Config) { Coordinator->RunRenderSystems(Config); }
+		RazorImGui& GetGUI() { return std::move(*RazorGUI); }
+		Window& GetWindow() { return std::move(*EngineWindow); }
 		std::shared_ptr<Coordinator> GetCoordinator()
 		{
 			return Coordinator;
@@ -54,13 +65,16 @@ namespace Razor
 		{
 			AddComponent<T>(InEntity, Component);
 		}
-		void ProcessInput(GLFWwindow* window);
+		void ProcessInput();
+		void PickObject(unsigned int PickBuffer);
 		// TODO move this
 		ModelInfo ProcessModel(const char* Path);
 		std::shared_ptr<IRenderer> Renderer;
 		void Init();
 		std::shared_ptr<Shader> GetShaderForID(uint8_t ID);
 		std::shared_ptr<Shader> GetShaderForType(const char* Type);
+		Ref<Scene> CurrentScene;
+
 	private:
 		template<typename T>
 		void AddComponent(Entity InEntity, T Component)
@@ -68,8 +82,9 @@ namespace Razor
 			Coordinator->AddComponent<T>(InEntity, Component);
 		}
 		// TODO replace this properly
-		void PickObject(unsigned int PickBuffer);
-		std::unique_ptr<Window> window;
+		
+		void RenderImGui(uint64_t SceneTexture);
+		std::unique_ptr<Window> EngineWindow;
 		std::shared_ptr<Coordinator> Coordinator;
 		std::unordered_map<uint8_t, std::shared_ptr<Shader>> ShaderIDMap;
 		std::unordered_map<const char*, std::shared_ptr<Shader>> ShaderTypeMap;
@@ -79,5 +94,6 @@ namespace Razor
 		float LastFrame = 0.0f;
 		static Engine* GEngine;
 		std::unique_ptr<IPlatformIO> PlatformIO;
+		
 	};
 }

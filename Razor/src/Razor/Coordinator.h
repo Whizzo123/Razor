@@ -6,7 +6,7 @@
 namespace Razor
 {
 
-	class RAZOR_API Coordinator
+	class Coordinator
 	{
 	public:
 		static std::shared_ptr<Coordinator> GetInstance()
@@ -57,33 +57,27 @@ namespace Razor
 		}
 
 		template<typename T>
+		bool HasComponent(Entity InEntity)
+		{
+			return ComponentMgr->HasComponent<T>(InEntity);
+		}
+
+		template<typename T>
 		ComponentType GetComponentType()
 		{
 			return ComponentMgr->GetComponentType<T>();
 		}
 
 		template<typename T>
-		std::shared_ptr<T> RegisterSystem(T System)
+		std::shared_ptr<T> RegisterSystem(T System, ComponentType* SignatureComponents, std::uint8_t Size)
 		{
-			return SystemMgr->RegisterSystem<T>(System);
-		}
-
-		template<typename T>
-		std::shared_ptr<T> RegisterRenderSystem(T System)
-		{
-			return SystemMgr->RegisterRenderSystem<T>(System);
+			return SystemMgr->RegisterSystem<T>(System, SignatureComponents, Size);
 		}
 
 		template<typename T>
 		void SetSystemSignature(Signature Signature)
 		{
 			SystemMgr->SetSignature<T>(Signature);
-		}
-
-		template<typename T>
-		void SetRenderSystemSignature(RenderStage Stage, Signature Signature)
-		{
-			SystemMgr->SetRenderSignature<T>(Stage, Signature);
 		}
 
 		void RunSystems(float dt)
@@ -100,6 +94,8 @@ namespace Razor
 		{
 			SystemMgr->InitSystems();
 		}
+
+		uint32_t GetCurrentEntityCount();
 
 	private:
 		std::unique_ptr<EntityManager> EntityMgr;

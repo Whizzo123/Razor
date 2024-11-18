@@ -9,7 +9,7 @@ namespace Razor
 		for (Entity Entity : Entities)
 		{
 			Transform& EntityTransform = Coordinator->GetComponent<Transform>(Entity);
-			glm::vec3 TransformRotation = EntityTransform.GetRotation();
+			glm::vec3 TransformRotation = EntityTransform.Rotation;
 			float lastRotateX = TransformRotation.x;
 			float lastRotateY = TransformRotation.y;
 			float lastRotateZ = TransformRotation.z;

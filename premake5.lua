@@ -1,5 +1,6 @@
 workspace "Razor"
 	architecture "x64"
+	startproject "Sandbox"
 
 	configurations
 	{
@@ -14,6 +15,8 @@ group "Dependencies"
 	include "Razor/vendor/GLFW"
 	include "Razor/vendor/assimp"
 	include "Razor/vendor/ImGui"
+	include "Razor/vendor/JoltPhysics"
+	include "Razor/vendor/YAML"
 
 project "Razor"
 	location "Razor"
@@ -44,7 +47,9 @@ project "Razor"
 		"%{prj.name}/vendor/Glad/include",
 		"%{prj.name}/vendor/stb_image/include",
 		"%{prj.name}/vendor/glm",
-		"%{prj.name}/vendor/ImGui"
+		"%{prj.name}/vendor/ImGui",
+		"%{prj.name}/vendor/JoltPhysics",
+		"%{prj.name}/vendor/YAML/include"
 	}
 
 	links
@@ -52,10 +57,17 @@ project "Razor"
 		"GLFW",
 		"opengl32.lib",
 		"assimp",
-		"ImGui"
+		"ImGui",
+		"JoltPhysics",
+		"yaml-cpp"
 	}
 
 	rtti("On")
+
+	defines
+	{
+		"YAML_CPP_STATIC_DEFINE"
+	}
 
 	filter "system:windows"
 		systemversion "latest"
@@ -81,6 +93,71 @@ project "Razor"
 		runtime "Release"
 		optimize "on"
 
+project "Edge"
+	location "Edge"
+	kind "ConsoleApp"
+	language "C++"
+	cppdialect "C++17"
+	staticruntime "on"
+
+	targetdir("bin/" .. outputdir .. "/%{prj.name}")
+	objdir("intermediate/" .. outputdir .. "/%{prj.name}")
+	
+	files
+	{
+		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.cpp"
+	}
+	
+	includedirs 
+	{
+		"Razor/vendor/spdlog/include",
+		"Razor/vendor/GLFW/include",
+		"Razor/vendor/assimp/include",
+		"Razor/vendor/Glad/include",
+		"Razor/vendor/stb_image/include",
+		"Razor/vendor/glm",
+		"Razor/vendor/ImGui",
+		"Razor/vendor/JoltPhysics",
+		"Razor/vendor/YAML/include",
+		"Razor/src"
+	}
+	
+	links 
+	{
+		"Razor"
+	}
+	
+	defines
+	{
+		"YAML_CPP_STATIC_DEFINE"
+	}
+
+	filter "system:windows"
+		staticruntime "On"
+		systemversion "10.0.22621.0"
+
+		defines
+		{
+			"RZ_PLATFORM_WINDOWS"
+		}
+	
+	filter "configurations:Debug"
+		defines "RZ_DEBUG"
+		runtime "Debug"
+		symbols "on"
+	
+	filter "configurations:Release"
+		defines "RZ_RELEASE"
+		runtime "Release"
+		optimize "on"
+	
+	filter "configurations:Dist"
+		defines "RZ_DIST"
+		runtime "Release"
+		optimize "on"
+	
+
 project "Sandbox"
 	location "Sandbox"
 	kind "ConsoleApp"
@@ -105,6 +182,9 @@ project "Sandbox"
 		"Razor/vendor/Glad/include",
 		"Razor/vendor/stb_image/include",
 		"Razor/vendor/glm",
+		"Razor/vendor/ImGui",
+		"Razor/vendor/JoltPhysics",
+		"Razor/vendor/YAML/include",
 		"Razor/src"
 	}
 
@@ -119,7 +199,8 @@ project "Sandbox"
 
 		defines
 		{
-			"RZ_PLATFORM_WINDOWS"
+			"RZ_PLATFORM_WINDOWS",
+			"YAML_CPP_STATIC_DEFINE"
 		}
 
 	filter "configurations:Debug"
