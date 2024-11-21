@@ -7,9 +7,6 @@
 [submodule "Razor/vendor/ImGui"]
 	path = Razor/vendor/ImGui
 	url = https://github.com/TheCherno/imgui.git
-[submodule "Razor/vendor/GLFW"]
-	path = Razor/vendor/GLFW
-	url = https://github.com/TheCherno/glfw
 [submodule "Razor/vendor/glm"]
 	path = Razor/vendor/glm
 	url = https://github.com/g-truc/glm
