@@ -15,8 +15,7 @@ group "Dependencies"
 	include "Razor/vendor/GLFW"
 	include "Razor/vendor/assimp"
 	include "Razor/vendor/ImGui"
-	include "Razor/vendor/JoltPhysics"
-	include "Razor/vendor/YAML"
+	include "Razor/vendor/yaml-cpp"
 
 project "Razor"
 	location "Razor"
@@ -39,6 +38,11 @@ project "Razor"
 		"%{prj.name}/vendor/glm/glm/**.inl"
 	}
 
+	defines
+	{
+		"_CRT_SECURE_NO_WARNINGS"
+	}
+
 	includedirs 
 	{
 		"%{prj.name}/vendor/spdlog/include",
@@ -48,8 +52,7 @@ project "Razor"
 		"%{prj.name}/vendor/stb_image/include",
 		"%{prj.name}/vendor/glm",
 		"%{prj.name}/vendor/ImGui",
-		"%{prj.name}/vendor/JoltPhysics",
-		"%{prj.name}/vendor/YAML/include"
+		"%{prj.name}/vendor/yaml-cpp/include"
 	}
 
 	links
@@ -58,7 +61,6 @@ project "Razor"
 		"opengl32.lib",
 		"assimp",
 		"ImGui",
-		"JoltPhysics",
 		"yaml-cpp"
 	}
 
@@ -118,8 +120,7 @@ project "Edge"
 		"Razor/vendor/stb_image/include",
 		"Razor/vendor/glm",
 		"Razor/vendor/ImGui",
-		"Razor/vendor/JoltPhysics",
-		"Razor/vendor/YAML/include",
+		"Razor/vendor/yaml-cpp/include",
 		"Razor/src"
 	}
 	
@@ -183,8 +184,7 @@ project "Sandbox"
 		"Razor/vendor/stb_image/include",
 		"Razor/vendor/glm",
 		"Razor/vendor/ImGui",
-		"Razor/vendor/JoltPhysics",
-		"Razor/vendor/YAML/include",
+		"Razor/vendor/yaml-cpp/include",
 		"Razor/src"
 	}
 
