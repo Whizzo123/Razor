@@ -13,3 +13,6 @@
 [submodule "Razor/vendor/yaml-cpp"]
 	path = Razor/vendor/yaml-cpp
 	url = https://github.com/Whizzo123/yaml-cpp
+[submodule "Razor/vendor/ImGui"]
+	path = Razor/vendor/ImGui
+	url = https://github.com/Whizzo123/imgui
