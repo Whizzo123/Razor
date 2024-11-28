@@ -124,10 +124,10 @@ namespace Razor
         glfwSwapBuffers(std::dynamic_pointer_cast<OpenGLWindowProvider>(window.GetWindowProvider())->GetPlatformWindowPtr());
     }
 
-    void OpenGLRenderer::ReadPixels(unsigned int X, unsigned int Y, unsigned int Width, unsigned int Height, unsigned char* Pixels, unsigned int Buffer)
+    void OpenGLRenderer::ReadPixels(unsigned int X, unsigned int Y, unsigned int Width, unsigned int Height, unsigned char* OutPixels, unsigned int Buffer)
     {
         glReadBuffer(GL_COLOR_ATTACHMENT0);
-        glReadPixels(X, Y, Width, Height, GL_RGBA, GL_UNSIGNED_BYTE, Pixels);
+        glReadPixels(X, Y, Width, Height, GL_RGBA, GL_UNSIGNED_BYTE, OutPixels);
     }
 
     void OpenGLRenderer::BackupContext()

@@ -10,24 +10,27 @@ namespace Razor
 			Camera& EntityCamera = Coordinator->GetComponent<Camera>(OurEntity);
 			
 			const float CameraSpeed = 5.0f * dt; // adjust accordingly
+			const glm::vec3 CameraFront = EntityCamera.CameraFront;
+			const glm::vec3 CameraUp = EntityCamera.CameraUp;
+
 			if (RazorIO::Get().GetStateForKey(RazorKey::W) == KEY_PRESSED)
 			{
-				EntityCamera.CameraPos += CameraSpeed * EntityCamera.CameraFront;
+				EntityCamera.CameraPos += CameraSpeed * CameraFront;
 			}
 			if (RazorIO::Get().GetStateForKey(RazorKey::S) == KEY_PRESSED)
 			{
-				EntityCamera.CameraPos -= CameraSpeed * EntityCamera.CameraFront;
+				EntityCamera.CameraPos -= CameraSpeed * CameraFront;
 			}
 			if (RazorIO::Get().GetStateForKey(RazorKey::A) == KEY_PRESSED)
 			{
-				EntityCamera.CameraPos -= glm::normalize(glm::cross(EntityCamera.CameraFront, EntityCamera.CameraUp)) * CameraSpeed;
+				EntityCamera.CameraPos -= glm::normalize(glm::cross(CameraFront, CameraUp)) * CameraSpeed;
 			}
 			if (RazorIO::Get().GetStateForKey(RazorKey::D) == KEY_PRESSED)
 			{
-				EntityCamera.CameraPos += glm::normalize(glm::cross(EntityCamera.CameraFront, EntityCamera.CameraUp)) * CameraSpeed;
+				EntityCamera.CameraPos += glm::normalize(glm::cross(CameraFront, CameraUp)) * CameraSpeed;
 			}
 
-			Vector2D CurrentMouseCoords = RazorIO::Get().CurrentMousePos;
+			const Vector2D CurrentMouseCoords = RazorIO::Get().CurrentMousePos;
 			// Capture moment we click down
 			// Move us each update by the distance we have moved
 			// Capture moment we stop clicking

@@ -9,19 +9,13 @@ namespace Razor
 	class Coordinator
 	{
 	public:
-		static std::shared_ptr<Coordinator> GetInstance()
-		{
-			if (!Instance)
-			{
-				Instance = std::make_shared<Coordinator>();
-			}
-			return Instance;
+		static std::shared_ptr<Coordinator> GetInstance();
+
+		Coordinator() 
+		{ 
+			Init(); 
 		};
-		Coordinator() { Init(); };
-	private:
-		void Init();
 		
-	public:
 		Entity CreateEntity();
 		void DestroyEntity(Entity InEntity);
 
@@ -80,22 +74,14 @@ namespace Razor
 			SystemMgr->SetSignature<T>(Signature);
 		}
 
-		void RunSystems(float dt)
-		{
-			SystemMgr->RunSystems(dt);
-		}
-
-		void RunRenderSystems(RenderPipelineConfig PipelineConfig)
-		{
-			SystemMgr->RunRenderSystems(PipelineConfig);
-		}
-
-		void InitSystems()
-		{
-			SystemMgr->InitSystems();
-		}
+		void RunSystems(float dt);
+		void RunRenderSystems(RenderPipelineConfig PipelineConfig);
+		void InitSystems();
 
 		uint32_t GetCurrentEntityCount();
+
+	private:
+		void Init();
 
 	private:
 		std::unique_ptr<EntityManager> EntityMgr;

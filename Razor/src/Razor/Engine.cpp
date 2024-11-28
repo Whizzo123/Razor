@@ -47,7 +47,9 @@ namespace Razor
 		RazorGUI->RegisterImGuiEvents();
 		PlatformIO = std::make_unique<OpenGLIO>(std::dynamic_pointer_cast<OpenGLWindowProvider>(EngineWindow->GetWindowProvider())->GetPlatformWindowPtr());
 		PlatformIO->RegisterInputCallbacks();
-		//CREATE SHADERS
+		
+
+		//TODO don't like this being here
 		std::shared_ptr<Shader> D_MeshShader = std::make_shared<DefaultMeshShader>();
 		ShaderIDMap[D_MeshShader->ID] = D_MeshShader;
 		ShaderTypeMap[typeid(DefaultMeshShader).name()] = D_MeshShader;

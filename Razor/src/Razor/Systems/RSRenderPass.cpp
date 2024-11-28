@@ -12,28 +12,57 @@ namespace Razor
 			{
 				//TODO remove in place of IRenderer alternative
 				glUseProgram(EntityMaterial.ShaderID);
-				PropertySlot Slot = Properties.Properties[EntityToRender].GetPropertySlot(Child.MaterialId);
+				PropertySlot& Slot = Properties.Properties[EntityToRender].GetPropertySlot(Child.MaterialId);
 				std::shared_ptr<Shader> MeshShader = ShaderMap[EntityMaterial.ShaderID];
-				for (const FProperty& FloatProperty : Slot.GetFloatProperties())
+				
+				for (Scope<IProperty>& Prop : Slot.GetProperties())
 				{
-					MeshShader->SetFloat(FloatProperty.Name, FloatProperty.Value);
+					if (!Prop)
+					{
+						continue;
+					}
+					
+					if (Prop->GetType() == typeid(float).name())
+					{
+						if (Property<float>* FloatProperty = dynamic_cast<Property<float>*>(Prop.get()))
+						{
+							MeshShader->SetFloat(FloatProperty->Name, FloatProperty->Value);
+						}
+					}
+
+					if (Prop->GetType() == typeid(glm::vec3).name())
+					{
+						if (Property<glm::vec3>* Vec3Property = dynamic_cast<Property<glm::vec3>*>(Prop.get()))
+						{
+							MeshShader->SetVec3(Vec3Property->Name, Vec3Property->Value);
+						}
+					}
+
+					if (Prop->GetType() == typeid(glm::mat4).name())
+					{
+						if (Property<glm::mat4>* Mat4Property = dynamic_cast<Property<glm::mat4>*>(Prop.get()))
+						{
+							MeshShader->SetMat4Float(Mat4Property->Name, Mat4Property->Value);
+						}
+					}
+
+					if (Prop->GetType() == typeid(bool).name())
+					{
+						if (Property<bool>* BoolProperty = dynamic_cast<Property<bool>*>(Prop.get()))
+						{
+							MeshShader->SetBool(BoolProperty->Name, BoolProperty->Value);
+						}
+					}
+
+					if (Prop->GetType() == typeid(int).name())
+					{
+						if (Property<int>* IntProperty = dynamic_cast<Property<int>*>(Prop.get()))
+						{
+							MeshShader->SetInt(IntProperty->Name, IntProperty->Value);
+						}
+					}
 				}
-				for (const VProperty& Vec3Property : Slot.GetVec3Properties())
-				{
-					MeshShader->SetVec3(Vec3Property.Name, Vec3Property.Value);
-				}
-				for (const MProperty& Mat4Property : Slot.GetMat4Properties())
-				{
-					MeshShader->SetMat4Float(Mat4Property.Name, Mat4Property.Value);
-				}
-				for (const BProperty& BoolProperty : Slot.GetBoolProperties())
-				{
-					MeshShader->SetBool(BoolProperty.Name, BoolProperty.Value);
-				}
-				for (const IProperty& IntProperty : Slot.GetIntProperties())
-				{
-					MeshShader->SetInt(IntProperty.Name, IntProperty.Value);
-				}
+
 				Renderer->DrawMesh({ Child });
 			}
 			Properties.Properties[EntityToRender].Clear();

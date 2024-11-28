@@ -48,9 +48,9 @@ namespace Razor
 		}
 	}
 
-	void SystemManager::RunRenderSystems(RenderPipelineConfig PipelineConfig)
+	void SystemManager::RunRenderSystems(RenderPipelineConfig& PipelineConfig)
 	{
-		for (RenderStageConfig StageConfig : PipelineConfig.Configuration)
+		for (const RenderStageConfig& StageConfig : PipelineConfig)
 		{
 			for (const char* SystemType : StageConfig.StageSystemsToRun)
 			{

@@ -15,14 +15,14 @@ namespace Razor
 				{
 					PropertySlot& Slot = Property.GetPropertySlot(i);
 
-					Slot.AddVec3Property("light.position", Light.Position);
-					Slot.AddVec3Property("light.ambient", Light.Ambient);
-					Slot.AddVec3Property("light.diffuse", Light.Diffuse);
-					Slot.AddVec3Property("light.specular", Light.Specular);
-					Slot.AddFloatProperty("light.constant", Light.Constant);
-					Slot.AddFloatProperty("light.linear", Light.Linear);
-					Slot.AddFloatProperty("light.quadratic", Light.Quadratic);
-					Slot.AddIntProperty("light.lightType", 1);
+					Slot.AddProperty<glm::vec3>("light.position", Light.Position);
+					Slot.AddProperty<glm::vec3>("light.ambient", Light.Ambient);
+					Slot.AddProperty<glm::vec3>("light.diffuse", Light.Diffuse);
+					Slot.AddProperty<glm::vec3>("light.specular", Light.Specular);
+					Slot.AddProperty<float>("light.constant", Light.Constant);
+					Slot.AddProperty<float>("light.linear", Light.Linear);
+					Slot.AddProperty<float>("light.quadratic", Light.Quadratic);
+					Slot.AddProperty<int>("light.lightType", 1);
 				}
 			}
 		}

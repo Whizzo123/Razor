@@ -19,7 +19,7 @@ namespace Razor
 				glm::vec3 EntityColor = glm::vec3(((RenderingEntity >> 16) & 0xff) / 255.0f,
 					((RenderingEntity >> 8) & 0xff) / 255.0f, 
 					(RenderingEntity & 0xff) / 255.0f);
-				Slot.AddVec3Property("entitycolor", EntityColor);
+				Slot.AddProperty<glm::vec3>("entitycolor", EntityColor);
 			}
 		}
 	}

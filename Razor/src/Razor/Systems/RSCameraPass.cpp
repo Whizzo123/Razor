@@ -9,8 +9,6 @@ namespace Razor
 		for(Entity CameraEntity : Entities)
 		{
 			Camera& GameCamera = Coordinator->GetComponent<Camera>(CameraEntity);
-			glm::mat4 View = glm::mat4(1.0f);
-			glm::mat4 Projection = glm::mat4(1.0f);
 			glm::mat4 CameraProjection = glm::perspective(glm::radians(45.0f), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
 			glm::mat4 CameraView = glm::lookAt(GameCamera.CameraPos, GameCamera.CameraPos + GameCamera.CameraFront, GameCamera.CameraUp);
 			for (int i = 0; i <= EntityProperties.HighestEntity; i++)
@@ -20,9 +18,9 @@ namespace Razor
 				{
 					PropertySlot& Slot = EntityProperty.GetPropertySlot(j);
 
-					Slot.AddMat4Property("projection", CameraProjection);
-					Slot.AddMat4Property("view", CameraView);
-					Slot.AddVec3Property("viewPos", GameCamera.CameraPos);
+					Slot.AddProperty<glm::mat4>("projection", CameraProjection);
+					Slot.AddProperty<glm::mat4>("view", CameraView);
+					Slot.AddProperty<glm::vec3>("viewPos", GameCamera.CameraPos);
 				}
 			}
 		}

@@ -10,14 +10,28 @@ namespace Razor
         Height = height;
     }
 
-    Window::~Window()
-    {
-
-    }
-
-
     std::shared_ptr<IWindowProvider> Window::GetWindowProvider()
     {
         return Provider;
+    }
+
+    bool Window::ShouldWindowClose()
+    {
+        return Provider->ShouldWindowClose();
+    }
+
+    void Window::SetWindowToClose()
+    {
+        Provider->SetWindowToClose();
+    }
+
+    int Window::GetWidth() const
+    {
+        return Width;
+    }
+
+    int Window::GetHeight() const
+    {
+        return Height;
     }
 }

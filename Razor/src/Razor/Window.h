@@ -9,12 +9,13 @@ namespace Razor
     {
     public:
         Window(int width, int height, std::shared_ptr<IWindowProvider> Provider);
-        ~Window();
+        ~Window() {};
+
         std::shared_ptr<IWindowProvider> GetWindowProvider();
-        bool ShouldWindowClose() { return Provider->ShouldWindowClose(); }
-        void SetWindowToClose() { Provider->SetWindowToClose(); }
-        int GetWidth() const { return Width; }
-        int GetHeight() const { return Height; }
+        bool ShouldWindowClose();
+        void SetWindowToClose();
+        int GetWidth() const;
+        int GetHeight() const;
 
     protected:
         std::shared_ptr<IWindowProvider> Provider;

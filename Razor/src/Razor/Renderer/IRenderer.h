@@ -41,7 +41,7 @@ namespace Razor
 		virtual void BindFrameBuffer(uint32_t = 0) = 0;
 		virtual Ref<Framebuffer> CreateFrameBuffer(uint32_t Width, uint32_t Height) = 0;
 		virtual CameraInfo GetCameraInfo() = 0;
-		virtual void ReadPixels(unsigned int X, unsigned int Y, unsigned int Width, unsigned int Height, unsigned char* Pixels, unsigned int Buffer) = 0;
+		virtual void ReadPixels(unsigned int X, unsigned int Y, unsigned int Width, unsigned int Height, unsigned char* OutPixels, unsigned int Buffer) = 0;
 		virtual void BackupContext() = 0;
 		virtual void ResetCurrentContext() = 0;
 		virtual void* GetSceneRenderedToTexture() = 0;

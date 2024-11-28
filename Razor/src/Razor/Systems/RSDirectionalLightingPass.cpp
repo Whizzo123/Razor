@@ -16,12 +16,12 @@ namespace Razor
 				{
 					PropertySlot& Slot = Property.GetPropertySlot(i);
 
-					Slot.AddVec3Property("light.position", Light.Position);
-					Slot.AddVec3Property("light.ambient", Light.Ambient);
-					Slot.AddVec3Property("light.diffuse", Light.Diffuse);
-					Slot.AddVec3Property("light.specular", Light.Specular);
-					Slot.AddVec3Property("light.direction", Light.Direction);
-					Slot.AddIntProperty("light.lightType", 0);
+					Slot.AddProperty<glm::vec3>("light.position", Light.Position);
+					Slot.AddProperty<glm::vec3>("light.ambient", Light.Ambient);
+					Slot.AddProperty<glm::vec3>("light.diffuse", Light.Diffuse);
+					Slot.AddProperty<glm::vec3>("light.specular", Light.Specular);
+					Slot.AddProperty<glm::vec3>("light.direction", Light.Direction);
+					Slot.AddProperty<int>("light.lightType", 0);
 				}
 			}
 		}

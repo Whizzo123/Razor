@@ -11,92 +11,57 @@ namespace Razor
 	#define ENUM_RENDERSTAGE
 	enum class RenderStage { RENDER_STAGE_MATERIAL_PASS, RENDER_STAGE_LIGHTING_PASS, RENDER_STAGE_TRANSFORMATION_PASS, RENDER_STAGE_CAMERA_PASS, RENDER_STAGE_RENDER };
 	#endif
+
 	struct RenderStageConfig
 	{
 		RenderStage Stage;
 		std::vector<const char*> StageSystemsToRun;
 	};
-	struct RenderPipelineConfig
+	
+	using RenderPipelineConfig = std::vector<RenderStageConfig>;
+
+	class IProperty
 	{
-		std::vector<RenderStageConfig> Configuration;
+	public:
+		virtual ~IProperty() = default;
+		virtual const char* GetType() = 0;
 	};
-	struct FProperty
+
+	template<typename T>
+	class Property : public IProperty
 	{
+	public:
+		Property() {}
+		~Property() {}
+		Property(std::string Name, T Value)
+		{
+			this->Name = Name;
+			this->Value = Value;
+		}
+		const char* GetType() override
+		{
+			return typeid(T).name();
+		}
+	public:
 		std::string Name;
-		float Value;
+		T Value;
 	};
-	struct VProperty
-	{
-		std::string Name;
-		glm::vec3 Value;
-	};
-	struct MProperty
-	{
-		std::string Name;
-		glm::mat4 Value;
-	};
-	struct BProperty
-	{
-		std::string Name;
-		bool Value;
-	};
-	struct IProperty
-	{
-		std::string Name;
-		int Value;
-	};
+
 	struct PropertySlot
 	{
-		void AddFloatProperty(std::string Name, float Value)
+		template<typename T>
+		void AddProperty(std::string Name, T Value)
 		{
-			FProperties.push_back({ Name, Value });
+			Properties.emplace_back(new Property<T>(Name, Value));
 		}
-
-		void AddIntProperty(std::string Name, int Value)
+		
+		std::vector<Scope<IProperty>>& GetProperties()
 		{
-			IProperties.push_back({ Name, Value });
+			return Properties;
 		}
-
-		void AddBoolProperty(std::string Name, bool Value)
-		{
-			BProperties.push_back({ Name, Value });
-		}
-
-		void AddVec3Property(std::string Name, glm::vec3 Value)
-		{
-			VProperties.push_back({ Name, Value });
-		}
-
-		void AddMat4Property(std::string Name, glm::mat4 Value)
-		{
-			MProperties.push_back({ Name, Value });
-		}
-		std::vector<FProperty>& GetFloatProperties()
-		{
-			return FProperties;
-		}
-		std::vector<VProperty>& GetVec3Properties()
-		{
-			return VProperties;
-		}
-		std::vector<MProperty>& GetMat4Properties()
-		{
-			return MProperties;
-		}
-		std::vector<BProperty>& GetBoolProperties()
-		{
-			return BProperties;
-		}
-		std::vector<IProperty>& GetIntProperties()
-		{
-			return IProperties;
-		}
+		
 	private:
-		std::vector<FProperty> FProperties;
-		std::vector<VProperty> VProperties;
-		std::vector<MProperty> MProperties;
-		std::vector<BProperty> BProperties;
-		std::vector<IProperty> IProperties;
+		std::vector<Scope<IProperty>> Properties;
 	};
 	struct EntityRenderProperty
 	{
@@ -121,7 +86,7 @@ namespace Razor
 
 
 	public:
-		PropertySlot& GetPropertySlot(uint8_t SlotIndex)
+		PropertySlot& GetPropertySlot(int32_t SlotIndex)
 		{
 			if (SlotIndex >= 0 && SlotIndex < Slots.size())
 			{
@@ -142,14 +107,14 @@ namespace Razor
 	{
 	public:
 		std::set<Entity> Entities;
-		virtual void Init() {};
-		virtual void Run(float dt) {};
+		virtual void Init() {}
+		virtual void Run(float dt) {}
 	};
 
 	class RenderSystem : public System
 	{
 	public:
-		virtual void Render(RenderPipelineEntityProperties& Properties) {};
+		virtual void Render(RenderPipelineEntityProperties& Properties) {}
 		static RenderStage SystemRenderStage;
 	};
 
@@ -170,7 +135,7 @@ namespace Razor
 	{
 	public:
 
-		SystemManager() {};
+		SystemManager() {}
 
 		template<typename T>
 		std::shared_ptr<T> RegisterSystem(T SystemInst, ComponentType* SignatureComponents, std::uint8_t Size)
@@ -208,7 +173,7 @@ namespace Razor
 		void EntityDestroyed(Entity InEntity);
 		void EntitySignatureChanged(Entity InEntity, Signature EntitySignature);
 		void RunSystems(float dt);
-		void RunRenderSystems(RenderPipelineConfig PipelineConfig);
+		void RunRenderSystems(RenderPipelineConfig& PipelineConfig);
 		void InitSystems();
 	private:
 		std::unordered_map<const char*, Signature> Signatures{};

@@ -22,7 +22,7 @@ namespace Razor
 		void ClearBuffer() override;
 		void BindFrameBuffer(uint32_t BufferIndex = 0) override;
 		Ref<Framebuffer> CreateFrameBuffer(uint32_t Width, uint32_t Height) override;
-		void ReadPixels(unsigned int X, unsigned int Y, unsigned int I1, unsigned int I2, unsigned char* Pixels, unsigned int Buffer) override;
+		void ReadPixels(unsigned int X, unsigned int Y, unsigned int I1, unsigned int I2, unsigned char* OutPixels, unsigned int Buffer) override;
 		void SwapBuffer(Window& window) override;
 		void BackupContext() override;
 		void ResetCurrentContext() override;
