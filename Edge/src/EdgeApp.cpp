@@ -53,9 +53,12 @@ void Edge::Run()
 	{
 		Engine.Step();
 
-		PickBuffer->Refresh(ViewportSize.x, ViewportSize.y);
-		SceneBuffer->Refresh(ViewportSize.x, ViewportSize.y);
-		glViewport(0, 0, ViewportSize.x, ViewportSize.y);
+		const uint32_t SizeX = (uint32_t)ViewportSize.x;
+		const uint32_t SizeY = (uint32_t)ViewportSize.y;
+
+		PickBuffer->Refresh(SizeX, SizeY);
+		SceneBuffer->Refresh(SizeX, SizeY);
+		glViewport(0, 0, SizeX, SizeY);
 
 		Engine.ProcessInput();
 
@@ -76,7 +79,6 @@ void Edge::Run()
 		Renderer->ClearBuffer();
 
 		Renderer->PollForEvents();
-		bool bIsOpen;
 		Engine.GetGUI().BeginNewFrame();
 		Engine.GetGUI().CreateDockspace();
 		RenderInspector();
