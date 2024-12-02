@@ -4,6 +4,7 @@
 #include "../EntityManager.h"
 #include "../ComponentManager.h"
 #include <glm/glm.hpp>
+#include "../Utils/RazorMacros.h"
 
 namespace Razor
 {
@@ -65,7 +66,7 @@ namespace Razor
 	};
 	struct EntityRenderProperty
 	{
-		void GeneratePropertySlots(uint8_t NumberOfSlots)
+		void GeneratePropertySlots(size_t NumberOfSlots)
 		{
 			Slots.reserve(NumberOfSlots);
 			for (int i = 0; i < NumberOfSlots; i++)
@@ -73,9 +74,9 @@ namespace Razor
 				Slots.push_back(PropertySlot());
 			}
 		}
-		int GetNumberOfSlots()
+		int32_t GetNumberOfSlots()
 		{
-			return Slots.size();
+			return Size_tToInt(Slots.size());
 		}
 		void Clear()
 		{
