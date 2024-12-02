@@ -1,4 +1,5 @@
 ﻿#include "ShaderReader.h"
+#include "Log.h"
 
 
 
@@ -17,10 +18,17 @@ std::string ShaderReader::ReadInShader(std::string shaderName)
 unsigned int ShaderReader::CreateShader(std::string shaderName, ShaderType type)
 {
     std::string temp = ReadInShader(shaderName);
+
+    unsigned int shader = -1;
+
+    if (temp.empty())
+    {
+        RZ_CORE_ERROR("ERROR::SHADER:: {0} ::COMPILATION::FAILED no file found or empty file at {1}", type, shaderName );
+        return shader;
+    }
 	
     const char* source = temp.c_str();
 	
-    unsigned int shader = -1;
     switch(type)
     {
         case VERTEX:
