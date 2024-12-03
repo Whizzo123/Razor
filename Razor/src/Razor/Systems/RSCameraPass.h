@@ -14,6 +14,8 @@ namespace Razor
 			SystemRenderStage = RenderStage::RENDER_STAGE_CAMERA_PASS;
 			Coordinator = Coordinator::GetInstance();
 			this->Renderer = Renderer;
+
+			Signature = { Coordinator->GetComponentType<Camera>() };
 		}
 		void Render(RenderPipelineEntityProperties& EntityProperties) override;
 

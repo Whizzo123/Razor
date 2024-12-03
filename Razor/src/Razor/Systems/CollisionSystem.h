@@ -4,6 +4,9 @@
 
 namespace Razor
 {
+	struct Transform;
+	struct Collider;
+
 	class CollisionSystem : public System
 	{
 	public:
@@ -11,6 +14,7 @@ namespace Razor
 		CollisionSystem()
 		{
 			Coordinator = Razor::Coordinator::GetInstance();
+			Signature = { Coordinator->GetComponentType<Transform>(), Coordinator->GetComponentType<Collider>() };
 		}
 		void Run(float dt) override;
 

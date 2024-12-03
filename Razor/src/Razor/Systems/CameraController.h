@@ -2,8 +2,12 @@
 #include "System.h"
 #include "../Coordinator.h"
 
+
+
 namespace Razor
 {
+	struct Camera;
+
 	class CameraController : public System
 	{
 	public:
@@ -11,6 +15,7 @@ namespace Razor
 		CameraController()
 		{
 			Coordinator = Razor::Coordinator::GetInstance();
+			Signature = { Coordinator->GetComponentType<Camera>() };
 		}
 		void Run(float dt) override;
 

@@ -4,6 +4,8 @@
 
 namespace Razor
 {
+	struct Transform;
+
 	class RSTransformationsPass : public RenderSystem
 	{
 	public:
@@ -11,6 +13,8 @@ namespace Razor
 		{
 			SystemRenderStage = RenderStage::RENDER_STAGE_TRANSFORMATION_PASS;
 			Coordinator = Coordinator::GetInstance();
+
+			Signature = { Coordinator->GetComponentType<Transform>() };
 		}
 		void Render(RenderPipelineEntityProperties& EntityProperties) override;
 

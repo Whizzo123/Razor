@@ -104,10 +104,11 @@ namespace Razor
 	};
 	
 
-	class   System
+	class System
 	{
 	public:
 		std::set<Entity> Entities;
+		std::vector<ComponentType> Signature;
 		virtual void Init() {}
 		virtual void Run(float dt) {}
 	};
@@ -139,7 +140,7 @@ namespace Razor
 		SystemManager() {}
 
 		template<typename T>
-		std::shared_ptr<T> RegisterSystem(T SystemInst, ComponentType* SignatureComponents, std::uint8_t Size)
+		std::shared_ptr<T> RegisterSystem(T SystemInst)
 		{
 			const char* typeName = typeid(T).name();
 			assert(Systems.find(typeName) == Systems.end() && "Registering system twice");
@@ -151,9 +152,9 @@ namespace Razor
 			}
 			// Setup Signature
 			Signature SystemSignature;
-			for (int i = 0; i < Size; i++)
+			for (const ComponentType& Type : SystemInstPtr->Signature)
 			{
-				SystemSignature.set(SignatureComponents[i]);
+				SystemSignature.set(Type);
 			}
 			SetSignature<T>(SystemSignature);
 			return SystemInstPtr;

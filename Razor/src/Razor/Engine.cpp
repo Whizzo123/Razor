@@ -60,45 +60,24 @@ namespace Razor
 		ShaderIDMap[PickShader->ID] = PickShader;
 		ShaderTypeMap[typeid(PickBufferShader).name()] = PickShader;
 
-		// Seperate into some sort of all component/system registration
-		//Swap out Coordinator here with Scene and we will fix this later one :)
-		// Move this to edge as well perhaps
-
 		CurrentScene = CreateRef<Scene>("Untitled.rzscn");
 
-		ComponentType MeshType = Coordinator->GetComponentType<Mesh>();
-		ComponentType MaterialType = Coordinator->GetComponentType<Material>();
-		ComponentType TransformType = Coordinator->GetComponentType<Transform>();
-
 		SceneLights = std::make_shared<std::vector<Light*>>();
-		ComponentType MeshRendererSignature[3]{ MeshType, MaterialType, TransformType };
 		// TODO rename mesh renderer doesn't do rendering just sets up the mesh for renderering
-		Coordinator->RegisterSystem<MeshRenderer>(MeshRenderer(Renderer, ShaderIDMap, SceneLights), MeshRendererSignature, 3);
-		ComponentType CollisionSystemSignature[2]{ TransformType, Coordinator->GetComponentType<Collider>() };
-		Coordinator->RegisterSystem<CollisionSystem>(CollisionSystem(), CollisionSystemSignature, 2);
-		ComponentType CameraControllerSignature[1]{ Coordinator->GetComponentType<Camera>() };
-		Coordinator->RegisterSystem<CameraController>(CameraController(), CameraControllerSignature, 1);
+		Coordinator->RegisterSystem<MeshRenderer>(MeshRenderer(Renderer, ShaderIDMap, SceneLights));
+		Coordinator->RegisterSystem<CollisionSystem>(CollisionSystem());
+		Coordinator->RegisterSystem<CameraController>(CameraController());
 
 		//Render Systems
-		
-		ComponentType MaterialPassSignature[1] { MaterialType };
-		Coordinator->RegisterSystem<RSMaterialPass>(RSMaterialPass(), MaterialPassSignature, 1);
-		ComponentType TransformPassSignature[1]{ Coordinator->GetComponentType<Transform>() };
-		Coordinator->RegisterSystem<RSTransformationsPass>(RSTransformationsPass(), TransformPassSignature, 1);
-		ComponentType DirectionalLightPassSignature[1]{ Coordinator->GetComponentType<DirectionalLight>() };
-		Coordinator->RegisterSystem<RSDirectionalLightingPass>(RSDirectionalLightingPass(), DirectionalLightPassSignature, 1);
-		ComponentType CameraPassSignature[1]{ Coordinator->GetComponentType<Camera>() };
-		Coordinator->RegisterSystem<RSCameraPass>(RSCameraPass(Renderer), CameraPassSignature, 1);
-		ComponentType RenderPassSignature[2]{ MeshType, MaterialType };
-		Coordinator->RegisterSystem<RSRenderPass>(RSRenderPass(Renderer, ShaderIDMap), RenderPassSignature, 2);
-		ComponentType PickBufferMaterialPassSignature[2]{ MeshType, MaterialType };
-		Coordinator->RegisterSystem<RSPickBufferMaterialPass>(RSPickBufferMaterialPass(), PickBufferMaterialPassSignature, 2);
-		ComponentType PickBufferRenderPassSignature[2]{ MeshType, MaterialType };
-		Coordinator->RegisterSystem<RSPickBufferRenderPass>(RSPickBufferRenderPass(Renderer, ShaderIDMap), PickBufferRenderPassSignature, 2);
-		ComponentType PointLightingPassSignature[2]{ Coordinator->GetComponentType<PointLight>() };
-		Coordinator->RegisterSystem<RSPointLightingPass>(RSPointLightingPass(), PointLightingPassSignature, 2);
-		ComponentType SpotLightingPassSignature[1]{ Coordinator->GetComponentType<SpotLight>() };
-		Coordinator->RegisterSystem<RSSpotLightingPass>(RSSpotLightingPass(), SpotLightingPassSignature, 1);
+		Coordinator->RegisterSystem<RSMaterialPass>(RSMaterialPass());
+		Coordinator->RegisterSystem<RSTransformationsPass>(RSTransformationsPass());
+		Coordinator->RegisterSystem<RSDirectionalLightingPass>(RSDirectionalLightingPass());
+		Coordinator->RegisterSystem<RSCameraPass>(RSCameraPass(Renderer));
+		Coordinator->RegisterSystem<RSRenderPass>(RSRenderPass(Renderer, ShaderIDMap));
+		Coordinator->RegisterSystem<RSPickBufferMaterialPass>(RSPickBufferMaterialPass());
+		Coordinator->RegisterSystem<RSPickBufferRenderPass>(RSPickBufferRenderPass(Renderer, ShaderIDMap));
+		Coordinator->RegisterSystem<RSPointLightingPass>(RSPointLightingPass());
+		Coordinator->RegisterSystem<RSSpotLightingPass>(RSSpotLightingPass());
 		
 	}
 

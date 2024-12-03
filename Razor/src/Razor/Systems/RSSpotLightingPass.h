@@ -4,6 +4,8 @@
 
 namespace Razor
 {
+	struct SpotLight;
+
     class RSSpotLightingPass : public RenderSystem
     {
 	public:
@@ -11,6 +13,8 @@ namespace Razor
 		{
 			Coordinator = Coordinator::GetInstance();
 			SystemRenderStage = RenderStage::RENDER_STAGE_LIGHTING_PASS;
+
+			Signature = { Coordinator->GetComponentType<SpotLight>() };
 		}
 		void Render(RenderPipelineEntityProperties& Properties) override;
 

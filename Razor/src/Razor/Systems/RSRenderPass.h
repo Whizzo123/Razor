@@ -15,6 +15,8 @@ namespace Razor
 				SystemRenderStage = RenderStage::RENDER_STAGE_RENDER;
 				Renderer = EngineRenderer;
 				ShaderMap = IDToShaderMap;
+
+				Signature = { Coordinator->GetComponentType<Mesh>(), Coordinator->GetComponentType<Material>() };
 			}
 			void Render(RenderPipelineEntityProperties& Properties) override;
 

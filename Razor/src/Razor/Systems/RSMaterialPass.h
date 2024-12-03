@@ -4,6 +4,8 @@
 
 namespace Razor
 {
+	struct Material;
+
 	class RSMaterialPass : public RenderSystem
 	{
 	public:
@@ -11,6 +13,8 @@ namespace Razor
 		{
 			Coordinator = Coordinator::GetInstance();
 			SystemRenderStage = RenderStage::RENDER_STAGE_MATERIAL_PASS;
+
+			Signature = { Coordinator->GetComponentType<Material>() };
 		}
 		void Render(RenderPipelineEntityProperties& Properties) override;
 

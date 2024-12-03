@@ -9,7 +9,7 @@
 
 namespace Razor
 {
-	class   MeshRenderer : public System
+	class MeshRenderer : public System
 	{
 	public:
 		MeshRenderer(std::shared_ptr<IRenderer> Renderer, std::unordered_map<uint8_t, std::shared_ptr<Shader>>& IDToShaderMap, std::shared_ptr<std::vector<Light*>> SceneLights)
@@ -18,6 +18,7 @@ namespace Razor
 			this->Renderer = Renderer;
 			ShaderMap = IDToShaderMap;
 			Lights = SceneLights;
+			Signature = { Coordinator->GetComponentType<Mesh>(), Coordinator->GetComponentType<Material>(), Coordinator->GetComponentType<Transform>() };
 		}
 		void Run(float dt) override;
 		void Init() override;

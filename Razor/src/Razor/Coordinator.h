@@ -63,9 +63,9 @@ namespace Razor
 		}
 
 		template<typename T>
-		std::shared_ptr<T> RegisterSystem(T System, ComponentType* SignatureComponents, std::uint8_t Size)
+		std::shared_ptr<T> RegisterSystem(T System)
 		{
-			return SystemMgr->RegisterSystem<T>(System, SignatureComponents, Size);
+			return SystemMgr->RegisterSystem<T>(System);
 		}
 
 		template<typename T>
