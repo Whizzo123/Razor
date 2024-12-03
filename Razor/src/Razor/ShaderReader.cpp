@@ -51,7 +51,7 @@ unsigned int ShaderReader::CreateShader(std::string shaderName, ShaderType type)
     if(!success)
     {
         glGetShaderInfoLog(shader, 512, nullptr, infoLog);
-        std::cout << "ERROR::SHADER::"<< type <<"::COMPILATION::FAILED\n" << infoLog << std::endl;
+        RZ_CORE_ERROR("ERROR::SHADER::{0}::COMPILATION::FAILED\n{1}", type, infoLog);
     }
 
     return shader;
@@ -75,7 +75,7 @@ unsigned ShaderReader::CreateShaderProgram(std::string vertexShaderFile, std::st
     {
         char infoLog[512];
         glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
-        std::cout << "ERROR::PROGRAM::LINKING::FAILED" << infoLog << std::endl;
+        RZ_CORE_ERROR("ERROR::PROGRAM::LINKING::FAILED\n{0}", infoLog);
     }
 
     glDeleteShader(vertexShader);

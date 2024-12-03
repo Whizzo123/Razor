@@ -26,7 +26,10 @@ namespace Razor
 		ComponentType GetComponentType()
 		{
 			const char* typeName = typeid(T).name();
-			assert(ComponentTypes.find(typeName) != ComponentTypes.end() && "Component does not exist");
+			if (ComponentTypes.find(typeName) == ComponentTypes.end())
+			{
+				RegisterComponent<T>();
+			}
 			return ComponentTypes[typeName];
 		}
 

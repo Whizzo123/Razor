@@ -66,16 +66,6 @@ namespace Razor
 
 		CurrentScene = CreateRef<Scene>("Untitled.rzscn");
 
-		Coordinator->RegisterComponent<Mesh>();
-		Coordinator->RegisterComponent<Material>();
-		Coordinator->RegisterComponent<Transform>();
-		Coordinator->RegisterComponent<Collider>();
-		Coordinator->RegisterComponent<Light>();
-		Coordinator->RegisterComponent<DirectionalLight>();
-		Coordinator->RegisterComponent<PointLight>();
-		Coordinator->RegisterComponent<SpotLight>();
-		Coordinator->RegisterComponent<Camera>();
-
 		ComponentType MeshType = Coordinator->GetComponentType<Mesh>();
 		ComponentType MaterialType = Coordinator->GetComponentType<Material>();
 		ComponentType TransformType = Coordinator->GetComponentType<Transform>();
