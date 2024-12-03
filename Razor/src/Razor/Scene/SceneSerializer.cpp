@@ -53,6 +53,7 @@ namespace Razor
 			Out << YAML::Key << "Position" << YAML::Value << EntityTransform.Position;
 			Out << YAML::Key << "Rotation" << YAML::Value << EntityTransform.Rotation;
 			Out << YAML::Key << "Scale" << YAML::Value << EntityTransform.Scale;
+			Out << YAML::EndMap;
 		}
 
 		Out << YAML::EndMap;

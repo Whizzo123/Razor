@@ -1,4 +1,7 @@
-#include "Razor.h"
+#include <Razor.h>
+#include <Razor/EntryPoint.h>
+
+#include "Inspector.h"
 
 
 class Edge : public Razor::Application
@@ -7,7 +10,6 @@ public:
 	Edge() {};
 	~Edge() {};
 	void Run() override;
-	void RenderInspector();
 	void RenderSceneViewport(Razor::Ref<Razor::Framebuffer> SceneBuffer, ImVec2 ViewportSize);
 };
 
@@ -48,6 +50,8 @@ void Edge::Run()
 	SceneBuffer = Engine.Renderer->CreateFrameBuffer(300, 200);
 	PickBuffer = Engine.Renderer->CreateFrameBuffer(300, 200);
 
+	Inspector InspectorWindow;
+
 	Razor::SceneSerializer::Deserialize(Engine.CurrentScene);
 	while (!Engine.ShouldEngineClose())
 	{
@@ -81,7 +85,7 @@ void Edge::Run()
 		Renderer->PollForEvents();
 		Engine.GetGUI().BeginNewFrame();
 		Engine.GetGUI().CreateDockspace();
-		RenderInspector();
+		InspectorWindow.Render();
 		RenderSceneViewport(SceneBuffer, ViewportSize);
 		ImGui::ShowMetricsWindow();
 		ImGui::End();
@@ -90,16 +94,6 @@ void Edge::Run()
 	}
 	Razor::SceneSerializer::Serialize(Engine.CurrentScene);
 	Razor::Engine::Get().Renderer->TerminateRendererAPI();
-}
-
-void Edge::RenderInspector()
-{
-	bool bIsOpen;
-	ImGui::Begin("Inspector", &bIsOpen, ImGuiWindowFlags_MenuBar);
-	ImGui::SetWindowSize(ImVec2(200.0f, 200.0f));
-	ImGui::Text("Hello Inspector, %d", 123);
-	ImGui::Button("Button", ImVec2(50.f, 25.f));
-	ImGui::End();
 }
 
 void Edge::RenderSceneViewport(Razor::Ref<Razor::Framebuffer> SceneBuffer, ImVec2 ViewportSize)

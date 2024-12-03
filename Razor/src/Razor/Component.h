@@ -13,14 +13,14 @@
 namespace Razor
 {
 
-	struct   Transform
+	struct Transform
 	{
 		glm::vec3 Position;
 		glm::vec3 Scale;
 		glm::vec3 Rotation;
 
-		Transform() {}
-		Transform(glm::vec3 Pos, glm::vec3 Scl, glm::vec3 Rot) : Position(Pos), Scale(Scl), Rotation(Rot) {}
+		Transform() : Position(0.0f, 0.0f, 0.0f), Scale(0.0f, 0.0f, 0.0f), Rotation(0.0f, 0.0f, 0.0f), RotationQ(0.0f, 0.0f, 0.0f, 1.0f) {}
+		Transform(glm::vec3 Pos, glm::vec3 Scl, glm::vec3 Rot) : Position(Pos), Scale(Scl), Rotation(Rot), RotationQ(0.0f, 0.0f, 0.0f, 1.0f) {}
 
 		void Rotate(glm::vec3 EulerAngles)
 		{
