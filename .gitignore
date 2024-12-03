@@ -44,3 +44,4 @@ intermediate/
 *.vcxproj
 *.vcxproj.filters
 *.sln
+*.ini
