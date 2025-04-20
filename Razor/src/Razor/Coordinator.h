@@ -77,6 +77,7 @@ namespace Razor
 		void RunSystems(float dt);
 		void RunRenderSystems(RenderPipelineConfig PipelineConfig);
 		void InitSystems();
+		std::vector<const char*> GetComponentsForEntity(Entity InEntity);
 
 		uint32_t GetCurrentEntityCount();
 
