@@ -52,4 +52,9 @@ namespace Razor
 	{
 		SystemMgr->InitSystems();
 	}
+
+	std::vector<const char*> Coordinator::GetComponentsForEntity(Entity InEntity)
+	{
+		return ComponentMgr->GetComponentsForEntity(InEntity);
+	}
 }
