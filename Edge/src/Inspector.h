@@ -9,5 +9,6 @@ public:
 
 private:
 	void CreateEntity();
+	void CreateWidgetForProperty(const std::string& PropertyName, const std::string& PropertyValue);
 };
 

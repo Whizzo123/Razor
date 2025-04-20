@@ -59,6 +59,8 @@ namespace Razor
 
 		void EntityDestroyed(Entity InEntity);
 
+		std::vector<const char*> GetComponentsForEntity(Entity InEntity);
+
 	private:
 		// Map from type string pointer to a component type
 		std::unordered_map<const char*, ComponentType> ComponentTypes{};

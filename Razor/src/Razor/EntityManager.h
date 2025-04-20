@@ -42,6 +42,7 @@ namespace Razor
 	public:
 		virtual ~IComponentArray() = default;
 		virtual void EntityDestroyed(Entity InEntity) = 0;
+		virtual bool HasData(Entity InEntity) = 0;
 	};
 
 

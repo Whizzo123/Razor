@@ -12,6 +12,12 @@
 
 namespace Razor
 {
+	struct ISerializable
+	{
+	public:
+		virtual std::unordered_map<std::string, std::string> Serialize() = 0;
+	};
+
 
 	struct Transform
 	{
