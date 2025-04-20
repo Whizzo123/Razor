@@ -16,3 +16,6 @@
 [submodule "Razor/vendor/ImGui"]
 	path = Razor/vendor/ImGui
 	url = https://github.com/Whizzo123/imgui
+[submodule "Razor/vendor/entt"]
+	path = Razor/vendor/entt
+	url = https://github.com/Whizzo123/entt.git

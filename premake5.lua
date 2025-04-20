@@ -16,6 +16,7 @@ group "Dependencies"
 	include "Razor/vendor/assimp"
 	include "Razor/vendor/ImGui"
 	include "Razor/vendor/yaml-cpp"
+	include "Razor/vendor/entt"
 
 project "Razor"
 	location "Razor"
@@ -35,7 +36,9 @@ project "Razor"
 		"%{prj.name}/vendor/Glad/src/glad.c",
 		"%{prj.name}/vendor/stb_image/src/stb_image.h",
 		"%{prj.name}/vendor/glm/glm/**.hpp",
-		"%{prj.name}/vendor/glm/glm/**.inl"
+		"%{prj.name}/vendor/glm/glm/**.inl",
+		"%{prj.name}/vendor/entt/src**.hpp",
+		"%{prj.name}/vendor/entt/src**.cpp"
 	}
 
 	defines
@@ -52,7 +55,8 @@ project "Razor"
 		"%{prj.name}/vendor/stb_image/include",
 		"%{prj.name}/vendor/glm",
 		"%{prj.name}/vendor/ImGui",
-		"%{prj.name}/vendor/yaml-cpp/include"
+		"%{prj.name}/vendor/yaml-cpp/include",
+		"%{prj.name}/vendor/entt/src"
 	}
 
 	links
