@@ -11,6 +11,7 @@
 #include "../Platform/Generic/IPlatformIO.h"
 #include "imgui.h"
 #include "Scene/Scene.h"
+#include "entt/entt.hpp"
 
 namespace Razor
 {
@@ -58,13 +59,6 @@ namespace Razor
 			return Coordinator;
 		}
 
-		Entity CreateEntity();
-
-		template<typename T>
-		void AddComponentToEntity(Entity InEntity, T Component)
-		{
-			AddComponent<T>(InEntity, Component);
-		}
 		void ProcessInput();
 		void PickObject(unsigned int PickBuffer);
 		// TODO move this
@@ -76,14 +70,9 @@ namespace Razor
 		Ref<Scene> CurrentScene;
 
 	private:
-		template<typename T>
-		void AddComponent(Entity InEntity, T Component)
-		{
-			Coordinator->AddComponent<T>(InEntity, Component);
-		}
-		// TODO replace this properly
 		
 		void RenderImGui(uint64_t SceneTexture);
+
 		std::unique_ptr<Window> EngineWindow;
 		std::shared_ptr<Coordinator> Coordinator;
 		std::unordered_map<uint8_t, std::shared_ptr<Shader>> ShaderIDMap;

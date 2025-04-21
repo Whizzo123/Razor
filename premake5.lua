@@ -125,7 +125,8 @@ project "Edge"
 		"Razor/vendor/glm",
 		"Razor/vendor/ImGui",
 		"Razor/vendor/yaml-cpp/include",
-		"Razor/src"
+		"Razor/src",
+		"Razor/vendor/entt/src"
 	}
 	
 	links 
@@ -189,7 +190,8 @@ project "Sandbox"
 		"Razor/vendor/glm",
 		"Razor/vendor/ImGui",
 		"Razor/vendor/yaml-cpp/include",
-		"Razor/src"
+		"Razor/src",
+		"Razor/vendor/entt/src"
 	}
 
 	links 

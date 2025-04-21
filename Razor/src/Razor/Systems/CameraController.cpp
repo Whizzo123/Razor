@@ -5,9 +5,11 @@ namespace Razor
 {
 	void CameraController::Run(float dt)
 	{
-		for (Entity OurEntity : Entities)
+		auto View = CurrentScene->GetEntitiesWithComponents<Camera>();
+
+		for (auto Entity : View)
 		{
-			Camera& EntityCamera = Coordinator->GetComponent<Camera>(OurEntity);
+			Camera& EntityCamera = CurrentScene->GetComponent<Camera>(Entity);
 			
 			const float CameraSpeed = 5.0f * dt; // adjust accordingly
 			const glm::vec3 CameraFront = EntityCamera.CameraFront;

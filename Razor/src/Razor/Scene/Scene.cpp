@@ -1,5 +1,5 @@
 #include "Scene.h"
-
+#include "../Core/Entity.h"
 
 namespace Razor
 {
@@ -10,6 +10,13 @@ namespace Razor
 	Scene::~Scene()
 	{
 
+	}
+
+	Ref<Entity> Scene::CreateEntity()
+	{
+		auto entityHandle = registry.create();
+		Ref<Entity> ent = CreateRef<Entity>(entityHandle, this);
+		return ent;
 	}
 	
 

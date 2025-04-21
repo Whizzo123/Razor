@@ -12,13 +12,12 @@ namespace Razor
 	class MeshRenderer : public System
 	{
 	public:
-		MeshRenderer(std::shared_ptr<IRenderer> Renderer, std::unordered_map<uint8_t, std::shared_ptr<Shader>>& IDToShaderMap, std::shared_ptr<std::vector<Light*>> SceneLights)
+		MeshRenderer(Ref<Scene> Scene, std::shared_ptr<IRenderer> Renderer, std::unordered_map<uint8_t, std::shared_ptr<Shader>>& IDToShaderMap, std::shared_ptr<std::vector<Light*>> SceneLights)
+			: System(Scene)
 		{
-			Coordinator = Razor::Coordinator::GetInstance();
 			this->Renderer = Renderer;
 			ShaderMap = IDToShaderMap;
 			Lights = SceneLights;
-			Signature = { Coordinator->GetComponentType<Mesh>(), Coordinator->GetComponentType<Material>(), Coordinator->GetComponentType<Transform>() };
 		}
 		void Run(float dt) override;
 		void Init() override;
@@ -27,7 +26,6 @@ namespace Razor
 		void InitMesh(MeshData& MeshToInit);
 
 	private:
-		std::shared_ptr<Razor::Coordinator> Coordinator;
 		std::shared_ptr<IRenderer> Renderer;
 		std::unordered_map<uint8_t, std::shared_ptr<Shader>> ShaderMap;
 		std::shared_ptr<std::vector<Light*>> Lights;

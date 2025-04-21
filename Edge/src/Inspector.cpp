@@ -13,18 +13,22 @@ void Inspector::Render()
 	{
 		CreateEntity();
 	}
+
+	Razor::Ref<Razor::Scene> CurrentScene = Engine.CurrentScene;
+
 	if (ImGui::TreeNode("Entities"))
 	{
-		for (int EntityIndex = 0; EntityIndex < Engine.GetCoordinator()->GetCurrentEntityCount(); EntityIndex++)
+		// Need wrapper for the view type not lovely to have
+		auto View = CurrentScene->GetEntitiesWithComponents<Razor::Transform>();
+		for (auto Entity : View)
 		{
-			if (ImGui::Button(std::to_string(EntityIndex).c_str(), ImVec2(50.f, 25.f)))
+			if (ImGui::Button(std::to_string((uint32_t)Entity).c_str(), ImVec2(50.f, 25.f)))
 			{
-				std::shared_ptr<Razor::Coordinator> Coordinator = Engine.GetCoordinator();
-				std::vector<const char*> ComponentTypeNames = Coordinator->GetComponentsForEntity(EntityIndex);
+				/*std::vector<const char*> ComponentTypeNames = Coordinator->GetComponentsForEntity(EntityIndex);
 				for (const char*& Name : ComponentTypeNames)
 				{
 					if (Name == typeid(Razor::Transform).name())
-					{
+					{*/
 						// TODO do we want to consider some sort of reflection based approach to the typing i.e a map of typename() to T
 						/*Razor::Transform TransformComp = Coordinator->GetComponent<Razor::Transform>(EntityIndex);
 						std::unordered_map<std::string, std::string> PropertiesMap = TransformComp.Serialize();
@@ -32,8 +36,8 @@ void Inspector::Render()
 						{
 							CreateWidgetForProperty(Property.first, Property.second);
 						}*/
-					}
-				}
+					//}
+				//}
 			}
 		}
 		ImGui::TreePop();
@@ -44,8 +48,8 @@ void Inspector::Render()
 void Inspector::CreateEntity()
 {
 	Razor::Engine& Engine = Razor::Engine::Get();
-	Razor::Entity NewEntity = Engine.CreateEntity();
-	Engine.AddComponentToEntity(NewEntity, Razor::Transform());
+	Razor::Ref<Razor::Entity> NewEntity = Engine.CurrentScene->CreateEntity();
+	NewEntity->AddComponent<Razor::Transform>();
 }
 
 void Inspector::CreateWidgetForProperty(const std::string& PropertyName, const std::string& PropertyValue)

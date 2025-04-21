@@ -5,12 +5,14 @@ namespace Razor
 {
 	void RSPointLightingPass::Render(RenderPipelineEntityProperties& Properties)
 	{
-		for (Entity RenderingEntity : Entities)
+		auto View = CurrentScene->GetEntitiesWithComponents<PointLight>();
+
+		for (auto RenderingEntity : View)
 		{
-			PointLight& Light = Coordinator->GetComponent<PointLight>(RenderingEntity);
-			for (int j = 0; j <= Properties.HighestEntity; j++)
+			PointLight& Light = CurrentScene->GetComponent<PointLight>(RenderingEntity);
+			for (auto& Pair : Properties.Properties)
 			{
-				EntityRenderProperty& Property = Properties.Properties[j];
+				EntityRenderProperty& Property = Pair.second;
 				for (int i = 0; i < Property.GetNumberOfSlots(); i++)
 				{
 					PropertySlot& Slot = Property.GetPropertySlot(i);

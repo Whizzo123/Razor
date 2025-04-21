@@ -9,17 +9,11 @@ namespace Razor
 	class RSMaterialPass : public RenderSystem
 	{
 	public:
-		RSMaterialPass()
+		RSMaterialPass(Ref<Razor::Scene> Scene) : RenderSystem(Scene)
 		{
-			Coordinator = Coordinator::GetInstance();
 			SystemRenderStage = RenderStage::RENDER_STAGE_MATERIAL_PASS;
-
-			Signature = { Coordinator->GetComponentType<Material>() };
 		}
 		void Render(RenderPipelineEntityProperties& Properties) override;
-
-	protected:
-		std::shared_ptr<Coordinator> Coordinator;
 	};
 }
 

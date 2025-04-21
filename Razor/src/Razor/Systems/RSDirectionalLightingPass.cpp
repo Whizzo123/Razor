@@ -6,12 +6,14 @@ namespace Razor
 
 	void RSDirectionalLightingPass::Render(RenderPipelineEntityProperties& Properties)
 	{
-		for (Entity RenderingEntity : Entities)
+		auto View = CurrentScene->GetEntitiesWithComponents<DirectionalLight>();
+
+		for (auto RenderingEntity : View)
 		{
-			DirectionalLight& Light = Coordinator->GetComponent<DirectionalLight>(RenderingEntity);
-			for (int j = 0; j <= Properties.HighestEntity; j++)
+			DirectionalLight& Light = CurrentScene->GetComponent<DirectionalLight>(RenderingEntity);
+			for (auto& Pair : Properties.Properties)
 			{
-				EntityRenderProperty& Property = Properties.Properties[j];
+				EntityRenderProperty& Property = Pair.second;
 				for (int i = 0; i < Property.GetNumberOfSlots(); i++)
 				{
 					PropertySlot& Slot = Property.GetPropertySlot(i);

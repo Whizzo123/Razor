@@ -5,9 +5,14 @@ namespace Razor
 {
 	void RSTransformationsPass::Render(RenderPipelineEntityProperties& EntityProperties)
 	{
-		for (const Entity& Entity : Entities)
+		auto View = CurrentScene->GetEntitiesWithComponents<Transform>();
+		for (auto Entity : View)
 		{
-			Transform& EntityTransform = Coordinator->GetComponent<Transform>(Entity);
+			Transform& EntityTransform = CurrentScene->GetComponent<Transform>(Entity);
+			if (EntityProperties.Properties.find(Entity) == EntityProperties.Properties.end())
+			{
+				continue;
+			}
 			EntityRenderProperty& EntityProperty = EntityProperties.Properties[Entity];
 			for (int i = 0; i < EntityProperty.GetNumberOfSlots(); i++)
 			{

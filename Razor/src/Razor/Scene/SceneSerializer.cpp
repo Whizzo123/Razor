@@ -42,7 +42,7 @@ namespace Razor
 
 	void SceneSerializer::SerializeEntity(YAML::Emitter& Out, Entity InEntity)
 	{
-		Out << YAML::BeginMap;
+		/*Out << YAML::BeginMap;
 		Out << YAML::Key << "Entity" << YAML::Value << InEntity;
 		if (Coordinator::GetInstance()->HasComponent<Transform>(InEntity))
 		{
@@ -56,14 +56,14 @@ namespace Razor
 			Out << YAML::EndMap;
 		}
 
-		Out << YAML::EndMap;
+		Out << YAML::EndMap;*/
 	}
 
 
 
 	void SceneSerializer::Serialize(Ref<Scene> OutScene)
 	{
-		YAML::Emitter Out;
+		/*YAML::Emitter Out;
 		Out << YAML::BeginMap;
 		Out << YAML::Key << "Scene" << YAML::Value << "Untitled";
 		Out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
@@ -80,7 +80,7 @@ namespace Razor
 		std::perror(ErrorMsg);
 		RZ_CORE_WARN("Error Msg: {0}", ErrorMsg);
 		FOut << Out.c_str();
-		FOut.close();
+		FOut.close();*/
 	}
 
 	void SceneSerializer::Deserialize(Ref<Scene> OutScene)
@@ -110,7 +110,7 @@ namespace Razor
 		{
 			for (auto EntityNode : Entities)
 			{
-				Entity DeserializedEntity = Coordinator::GetInstance()->CreateEntity();
+				Ref<Entity> DeserializedEntity = OutScene->CreateEntity();
 				auto TransformComponent = EntityNode["Transform"];
 				if (TransformComponent)
 				{
@@ -118,7 +118,7 @@ namespace Razor
 					glm::vec3 Rotation = TransformComponent["Rotation"].as<glm::vec3>();
 					glm::vec3 Scale = TransformComponent["Scale"].as<glm::vec3>();
 					Transform EntityTransform = { Position, Scale, Rotation };
-					Coordinator::GetInstance()->AddComponent<Transform>(DeserializedEntity, EntityTransform);
+					DeserializedEntity->AddComponent<Transform>(EntityTransform);
 				}
 			}
 		}

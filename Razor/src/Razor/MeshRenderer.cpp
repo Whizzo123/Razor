@@ -9,9 +9,10 @@ namespace Razor
 {
     void MeshRenderer::Init()
     {
-        for (Entity Entity : Entities)
+        auto View = CurrentScene->GetEntitiesWithComponents<Mesh>();
+        for (auto Entity : View)
         {
-            Mesh& EntityMesh = Coordinator->GetComponent<Mesh>(Entity);
+            Mesh& EntityMesh = CurrentScene->GetComponent<Mesh>(Entity);
             for (MeshData& Mesh : EntityMesh.Data)
             {
                 if (Mesh.Vertices.size() > 0)
