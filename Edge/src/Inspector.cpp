@@ -22,22 +22,9 @@ void Inspector::Render()
 		auto View = CurrentScene->GetEntitiesWithComponents<Razor::Transform>();
 		for (auto Entity : View)
 		{
-			if (ImGui::Button(std::to_string((uint32_t)Entity).c_str(), ImVec2(50.f, 25.f)))
+			if (ImGui::CollapsingHeader(std::to_string((uint32_t)Entity).c_str()))
 			{
-				/*std::vector<const char*> ComponentTypeNames = Coordinator->GetComponentsForEntity(EntityIndex);
-				for (const char*& Name : ComponentTypeNames)
-				{
-					if (Name == typeid(Razor::Transform).name())
-					{*/
-						// TODO do we want to consider some sort of reflection based approach to the typing i.e a map of typename() to T
-						/*Razor::Transform TransformComp = Coordinator->GetComponent<Razor::Transform>(EntityIndex);
-						std::unordered_map<std::string, std::string> PropertiesMap = TransformComp.Serialize();
-						for (auto const& Property : PropertiesMap)
-						{
-							CreateWidgetForProperty(Property.first, Property.second);
-						}*/
-					//}
-				//}
+				Razor::ComponentImGui::DrawComponents(CurrentScene->GetEntity(Entity));
 			}
 		}
 		ImGui::TreePop();

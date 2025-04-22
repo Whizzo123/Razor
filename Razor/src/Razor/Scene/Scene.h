@@ -16,6 +16,8 @@ namespace Razor
 
 		Ref<Entity> CreateEntity();
 
+		Ref<Entity> GetEntity(entt::entity EntityHandle);
+
 		template<typename... T>
 		auto GetEntitiesWithComponents()
 		{

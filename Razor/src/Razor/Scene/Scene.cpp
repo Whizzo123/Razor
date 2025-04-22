@@ -19,6 +19,9 @@ namespace Razor
 		return ent;
 	}
 	
-
+	Ref<Entity> Scene::GetEntity(entt::entity EntityHandle)
+	{
+		return CreateRef<Entity>(EntityHandle, this);
+	}
 	
 }

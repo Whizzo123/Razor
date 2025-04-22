@@ -17,6 +17,18 @@ namespace Razor
 			return component;
 		}
 
+		template<typename T>
+		bool HasComponent()
+		{
+			return _Scene->registry.try_get<T>(EntityHandle) != nullptr;
+		}
+
+		template<typename T>
+		T& GetComponent()
+		{
+			return _Scene->registry.get<T>(EntityHandle);
+		}
+
 		entt::entity EntityHandle;
 
 	private:
