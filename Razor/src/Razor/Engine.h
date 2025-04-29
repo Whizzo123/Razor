@@ -62,7 +62,7 @@ namespace Razor
 		void ProcessInput();
 		void PickObject(unsigned int PickBuffer);
 		// TODO move this
-		ModelInfo ProcessModel(const char* Path);
+		Model ProcessModel(const char* Path);
 		std::shared_ptr<IRenderer> Renderer;
 		void Init();
 		std::shared_ptr<Shader> GetShaderForID(uint8_t ID);

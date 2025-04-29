@@ -13,7 +13,7 @@ namespace Razor
         for (auto Entity : View)
         {
             Mesh& EntityMesh = CurrentScene->GetComponent<Mesh>(Entity);
-            for (MeshData& Mesh : EntityMesh.Data)
+            for (MeshData& Mesh : EntityMesh.Model->GetModelMeshData())
             {
                 if (Mesh.Vertices.size() > 0)
                 {

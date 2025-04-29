@@ -94,10 +94,11 @@ namespace Razor
 		LastFrame = CurrentFrame;
 	}
 
-	ModelInfo Engine::ProcessModel(const char* Path)
+	Model Engine::ProcessModel(const char* Path)
 	{
 		Model Tmp = Model();
-		return Tmp.LoadMesh(Path);
+		Tmp.LoadMesh(Path);
+		return Tmp;
 	}
 
 	void Engine::ProcessInput()

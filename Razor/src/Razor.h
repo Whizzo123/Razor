@@ -20,4 +20,3 @@
 #include "Razor/Systems/RSPickBufferMaterialPass.h"
 #include "Razor/Renderer/Framebuffer.h"
 #include "Razor/Scene/SceneSerializer.h"
-#include "Razor/ImGui/ComponentImGui.h"

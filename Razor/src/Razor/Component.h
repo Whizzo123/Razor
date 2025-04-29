@@ -9,6 +9,7 @@
 #include "Core.h"
 #include <memory>
 #include "IO/RazorIO.h"
+#include "Renderer/Model.h"
 
 namespace Razor
 {
@@ -44,45 +45,6 @@ namespace Razor
 
 	};
 
-	struct MeshData
-	{
-		struct Vertex
-		{
-			glm::vec3 Position;
-			glm::vec3 Normal;
-			glm::vec2 TexCoords;
-			glm::vec3 Tangent;
-			glm::vec3 Bitangent;
-		};
-		struct Texture
-		{
-			unsigned int Id;
-			std::string Type;
-			std::string Path;
-		};
-
-		MeshData()
-		{
-
-		}
-
-		MeshData(std::vector<Vertex> Vertices, std::vector<unsigned int> Indices, std::vector<Texture> Textures, unsigned int MaterialID)
-		{
-			this->Vertices = Vertices;
-			this->Indices = Indices;
-			this->Textures = Textures;
-			MaterialId = MaterialID;
-		}
-
-		std::vector<Vertex> Vertices;
-		std::vector<MeshData> Meshes;
-		std::vector<unsigned int> Indices;
-		std::vector<Texture> Textures;
-		unsigned int VAO, VBO, EBO;
-		unsigned int MaterialId;
-		bool bHasIndices = true;
-	};
-
 	struct Light
 	{
 		glm::vec3 Position;
@@ -116,25 +78,10 @@ namespace Razor
 	};
 
 
-	struct   Mesh
+	struct Mesh
 	{
-		std::vector<MeshData> Data;
-	};
-
-	struct MaterialData
-	{
-		std::string MaterialName;
-		glm::vec3 Ambient;
-		glm::vec3 Diffuse;
-		glm::vec3 Specular;
-		float Shininess;
-		MaterialData(glm::vec3 A, glm::vec3 D, glm::vec3 S, float SH) : Ambient(A), Diffuse(D), Specular(S), Shininess(SH) {}
-	};
-
-	struct Material
-	{
-		std::vector<MaterialData> Materials;
-		uint8_t ShaderID;
+		// Potentially what we want here is a the ability to take this ref and hold basically a ref to it's location in filesystem for when we load up
+		Ref<Model> Model;
 	};
 
 	struct Collider

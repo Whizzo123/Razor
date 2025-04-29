@@ -10,7 +10,7 @@ namespace Razor
 		{
 			Mesh& EntityMesh = CurrentScene->GetComponent<Mesh>(EntityToRender);
 			Material& EntityMaterial = CurrentScene->GetComponent<Material>(EntityToRender);
-			for (const MeshData& Child : EntityMesh.Data)
+			for (const MeshData& Child : EntityMesh.Model->GetModelMeshData())
 			{
 				//TODO remove in place of IRenderer alternative
 				glUseProgram(EntityMaterial.ShaderID);

@@ -19,21 +19,18 @@ public:
 		
 		
 		//// TODO include resources/model path in ProcessModel so we only supply name
-		Razor::ModelInfo WormModel = GEngine.ProcessModel("resources/models/Articulated_Worm.obj");
-		Razor::Mesh TestMesh = WormModel.ModelMesh;
-		Razor::Material WormMat = WormModel.ModelMaterial;
+		Razor::Model WormModel = GEngine.ProcessModel("resources/models/Articulated_Worm.obj");
 		Razor::Collider WormCollider;
 		WormCollider.Radius = 10.0f;
-		WormMat.ShaderID = GEngine.GetShaderForType(typeid(Razor::DefaultMeshShader).name())->ID;
-		/*GEngine.AddComponentToEntity<Razor::Mesh>(entity, TestMesh);
+		//WormMat.ShaderID = GEngine.GetShaderForType(typeid(Razor::DefaultMeshShader).name())->ID;
+		/*GEngine.AddComponentToEntity<Razor::Mesh>(entity, WormModel);
 		GEngine.AddComponentToEntity<Razor::Transform>(entity, EntityTransform);
 		GEngine.AddComponentToEntity<Razor::Material>(entity, WormMat);
 		GEngine.AddComponentToEntity<Razor::Collider>(entity, WormCollider);*/
 		// LIGHT
-		Razor::ModelInfo LightModel = GEngine.ProcessModel("resources/models/Cube.obj");
-		Razor::Mesh LightMesh = LightModel.ModelMesh;
-		Razor::Material LightMeshMaterial = LightModel.ModelMaterial;
-		LightMeshMaterial.ShaderID = GEngine.GetShaderForType(typeid(Razor::DefaultMeshShader).name())->ID;
+		Razor::Model LightModel = GEngine.ProcessModel("resources/models/Cube.obj");
+		/*Razor::Material LightMeshMaterial = LightModel.;
+		LightMeshMaterial.ShaderID = GEngine.GetShaderForType(typeid(Razor::DefaultMeshShader).name())->ID;*/
 		Razor::Transform LightTransform;
 		LightTransform.Position = glm::vec3(-15.2f, 1.0f, -1.0f);
 		LightTransform.Rotate(glm::vec3(0.0f, 0.0f, 0.0f));
