@@ -3,6 +3,17 @@
 
 namespace EdgeEditor
 {
+	// TODO don't really think we want this
+	Inspector::Inspector() : Storage(std::make_shared<EditorStorage>())
+	{
+
+	}
+
+	Inspector::Inspector(Razor::Ref<EditorStorage> Storage) : Storage(Storage)
+	{
+
+	}
+
 	void Inspector::Render()
 	{
 		Razor::Engine& Engine = Razor::Engine::Get();
@@ -11,23 +22,21 @@ namespace EdgeEditor
 		ImGui::Begin("Inspector", &bIsOpen, ImGuiWindowFlags_MenuBar);
 		ImGui::SetWindowSize(ImVec2(200.0f, 200.0f));
 		ImGui::Text("Hello Inspector, %d", 123);
-		if (ImGui::Button("Create Entity", ImVec2(50.f, 25.f)))
+
+		if (!Storage->SelectedEntity)
 		{
-			CreateEntity();
+			ImGui::End();
+			return;
 		}
 
 		Razor::Ref<Razor::Scene> CurrentScene = Engine.CurrentScene;
-
-		if (ImGui::TreeNode("Entities"))
+		
+		if (ImGui::TreeNode(std::to_string((uint32_t)Storage->SelectedEntity->EntityHandle).c_str()))
 		{
-			// Need wrapper for the view type not lovely to have
-			auto View = CurrentScene->GetEntitiesWithComponents<Razor::Transform>();
-			for (auto Entity : View)
+			ComponentImGui::DrawComponents(Storage->SelectedEntity);
+			if (ImGui::Button("Add Component"))
 			{
-				if (ImGui::CollapsingHeader(std::to_string((uint32_t)Entity).c_str()))
-				{
-					ComponentImGui::DrawComponents(CurrentScene->GetEntity(Entity));
-				}
+				//TODO add a component popup menu
 			}
 			ImGui::TreePop();
 		}

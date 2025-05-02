@@ -2,6 +2,8 @@
 #include <Razor/EntryPoint.h>
 
 #include "Inspector.h"
+#include "SceneView.h"
+#include "../EditorStorage.h"
 
 
 class Edge : public Razor::Application
@@ -50,7 +52,10 @@ void Edge::Run()
 	SceneBuffer = Engine.Renderer->CreateFrameBuffer(300, 200);
 	PickBuffer = Engine.Renderer->CreateFrameBuffer(300, 200);
 
-	EdgeEditor::Inspector InspectorWindow;
+	Razor::Ref<EdgeEditor::EditorStorage> Storage = std::make_shared<EdgeEditor::EditorStorage>();
+
+	EdgeEditor::Inspector InspectorWindow(Storage);
+	EdgeEditor::SceneView SceneViewWindow(Storage);
 
 	Razor::SceneSerializer::Deserialize(Engine.CurrentScene);
 	while (!Engine.ShouldEngineClose())
@@ -86,6 +91,7 @@ void Edge::Run()
 		Engine.GetGUI().BeginNewFrame();
 		Engine.GetGUI().CreateDockspace();
 		InspectorWindow.Render();
+		SceneViewWindow.Render();
 		RenderSceneViewport(SceneBuffer, ViewportSize);
 		ImGui::ShowMetricsWindow();
 		ImGui::End();

@@ -18,6 +18,7 @@ namespace Razor
 		{
 			RZ_CORE_ERROR("ERROR::ASSIMP::%s", Import.GetErrorString());
 			Info = ModelInfo();
+			return;
 		}
 		Directory = Path.substr(0, Path.find_last_of('/'));
 
