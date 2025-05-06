@@ -16,7 +16,7 @@ namespace Razor
 
 		if (!Scene || Scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !Scene->mRootNode)
 		{
-			RZ_CORE_ERROR("ERROR::ASSIMP::%s", Import.GetErrorString());
+			RZ_CORE_ERROR("ERROR::ASSIMP::{0}", Import.GetErrorString());
 			Info = ModelInfo();
 			return;
 		}

@@ -10,6 +10,7 @@ namespace EdgeEditor
 		std::unordered_map<std::string, ComponentDrawer> map = std::unordered_map<std::string, ComponentDrawer>();
 		map["Transform"] = DrawTransform;
 		map["Mesh"] = DrawMesh;
+		map["DirectionalLight"] = DrawDirectionalLight;
 		return map;
 	}
 
@@ -44,6 +45,18 @@ namespace EdgeEditor
 		{
 			Razor::Mesh& mesh = InEntity->GetComponent<Razor::Mesh>();
 			if (ImGui::CollapsingHeader("Mesh"))
+			{
+				// Nothing really here to show just now maybe in the future but at least we know it's there
+			}
+		}
+	}
+
+	void ComponentImGui::DrawDirectionalLight(Razor::Ref<Razor::Entity> InEntity)
+	{
+		if (InEntity->HasComponent<Razor::DirectionalLight>())
+		{
+			Razor::DirectionalLight& mesh = InEntity->GetComponent<Razor::DirectionalLight>();
+			if (ImGui::CollapsingHeader("Directional Light"))
 			{
 				// Nothing really here to show just now maybe in the future but at least we know it's there
 			}

@@ -98,6 +98,7 @@ namespace Razor
 	{
 		Model Tmp = Model();
 		Tmp.LoadMesh(Path);
+		MeshRenderer::InitMesh(Tmp.GetModelMeshData());
 		return Tmp;
 	}
 
@@ -123,7 +124,7 @@ namespace Razor
 			Renderer->ReadPixels(MousePos.X, 600 - MousePos.Y, 1, 1, Pixel, PickBuffer);
 			int PickedEntity = 0;
 			PickedEntity = static_cast<int>(Pixel[0]) << 16 | static_cast<int>(Pixel[1]) << 8 | static_cast<int>(Pixel[2]);
-			RZ_CORE_INFO("Picked {0}", PickedEntity);
+			//RZ_CORE_INFO("Picked {0}", PickedEntity);
 		}
 	}
 

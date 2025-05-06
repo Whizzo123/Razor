@@ -21,6 +21,7 @@ namespace EdgeEditor
 		static std::unordered_map<std::string, ComponentDrawer> RegisterDrawers();
 		static void DrawTransform(Razor::Ref<Razor::Entity> InEntity);
 		static void DrawMesh(Razor::Ref<Razor::Entity> InEntity);
+		static void DrawDirectionalLight(Razor::Ref<Razor::Entity> InEntity);
 	private:
 		static std::unordered_map<std::string, ComponentDrawer> _ComponentDrawers;
 	};

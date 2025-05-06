@@ -6,10 +6,10 @@ namespace Razor
 
 	void RSMaterialPass::Render(RenderPipelineEntityProperties& Properties)
 	{
-		auto View = CurrentScene->GetEntitiesWithComponents<Material>();
+		auto View = CurrentScene->GetEntitiesWithComponents<Mesh>();
 		for (auto RenderingEntity : View)
 		{
-			Material& EntityMat = CurrentScene->GetComponent<Material>(RenderingEntity);
+			Material& EntityMat = CurrentScene->GetComponent<Mesh>(RenderingEntity).Model->GetMaterial();
 			if (Properties.Properties.find(RenderingEntity) == Properties.Properties.end())
 			{
 				continue;

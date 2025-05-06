@@ -34,11 +34,24 @@ namespace EdgeEditor
 		if (ImGui::TreeNode(std::to_string((uint32_t)Storage->SelectedEntity->EntityHandle).c_str()))
 		{
 			ComponentImGui::DrawComponents(Storage->SelectedEntity);
-			if (ImGui::Button("Add Component"))
-			{
-				//TODO add a component popup menu
-			}
 			ImGui::TreePop();
+		}
+		const char* PopupId = "Add Component Popup";
+		if (ImGui::Button("Add Component"))
+		{
+			ImGui::OpenPopup(PopupId);	
+		}
+		if (ImGui::BeginPopup(PopupId))
+		{
+			if (ImGui::Button("Mesh Component"))
+			{
+				Storage->SelectedEntity->AddComponent<Razor::Mesh>(Razor::CreateRef<Razor::Model>(Storage->DefaultModel));
+			}
+			if (ImGui::Button("Directional Light Component"))
+			{
+				Storage->SelectedEntity->AddComponent<Razor::DirectionalLight>();
+			}
+			ImGui::EndPopup();
 		}
 		ImGui::End();
 	}

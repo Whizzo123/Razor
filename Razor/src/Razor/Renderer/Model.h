@@ -79,6 +79,8 @@ namespace Razor
 		unsigned int LoadMaterialParam(aiMaterial* Mat);
 		unsigned int TextureFromFile(const char* Path);
 		std::vector<MaterialData> GetMaterialsForModel() { return Materials_Loaded; };
+		void SetModelShader(uint8_t ID) { Info.ModelMaterial.ShaderID = ID; }
+		Material& GetMaterial() { return Info.ModelMaterial; }
 
 		std::vector<MeshData>& GetModelMeshData();
 	private:

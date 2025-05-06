@@ -12,7 +12,7 @@ public:
 	Edge() {};
 	~Edge() {};
 	void Run() override;
-	void RenderSceneViewport(Razor::Ref<Razor::Framebuffer> SceneBuffer, ImVec2 ViewportSize);
+	void RenderSceneViewport(Razor::Ref<Razor::Framebuffer> SceneBuffer, ImVec2& ViewportSize);
 };
 
 Razor::Application* Razor::CreateApplication()
@@ -52,12 +52,18 @@ void Edge::Run()
 	SceneBuffer = Engine.Renderer->CreateFrameBuffer(300, 200);
 	PickBuffer = Engine.Renderer->CreateFrameBuffer(300, 200);
 
+	Razor::Model DefaultModel = Engine.ProcessModel("resources/models/Cube.obj");
+	DefaultModel.SetModelShader(Engine.GetShaderForType(typeid(Razor::DefaultMeshShader).name())->ID);
+
 	Razor::Ref<EdgeEditor::EditorStorage> Storage = std::make_shared<EdgeEditor::EditorStorage>();
+	Storage->DefaultModel = DefaultModel;
 
 	EdgeEditor::Inspector InspectorWindow(Storage);
 	EdgeEditor::SceneView SceneViewWindow(Storage);
 
 	Razor::SceneSerializer::Deserialize(Engine.CurrentScene);
+	Razor::Ref<Razor::Entity> Camera = Engine.CurrentScene->CreateEntity();
+	Camera->AddComponent<Razor::Camera>();
 	while (!Engine.ShouldEngineClose())
 	{
 		Engine.Step();
@@ -102,7 +108,7 @@ void Edge::Run()
 	Razor::Engine::Get().Renderer->TerminateRendererAPI();
 }
 
-void Edge::RenderSceneViewport(Razor::Ref<Razor::Framebuffer> SceneBuffer, ImVec2 ViewportSize)
+void Edge::RenderSceneViewport(Razor::Ref<Razor::Framebuffer> SceneBuffer, ImVec2& ViewportSize)
 {
 	bool bIsOpen;
 	ImGui::Begin("Scene", &bIsOpen, ImGuiWindowFlags_MenuBar || ImGuiWindowFlags_NoScrollbar);

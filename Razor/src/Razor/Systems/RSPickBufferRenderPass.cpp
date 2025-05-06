@@ -6,12 +6,11 @@ namespace Razor
 {
 	void RSPickBufferRenderPass::Render(RenderPipelineEntityProperties& Properties)
 	{
-		auto View = CurrentScene->GetEntitiesWithComponents<Mesh, Material>();
+		auto View = CurrentScene->GetEntitiesWithComponents<Mesh>();
 
 		for (auto EntityToRender : View)
 		{
 			Mesh& EntityMesh = CurrentScene->GetComponent<Mesh>(EntityToRender);
-			Material& EntityMaterial = CurrentScene->GetComponent<Material>(EntityToRender);
 			for (const MeshData& Child : EntityMesh.Model->GetModelMeshData())
 			{
 				//TODO remove in place of IRenderer alternative

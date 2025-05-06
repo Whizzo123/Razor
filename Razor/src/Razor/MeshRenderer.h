@@ -21,9 +21,10 @@ namespace Razor
 		}
 		void Run(float dt) override;
 		void Init() override;
-
+		//Remove this back to private once we have some kind of import feature
+		static void InitMesh(std::vector<MeshData>& Meshes);
 	private:
-		void InitMesh(MeshData& MeshToInit);
+		
 
 	private:
 		std::shared_ptr<IRenderer> Renderer;

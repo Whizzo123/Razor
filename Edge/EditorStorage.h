@@ -8,6 +8,7 @@ namespace EdgeEditor
 	{
 		EditorStorage() : SelectedEntity(nullptr) {}
 		Razor::Ref<Razor::Entity> SelectedEntity;
+		Razor::Model DefaultModel;
 	};
 }
 

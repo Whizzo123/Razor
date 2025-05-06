@@ -5,10 +5,11 @@ namespace Razor
 {
 	void RSPickBufferMaterialPass::Render(RenderPipelineEntityProperties& Properties)
 	{
-		auto View = CurrentScene->GetEntitiesWithComponents<Material>();
+		auto View = CurrentScene->GetEntitiesWithComponents<Mesh>();
 		for (auto RenderingEntity : View)
 		{
-			Material& EntityMat = CurrentScene->GetComponent<Material>(RenderingEntity);
+			Material& EntityMat = CurrentScene->GetComponent<Mesh>(RenderingEntity).Model->GetMaterial();
+			auto View = CurrentScene->GetEntitiesWithComponents<Material>();
 
 			if (Properties.Properties.find(RenderingEntity) == Properties.Properties.end())
 			{
