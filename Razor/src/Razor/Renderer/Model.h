@@ -54,6 +54,7 @@ namespace Razor
 		glm::vec3 Diffuse;
 		glm::vec3 Specular;
 		float Shininess;
+		MaterialData() : MaterialName ("Untitled"), Ambient(glm::vec3(1.0f, 1.0f, 1.0f)), Diffuse(glm::vec3(1.0f, 1.0f, 1.0f)), Specular(glm::vec3(1.0f, 1.0f, 1.0f)), Shininess(1.0f) {}
 		MaterialData(glm::vec3 A, glm::vec3 D, glm::vec3 S, float SH) : Ambient(A), Diffuse(D), Specular(S), Shininess(SH) {}
 	};
 
@@ -83,6 +84,8 @@ namespace Razor
 		Material& GetMaterial() { return Info.ModelMaterial; }
 
 		std::vector<MeshData>& GetModelMeshData();
+		ModelInfo& GetModelInfo() { return Info; }
+		void SetModelInfo(const ModelInfo& Info) { this->Info = Info; }
 	private:
 		std::vector<MeshData::Texture> Textures_Loaded;
 		std::vector<MaterialData> Materials_Loaded;

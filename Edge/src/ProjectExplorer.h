@@ -23,7 +23,8 @@ namespace EdgeEditor
 	private:
 		std::vector<std::string> GrabFiles(const std::string& Path);
 		void DrawFileGui(const std::string& FileName);
-		std::string OpenFile();
+		void OpenFile();
+		bool SaveModelToProject(const std::string& Name);
 	private:
 		Razor::Ref<EditorStorage> Storage;
 		const std::string ProjectDir = "project";

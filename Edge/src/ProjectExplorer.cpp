@@ -1,6 +1,7 @@
 #include "ProjectExplorer.h"
 #include <filesystem>
 #include "Utils/Windows/CDialogEventHandler.h"
+#include "FileIO/ModelSerializer.h"
 
 HRESULT CDialogEventHandler_CreateInstance(REFIID riid, void** ppv)
 {
@@ -17,6 +18,9 @@ HRESULT CDialogEventHandler_CreateInstance(REFIID riid, void** ppv)
 
 namespace EdgeEditor
 {
+	/*
+	* 
+	*/
 	void ProjectExplorer::Render()
 	{
 		bool bIsOpen;
@@ -64,9 +68,10 @@ namespace EdgeEditor
 		ImGui::Text(FileName.c_str());
 	}
 
-	std::string ProjectExplorer::OpenFile()
+	// TODO this is windows only will want a linux version too should probably be hidden behind a platform generic interface
+	void ProjectExplorer::OpenFile()
 	{
-		// TODO this is windows only will want a linux version too
+	
 
 		IFileDialog* FileDialogPtr = nullptr;
 		HRESULT Result = CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&FileDialogPtr));
@@ -120,7 +125,7 @@ namespace EdgeEditor
 												if (SUCCEEDED(Result))
 												{
 													std::wstring ws = std::wstring(pszFilePath);
-													return std::string(ws.begin(), ws.end());
+													SaveModelToProject(std::string(ws.begin(), ws.end()));
 													CoTaskMemFree(pszFilePath);
 												}
 												psiResult->Release();
@@ -134,9 +139,18 @@ namespace EdgeEditor
 				}
 			}
 		}
-
-		return "";
 	}
-	
+
+	bool ProjectExplorer::SaveModelToProject(const std::string& Name)
+	{
+		Razor::Model Model = Razor::Engine::Get().ProcessModel(Name.c_str());
+		int LastIndexOf = Name.find_last_of('\\');
+		std::string FileName = Name.substr(LastIndexOf + 1);
+		int FirstIndexOf = FileName.find_first_of('.');
+		FileName = FileName.substr(0, FirstIndexOf);
+		ModelSerializer::Serialize("project/" + FileName, Razor::CreateRef<Razor::Model>(Model));
+		FileNames = GrabFiles(ProjectDir);
+		return true;
+	}
 }
 
