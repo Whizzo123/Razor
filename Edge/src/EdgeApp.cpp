@@ -4,6 +4,7 @@
 #include "Inspector.h"
 #include "SceneView.h"
 #include "../EditorStorage.h"
+#include "ProjectExplorer.h"
 
 
 class Edge : public Razor::Application
@@ -60,6 +61,7 @@ void Edge::Run()
 
 	EdgeEditor::Inspector InspectorWindow(Storage);
 	EdgeEditor::SceneView SceneViewWindow(Storage);
+	EdgeEditor::ProjectExplorer ProjectExplorerWindow(Storage);
 
 	Razor::SceneSerializer::Deserialize(Engine.CurrentScene);
 	Razor::Ref<Razor::Entity> Camera = Engine.CurrentScene->CreateEntity();
@@ -98,6 +100,7 @@ void Edge::Run()
 		Engine.GetGUI().CreateDockspace();
 		InspectorWindow.Render();
 		SceneViewWindow.Render();
+		ProjectExplorerWindow.Render();
 		RenderSceneViewport(SceneBuffer, ViewportSize);
 		ImGui::ShowMetricsWindow();
 		ImGui::End();

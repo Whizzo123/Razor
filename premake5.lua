@@ -131,7 +131,9 @@ project "Edge"
 	
 	links 
 	{
-		"Razor"
+		"Razor",
+		"Shlwapi.lib",
+		"Propsys.lib"
 	}
 	
 	defines
