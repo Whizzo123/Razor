@@ -35,6 +35,8 @@
 .vs/
 bin/
 intermediate/
+html/
+latex/
 
 !vendor/
 
