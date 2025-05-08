@@ -110,11 +110,6 @@ namespace Razor
 		}
 	}
 
-	void Engine::Run()
-	{
-		
-	}
-
 	void Engine::PickObject(unsigned int PickBuffer)
 	{
 		if (RazorIO::Get().GetStateForMouseButton(LEFT) == MOUSE_DOWN)
