@@ -15,11 +15,14 @@ public:
 	Edge() {};
 	~Edge() {};
 	void Run() override;
+	/**
+	* Processes input from the user for the editor as well as calls Engine::ProcessInput()
+	*/
 	void ProcessInput();
 	void RenderSceneViewport(Razor::Ref<Razor::Framebuffer> SceneBuffer, ImVec2& ViewportSize);
 
 private:
-	EdgeEditor::EditorCamera EditorCamera;
+	EdgeEditor::EditorCamera EditorCamera; /** Object to house and control the camera we will use for rendering the scene to the viewport */
 };
 
 Razor::Application* Razor::CreateApplication()
