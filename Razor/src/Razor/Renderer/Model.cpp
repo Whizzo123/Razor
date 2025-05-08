@@ -3,21 +3,22 @@
 #include <assimp/postprocess.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-#include <iostream>
-#include "../Log.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 namespace Razor
 {
 
-	ModelInfo Model::LoadMesh(std::string Path)
+	void Model::LoadMesh(std::string Path)
 	{
 		Assimp::Importer Import;
 		const aiScene* Scene = Import.ReadFile(Path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
 		if (!Scene || Scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !Scene->mRootNode)
 		{
-			RZ_CORE_ERROR("ERROR::ASSIMP::%s", Import.GetErrorString());
-			return ModelInfo();
+			RZ_CORE_ERROR("ERROR::ASSIMP::{0}", Import.GetErrorString());
+			Info = ModelInfo();
+			return;
 		}
 		Directory = Path.substr(0, Path.find_last_of('/'));
 
@@ -25,16 +26,13 @@ namespace Razor
 
 		ProcessNode(Scene->mRootNode, Scene, Meshes);
 
-		Mesh ReturnMesh;
-		ReturnMesh.Data = Meshes;
-
-		ModelInfo Info;
-		Info.ModelMesh = ReturnMesh;
+		ModelInfo ProcessedInfo;
+		ProcessedInfo.ModelMeshData = Meshes;
 		Material ReturnMaterial;
 		ReturnMaterial.Materials = Materials_Loaded;
-		Info.ModelMaterial = ReturnMaterial;
+		ProcessedInfo.ModelMaterial = ReturnMaterial;
 
-		return Info;
+		Info = ProcessedInfo;
 	}
 
 	void Model::ProcessNode(aiNode* Node, const aiScene* Scene, std::vector<MeshData>& Parts)
@@ -232,6 +230,11 @@ namespace Razor
 		}
 
 		return TextureID;
+	}
+
+	std::vector<MeshData>& Model::GetModelMeshData()
+	{
+		return Info.ModelMeshData;
 	}
 
 }

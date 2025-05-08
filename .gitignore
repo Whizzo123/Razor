@@ -35,6 +35,7 @@
 .vs/
 bin/
 intermediate/
+documentation/
 
 !vendor/
 

@@ -23,6 +23,10 @@ namespace Razor
             glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, Width, Height);
             glBindRenderbuffer(GL_RENDERBUFFER, 0);
             glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, DepthID);
+            if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            {
+                RZ_CORE_ERROR("Framebuffer is not complete!");
+            }
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
 

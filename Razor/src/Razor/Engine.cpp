@@ -48,6 +48,7 @@ namespace Razor
 		PlatformIO = std::make_unique<OpenGLIO>(std::dynamic_pointer_cast<OpenGLWindowProvider>(EngineWindow->GetWindowProvider())->GetPlatformWindowPtr());
 		PlatformIO->RegisterInputCallbacks();
 		
+		
 
 		//TODO don't like this being here
 		std::shared_ptr<Shader> D_MeshShader = std::make_shared<DefaultMeshShader>();
@@ -64,20 +65,20 @@ namespace Razor
 
 		SceneLights = std::make_shared<std::vector<Light*>>();
 		// TODO rename mesh renderer doesn't do rendering just sets up the mesh for renderering
-		Coordinator->RegisterSystem<MeshRenderer>(MeshRenderer(Renderer, ShaderIDMap, SceneLights));
-		Coordinator->RegisterSystem<CollisionSystem>(CollisionSystem());
-		Coordinator->RegisterSystem<CameraController>(CameraController());
+		Coordinator->RegisterSystem<MeshRenderer>(MeshRenderer(CurrentScene, Renderer, ShaderIDMap, SceneLights));
+		Coordinator->RegisterSystem<CollisionSystem>(CollisionSystem(CurrentScene));
+		Coordinator->RegisterSystem<CameraController>(CameraController(CurrentScene));
 
 		//Render Systems
-		Coordinator->RegisterSystem<RSMaterialPass>(RSMaterialPass());
-		Coordinator->RegisterSystem<RSTransformationsPass>(RSTransformationsPass());
-		Coordinator->RegisterSystem<RSDirectionalLightingPass>(RSDirectionalLightingPass());
-		Coordinator->RegisterSystem<RSCameraPass>(RSCameraPass(Renderer));
-		Coordinator->RegisterSystem<RSRenderPass>(RSRenderPass(Renderer, ShaderIDMap));
-		Coordinator->RegisterSystem<RSPickBufferMaterialPass>(RSPickBufferMaterialPass());
-		Coordinator->RegisterSystem<RSPickBufferRenderPass>(RSPickBufferRenderPass(Renderer, ShaderIDMap));
-		Coordinator->RegisterSystem<RSPointLightingPass>(RSPointLightingPass());
-		Coordinator->RegisterSystem<RSSpotLightingPass>(RSSpotLightingPass());
+		Coordinator->RegisterSystem<RSMaterialPass>(RSMaterialPass(CurrentScene));
+		Coordinator->RegisterSystem<RSTransformationsPass>(RSTransformationsPass(CurrentScene));
+		Coordinator->RegisterSystem<RSDirectionalLightingPass>(RSDirectionalLightingPass(CurrentScene));
+		Coordinator->RegisterSystem<RSCameraPass>(RSCameraPass(CurrentScene, Renderer));
+		Coordinator->RegisterSystem<RSRenderPass>(RSRenderPass(CurrentScene, Renderer, ShaderIDMap));
+		Coordinator->RegisterSystem<RSPickBufferMaterialPass>(RSPickBufferMaterialPass(CurrentScene));
+		Coordinator->RegisterSystem<RSPickBufferRenderPass>(RSPickBufferRenderPass(CurrentScene, Renderer, ShaderIDMap));
+		Coordinator->RegisterSystem<RSPointLightingPass>(RSPointLightingPass(CurrentScene));
+		Coordinator->RegisterSystem<RSSpotLightingPass>(RSSpotLightingPass(CurrentScene));
 		
 	}
 
@@ -93,10 +94,12 @@ namespace Razor
 		LastFrame = CurrentFrame;
 	}
 
-	ModelInfo Engine::ProcessModel(const char* Path)
+	Model Engine::ProcessModel(const char* Path)
 	{
 		Model Tmp = Model();
-		return Tmp.LoadMesh(Path);
+		Tmp.LoadMesh(Path);
+		MeshRenderer::InitMesh(Tmp.GetModelMeshData());
+		return Tmp;
 	}
 
 	void Engine::ProcessInput()
@@ -105,16 +108,6 @@ namespace Razor
 		{
 			EngineWindow->SetWindowToClose();
 		}
-	}
-
-	Entity Engine::CreateEntity()
-	{
-		return Coordinator->CreateEntity();
-	}
-
-	void Engine::Run()
-	{
-		
 	}
 
 	void Engine::PickObject(unsigned int PickBuffer)
@@ -126,7 +119,7 @@ namespace Razor
 			Renderer->ReadPixels(MousePos.X, 600 - MousePos.Y, 1, 1, Pixel, PickBuffer);
 			int PickedEntity = 0;
 			PickedEntity = static_cast<int>(Pixel[0]) << 16 | static_cast<int>(Pixel[1]) << 8 | static_cast<int>(Pixel[2]);
-			RZ_CORE_INFO("Picked {0}", PickedEntity);
+			//RZ_CORE_INFO("Picked {0}", PickedEntity);
 		}
 	}
 

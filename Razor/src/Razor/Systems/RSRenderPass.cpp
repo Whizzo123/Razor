@@ -4,14 +4,20 @@ namespace Razor
 {
 	void RSRenderPass::Render(RenderPipelineEntityProperties& Properties)
 	{
-		for (const Entity& EntityToRender : Entities)
+		auto View = CurrentScene->GetEntitiesWithComponents<Mesh>();
+
+		for (auto EntityToRender : View)
 		{
-			Mesh& EntityMesh = Coordinator->GetComponent<Mesh>(EntityToRender);
-			Material& EntityMaterial = Coordinator->GetComponent<Material>(EntityToRender);
-			for (const MeshData& Child : EntityMesh.Data)
+			Mesh& EntityMesh = CurrentScene->GetComponent<Mesh>(EntityToRender);
+			Material& EntityMaterial = EntityMesh.Model->GetMaterial();
+			for (const MeshData& Child : EntityMesh.Model->GetModelMeshData())
 			{
 				//TODO remove in place of IRenderer alternative
 				glUseProgram(EntityMaterial.ShaderID);
+				if (Properties.Properties.find(EntityToRender) == Properties.Properties.end())
+				{
+					continue;
+				}
 				PropertySlot& Slot = Properties.Properties[EntityToRender].GetPropertySlot(Child.MaterialId);
 				std::shared_ptr<Shader> MeshShader = ShaderMap[EntityMaterial.ShaderID];
 				

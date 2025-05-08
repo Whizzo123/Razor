@@ -9,17 +9,11 @@ namespace Razor
 	class RSTransformationsPass : public RenderSystem
 	{
 	public:
-		RSTransformationsPass()
+		RSTransformationsPass(Ref<Razor::Scene> Scene) : RenderSystem(Scene)
 		{
 			SystemRenderStage = RenderStage::RENDER_STAGE_TRANSFORMATION_PASS;
-			Coordinator = Coordinator::GetInstance();
-
-			Signature = { Coordinator->GetComponentType<Transform>() };
 		}
 		void Render(RenderPipelineEntityProperties& EntityProperties) override;
-
-	protected:
-		std::shared_ptr<Coordinator> Coordinator;
 	};
 }
 

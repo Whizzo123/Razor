@@ -1,10 +1,9 @@
 #pragma once
 #include <set>
 #include "../Core.h"
-#include "../EntityManager.h"
-#include "../ComponentManager.h"
 #include <glm/glm.hpp>
 #include "../Utils/RazorMacros.h"
+#include "../Scene/Scene.h"
 
 namespace Razor
 {
@@ -99,23 +98,25 @@ namespace Razor
 	};
 	struct RenderPipelineEntityProperties
 	{
-		std::array<EntityRenderProperty, MAX_ENTITIES> Properties;
-		uint8_t HighestEntity = 0;
+		std::unordered_map<entt::entity, EntityRenderProperty> Properties;
 	};
 	
 
 	class System
 	{
 	public:
-		std::set<Entity> Entities;
-		std::vector<ComponentType> Signature;
+		System(Ref<Scene> Scene) : CurrentScene(Scene) {}
 		virtual void Init() {}
 		virtual void Run(float dt) {}
+
+	protected:
+		Ref<Scene> CurrentScene;
 	};
 
 	class RenderSystem : public System
 	{
 	public:
+		RenderSystem(Ref<Scene> Scene) : System(Scene) {}
 		virtual void Render(RenderPipelineEntityProperties& Properties) {}
 		static RenderStage SystemRenderStage;
 	};
@@ -150,35 +151,20 @@ namespace Razor
 			{
 				RenderPipeline.PipelineSystems[RndrSystem->SystemRenderStage].insert({ typeName, RndrSystem });
 			}
-			// Setup Signature
-			Signature SystemSignature;
-			for (const ComponentType& Type : SystemInstPtr->Signature)
-			{
-				SystemSignature.set(Type);
-			}
-			SetSignature<T>(SystemSignature);
+			//// Setup Signature
+			//Signature SystemSignature;
+			//for (const ComponentType& Type : SystemInstPtr->Signature)
+			//{
+			//	SystemSignature.set(Type);
+			//}
+			//SetSignature<T>(SystemSignature);
 			return SystemInstPtr;
 		}
 
-		template<typename T>
-		void SetSignature(Signature InSignature)
-		{
-			const char* typeName = typeid(T).name();
-			std::string LogMsg = "System does not exist" + std::string(typeName);
-			if (!Systems.count(typeName))
-			{
-				RZ_CORE_ERROR(LogMsg);
-			} 
-			Signatures.insert({ typeName, InSignature });
-		}
-
-		void EntityDestroyed(Entity InEntity);
-		void EntitySignatureChanged(Entity InEntity, Signature EntitySignature);
 		void RunSystems(float dt);
 		void RunRenderSystems(RenderPipelineConfig& PipelineConfig);
 		void InitSystems();
 	private:
-		std::unordered_map<const char*, Signature> Signatures{};
 		std::unordered_map<const char*, std::shared_ptr<System>> Systems{};
 		RenderSystemPipeline RenderPipeline;
 		

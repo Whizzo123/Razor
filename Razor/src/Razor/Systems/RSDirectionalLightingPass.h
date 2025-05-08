@@ -10,17 +10,11 @@ namespace Razor
 	class RSDirectionalLightingPass : public RenderSystem
 	{
 	public:
-		RSDirectionalLightingPass()
+		RSDirectionalLightingPass(Ref<Razor::Scene> Scene) : RenderSystem(Scene)
 		{
-			Coordinator = Coordinator::GetInstance();
 			SystemRenderStage = RenderStage::RENDER_STAGE_LIGHTING_PASS;
-
-			Signature = { Coordinator->GetComponentType<DirectionalLight>() };
 		}
 		void Render(RenderPipelineEntityProperties& Properties) override;
-
-	protected:
-		std::shared_ptr<Coordinator> Coordinator;
 	};
 }
 

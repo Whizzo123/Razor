@@ -9,16 +9,10 @@
 #include "Core.h"
 #include <memory>
 #include "IO/RazorIO.h"
+#include "Renderer/Model.h"
 
 namespace Razor
 {
-	struct ISerializable
-	{
-	public:
-		virtual std::unordered_map<std::string, std::string> Serialize() = 0;
-	};
-
-
 	struct Transform
 	{
 		glm::vec3 Position;
@@ -51,45 +45,6 @@ namespace Razor
 
 	};
 
-	struct MeshData
-	{
-		struct Vertex
-		{
-			glm::vec3 Position;
-			glm::vec3 Normal;
-			glm::vec2 TexCoords;
-			glm::vec3 Tangent;
-			glm::vec3 Bitangent;
-		};
-		struct Texture
-		{
-			unsigned int Id;
-			std::string Type;
-			std::string Path;
-		};
-
-		MeshData()
-		{
-
-		}
-
-		MeshData(std::vector<Vertex> Vertices, std::vector<unsigned int> Indices, std::vector<Texture> Textures, unsigned int MaterialID)
-		{
-			this->Vertices = Vertices;
-			this->Indices = Indices;
-			this->Textures = Textures;
-			MaterialId = MaterialID;
-		}
-
-		std::vector<Vertex> Vertices;
-		std::vector<MeshData> Meshes;
-		std::vector<unsigned int> Indices;
-		std::vector<Texture> Textures;
-		unsigned int VAO, VBO, EBO;
-		unsigned int MaterialId;
-		bool bHasIndices = true;
-	};
-
 	struct Light
 	{
 		glm::vec3 Position;
@@ -107,6 +62,8 @@ namespace Razor
 		glm::vec3 Ambient;
 		glm::vec3 Specular;
 		glm::vec3 Direction;
+
+		DirectionalLight() : Position(glm::vec3(0.0f, 0.0f, 0.0f)), Diffuse(glm::vec3(1.0f, 1.0f, 1.0f)), Ambient(glm::vec3(1.0f, 1.0f, 1.0f)), Specular(glm::vec3(1.0f, 1.0f, 1.0f)), Direction(glm::vec3(1.0f, 0.0f, 0.0f)){}
 	};
 
 	struct PointLight : public Light
@@ -123,25 +80,11 @@ namespace Razor
 	};
 
 
-	struct   Mesh
+	struct Mesh
 	{
-		std::vector<MeshData> Data;
-	};
-
-	struct MaterialData
-	{
-		std::string MaterialName;
-		glm::vec3 Ambient;
-		glm::vec3 Diffuse;
-		glm::vec3 Specular;
-		float Shininess;
-		MaterialData(glm::vec3 A, glm::vec3 D, glm::vec3 S, float SH) : Ambient(A), Diffuse(D), Specular(S), Shininess(SH) {}
-	};
-
-	struct Material
-	{
-		std::vector<MaterialData> Materials;
-		uint8_t ShaderID;
+		Mesh() {}
+		Mesh(Ref<Model> Model) : Model(Model) {}
+		Ref<Model> Model;
 	};
 
 	struct Collider

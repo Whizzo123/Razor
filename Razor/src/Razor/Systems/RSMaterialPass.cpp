@@ -6,11 +6,14 @@ namespace Razor
 
 	void RSMaterialPass::Render(RenderPipelineEntityProperties& Properties)
 	{
-		for (Entity RenderingEntity : Entities)
+		auto View = CurrentScene->GetEntitiesWithComponents<Mesh>();
+		for (auto RenderingEntity : View)
 		{
-			Properties.HighestEntity = RenderingEntity;
-			Material& EntityMat = Coordinator->GetComponent<Material>(RenderingEntity);
-			
+			Material& EntityMat = CurrentScene->GetComponent<Mesh>(RenderingEntity).Model->GetMaterial();
+			if (Properties.Properties.find(RenderingEntity) == Properties.Properties.end())
+			{
+				continue;
+			}
 			EntityRenderProperty& Property = Properties.Properties[RenderingEntity];
 			Property.GeneratePropertySlots(EntityMat.Materials.size());
 			for (int i = 0; i < EntityMat.Materials.size(); i++)

@@ -9,19 +9,15 @@ namespace Razor
 	class RSPickBufferRenderPass : public RenderSystem
 	{
 	public:
-		RSPickBufferRenderPass(std::shared_ptr<IRenderer> EngineRenderer, std::unordered_map<uint8_t, std::shared_ptr<Shader>>& IDToShaderMap)
+		RSPickBufferRenderPass(Ref<Razor::Scene> Scene, std::shared_ptr<IRenderer> EngineRenderer, std::unordered_map<uint8_t, std::shared_ptr<Shader>>& IDToShaderMap) : RenderSystem(Scene)
 		{
-			Coordinator = Coordinator::GetInstance();
 			SystemRenderStage = RenderStage::RENDER_STAGE_RENDER;
 			Renderer = EngineRenderer;
 			ShaderMap = IDToShaderMap;
-
-			Signature = { Coordinator->GetComponentType<Mesh>(), Coordinator->GetComponentType<Material>() };
 		}
 		void Render(RenderPipelineEntityProperties& Properties) override;
 
 	protected:
-		std::shared_ptr<Coordinator> Coordinator;
 		std::shared_ptr<IRenderer> Renderer;
 		std::unordered_map<uint8_t, std::shared_ptr<Shader>> ShaderMap;
 	};

@@ -9,48 +9,47 @@ namespace Razor
 {
     void MeshRenderer::Init()
     {
-        for (Entity Entity : Entities)
+        auto View = CurrentScene->GetEntitiesWithComponents<Mesh>();
+        for (auto Entity : View)
         {
-            Mesh& EntityMesh = Coordinator->GetComponent<Mesh>(Entity);
-            for (MeshData& Mesh : EntityMesh.Data)
-            {
-                if (Mesh.Vertices.size() > 0)
-                {
-                    InitMesh(Mesh);
-                }
-            } 
+            Mesh& EntityMesh = CurrentScene->GetComponent<Mesh>(Entity);
+            InitMesh(EntityMesh.Model->GetModelMeshData());
         }
     }
 
-    void MeshRenderer::InitMesh(MeshData& MeshToInit)
+    void MeshRenderer::InitMesh(std::vector<MeshData>& Meshes)
     {
         // TODO Needs moved to inside RendererAPI
-        glGenVertexArrays(1, &MeshToInit.VAO);
-        glGenBuffers(1, &MeshToInit.VBO);
-        glGenBuffers(1, &MeshToInit.EBO);
-
-        glBindVertexArray(MeshToInit.VAO);
-        glBindBuffer(GL_ARRAY_BUFFER, MeshToInit.VBO);
-
-        glBufferData(GL_ARRAY_BUFFER, MeshToInit.Vertices.size() * sizeof(MeshData::Vertex), &MeshToInit.Vertices[0], GL_STATIC_DRAW);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, MeshToInit.EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, MeshToInit.Indices.size() * sizeof(unsigned int), &MeshToInit.Indices[0], GL_STATIC_DRAW);
-
-        // vertex positions
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(MeshData::Vertex), (void*)0);
-        // vertex normals
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(MeshData::Vertex), (void*)offsetof(MeshData::Vertex, Normal));
-        // vertex texture coords
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(MeshData::Vertex), (void*)offsetof(MeshData::Vertex, TexCoords));
-
-        glBindVertexArray(0);
-        for (MeshData& Child : MeshToInit.Meshes)
+        for (MeshData& Mesh : Meshes)
         {
-            InitMesh(Child);
+            glGenVertexArrays(1, &Mesh.VAO);
+            glGenBuffers(1, &Mesh.VBO);
+            glGenBuffers(1, &Mesh.EBO);
+
+            glBindVertexArray(Mesh.VAO);
+            glBindBuffer(GL_ARRAY_BUFFER, Mesh.VBO);
+
+            glBufferData(GL_ARRAY_BUFFER, Mesh.Vertices.size() * sizeof(MeshData::Vertex), &Mesh.Vertices[0], GL_STATIC_DRAW);
+
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Mesh.EBO);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, Mesh.Indices.size() * sizeof(unsigned int), &Mesh.Indices[0], GL_STATIC_DRAW);
+
+            // vertex positions
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(MeshData::Vertex), (void*)0);
+            // vertex normals
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(MeshData::Vertex), (void*)offsetof(MeshData::Vertex, Normal));
+            // vertex texture coords
+            glEnableVertexAttribArray(2);
+            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(MeshData::Vertex), (void*)offsetof(MeshData::Vertex, TexCoords));
+
+            glBindVertexArray(0);
+            
+            if (Mesh.Meshes.size() > 0)
+            {
+                InitMesh(Mesh.Meshes);
+            }
         }
     }
 

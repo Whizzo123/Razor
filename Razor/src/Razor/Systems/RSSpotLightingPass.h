@@ -9,17 +9,11 @@ namespace Razor
     class RSSpotLightingPass : public RenderSystem
     {
 	public:
-		RSSpotLightingPass()
+		RSSpotLightingPass(Ref<Scene> Scene) : RenderSystem(Scene)
 		{
-			Coordinator = Coordinator::GetInstance();
 			SystemRenderStage = RenderStage::RENDER_STAGE_LIGHTING_PASS;
-
-			Signature = { Coordinator->GetComponentType<SpotLight>() };
 		}
 		void Render(RenderPipelineEntityProperties& Properties) override;
-
-	protected:
-		std::shared_ptr<Coordinator> Coordinator;
     };
 }
 

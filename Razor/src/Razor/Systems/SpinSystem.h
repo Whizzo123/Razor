@@ -12,14 +12,10 @@ namespace Razor
 
 	public:
 
-		SpinSystem()
+		SpinSystem(Ref<Razor::Scene> Scene) : System(Scene)
 		{
-			Coordinator = Razor::Coordinator::GetInstance();
 		}
 		void Run(float dt) override;
-
-	private:
-		std::shared_ptr<Razor::Coordinator> Coordinator;
 	};
 
 }

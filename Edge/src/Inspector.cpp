@@ -1,54 +1,70 @@
 #include "Inspector.h"
+#include "Gui/ComponentImGui.h"
 
-
-void Inspector::Render()
+namespace EdgeEditor
 {
-	Razor::Engine& Engine = Razor::Engine::Get();
+	// TODO don't really think we want this
+	Inspector::Inspector() : Storage(std::make_shared<EditorStorage>())
+	{
 
-	bool bIsOpen;
-	ImGui::Begin("Inspector", &bIsOpen, ImGuiWindowFlags_MenuBar);
-	ImGui::SetWindowSize(ImVec2(200.0f, 200.0f));
-	ImGui::Text("Hello Inspector, %d", 123);
-	if (ImGui::Button("Create Entity", ImVec2(50.f, 25.f)))
-	{
-		CreateEntity();
 	}
-	if (ImGui::TreeNode("Entities"))
+
+	Inspector::Inspector(Razor::Ref<EditorStorage> Storage) : Storage(Storage)
 	{
-		for (int EntityIndex = 0; EntityIndex < Engine.GetCoordinator()->GetCurrentEntityCount(); EntityIndex++)
+
+	}
+
+	void Inspector::Render()
+	{
+		Razor::Engine& Engine = Razor::Engine::Get();
+
+		bool bIsOpen;
+		ImGui::Begin("Inspector", &bIsOpen, ImGuiWindowFlags_MenuBar);
+		ImGui::SetWindowSize(ImVec2(200.0f, 200.0f));
+		ImGui::Text("Hello Inspector, %d", 123);
+
+		if (!Storage->SelectedEntity)
 		{
-			if (ImGui::Button(std::to_string(EntityIndex).c_str(), ImVec2(50.f, 25.f)))
-			{
-				std::shared_ptr<Razor::Coordinator> Coordinator = Engine.GetCoordinator();
-				std::vector<const char*> ComponentTypeNames = Coordinator->GetComponentsForEntity(EntityIndex);
-				for (const char*& Name : ComponentTypeNames)
-				{
-					if (Name == typeid(Razor::Transform).name())
-					{
-						// TODO do we want to consider some sort of reflection based approach to the typing i.e a map of typename() to T
-						/*Razor::Transform TransformComp = Coordinator->GetComponent<Razor::Transform>(EntityIndex);
-						std::unordered_map<std::string, std::string> PropertiesMap = TransformComp.Serialize();
-						for (auto const& Property : PropertiesMap)
-						{
-							CreateWidgetForProperty(Property.first, Property.second);
-						}*/
-					}
-				}
-			}
+			ImGui::End();
+			return;
 		}
-		ImGui::TreePop();
+
+		Razor::Ref<Razor::Scene> CurrentScene = Engine.CurrentScene;
+		
+		if (ImGui::TreeNode(std::to_string((uint32_t)Storage->SelectedEntity->EntityHandle).c_str()))
+		{
+			ComponentImGui::DrawComponents(Storage->SelectedEntity);
+			ImGui::TreePop();
+		}
+		const char* PopupId = "Add Component Popup";
+		if (ImGui::Button("Add Component"))
+		{
+			ImGui::OpenPopup(PopupId);	
+		}
+		if (ImGui::BeginPopup(PopupId))
+		{
+			if (ImGui::Button("Mesh Component"))
+			{
+				Storage->SelectedEntity->AddComponent<Razor::Mesh>(Razor::CreateRef<Razor::Model>(Storage->DefaultModel));
+			}
+			if (ImGui::Button("Directional Light Component"))
+			{
+				Storage->SelectedEntity->AddComponent<Razor::DirectionalLight>();
+			}
+			ImGui::EndPopup();
+		}
+		ImGui::End();
 	}
-	ImGui::End();
-}
 
-void Inspector::CreateEntity()
-{
-	Razor::Engine& Engine = Razor::Engine::Get();
-	Razor::Entity NewEntity = Engine.CreateEntity();
-	Engine.AddComponentToEntity(NewEntity, Razor::Transform());
-}
+	void Inspector::CreateEntity()
+	{
+		Razor::Engine& Engine = Razor::Engine::Get();
+		Razor::Ref<Razor::Entity> NewEntity = Engine.CurrentScene->CreateEntity();
+		NewEntity->AddComponent<Razor::Transform>();
+	}
 
-void Inspector::CreateWidgetForProperty(const std::string& PropertyName, const std::string& PropertyValue)
-{
+	void Inspector::CreateWidgetForProperty(const std::string& PropertyName, const std::string& PropertyValue)
+	{
 
+	}
 }

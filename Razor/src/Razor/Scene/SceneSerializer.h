@@ -1,6 +1,6 @@
 #pragma once
 #include <yaml-cpp/yaml.h>
-#include "../EntityManager.h"
+#include "../Core/Entity.h"
 #include "Scene.h"
 
 namespace Razor

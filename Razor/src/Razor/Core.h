@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <iostream>
+#include "Log.h"
 
 #ifdef RZ_DEBUG
 	#if defined(RZ_PLATFORM_WINDOWS)

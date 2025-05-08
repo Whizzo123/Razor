@@ -11,15 +11,10 @@ namespace Razor
 	{
 	public:
 
-		CollisionSystem()
+		CollisionSystem(Ref<Razor::Scene> Scene) : System(Scene)
 		{
-			Coordinator = Razor::Coordinator::GetInstance();
-			Signature = { Coordinator->GetComponentType<Transform>(), Coordinator->GetComponentType<Collider>() };
 		}
 		void Run(float dt) override;
-
-	private:
-		std::shared_ptr<Razor::Coordinator> Coordinator;
 	};
 }
 
