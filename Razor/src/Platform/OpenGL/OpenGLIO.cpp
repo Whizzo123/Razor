@@ -9,7 +9,8 @@ std::unordered_map<int, RazorKey> OpenGLIO::GLFWToCustomKeyMap = {
 };
 std::unordered_map<int, RazorKeyState> OpenGLIO::GLFWToCustomStateMap = {
 		{GLFW_PRESS, KEY_PRESSED},
-		{GLFW_RELEASE, KEY_RELEASED}
+		{GLFW_RELEASE, KEY_RELEASED},
+		{GLFW_REPEAT, KEY_HELD}
 };
 std::unordered_map<int, RazorMouseButton> OpenGLIO::GLFWToCustomMouseMap = {
 	{GLFW_MOUSE_BUTTON_1, LEFT},
