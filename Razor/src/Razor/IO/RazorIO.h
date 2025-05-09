@@ -15,7 +15,8 @@ enum class RazorKey
 enum RazorKeyState
 {
 	KEY_RELEASED,
-	KEY_PRESSED
+	KEY_PRESSED,
+	KEY_HELD
 };
 
 enum RazorMouseButton

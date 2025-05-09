@@ -8,19 +8,19 @@ namespace EdgeEditor
 		const glm::vec3 CameraFront = Camera.CameraFront;
 		const glm::vec3 CameraUp = Camera.CameraUp;
 
-		if (RazorIO::Get().GetStateForKey(RazorKey::W) == KEY_PRESSED)
+		if (RazorIO::Get().GetStateForKey(RazorKey::W) == KEY_PRESSED || RazorIO::Get().GetStateForKey(RazorKey::W) == KEY_HELD)
 		{
 			Camera.CameraPos += CameraSpeed * CameraFront;
 		}
-		if (RazorIO::Get().GetStateForKey(RazorKey::S) == KEY_PRESSED)
+		if (RazorIO::Get().GetStateForKey(RazorKey::S) == KEY_PRESSED || RazorIO::Get().GetStateForKey(RazorKey::S) == KEY_HELD)
 		{
 			Camera.CameraPos -= CameraSpeed * CameraFront;
 		}
-		if (RazorIO::Get().GetStateForKey(RazorKey::A) == KEY_PRESSED)
+		if (RazorIO::Get().GetStateForKey(RazorKey::A) == KEY_PRESSED || RazorIO::Get().GetStateForKey(RazorKey::A) == KEY_HELD)
 		{
 			Camera.CameraPos -= glm::normalize(glm::cross(CameraFront, CameraUp)) * CameraSpeed;
 		}
-		if (RazorIO::Get().GetStateForKey(RazorKey::D) == KEY_PRESSED)
+		if (RazorIO::Get().GetStateForKey(RazorKey::D) == KEY_PRESSED || RazorIO::Get().GetStateForKey(RazorKey::D) == KEY_HELD)
 		{
 			Camera.CameraPos += glm::normalize(glm::cross(CameraFront, CameraUp)) * CameraSpeed;
 		}
