@@ -12,8 +12,7 @@ namespace Razor
 			Material& EntityMaterial = EntityMesh.Model->GetMaterial();
 			for (const MeshData& Child : EntityMesh.Model->GetModelMeshData())
 			{
-				//TODO remove in place of IRenderer alternative
-				glUseProgram(EntityMaterial.ShaderID);
+				Renderer->UseShader(EntityMaterial.ShaderID);
 				if (Properties.Properties.find(EntityToRender) == Properties.Properties.end())
 				{
 					continue;

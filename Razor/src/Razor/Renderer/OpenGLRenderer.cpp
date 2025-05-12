@@ -51,6 +51,11 @@ namespace Razor
         glStencilOp(Translate(StencilFailAction), Translate(DepthFailAction), Translate(SDPassAction));
     }
 
+    void OpenGLRenderer::UseShader(uint32_t ShaderProgramId)
+    {
+        glUseProgram(ShaderProgramId);
+    }
+
     GLenum OpenGLRenderer::Translate(EStencilAction Action)
     {
         RZ_CORE_ASSERT(StencilActionTranslation.find(Action) != StencilActionTranslation.end(), "Can't translate this action");
@@ -157,6 +162,7 @@ namespace Razor
         SceneTexture = InSceneTexture;
     }
 
+    //TODO potentially remove this do we actually use this?
     void OpenGLRenderer::ResizeFramebuffers(unsigned int Width, unsigned int Height)
     {
         //There are things that depend on these framebuffers so how do we notify them that the framebuffers have been regenerated and they need to grab the new ones
@@ -164,4 +170,8 @@ namespace Razor
         //Do we keep a list of these framebuffers and there relevant textures a new type?
     }
     
+    void OpenGLRenderer::SetViewport(uint32_t X, uint32_t Y, uint32_t Width, uint32_t Height)
+    {
+        glViewport(X, Y, Width, Height);
+    }
 }

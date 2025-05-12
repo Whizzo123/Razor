@@ -57,6 +57,22 @@ namespace Razor
 		virtual void* GetSceneRenderedToTexture() = 0;
 		virtual void SetFrameBufferTextureForScene(unsigned int SceneTexture) = 0;
 		virtual void ResizeFramebuffers(unsigned int Width, unsigned int Height) = 0;
+		/**
+		* Function to set the viewport
+		* 
+		* @param X - lower left corner x-coord of viewport rectangle (in pixels)
+		* @param Y - lower left corner y-coord of viewport rectangle (in pixels)
+		* @param Width - width of viewport
+		* @param Height - height of viewport
+		*/
+		virtual void SetViewport(uint32_t X, uint32_t Y, uint32_t Width, uint32_t Height) = 0;
+		/**
+		* Function to set shader to use while rendering
+		* 
+		* @param ShaderProgramId - id for shader program to use
+		*/
+		virtual void UseShader(uint32_t ShaderProgramId) = 0;
+		//TODO remove this
 		Camera RendererCamera;
 	};
 

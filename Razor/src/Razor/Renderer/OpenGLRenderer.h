@@ -29,6 +29,21 @@ namespace Razor
 		void* GetSceneRenderedToTexture() override;
 		void SetFrameBufferTextureForScene(unsigned int SceneTexture) override;
 		void ResizeFramebuffers(unsigned int Width, unsigned int Height) override;
+		/**
+		* Function to set viewport
+		* 
+		* @param X - lower left corner x-coord of viewport rectangle (in pixels)
+		* @param Y - lower left corner y-coord of viewport rectangle (in pixels)
+		* @param Width - width of viewport
+		* @param Height - height of viewport
+		*/
+		void SetViewport(uint32_t X, uint32_t Y, uint32_t Width, uint32_t Height) override;
+		/**
+		* Function to set shader to use while rendering
+		* 
+		* @param ShaderProgramId - id for shader program to use
+		*/
+		void UseShader(uint32_t ShaderProgramId) override;
 	private:
 		GLenum Translate(EStencilAction StencilAction);
 		GLenum Translate(EStencilFunc StencilFunction);
