@@ -34,7 +34,6 @@ namespace Razor
         {
             if ((InWidth != Width || InHeight != Height) && (InHeight != 0 && InWidth != 0))
             {
-                RZ_CORE_WARN("Invalidating current framebuffer old({0},{1}) vs new({2},{3})", Width, Height, InWidth, InHeight);
                 Width = InWidth;
                 Height = InHeight;
                 Invalidate();

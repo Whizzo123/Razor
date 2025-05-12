@@ -127,13 +127,6 @@ namespace Razor
 		* This just checks for the close event on the window
 		*/
 		void ProcessInput();
-		/**
-		* Function to pick and object via the PickBuffer
-		* Needs it's functionality properly implemented
-		* 
-		* @param PickBuffer - An unsigned int pointing to the FrameBuffer used as the PickBuffer
-		*/
-		void PickObject(unsigned int PickBuffer);
 		// TODO move this
 		/**
 		* Function to process Model from .obj file to Model object

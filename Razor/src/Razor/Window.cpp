@@ -34,4 +34,14 @@ namespace Razor
     {
         return Height;
     }
+
+    void Window::SetWidth(int Value)
+    {
+        Width = Value;
+    }
+
+    void Window::SetHeight(int Value)
+    {
+        Height = Value;
+    }
 }
