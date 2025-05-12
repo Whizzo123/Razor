@@ -35,6 +35,7 @@ private:
 	Razor::Ref<Razor::Framebuffer> SceneBuffer; /** Framebuffer object for rendering scene */
 	ImVec2 ViewportSize; /** 2D vector to hold size of viewport window */
 	ImVec2 ViewportPos; /** 2D vector to hold position of image displaying scene texture for viewport*/
+	Razor::Ref<EdgeEditor::EditorStorage> Storage; /** Container object to hold data to be shared among windows*/
 };
 
 Razor::Application* Razor::CreateApplication()
@@ -86,7 +87,7 @@ void Edge::Run()
 	Razor::Model DefaultModel = Engine.ProcessModel("resources/models/Cube.obj");
 	DefaultModel.SetModelShader(Engine.GetShaderForType(typeid(Razor::DefaultMeshShader).name())->ID);
 
-	Razor::Ref<EdgeEditor::EditorStorage> Storage = std::make_shared<EdgeEditor::EditorStorage>();
+	Storage = std::make_shared<EdgeEditor::EditorStorage>();
 	Storage->DefaultModel = DefaultModel;
 
 	EdgeEditor::Inspector InspectorWindow(Storage);
@@ -179,4 +180,5 @@ void Edge::PickObject(ImVec2 MousePos)
 	RZ_INFO("Mouse Pos x:{0} y:{1}", MousePos.x, MousePos.y);
 	RZ_INFO("Picked color {0}, {1}, {2}", Pixel[0], Pixel[1], Pixel[2]);
 	RZ_INFO("Picked entity {0}", PickedEntity);
+	Storage->SelectedEntity = Razor::Engine::Get().CurrentScene->GetEntity(entt::entity(PickedEntity));
 }

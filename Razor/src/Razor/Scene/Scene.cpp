@@ -1,5 +1,6 @@
 #include "Scene.h"
 #include "../Core/Entity.h"
+#include "../Component.h"
 
 namespace Razor
 {
@@ -21,7 +22,9 @@ namespace Razor
 	
 	Ref<Entity> Scene::GetEntity(entt::entity EntityHandle)
 	{
-		return CreateRef<Entity>(EntityHandle, this);
+		Ref<Entity> Entt = CreateRef<Entity>(EntityHandle, this);
+		
+		return Entt->HasComponent<Transform>() ? Entt : nullptr;
 	}
 	
 }
