@@ -40,8 +40,6 @@ namespace EdgeEditor
 
 			if (MouseLastX != CurrentMouseCoords.X || MouseLastY != CurrentMouseCoords.Y)
 			{
-				RZ_CORE_INFO("MouseCoords: {0},{1}", CurrentMouseCoords.X, CurrentMouseCoords.Y);
-				RZ_CORE_INFO("LastMouseCoords: {0},{1}", MouseLastX, MouseLastY);
 				float Xoffset = RazorIO::Get().CurrentMousePos.X - MouseLastX;
 				float Yoffset = RazorIO::Get().CurrentMousePos.Y - MouseLastY;
 

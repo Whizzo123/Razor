@@ -41,7 +41,17 @@ namespace Razor
 		virtual void BindFrameBuffer(uint32_t = 0) = 0;
 		virtual Ref<Framebuffer> CreateFrameBuffer(uint32_t Width, uint32_t Height) = 0;
 		virtual CameraInfo GetCameraInfo() = 0;
-		virtual void ReadPixels(unsigned int X, unsigned int Y, unsigned int Width, unsigned int Height, unsigned char* OutPixels, unsigned int Buffer) = 0;
+		/**
+		* Function to read pixels from a frame buffer out to a float ptr
+		* 
+		* @param X - the x-coord we are looking for in the buffer
+		* @param Y - the y-coord we are looking for in the buffer
+		* @param Width - the width of pixels we are reading 
+		* @param Height - the height of pixels we are reading
+		* @param OutPixels - the pixels resulting from the read
+		* @param Buffer - int corresponding to buffer we are reading from
+		*/
+		virtual void ReadPixels(unsigned int X, unsigned int Y, unsigned int Width, unsigned int Height, float* OutPixels, unsigned int Buffer) = 0;
 		virtual void BackupContext() = 0;
 		virtual void ResetCurrentContext() = 0;
 		virtual void* GetSceneRenderedToTexture() = 0;

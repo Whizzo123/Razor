@@ -110,19 +110,6 @@ namespace Razor
 		}
 	}
 
-	void Engine::PickObject(unsigned int PickBuffer)
-	{
-		if (RazorIO::Get().GetStateForMouseButton(LEFT) == MOUSE_DOWN)
-		{
-			Vector2D MousePos = RazorIO::Get().CurrentMousePos;
-			unsigned char Pixel[4];
-			Renderer->ReadPixels(MousePos.X, 600 - MousePos.Y, 1, 1, Pixel, PickBuffer);
-			int PickedEntity = 0;
-			PickedEntity = static_cast<int>(Pixel[0]) << 16 | static_cast<int>(Pixel[1]) << 8 | static_cast<int>(Pixel[2]);
-			//RZ_CORE_INFO("Picked {0}", PickedEntity);
-		}
-	}
-
 	void Engine::RenderImGui(uint64_t SceneTexture)
 	{
 		
