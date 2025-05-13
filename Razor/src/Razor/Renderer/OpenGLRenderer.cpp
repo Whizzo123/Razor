@@ -24,6 +24,37 @@ namespace Razor
         {
             {EStencilFunc::ALWAYS, GL_ALWAYS}
         };
+
+        ShaderTranslation = std::unordered_map<EShader, GLenum>
+        {
+            {EShader::VERTEX, GL_VERTEX_SHADER},
+            {EShader::FRAGMENT, GL_FRAGMENT_SHADER}
+        };
+
+        StatusParamTranslation = std::unordered_map<EStatusParam, GLenum>
+        {
+            {EStatusParam::COMPILE, GL_COMPILE_STATUS}
+        };
+
+        ProgramStatusParamTranslation = std::unordered_map<EProgramStatusParam, GLenum>
+        {
+            {EProgramStatusParam::LINK, GL_LINK_STATUS}
+        };
+
+        TextureTypeTranslation = std::unordered_map<ETextureType, GLenum>
+        {
+            {ETextureType::TEXTURE_2D, GL_TEXTURE_2D}
+        };
+
+        PixelDataFormatTranslation = std::unordered_map<EPixelDataFormat, GLenum>
+        {
+            {EPixelDataFormat::RGBA, GL_RGBA}
+        };
+
+        PixelDataTypeTranslation = std::unordered_map<EPixelDataType, GLenum>
+        {
+            {EPixelDataType::UNSIGNED_BYTE, GL_UNSIGNED_BYTE}
+        };
     }
 
     void OpenGLRenderer::PollForEvents()
@@ -173,5 +204,71 @@ namespace Razor
     void OpenGLRenderer::SetViewport(uint32_t X, uint32_t Y, uint32_t Width, uint32_t Height)
     {
         glViewport(X, Y, Width, Height);
+    }
+
+    uint32_t OpenGLRenderer::CreateShader(EShader ShaderType)
+    {
+        return glCreateShader(ShaderTranslation[ShaderType]);
+    }
+    void OpenGLRenderer::SetShaderSource(uint32_t ShaderHandle, int32_t Count, const char* const* String, const int* Length)
+    {
+        glShaderSource(ShaderHandle, Count, String, Length);
+    }
+
+    void OpenGLRenderer::CompileShader(uint32_t ShaderHandle)
+    {
+        glCompileShader(ShaderHandle);
+    }
+    void OpenGLRenderer::GetShaderStatusParam(uint32_t ShaderHandle, EStatusParam Param, int* SuccessCode)
+    {
+        glGetShaderiv(ShaderHandle, GL_COMPILE_STATUS, SuccessCode);
+    }
+    void OpenGLRenderer::GetShaderLog(uint32_t ShaderHandle, int32_t MaxLength, int32_t* Length, char* Log)
+    {
+        glGetShaderInfoLog(ShaderHandle, MaxLength, Length, Log);
+    }
+    uint32_t OpenGLRenderer::CreateShaderProgram()
+    {
+        return glCreateProgram();
+    }
+    void OpenGLRenderer::AttachShader(uint32_t ShaderProgramHandle, uint32_t ShaderHandle)
+    {
+        glAttachShader(ShaderProgramHandle, ShaderHandle);
+    }
+
+    void OpenGLRenderer::LinkShaderProgram(uint32_t ShaderProgramHandle)
+    {
+        glLinkProgram(ShaderProgramHandle);
+    }
+
+    void OpenGLRenderer::GetShaderProgramStatusParam(uint32_t ShaderProgramHandle, EProgramStatusParam Param, int* SuccessCode)
+    {
+        glGetProgramiv(ShaderProgramHandle, ProgramStatusParamTranslation[Param], SuccessCode);
+    }
+
+    void OpenGLRenderer::GetShaderProgramLog(uint32_t ShaderProgramHandle, int32_t MaxLength, int32_t* Length, char* Log)
+    {
+        glGetProgramInfoLog(ShaderProgramHandle, MaxLength, Length, Log);
+    }
+
+    void OpenGLRenderer::DeleteShader(uint32_t ShaderHandle)
+    {
+        glDeleteShader(ShaderHandle);
+    }
+    void OpenGLRenderer::GenerateTextures(int32_t NumberOfTextures, uint32_t* Textures)
+    {
+        glGenTextures(NumberOfTextures, Textures);
+    }
+    void OpenGLRenderer::BindTexture(ETextureType TextureType, uint32_t TextureHandle)
+    {
+        glBindTexture(TextureTypeTranslation[TextureType], TextureHandle);
+    }
+    void OpenGLRenderer::WriteTexture2dData(ETextureType TextureType, int32_t LevelOfDetail, EPixelDataFormat NumberOfColorComponents, int32_t Width, int32_t Height, int32_t Border, EPixelDataFormat DataFormat, EPixelDataType DataType, const void* Data)
+    {
+        glTexImage2D(TextureTypeTranslation[TextureType], LevelOfDetail, PixelDataFormatTranslation[NumberOfColorComponents], Width, Height, Border, PixelDataFormatTranslation[DataFormat], PixelDataTypeTranslation[DataType], Data);
+    }
+    void OpenGLRenderer::GenerateMipmap(ETextureType TextureType)
+    {
+        glGenerateMipmap(TextureTypeTranslation[TextureType]);
     }
 }
