@@ -97,6 +97,8 @@ void Edge::Run()
 	Razor::SceneSerializer::Deserialize(Engine.CurrentScene);
 	while (!Engine.ShouldEngineClose())
 	{
+		std::shared_ptr<Razor::IRenderer>& Renderer = Engine.Renderer;
+
 		Engine.Step();
 
 		const uint32_t SizeX = (uint32_t)ViewportSize.x;
@@ -104,9 +106,7 @@ void Edge::Run()
 
 		PickBuffer->Refresh(SizeX, SizeY);
 		SceneBuffer->Refresh(SizeX, SizeY);
-		glViewport(0, 0, SizeX, SizeY);
-
-		std::shared_ptr<Razor::IRenderer>& Renderer = Engine.Renderer;
+		Renderer->SetViewport(0, 0, SizeX, SizeY);
 
 		Renderer->BindFrameBuffer(PickBuffer->GetID());
 		Renderer->ClearBuffer();
@@ -130,7 +130,7 @@ void Edge::Run()
 		InspectorWindow.Render();
 		SceneViewWindow.Render();
 		ProjectExplorerWindow.Render();
-		RenderSceneViewport(PickBuffer);
+		RenderSceneViewport(SceneBuffer);
 		ImGui::ShowMetricsWindow();
 		ImGui::End();
 		Engine.GetGUI().EndFrame(Razor::Engine::Get().GetWindow(), Razor::Engine::Get().Renderer);
@@ -177,8 +177,5 @@ void Edge::PickObject(ImVec2 MousePos)
 	std::uint32_t PickedEntity = 0;
 	PickedEntity = static_cast<std::uint32_t>(Pixel[0] * 255.0f) + (std::uint32_t(Pixel[1] * 255.0f) << 8)
 			+ (std::uint32_t(Pixel[2] * 255.0f) << 16);
-	RZ_INFO("Mouse Pos x:{0} y:{1}", MousePos.x, MousePos.y);
-	RZ_INFO("Picked color {0}, {1}, {2}", Pixel[0], Pixel[1], Pixel[2]);
-	RZ_INFO("Picked entity {0}", PickedEntity);
 	Storage->SelectedEntity = Razor::Engine::Get().CurrentScene->GetEntity(entt::entity(PickedEntity));
 }

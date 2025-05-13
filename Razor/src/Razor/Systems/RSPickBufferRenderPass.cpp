@@ -13,8 +13,7 @@ namespace Razor
 			Mesh& EntityMesh = CurrentScene->GetComponent<Mesh>(EntityToRender);
 			for (const MeshData& Child : EntityMesh.Model->GetModelMeshData())
 			{
-				//TODO remove in place of IRenderer alternative
-				glUseProgram(Engine::Get().GetShaderForType(typeid(PickBufferShader).name())->ID);
+				Renderer->UseShader(Engine::Get().GetShaderForType(typeid(PickBufferShader).name())->ID);
 				if (Properties.Properties.find(EntityToRender) == Properties.Properties.end())
 				{
 					continue;

@@ -12,6 +12,7 @@
 #include "imgui.h"
 #include "Scene/Scene.h"
 #include "entt/entt.hpp"
+#include "../Platform/Generic/ITimeProvider.h"
 
 namespace Razor
 {
@@ -175,6 +176,6 @@ namespace Razor
 		float LastFrame = 0.0f;
 		static Engine* GEngine;
 		std::unique_ptr<IPlatformIO> PlatformIO;
-		
+		std::unique_ptr<ITimeProvider> TimeProvider; /** Generic object to provide time functionality */
 	};
 }

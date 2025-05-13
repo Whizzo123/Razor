@@ -21,6 +21,7 @@
 #include "../Platform/OpenGL/OpenGLWindowProvider.h"
 #include "Scene/SceneSerializer.h"
 #include <imgui.h>
+#include "../Platform/OpenGL/GLFWTimeProvider.h"
 
 namespace Razor
 {
@@ -37,6 +38,8 @@ namespace Razor
 
 		std::shared_ptr<IWindowProvider> Provider = std::make_shared<OpenGLWindowProvider>();
 		EngineWindow = std::make_unique<Window>(800, 600, Provider);
+
+		TimeProvider = std::make_unique<GLFWTimeProvider>();
 		
 		Renderer->EnableDepthTesting(/*bEnable*/true);
 
@@ -89,7 +92,7 @@ namespace Razor
 
 	void Engine::Step()
 	{
-		float CurrentFrame = glfwGetTime();
+		float CurrentFrame = TimeProvider->GetTime();
 		DeltaTime = CurrentFrame - LastFrame;
 		LastFrame = CurrentFrame;
 	}
