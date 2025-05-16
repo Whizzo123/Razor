@@ -3,7 +3,7 @@
 
 #include "Inspector.h"
 #include "SceneView.h"
-#include "../EditorStorage.h"
+#include "EditorStorage.h"
 #include "ProjectExplorer.h"
 #include "Systems/RSEditorCamera.h"
 #include "EditorCamera.h"
@@ -126,7 +126,7 @@ void Edge::Run()
 		Engine.RunSystems();
 
 		Engine.GetGUI().BeginNewFrame();
-		Engine.GetGUI().CreateDockspace();
+		Engine.GetGUI().CreateDockspace("Edge");
 		InspectorWindow.Render();
 		SceneViewWindow.Render();
 		ProjectExplorerWindow.Render();

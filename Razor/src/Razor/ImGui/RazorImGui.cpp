@@ -62,7 +62,7 @@ namespace Razor
 		//RZ_CORE_INFO("Mouse Pos: {0},{1}", ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y);
 	}
 
-	void RazorImGui::CreateDockspace()
+	void RazorImGui::CreateDockspace(const std::string& Title)
 	{
 		bool bIsOpen;
 		bool bIsDockspaceOpen;
@@ -73,8 +73,8 @@ namespace Razor
 		ImGui::SetNextWindowViewport(viewport->ID);
 		window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-		ImGui::Begin("Dockspace", &bIsDockspaceOpen, window_flags);
-		ImGui::DockSpace(ImGui::GetID("Dockspace"), ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
+		ImGui::Begin(Title.c_str(), &bIsDockspaceOpen, window_flags);
+		ImGui::DockSpace(ImGui::GetID(Title.c_str()), ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
 	}
 
 	void RazorImGui::RegisterImGuiEvents()

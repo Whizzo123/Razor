@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Razor.h"
-#include "../EditorStorage.h"
+#include "EditorStorage.h"
 
 
 namespace EdgeEditor
