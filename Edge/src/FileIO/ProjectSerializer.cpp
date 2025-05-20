@@ -2,6 +2,7 @@
 #include "../Project.h"
 #include <yaml-cpp/yaml.h>
 #include <fstream>
+#include <filesystem>
 
 
 namespace EdgeEditor
@@ -9,6 +10,24 @@ namespace EdgeEditor
 
 	void ProjectSerializer::Serialize(const std::string& Path, Razor::Ref<Project> Project)
 	{
+		if (Project == nullptr)
+		{
+			RZ_ERROR("ProjectSerializer::Serialize Error: Project Ptr passed in was null");
+			return;
+		}
+
+		if (Project->ProjectName == "")
+		{
+			RZ_ERROR("ProjectSerializer::Serialize Error: Project Name cannot be an empty string");
+			return;
+		}
+
+		const std::string ProjectFolderPath = Path + "/" + Project->ProjectName;
+		const std::string AssetFolderPath = ProjectFolderPath + "/" + "assets";
+		const std::string DllFolderPath = ProjectFolderPath + "/" + "assembly";
+
+		Project->AssetDirectory = AssetFolderPath;
+		Project->DllDirectory = DllFolderPath;
 
 		YAML::Emitter Out;
 		Out << YAML::BeginMap;
@@ -18,7 +37,11 @@ namespace EdgeEditor
 		Out << YAML::Key << "MainScenePath" << YAML::Value << Project->MainScenePath;
 		Out << YAML::EndMap;
 
-		const std::string PathPlusExt = Path + ".proj";
+		std::filesystem::create_directory(ProjectFolderPath);
+		std::filesystem::create_directory(AssetFolderPath);
+		std::filesystem::create_directory(DllFolderPath);
+
+		const std::string PathPlusExt = ProjectFolderPath + "/" + Project->ProjectName + ".proj";
 
 		std::ofstream FOut(PathPlusExt.c_str());
 		const char* ErrorMsg = new char(' ');
