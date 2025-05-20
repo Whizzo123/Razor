@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Razor.h>
+#include "Project.h"
 
 namespace EdgeEditor
 {
@@ -9,6 +10,7 @@ namespace EdgeEditor
 		EditorStorage() : SelectedEntity(nullptr) {}
 		Razor::Ref<Razor::Entity> SelectedEntity;
 		Razor::Model DefaultModel;
+		Project CurrentProject;
 	};
 }
 

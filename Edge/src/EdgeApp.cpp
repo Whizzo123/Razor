@@ -3,10 +3,14 @@
 
 #include "Inspector.h"
 #include "SceneView.h"
-#include "../EditorStorage.h"
+#include "EditorStorage.h"
 #include "ProjectExplorer.h"
 #include "Systems/RSEditorCamera.h"
 #include "EditorCamera.h"
+#include "FileIO/ProjectSerializer.h"
+#include "misc/cpp/imgui_stdlib.h"
+#include "Gui/NewProjectPopupWindow.h"
+
 
 
 class Edge : public Razor::Application
@@ -28,6 +32,15 @@ public:
 	* @param Offset - 2D vector to offset mouse position based on viewport position
 	*/
 	void PickObject(ImVec2 Offset);
+	/**
+	* Function to create an ImGui dockspace
+	* 
+	* @param Title - string to use as title
+	*/
+	void CreateDockspace(const std::string& Title);
+
+private:
+	EdgeEditor::PopupWindow* CurrentPopup = nullptr; /** Holds current popup open */
 
 private:
 	EdgeEditor::EditorCamera EditorCamera; /** Object to house and control the camera we will use for rendering the scene to the viewport */
@@ -126,13 +139,21 @@ void Edge::Run()
 		Engine.RunSystems();
 
 		Engine.GetGUI().BeginNewFrame();
-		Engine.GetGUI().CreateDockspace();
+		CreateDockspace("Edge");
 		InspectorWindow.Render();
 		SceneViewWindow.Render();
 		ProjectExplorerWindow.Render();
 		RenderSceneViewport(SceneBuffer);
 		ImGui::ShowMetricsWindow();
 		ImGui::End();
+		if (CurrentPopup)
+		{
+			if (CurrentPopup->Draw() == false)
+			{
+				delete(CurrentPopup);
+				CurrentPopup = nullptr;
+			}
+		}
 		Engine.GetGUI().EndFrame(Razor::Engine::Get().GetWindow(), Razor::Engine::Get().Renderer);
 		Engine.Renderer->SwapBuffer(Razor::Engine::Get().GetWindow());
 	}
@@ -178,4 +199,31 @@ void Edge::PickObject(ImVec2 MousePos)
 	PickedEntity = static_cast<std::uint32_t>(Pixel[0] * 255.0f) + (std::uint32_t(Pixel[1] * 255.0f) << 8)
 			+ (std::uint32_t(Pixel[2] * 255.0f) << 16);
 	Storage->SelectedEntity = Razor::Engine::Get().CurrentScene->GetEntity(entt::entity(PickedEntity));
+}
+
+void Edge::CreateDockspace(const std::string& Title)
+{
+	bool bIsOpen;
+	bool bIsDockspaceOpen;
+	ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+	ImGuiViewport* viewport = ImGui::GetMainViewport();
+	ImGui::SetNextWindowPos(viewport->Pos);
+	ImGui::SetNextWindowSize(viewport->Size);
+	ImGui::SetNextWindowViewport(viewport->ID);
+	window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+	window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+	ImGui::Begin(Title.c_str(), &bIsDockspaceOpen, window_flags);
+	if (ImGui::BeginMainMenuBar())
+	{
+		if (ImGui::BeginMenu("File"))
+		{
+			if (ImGui::MenuItem("Create Project"))
+			{
+				CurrentPopup = new EdgeEditor::NewProjectPopupWindow();
+			}
+			ImGui::EndMenu();
+		}
+		ImGui::EndMainMenuBar();
+	}
+	ImGui::DockSpace(ImGui::GetID(Title.c_str()), ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
 }

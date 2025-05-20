@@ -14,7 +14,6 @@ namespace Razor
 		void Setup(const std::shared_ptr<IWindowProvider>& WindowProvider);
 		void BeginNewFrame();
 		void EndFrame(const Window& RenderWindow, Ref<IRenderer> Renderer);
-		void CreateDockspace();
 	public:
 		// Function to hook our on such and such events to GLFW key events
 		void RegisterImGuiEvents();
