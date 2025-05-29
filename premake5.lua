@@ -17,6 +17,8 @@ group "Dependencies"
 	include "Razor/vendor/ImGui"
 	include "Razor/vendor/yaml-cpp"
 	include "Razor/vendor/entt"
+	include "Razor/vendor/Coral/Coral.Native"
+	include "Razor/vendor/Coral/Coral.Managed"
 
 project "Razor"
 	location "Razor"
@@ -56,7 +58,8 @@ project "Razor"
 		"%{prj.name}/vendor/glm",
 		"%{prj.name}/vendor/ImGui",
 		"%{prj.name}/vendor/yaml-cpp/include",
-		"%{prj.name}/vendor/entt/src"
+		"%{prj.name}/vendor/entt/src",
+		"%{prj.name}/vendor/Coral/Coral.Native/Include"
 	}
 
 	links
@@ -65,7 +68,8 @@ project "Razor"
 		"opengl32.lib",
 		"assimp",
 		"ImGui",
-		"yaml-cpp"
+		"yaml-cpp",
+		"Coral.Native"
 	}
 
 	rtti("On")

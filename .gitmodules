@@ -19,3 +19,6 @@
 [submodule "Razor/vendor/entt"]
 	path = Razor/vendor/entt
 	url = https://github.com/Whizzo123/entt.git
+[submodule "Razor/vendor/Coral"]
+	path = Razor/vendor/Coral
+	url = https://github.com/Whizzo123/Coral.git
