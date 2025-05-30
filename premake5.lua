@@ -130,7 +130,8 @@ project "Edge"
 		"Razor/vendor/ImGui",
 		"Razor/vendor/yaml-cpp/include",
 		"Razor/src",
-		"Razor/vendor/entt/src"
+		"Razor/vendor/entt/src",
+		"Razor/vendor/Coral/Coral.Native/Include"
 	}
 	
 	links 

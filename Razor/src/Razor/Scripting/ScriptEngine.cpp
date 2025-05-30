@@ -32,6 +32,7 @@ namespace Razor
 			RZ_CORE_ERROR("Failed to initialise Coral");
 			return;
 		}
+		Context = CoralInstance.CreateAssemblyLoadContext("Game");
 		RZ_CORE_INFO("ScriptEngine: -> Successfully initialised Coral");
 		ScriptEngineInitialised = true;
 	}
@@ -44,7 +45,6 @@ namespace Razor
 			return;
 		}
 
-		Context = CoralInstance.CreateAssemblyLoadContext("Game");
 		Coral::ManagedAssembly& Assembly = Context.LoadAssembly(AssemblyPath);
 	}
 

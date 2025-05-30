@@ -23,8 +23,18 @@ namespace EdgeEditor
 		}
 
 		const std::string ProjectFolderPath = Path + "/" + Project->ProjectName;
-		const std::string AssetFolderPath = ProjectFolderPath + "/" + "assets";
-		const std::string DllFolderPath = ProjectFolderPath + "/" + "assembly";
+		std::string AssetFolderPath = Project->AssetDirectory;
+		std::string DllFolderPath = Project->DllDirectory;
+		if (Project->AssetDirectory.empty())
+		{
+			AssetFolderPath = ProjectFolderPath + "/" + "assets";
+			std::filesystem::create_directory(AssetFolderPath);
+		}
+		if (Project->DllDirectory.empty())
+		{
+			DllFolderPath = ProjectFolderPath + "/" + "assembly";
+			std::filesystem::create_directory(DllFolderPath);
+		}
 
 		Project->AssetDirectory = AssetFolderPath;
 		Project->DllDirectory = DllFolderPath;
@@ -37,9 +47,8 @@ namespace EdgeEditor
 		Out << YAML::Key << "MainScenePath" << YAML::Value << Project->MainScenePath;
 		Out << YAML::EndMap;
 
+
 		std::filesystem::create_directory(ProjectFolderPath);
-		std::filesystem::create_directory(AssetFolderPath);
-		std::filesystem::create_directory(DllFolderPath);
 
 		const std::string PathPlusExt = ProjectFolderPath + "/" + Project->ProjectName + ".proj";
 

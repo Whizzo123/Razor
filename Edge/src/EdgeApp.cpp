@@ -10,6 +10,7 @@
 #include "FileIO/ProjectSerializer.h"
 #include "misc/cpp/imgui_stdlib.h"
 #include "Gui/NewProjectPopupWindow.h"
+#include "Gui/OpenProjectPopupWindow.h"
 
 
 
@@ -38,6 +39,10 @@ public:
 	* @param Title - string to use as title
 	*/
 	void CreateDockspace(const std::string& Title);
+	/**
+	* Function to load new project into editor
+	*/
+	void OnNewProjectSet();
 
 private:
 	EdgeEditor::PopupWindow* CurrentPopup = nullptr; /** Holds current popup open */
@@ -102,6 +107,7 @@ void Edge::Run()
 
 	Storage = std::make_shared<EdgeEditor::EditorStorage>();
 	Storage->DefaultModel = DefaultModel;
+	Storage->OnProjectSet().AddRaw(this, &Edge::OnNewProjectSet);
 
 	EdgeEditor::Inspector InspectorWindow(Storage);
 	EdgeEditor::SceneView SceneViewWindow(Storage);
@@ -112,6 +118,7 @@ void Edge::Run()
 	{
 		std::shared_ptr<Razor::IRenderer>& Renderer = Engine.Renderer;
 
+		// TODO this potentially doesn't need to get called here cause we might not be pressing play yet
 		Engine.Step();
 
 		const uint32_t SizeX = (uint32_t)ViewportSize.x;
@@ -136,6 +143,7 @@ void Edge::Run()
 
 		Renderer->PollForEvents();
 
+		// TODO runtime
 		Engine.RunSystems();
 
 		Engine.GetGUI().BeginNewFrame();
@@ -221,9 +229,34 @@ void Edge::CreateDockspace(const std::string& Title)
 			{
 				CurrentPopup = new EdgeEditor::NewProjectPopupWindow();
 			}
+			if (ImGui::MenuItem("Open Project"))
+			{
+				CurrentPopup = new EdgeEditor::OpenProjectPopupWindow(Storage);
+			}
 			ImGui::EndMenu();
 		}
 		ImGui::EndMainMenuBar();
 	}
 	ImGui::DockSpace(ImGui::GetID(Title.c_str()), ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
+}
+
+void Edge::OnNewProjectSet()
+{
+	EdgeEditor::Project& LoadedProject = Storage->GetProject();
+	RZ_INFO("Loading up project: " + LoadedProject.ProjectName);
+	const std::string ProjectPath = "../Sandbox";
+	//Load new scene
+	Razor::Ref<Razor::Scene> MainScene = Razor::CreateRef<Razor::Scene>(ProjectPath + LoadedProject.MainScenePath);
+	if (Razor::SceneSerializer::Deserialize(MainScene) == false)
+	{
+		LoadedProject.MainScenePath = "/assets/scenes/Main.rzscn";
+		MainScene = Razor::CreateRef<Razor::Scene>(LoadedProject.MainScenePath);
+		Razor::SceneSerializer::Serialize(MainScene);
+		EdgeEditor::ProjectSerializer::Serialize("../", Razor::CreateRef<EdgeEditor::Project>(LoadedProject));
+	}
+	Razor::Engine::Get().CurrentScene = MainScene;
+	//TODO we haven't dealt with tearing down an old scene and loading a new one yet that's mainly just destroying old entities
+	//Load new dlls
+	Razor::ScriptEngine::LoadAssembly(ProjectPath + "/" + LoadedProject.DllDirectory + "/" + "Razor-ScriptBridge.dll");
+	Razor::ScriptEngine::LoadAssembly(ProjectPath + "/" + LoadedProject.DllDirectory + "/" + LoadedProject.ProjectName + ".dll");
 }
