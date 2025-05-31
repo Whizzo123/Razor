@@ -215,8 +215,31 @@ namespace Razor
 		FOut.close();
 	}
 
-	void SceneSerializer::Deserialize(Ref<Scene> OutScene)
+	bool SceneSerializer::Deserialize(Ref<Scene> OutScene)
 	{
+		bool bContainsExt = false;
+		for (int i = 0; i < OutScene->GetPath().length(); i++)
+		{
+			if (OutScene->GetPath()[i] == '.')
+			{
+				const std::string Extension = OutScene->GetPath().substr(i, 6);
+				if (Extension == ".rzscn")
+				{
+					bContainsExt = true;
+					break;
+				}
+			}
+		}
+		if (bContainsExt == false)
+		{
+			return false;
+		}
+		struct stat Buffer;
+		if (stat(OutScene->GetPath().c_str(), &Buffer) != 0)
+		{
+			RZ_CORE_WARN("SceneSerializer.Deserialize: Attempted to load scene file that didn't exist called: {0}", OutScene->GetPath());
+			return false;
+		}
 		YAML::Node Data;
 		try
 		{
@@ -225,13 +248,13 @@ namespace Razor
 		catch (YAML::ParserException e)
 		{
 			RZ_CORE_ERROR("Failed to load .rzscn file '{0}'\n	{1}", OutScene->GetPath(), e.what());
-			return;
+			return false;
 		}
 
 		if (!Data["Scene"])
 		{
 			RZ_CORE_ERROR("Incomplete .rzscn file missing 'Scene' key");
-			return;
+			return false;
 		}
 
 		std::string SceneName = Data["Scene"].as<std::string>();
@@ -261,5 +284,6 @@ namespace Razor
 				}*/
 			}
 		}
+		return true;
 	}
 }

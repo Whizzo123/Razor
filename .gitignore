@@ -35,7 +35,10 @@
 .vs/
 bin/
 intermediate/
+Intermediates/
 documentation/
+obj/
+Binaries/
 
 !vendor/
 
@@ -46,3 +49,7 @@ documentation/
 *.vcxproj.filters
 *.sln
 *.ini
+*.csproj
+*.csproj.Backup.tmp
+*.deps.json
+*.pdb

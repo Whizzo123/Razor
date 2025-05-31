@@ -9,7 +9,7 @@ namespace Razor
 	{
 	public:
 		static void Serialize(Ref<Scene> OutScene);
-		static void Deserialize(Ref<Scene> OutScene);
+		static bool Deserialize(Ref<Scene> OutScene);
 
 	private:
 		static void SerializeEntity(YAML::Emitter& Out, Entity InEntity);

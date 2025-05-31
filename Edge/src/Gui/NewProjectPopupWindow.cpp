@@ -20,6 +20,7 @@ namespace EdgeEditor
 			if (ImGui::Button("Create"))
 			{
 				EdgeEditor::ProjectSerializer::Serialize(MagicalPathToFixWithActualSelectedPathSoon, NewProject);
+				/*TODO actually load project up*/
 				ImGui::CloseCurrentPopup();
 			}
 			ImGui::SameLine();
