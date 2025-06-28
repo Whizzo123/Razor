@@ -1,5 +1,6 @@
 #pragma once
 #include <Coral/HostInstance.hpp>
+#include "../Core.h"
 
 
 namespace Razor
@@ -10,7 +11,7 @@ namespace Razor
 	public:
 		static void Init();
 		static void Shutdown();
-		static void LoadAssembly(const std::string& AssemblyPath);
+		static Razor::Ref<Coral::ManagedAssembly> LoadAssembly(const std::string& AssemblyPath);
 
 	private:
 		static Coral::HostInstance CoralInstance;

@@ -257,6 +257,11 @@ void Edge::OnNewProjectSet()
 	Razor::Engine::Get().CurrentScene = MainScene;
 	//TODO we haven't dealt with tearing down an old scene and loading a new one yet that's mainly just destroying old entities
 	//Load new dlls
-	Razor::ScriptEngine::LoadAssembly(ProjectPath + "/" + LoadedProject.DllDirectory + "/" + "Razor-ScriptBridge.dll");
+	Razor::Ref<Coral::ManagedAssembly> ScriptBridgeAssembly = Razor::ScriptEngine::LoadAssembly(ProjectPath + "/" + LoadedProject.DllDirectory + "/" + "Razor-ScriptBridge.dll");
 	Razor::ScriptEngine::LoadAssembly(ProjectPath + "/" + LoadedProject.DllDirectory + "/" + LoadedProject.ProjectName + ".dll");
+	if (ScriptBridgeAssembly)
+	{
+		Razor::ScriptGlue::RegisterFunctions(*ScriptBridgeAssembly);
+	}
+
 }

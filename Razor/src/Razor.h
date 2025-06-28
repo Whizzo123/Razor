@@ -21,3 +21,4 @@
 #include "Razor/Renderer/Framebuffer.h"
 #include "Razor/Scene/SceneSerializer.h"
 #include "Razor/Scripting/ScriptEngine.h"
+#include "Razor/Scripting/ScriptGlue.h"
