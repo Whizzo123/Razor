@@ -103,7 +103,7 @@ namespace Razor
 		* 
 		* @return A reference to the RazorImGui object
 		*/
-		RazorImGui& GetGUI() { return std::move(*RazorGUI); }
+		RazorImGui& GetGUI() { return *RazorGUI; }
 		/**
 		* Getter function for the Window object
 		* 
@@ -111,7 +111,7 @@ namespace Razor
 		* 
 		* @return A reference to the Window object
 		*/
-		Window& GetWindow() { return std::move(*EngineWindow); }
+		Window& GetWindow() { return *EngineWindow; }
 		/**
 		* Getter function for the Coordinator object
 		* 

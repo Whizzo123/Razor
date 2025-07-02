@@ -25,7 +25,7 @@ namespace Razor
 		}
 
 		template<typename T>
-		T GetComponent(entt::entity Entity)
+		T& GetComponent(entt::entity Entity)
 		{
 			return registry.get<T>(Entity);
 		}

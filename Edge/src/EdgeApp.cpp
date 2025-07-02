@@ -264,4 +264,14 @@ void Edge::OnNewProjectSet()
 		Razor::ScriptGlue::RegisterFunctions(*ScriptBridgeAssembly);
 	}
 
+	const std::vector<Coral::Type*> Types = ScriptBridgeAssembly->GetTypes();
+
+	for (Coral::Type* ScriptType : Types)
+	{
+		if (ScriptType->GetBaseType().GetTypeId() == ScriptBridgeAssembly->GetType("System").GetTypeId())
+		{
+			Coral::ManagedObject Instance = ScriptType->CreateInstance();
+			Instance.InvokeMethod("Run", 1.0f);
+		}
+	}
 }
