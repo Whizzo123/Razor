@@ -16,7 +16,7 @@ namespace Razor
         public bool HasComponent<T>() where T : new()
         {
             Type componentType = typeof(T);
-            return InternalCalls.Entity_HasComponent(EntityHandle, componentType);
+            return InternalManager.Entity_HasComponent(EntityHandle, componentType);
         }
     }
 

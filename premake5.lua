@@ -76,7 +76,8 @@ project "Razor"
 
 	defines
 	{
-		"YAML_CPP_STATIC_DEFINE"
+		"YAML_CPP_STATIC_DEFINE",
+		"CORAL_WINDOWS"
 	}
 
 	filter "system:windows"
@@ -85,7 +86,8 @@ project "Razor"
 		defines
 		{
 			"RZ_BUILD_DLL",
-			"RZ_PLATFORM_WINDOWS"
+			"RZ_PLATFORM_WINDOWS",
+			"CORAL_WINDOWS"
 		}
 
 	filter "configurations:Debug"

@@ -240,6 +240,14 @@ void Edge::CreateDockspace(const std::string& Title)
 	ImGui::DockSpace(ImGui::GetID(Title.c_str()), ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
 }
 
+template <>
+struct fmt::formatter<Coral::String> : fmt::formatter<std::string> {
+	auto format(const Coral::String& s, fmt::format_context& ctx) {
+		// Use your std::string conversion operator
+		return fmt::formatter<std::string>::format(std::string(s), ctx);
+	}
+};
+
 void Edge::OnNewProjectSet()
 {
 	EdgeEditor::Project& LoadedProject = Storage->GetProject();
@@ -258,18 +266,28 @@ void Edge::OnNewProjectSet()
 	//TODO we haven't dealt with tearing down an old scene and loading a new one yet that's mainly just destroying old entities
 	//Load new dlls
 	Razor::Ref<Coral::ManagedAssembly> ScriptBridgeAssembly = Razor::ScriptEngine::LoadAssembly(ProjectPath + "/" + LoadedProject.DllDirectory + "/" + "Razor-ScriptBridge.dll");
-	Razor::ScriptEngine::LoadAssembly(ProjectPath + "/" + LoadedProject.DllDirectory + "/" + LoadedProject.ProjectName + ".dll");
+	Razor::Ref<Coral::ManagedAssembly> GameAssembly = Razor::ScriptEngine::LoadAssembly(ProjectPath + "/" + LoadedProject.DllDirectory + "/" + LoadedProject.ProjectName + ".dll");
 	if (ScriptBridgeAssembly)
 	{
 		Razor::ScriptGlue::RegisterFunctions(*ScriptBridgeAssembly);
 	}
 
-	const std::vector<Coral::Type*> Types = ScriptBridgeAssembly->GetTypes();
+	const std::vector<Coral::Type*> Types = GameAssembly->GetTypes();
+
+	if (!ScriptBridgeAssembly->GetType("Razor.System"))
+	{
+		RZ_ERROR("Could not get System type");
+	}
 
 	for (Coral::Type* ScriptType : Types)
 	{
-		if (ScriptType->GetBaseType().GetTypeId() == ScriptBridgeAssembly->GetType("System").GetTypeId())
+		/*We are getting the type now however we are struggling to get base type as they are all null for some reason*/
+		RZ_INFO("Script Type {0} and name {1}", ScriptType->GetTypeId(), ScriptType->GetFullName());
+		RZ_INFO("Script Type Base Type {0} and name {1}", ScriptType->GetBaseType().GetTypeId(), ScriptType->GetBaseType().GetFullName());
+		RZ_INFO("Razor System Type Id {0}", ScriptBridgeAssembly->GetType("Razor.System").GetTypeId());
+		if (ScriptType->GetBaseType().GetTypeId() == ScriptBridgeAssembly->GetType("Razor.System").GetTypeId())
 		{
+			RZ_INFO("Instantiating system type");
 			Coral::ManagedObject Instance = ScriptType->CreateInstance();
 			Instance.InvokeMethod("Run", 1.0f);
 		}

@@ -3,7 +3,13 @@ using System.Runtime.CompilerServices;
 
 namespace Razor
 {
-    public static class InternalCalls
+    internal static unsafe class InternalCalls
+    {
+        internal static delegate* unmanaged[Cdecl]<bool> Entity_HasComponent;
+        internal static delegate* unmanaged[Cdecl]<IntPtr, void> Print_Message;
+    }
+
+        public static class InternalManager
     {
         #region Entity
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
