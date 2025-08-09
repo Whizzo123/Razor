@@ -80,6 +80,12 @@ project "Razor"
 		"CORAL_WINDOWS"
 	}
 
+	 -- Automatically copy DLL from C# project after build
+    postbuildcommands {
+        '{COPY} "%{wks.location}Razor/vendor/Coral/Coral.Managed/bin/%{cfg.buildcfg}/Coral.Managed.dll" "%{wks.location}Edge/bin"',
+		'{COPY} "%{wks.location}Razor/vendor/Coral/Coral.Managed/Coral.Managed.runtimeconfig.json" "%{wks.location}Edge/bin"'
+    }
+
 	filter "system:windows"
 		systemversion "latest"
 
