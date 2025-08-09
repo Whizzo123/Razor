@@ -9,6 +9,8 @@ project "Razor-ScriptBridge"
 
         architecture "x86_64"
 
+        buildoptions { "/unsafe" }
+
         files 
         {
             "Source/**.cs",
