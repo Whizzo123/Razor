@@ -5,7 +5,7 @@
 
 namespace Razor
 {
-	class SceneSerializer
+	class RAZOR_API SceneSerializer
 	{
 	public:
 		static void Serialize(Ref<Scene> OutScene);

@@ -55,7 +55,7 @@ namespace Razor
 		UNSIGNED_BYTE
 	};
 
-	class IRenderer
+	class RAZOR_API IRenderer
 	{
 	public:
 		virtual void InitRendererAPI() = 0;

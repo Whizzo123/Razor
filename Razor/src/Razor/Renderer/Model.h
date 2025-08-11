@@ -70,7 +70,7 @@ namespace Razor
 		Material ModelMaterial;
 	};
 
-	class Model
+	class RAZOR_API Model
 	{
 	public:
 		void LoadMesh(std::string Path);

@@ -22,7 +22,7 @@ namespace Razor
 	* 
 	* Exists as a singleton instance can only be accessed through Get() function
 	*/
-	class   Engine
+	class RAZOR_API Engine
 	{
 	
 	public:

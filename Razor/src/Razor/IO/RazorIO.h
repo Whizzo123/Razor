@@ -2,8 +2,9 @@
 
 #include "../Utils/Delegates.h"
 #include <unordered_map>
+#include "../Core.h"
 
-enum class RazorKey
+enum class RAZOR_API RazorKey
 {
 	A,
 	D,
@@ -42,7 +43,7 @@ struct Vector2D
 	double Y;
 };
 
-class RazorIO
+class RAZOR_API RazorIO
 {
 public:
 	static RazorIO& Get()

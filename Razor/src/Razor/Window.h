@@ -5,7 +5,7 @@
 
 namespace Razor
 {
-    class   Window
+    class RAZOR_API Window
     {
     public:
         Window(int width, int height, std::shared_ptr<IWindowProvider> Provider);

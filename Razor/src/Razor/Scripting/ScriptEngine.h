@@ -5,7 +5,7 @@
 
 namespace Razor
 {
-	class ScriptEngine
+	class RAZOR_API ScriptEngine
 	{
 
 	public:

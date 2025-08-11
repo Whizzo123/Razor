@@ -7,7 +7,7 @@ namespace Razor
 {
 	class Entity;
 
-	class Scene
+	class RAZOR_API Scene
 	{
 	public:
 		Scene(const std::string& Path);

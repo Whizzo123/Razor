@@ -102,7 +102,7 @@ namespace Razor
 	};
 	
 
-	class System
+	class RAZOR_API System
 	{
 	public:
 		System(Ref<Scene> Scene) : CurrentScene(Scene) {}
@@ -113,7 +113,7 @@ namespace Razor
 		Ref<Scene> CurrentScene;
 	};
 
-	class RenderSystem : public System
+	class RAZOR_API RenderSystem : public System
 	{
 	public:
 		RenderSystem(Ref<Scene> Scene) : System(Scene) {}

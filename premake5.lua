@@ -22,10 +22,10 @@ group "Dependencies"
 
 project "Razor"
 	location "Razor"
-	kind "StaticLib"
+	kind "SharedLib"
 	language "C++"
 	cppdialect "C++20"
-	staticruntime "on"
+	staticruntime "off"
 	
 
 	targetdir("bin/" .. outputdir .. "/%{prj.name}")
@@ -83,7 +83,8 @@ project "Razor"
 	 -- Automatically copy DLL from C# project after build
     postbuildcommands {
         '{COPY} "%{wks.location}Razor/vendor/Coral/Coral.Managed/bin/%{cfg.buildcfg}/Coral.Managed.dll" "%{wks.location}Edge/bin"',
-		'{COPY} "%{wks.location}Razor/vendor/Coral/Coral.Managed/Coral.Managed.runtimeconfig.json" "%{wks.location}Edge/bin"'
+		'{COPY} "%{wks.location}Razor/vendor/Coral/Coral.Managed/Coral.Managed.runtimeconfig.json" "%{wks.location}Edge/bin"',
+		'{COPY} "%{cfg.buildtarget.relpath}" "%{wks.location}bin/' .. outputdir .. '/Edge"'
     }
 
 	filter "system:windows"
@@ -116,7 +117,7 @@ project "Edge"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++20"
-	staticruntime "on"
+	staticruntime "off"
 
 	targetdir("bin/" .. outputdir .. "/%{prj.name}")
 	objdir("intermediate/" .. outputdir .. "/%{prj.name}")
@@ -184,7 +185,7 @@ project "Sandbox"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++20"
-	staticruntime "on"
+	staticruntime "off"
 
 	targetdir("bin/" .. outputdir .. "/%{prj.name}")
 	objdir("intermediate/" .. outputdir .. "/%{prj.name}")

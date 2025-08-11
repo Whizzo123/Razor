@@ -5,7 +5,7 @@
 namespace Razor
 {
 
-	class OpenGLRenderer : public IRenderer
+	class RAZOR_API OpenGLRenderer : public IRenderer
 	{
 
 	public:

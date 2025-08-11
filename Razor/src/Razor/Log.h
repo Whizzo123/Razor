@@ -5,7 +5,7 @@
 
 namespace Razor
 {
-	class   Log
+	class RAZOR_API Log
 	{
 	public:
 		static void Init();
@@ -15,7 +15,6 @@ namespace Razor
 	private:
 		static std::shared_ptr<spdlog::logger> CoreLogger;
 		static std::shared_ptr<spdlog::logger> ClientLogger;
-
 	};
 }
 

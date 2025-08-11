@@ -1,9 +1,10 @@
 #pragma once
 #include <string>
+#include "../../Razor/Core.h"
 
 namespace Razor
 {
-	class IWindowProvider
+	class RAZOR_API IWindowProvider
 	{
 	public:
 		virtual void CreateProviderWindow(int Width, int Height, const std::string& Title) = 0;

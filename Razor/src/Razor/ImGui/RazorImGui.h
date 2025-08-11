@@ -6,7 +6,7 @@
 namespace Razor
 {
 	// TODO API-CHANGE create seperate ImGUI opengl and dx11 api as shouldn't be having a Razor generic class containing a platform specific operation
-	class RazorImGui
+	class RAZOR_API RazorImGui
 	{
 	public:
 		RazorImGui() {}
