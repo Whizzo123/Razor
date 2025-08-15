@@ -14,13 +14,13 @@ namespace Razor
 	{
 		RZ_INFO(message);
 	}
-
-	void ScriptGlue::RegisterFunctions(Coral::ManagedAssembly& Assembly)
+	
+	void ScriptGlue::RegisterFunctions(Razor::Ref<Coral::ManagedAssembly> Assembly)
 	{
-		Assembly.AddInternalCall("Razor.InternalCalls", "Entity_HasComponent", &Entity_HasComponent);
-		Assembly.AddInternalCall("Razor.InternalCalls", "Print_Message", &Print_Message);
+		Assembly->AddInternalCall("Razor.InternalCalls", "Entity_HasComponent", &Entity_HasComponent);
+		Assembly->AddInternalCall("Razor.InternalCalls", "Print_Message", &Print_Message);
 
-		Assembly.UploadInternalCalls();
+		Assembly->UploadInternalCalls();
 	}
 
 }

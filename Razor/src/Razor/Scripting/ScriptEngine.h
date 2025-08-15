@@ -1,7 +1,12 @@
 #pragma once
-#include <Coral/HostInstance.hpp>
 #include "../Core.h"
 
+namespace Coral
+{
+	class ManagedAssembly;
+	class HostInstance;
+	class AssemblyLoadContext;
+}
 
 namespace Razor
 {

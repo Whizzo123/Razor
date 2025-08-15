@@ -20,8 +20,16 @@
 #include "Systems/RSSpotLightingPass.h"
 #include "../Platform/OpenGL/OpenGLWindowProvider.h"
 #include "Scene/SceneSerializer.h"
-#include <imgui.h>
+#include "ImGui/RazorImGui.h"
 #include "../Platform/OpenGL/GLFWTimeProvider.h"
+#include "Window.h"
+#include "Coordinator.h"
+#include "Renderer/IRenderer.h"
+#include "Renderer/Shaders/Shader.h"
+#include "Scene/Scene.h"
+#include "entt/entt.hpp"
+#include "../Platform/Generic/ITimeProvider.h"
+#include "Log.h"
 
 namespace Razor
 {
@@ -85,6 +93,24 @@ namespace Razor
 		
 	}
 
+	Engine::Engine()
+	{}
+
+	Engine::~Engine()
+	{
+		RZ_CORE_INFO("Destroying razor");
+		delete GEngine;
+	}
+
+	Engine& Engine::Get()
+	{
+		if (GEngine == nullptr)
+		{
+			GEngine = new Engine();
+		}
+		return *GEngine;
+	}
+
 	void Engine::InitSystems()
 	{
 		Coordinator->InitSystems();
@@ -127,5 +153,35 @@ namespace Razor
 	std::shared_ptr<Shader> Engine::GetShaderForType(const char* Type)
 	{
 		return ShaderTypeMap[Type];
+	}
+
+	void Engine::RunRenderSystems(const RenderPipelineConfig& Config) 
+	{
+		Coordinator->RunRenderSystems(Config); 
+	}
+
+	void Engine::RunSystems() 
+	{ 
+		Coordinator->RunSystems(DeltaTime); 
+	}
+
+	std::shared_ptr<Coordinator> Engine::GetCoordinator()
+	{
+		return Coordinator;
+	}
+
+	bool Engine::ShouldEngineClose() 
+	{ 
+		return EngineWindow->ShouldWindowClose(); 
+	}
+
+	Window& Engine::GetWindow() 
+	{ 
+		return *EngineWindow; 
+	}
+
+	std::shared_ptr<IRenderer> Engine::GetRenderer()
+	{
+		return Renderer;
 	}
 }

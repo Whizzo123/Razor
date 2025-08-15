@@ -1,22 +1,27 @@
 #pragma once
 
 #include <vector>
-#include "Window.h"
-#include "Coordinator.h"
+#include <unordered_map>
 #include "Core.h"
-#include "Renderer/IRenderer.h"
-#include "Renderer/Model.h"
-#include "Renderer/Shaders/Shader.h"
-#include "ImGui/RazorImGui.h"
 #include "../Platform/Generic/IPlatformIO.h"
-#include "imgui.h"
-#include "Scene/Scene.h"
-#include "entt/entt.hpp"
-#include "../Platform/Generic/ITimeProvider.h"
 
 namespace Razor
 {
-	using Vec2 = ImVec2;
+	// Forward Declarations
+	class RazorImGui;
+	class Window;
+	class Coordinator;
+	class IRenderer;
+	class Model;
+	class Shader;
+	class ITimeProvider;
+	class Scene;
+
+	struct Light;
+	struct RenderStageConfig;
+
+	using RenderPipelineConfig = std::vector<RenderStageConfig>;
+
 	/**
 	* Class that is responsible for loading up all the different pieces of the engine
 	* 
@@ -31,39 +36,23 @@ namespace Razor
 		* 
 		* @return Shared Ptr to IRenderer object
 		*/
-		std::shared_ptr<IRenderer> GetRenderer()
-		{
-			return Renderer;
-		}
+		std::shared_ptr<IRenderer> GetRenderer();
+
 		/**
 		* Deconstructor for the Engine object
 		*/
-		~Engine()
-		{
-			RZ_CORE_INFO("Destroying razor");
-			delete GEngine;
-		}
+		~Engine();
 		/**
 		* Function to return the singleton instance of the Engine
 		* 
 		* @return Reference to the Engine
 		*/
-		static Engine& Get()
-		{
-			if (GEngine == nullptr)
-			{
-				GEngine = new Engine();
-			}
-			return *GEngine;
-		}
+		static Engine& Get();
 	protected:
 		/**
 		* Default Engine Constructor
 		*/
-		Engine()
-		{
-
-		}
+		Engine();
 		
 	public:
 		/**
@@ -85,17 +74,17 @@ namespace Razor
 		* 
 		* @return A boolean representing if we should close the engine
 		*/
-		bool ShouldEngineClose() { return EngineWindow->ShouldWindowClose(); }
+		bool ShouldEngineClose();
 		/**
 		* Function to run the systems registered to the Coordinator
 		*/
-		void RunSystems() { Coordinator->RunSystems(DeltaTime); }
+		void RunSystems();
 		/**
 		* Function to run the render systems registered to the Coordinator 
 		* 
 		* @param Config - The pipeline configuration we want to run with this render
 		*/
-		void RunRenderSystems(const RenderPipelineConfig& Config) { Coordinator->RunRenderSystems(Config); }
+		void RunRenderSystems(const RenderPipelineConfig& Config);
 		/**
 		* Getter function for the RazorImGui object
 		* 
@@ -111,16 +100,13 @@ namespace Razor
 		* 
 		* @return A reference to the Window object
 		*/
-		Window& GetWindow() { return *EngineWindow; }
+		Window& GetWindow();
 		/**
 		* Getter function for the Coordinator object
 		* 
 		* @return A shared ptr to the Coordinator object
 		*/
-		std::shared_ptr<Coordinator> GetCoordinator()
-		{
-			return Coordinator;
-		}
+		std::shared_ptr<Coordinator> GetCoordinator();
 
 		/**
 		* Function to Process Input via the RazorIO class

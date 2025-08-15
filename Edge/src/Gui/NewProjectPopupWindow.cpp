@@ -16,7 +16,7 @@ namespace EdgeEditor
 		}
 		if (ImGui::BeginPopupModal("New Project Window", nullptr))
 		{
-			ImGui::InputText("Project Name", &NewProject->ProjectName);
+			//ImGui::InputText("Project Name", &NewProject->ProjectName);
 			if (ImGui::Button("Create"))
 			{
 				EdgeEditor::ProjectSerializer::Serialize(MagicalPathToFixWithActualSelectedPathSoon, NewProject);

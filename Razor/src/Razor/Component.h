@@ -92,7 +92,7 @@ namespace Razor
 		float Radius;
 	};
 
-	struct Camera
+	struct RAZOR_API Camera
 	{
 		// TODO Potentially move this and pass responsiblity onto the developer
 		Camera()

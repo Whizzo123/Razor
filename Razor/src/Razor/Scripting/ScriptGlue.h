@@ -1,4 +1,6 @@
 #pragma once
+#include "../Core.h"
+
 
 namespace Coral
 {
@@ -12,7 +14,7 @@ namespace Razor
 	{
 	public:
 		static void RegisterComponents();
-		static void RegisterFunctions(Coral::ManagedAssembly& Assembly);
+		static void RegisterFunctions(Razor::Ref<Coral::ManagedAssembly> Assembly);
 
 
 	};

@@ -1,4 +1,5 @@
 #include "ScriptEngine.h"
+#include <Coral/HostInstance.hpp>
 #include "../Log.h"
 
 namespace Razor

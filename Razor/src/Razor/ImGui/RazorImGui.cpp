@@ -10,7 +10,15 @@
 #include "../../Platform/OpenGL/OpenGLWindowProvider.h"
 #include "../Log.h"
 
+inline ImVec2 ToImVec2(const Razor::Vector2& Vec)
+{
+	return ImVec2(Vec.X, Vec.Y);
+}
 
+inline ImVec4 ToImVec4(const Razor::Vector4& Vec)
+{
+	return ImVec4(Vec.X, Vec.Y, Vec.Z, Vec.W);
+}
 
 namespace Razor
 {
@@ -87,5 +95,182 @@ namespace Razor
 	{
 		//ImGui requires full monitor space for coords when using docking branch
 		ImGui::GetIO().MousePos = ImVec2(XPos, YPos);
+	}
+
+	void RazorImGui::ShowMetricsWindow(bool* pOpen)
+	{
+		ImGui::ShowMetricsWindow(pOpen);
+	}
+
+	void RazorImGui::Begin(char const* Name, bool* pOpen, ImGuiWindowFlags Flags)
+	{
+		ImGui::Begin(Name, pOpen, Flags);
+	}
+
+	void RazorImGui::End()
+	{
+		ImGui::End();
+	}
+
+	void RazorImGui::SetNextWindowPos(Vector2 Pos)
+	{
+		ImGui::SetNextWindowPos(ToImVec2(Pos));
+	}
+
+	void RazorImGui::SetNextWindowSize(Vector2 Size)
+	{
+		ImGui::SetNextWindowSize(ToImVec2(Size));
+	}
+
+	void RazorImGui::SetNextWindowViewport(ImGuiID Id)
+	{
+		ImGui::SetNextWindowViewport(Id);
+	}
+
+	Vector2 RazorImGui::GetContentRegionAvail()
+	{
+		ImVec2 Region = ImGui::GetContentRegionAvail();
+		return Vector2(Region.x, Region.y);
+	}
+
+	unsigned int RazorImGui::GetID(const char* Title)
+	{
+		return ImGui::GetID(Title);
+	}
+
+	void RazorImGui::Image(void* Texture, Vector2 const& ViewportSize, Vector2 const& UV0, Vector2 const& UV1, Vector4 const& TintColor, Vector4 const& BorderColor)
+	{
+		ImGui::Image(Texture, ToImVec2(ViewportSize), ToImVec2(UV0), ToImVec2(UV1), ToImVec4(TintColor), ToImVec4(BorderColor));
+	}
+
+	bool RazorImGui::BeginMainMenuBar()
+	{
+		return ImGui::BeginMainMenuBar();
+	}
+
+	void RazorImGui::EndMainMenuBar()
+	{
+		return ImGui::EndMainMenuBar();
+	}
+
+	bool RazorImGui::BeginMenuBar()
+	{
+		return ImGui::BeginMenuBar();
+	}
+
+	void RazorImGui::EndMenuBar()
+	{
+		ImGui::EndMenuBar();
+	}
+
+	bool RazorImGui::BeginMenu(const char* Name, bool Enabled)
+	{
+		return ImGui::BeginMenu(Name, Enabled);
+	}
+
+	void RazorImGui::EndMenu()
+	{
+		ImGui::EndMenu();
+	}
+
+	bool RazorImGui::MenuItem(const char* Name, const char* Shortcut, bool Selected, bool Enabled)
+	{
+		return ImGui::MenuItem(Name, Shortcut, Selected, Enabled);
+	}
+
+	unsigned int RazorImGui::DockSpace(unsigned int ID, Vector2 Pos, ImGuiDockNodeFlags Flags)
+	{
+		return ImGui::DockSpace(ID, ToImVec2(Pos), Flags);
+	}
+
+	Vector2 RazorImGui::GetItemRectMin()
+	{
+		ImVec2 Min = ImGui::GetItemRectMin();
+		return Vector2(Min.x, Min.y);
+	}
+
+	ImGuiViewport* RazorImGui::GetMainViewport()
+	{
+		return ImGui::GetMainViewport();
+	}
+
+	bool RazorImGui::InputFloat(const char* Label, float* Value, float Step, float StepFast, const char* Format, ImGuiInputTextFlags Flags)
+	{
+		return ImGui::InputFloat(Label, Value, Step, StepFast, Format, Flags);
+	}
+
+	bool RazorImGui::CollapsingHeader(const char* Label, ImGuiTreeNodeFlags Flags)
+	{
+		return ImGui::CollapsingHeader(Label, Flags);
+	}
+
+	void RazorImGui::SameLine(float OffsetFromStartX, float Spacing)
+	{
+		ImGui::SameLine(OffsetFromStartX, Spacing);
+	}
+
+	bool RazorImGui::Button(const char* Label, const Vector2& Size = Vector2(0, 0))
+	{
+		return ImGui::Button(Label, ToImVec2(Size));
+	}
+
+	bool RazorImGui::BeginPopupModal(const char* Name, bool* pOpen, ImGuiWindowFlags Flags)
+	{
+		return ImGui::BeginPopupModal(Name, pOpen, Flags);
+	}
+
+	void RazorImGui::EndPopup()
+	{
+		ImGui::EndPopup();
+	}
+
+	void RazorImGui::OpenPopup(const char* Name, ImGuiPopupFlags Flags)
+	{
+		ImGui::OpenPopup(Name, Flags);
+	}
+
+	void RazorImGui::CloseCurrentPopup()
+	{
+		ImGui::CloseCurrentPopup();
+	}
+
+	void RazorImGui::Text(const char* Text, ImGuiTextFlags Flags)
+	{
+		ImGui::Text(Text, Flags);
+	}
+
+	bool RazorImGui::TreeNode(const char* Label)
+	{
+		return ImGui::TreeNode(Label);
+	}
+
+	void RazorImGui::TreePop()
+	{
+		ImGui::TreePop();
+	}
+
+	bool RazorImGui::BeginPopup(const char* Name, ImGuiWindowFlags Flags)
+	{
+		return ImGui::BeginPopup(Name, Flags);
+	}
+
+	bool RazorImGui::BeginTable(const char* Name, int Columns, ImGuiTableFlags Flags = 0, const Vector2& OuterSize = Vector2(0, 0), int RowBgColor = -1)
+	{
+		return ImGui::BeginTable(Name, Columns, Flags, ToImVec2(OuterSize), RowBgColor);
+	}
+
+	void RazorImGui::EndTable()
+	{
+		ImGui::EndTable();
+	}
+
+	bool RazorImGui::TableNextColumn()
+	{
+		return ImGui::TableNextColumn();
+	}
+
+	bool RazorImGui::ImageButton(void* TextureID, const Vector2& Size = Vector2(0, 0), const Vector2& UV0 = Vector2(0, 0), const Vector2& UV1 = Vector2(1, 1), int Framepadding = -1, const Vector4& BgColor = Vector4(0, 0, 0, 0), const Vector4& TintColor = Vector4(1, 1, 1, 1))
+	{
+		return ImGui::ImageButton(TextureID, ToImVec2(Size), ToImVec2(UV0), ToImVec2(UV1), Framepadding, ToImVec4(BgColor), ToImVec4(TintColor));
 	}
 }

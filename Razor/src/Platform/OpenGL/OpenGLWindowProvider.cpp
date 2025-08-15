@@ -1,6 +1,7 @@
 #include "OpenGLWindowProvider.h"
 #include <iostream>
 #include "../../Razor/Engine.h"
+#include "../../Razor/Window.h"
 
 
 namespace Razor

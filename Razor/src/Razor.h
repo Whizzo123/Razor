@@ -22,3 +22,4 @@
 #include "Razor/Scene/SceneSerializer.h"
 #include "Razor/Scripting/ScriptEngine.h"
 #include "Razor/Scripting/ScriptGlue.h"
+#include "Razor/ImGui/RazorImGui.h"
