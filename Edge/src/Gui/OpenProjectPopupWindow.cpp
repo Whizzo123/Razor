@@ -1,7 +1,7 @@
 #include "OpenProjectPopupWindow.h"
 #include "../FileIO/ProjectSerializer.h"
 #include "../Project.h"
-#include <Razor.h>
+#include "../EditorStorage.h"
 
 
 namespace EdgeEditor
@@ -12,30 +12,30 @@ namespace EdgeEditor
 		{
 			Open();
 		}
-		if (ImGui::BeginPopupModal(WindowName.c_str(), nullptr))
+		if (Razor::RazorImGui::BeginPopupModal(WindowName.c_str(), nullptr))
 		{
 			// TODO will create big old file explorer for now we just wanna have a button we click which directs us to the current Sandbox
-			if (ImGui::Button("Create"))
+			if (Razor::RazorImGui::Button("Create"))
 			{
 				Razor::Ref<Project> LoadedProject = Razor::CreateRef<Project>();
 				ProjectSerializer::Deserialize("../Sandbox/Sandbox", LoadedProject);
 				Storage->SetProject(*LoadedProject);
-				ImGui::CloseCurrentPopup();
+				Razor::RazorImGui::CloseCurrentPopup();
 			}
-			ImGui::SameLine();
-			if (ImGui::Button("Cancel"))
+			Razor::RazorImGui::SameLine();
+			if (Razor::RazorImGui::Button("Cancel"))
 			{
 				Close();
 				bIsOpen = false;
 			}
-			ImGui::EndPopup();
+			Razor::RazorImGui::EndPopup();
 		}
 		return bIsOpen;
 	}
 	void OpenProjectPopupWindow::Open()
 	{
 		bIsOpen = true;
-		ImGui::OpenPopup(WindowName.c_str());
+		Razor::RazorImGui::OpenPopup(WindowName.c_str());
 		if (Storage == nullptr)
 		{
 			RZ_ERROR("OpenProjectPopupWindow Error: Editor Storage ref not provided closing popup window");
@@ -45,6 +45,6 @@ namespace EdgeEditor
 	void OpenProjectPopupWindow::Close()
 	{
 		bIsOpen = false;
-		ImGui::CloseCurrentPopup();
+		Razor::RazorImGui::CloseCurrentPopup();
 	}
 }

@@ -1,6 +1,9 @@
 #pragma once
-
 #include "IRenderer.h"
+
+typedef unsigned int GLenum;
+typedef unsigned int GLuint;
+struct GLFWwindow;
 
 namespace Razor
 {

@@ -187,8 +187,8 @@ void Edge::ProcessInput()
 	if (RazorIO::Get().GetStateForMouseButton(LEFT) == MOUSE_DOWN)
 	{
 		Vector2D MousePos = RazorIO::Get().CurrentMousePos;
-		unsigned int OffsetMousePosX = MousePos.X - ViewportPos.x;
-		unsigned int OffsetMousePosY = MousePos.Y - ViewportPos.y;
+		unsigned int OffsetMousePosX = MousePos.X - ViewportPos.X;
+		unsigned int OffsetMousePosY = MousePos.Y - ViewportPos.Y;
 
 		if (OffsetMousePosX < 0 || OffsetMousePosX > PickBuffer->GetWidth() || OffsetMousePosY < 0 || OffsetMousePosY > PickBuffer->GetHeight())
 		{
@@ -201,7 +201,7 @@ void Edge::ProcessInput()
 void Edge::PickObject(Razor::Vector2 MousePos)
 {
 	float Pixel[3];
-	Razor::Engine::Get().GetRenderer()->ReadPixels(MousePos.x, PickBuffer->GetHeight() - MousePos.Y, 1, 1, Pixel, PickBuffer->GetID());
+	Razor::Engine::Get().GetRenderer()->ReadPixels(MousePos.X, PickBuffer->GetHeight() - MousePos.Y, 1, 1, Pixel, PickBuffer->GetID());
 	std::uint32_t PickedEntity = 0;
 	PickedEntity = static_cast<std::uint32_t>(Pixel[0] * 255.0f) + (std::uint32_t(Pixel[1] * 255.0f) << 8)
 			+ (std::uint32_t(Pixel[2] * 255.0f) << 16);
@@ -213,10 +213,10 @@ void Edge::CreateDockspace(const std::string& Title)
 	bool bIsOpen;
 	bool bIsDockspaceOpen;
 	Razor::RazorGuiWindowFlags_ window_flags = Razor::RazorGuiWindowFlags_MenuBar | Razor::RazorGuiWindowFlags_NoDocking;
-	ImGuiViewport* viewport = Razor::RazorImGui::GetMainViewport();
-	Razor::RazorImGui::SetNextWindowPos(viewport->Pos);
-	Razor::RazorImGui::SetNextWindowSize(viewport->Size);
-	Razor::RazorImGui::SetNextWindowViewport(viewport->ID);
+	unsigned int viewportId = Razor::RazorImGui::GetMainViewport();
+	Razor::RazorImGui::SetNextWindowPos(Razor::RazorImGui::GetViewportPos(viewportId));
+	Razor::RazorImGui::SetNextWindowSize(Razor::RazorImGui::GetViewportSize(viewportId));
+	Razor::RazorImGui::SetNextWindowViewport(viewportId);
 	window_flags |= Razor::RazorGuiWindowFlags_NoTitleBar | Razor::RazorGuiWindowFlags_NoCollapse | Razor::RazorGuiWindowFlags_NoResize | Razor::RazorGuiWindowFlags_NoMove;
 	window_flags |= Razor::RazorGuiWindowFlags_NoBringToFrontOnFocus | Razor::RazorGuiWindowFlags_NoNavFocus;
 	Razor::RazorImGui::Begin(Title.c_str(), &bIsDockspaceOpen, window_flags);

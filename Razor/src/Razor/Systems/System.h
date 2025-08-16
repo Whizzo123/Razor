@@ -1,7 +1,6 @@
 #pragma once
 #include <set>
 #include "../Core.h"
-#include <glm/glm.hpp>
 #include "../Utils/RazorMacros.h"
 #include "../Scene/Scene.h"
 #include "../Log.h"

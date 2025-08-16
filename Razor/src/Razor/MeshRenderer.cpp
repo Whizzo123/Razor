@@ -1,9 +1,8 @@
 #include "MeshRenderer.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include "TextureReader.h"
 #include "Renderer/Shaders/DefaultMeshShader.h"
-
-
-
 
 namespace Razor
 {

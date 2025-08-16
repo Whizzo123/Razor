@@ -97,6 +97,24 @@ namespace Razor
 		ImGui::GetIO().MousePos = ImVec2(XPos, YPos);
 	}
 
+	ImGuiViewport& RazorImGui::GetViewport(unsigned int ID)
+	{
+		if (ID < 0)
+		{
+			RZ_CORE_ERROR("Invalid ImGui viewport ID: {0}. Cannot retrieve viewport.", ID);
+			return *(new ImGuiViewport());
+		}
+		if (ImGuiViewport* Viewport = ImGui::FindViewportByID(ID))
+		{
+			return *Viewport;
+		}
+		else
+		{
+			RZ_CORE_ERROR("ImGui viewport with ID {0} not found.", ID);
+			return *(new ImGuiViewport());
+		}
+	}
+
 	void RazorImGui::ShowMetricsWindow(bool* pOpen)
 	{
 		ImGui::ShowMetricsWindow(pOpen);
@@ -189,9 +207,14 @@ namespace Razor
 		return Vector2(Min.x, Min.y);
 	}
 
-	ImGuiViewport* RazorImGui::GetMainViewport()
+	unsigned int RazorImGui::GetMainViewport()
 	{
-		return ImGui::GetMainViewport();
+		if (ImGui::GetMainViewport() == nullptr)
+		{
+			RZ_CORE_ERROR("ImGui main viewport is null, cannot get ID.");
+			return -1;
+		}
+		return ImGui::GetMainViewport()->ID;
 	}
 
 	bool RazorImGui::InputFloat(const char* Label, float* Value, float Step, float StepFast, const char* Format, ImGuiInputTextFlags Flags)
@@ -209,7 +232,7 @@ namespace Razor
 		ImGui::SameLine(OffsetFromStartX, Spacing);
 	}
 
-	bool RazorImGui::Button(const char* Label, const Vector2& Size = Vector2(0, 0))
+	bool RazorImGui::Button(const char* Label, const Vector2& Size)
 	{
 		return ImGui::Button(Label, ToImVec2(Size));
 	}
@@ -254,7 +277,7 @@ namespace Razor
 		return ImGui::BeginPopup(Name, Flags);
 	}
 
-	bool RazorImGui::BeginTable(const char* Name, int Columns, ImGuiTableFlags Flags = 0, const Vector2& OuterSize = Vector2(0, 0), int RowBgColor = -1)
+	bool RazorImGui::BeginTable(const char* Name, int Columns, ImGuiTableFlags Flags, const Vector2& OuterSize, int RowBgColor)
 	{
 		return ImGui::BeginTable(Name, Columns, Flags, ToImVec2(OuterSize), RowBgColor);
 	}
@@ -269,8 +292,36 @@ namespace Razor
 		return ImGui::TableNextColumn();
 	}
 
-	bool RazorImGui::ImageButton(void* TextureID, const Vector2& Size = Vector2(0, 0), const Vector2& UV0 = Vector2(0, 0), const Vector2& UV1 = Vector2(1, 1), int Framepadding = -1, const Vector4& BgColor = Vector4(0, 0, 0, 0), const Vector4& TintColor = Vector4(1, 1, 1, 1))
+	bool RazorImGui::ImageButton(void* TextureID, const Vector2& Size, const Vector2& UV0, const Vector2& UV1, int Framepadding, const Vector4& BgColor, const Vector4& TintColor)
 	{
 		return ImGui::ImageButton(TextureID, ToImVec2(Size), ToImVec2(UV0), ToImVec2(UV1), Framepadding, ToImVec4(BgColor), ToImVec4(TintColor));
+	}
+	Vector2 RazorImGui::GetViewportPos(unsigned int Id)
+	{
+		if (ImGuiViewport* Viewport = ImGui::FindViewportByID(Id))
+		{
+			return Vector2(Viewport->Pos.x, Viewport->Pos.y);
+		}
+		else
+		{
+			RZ_CORE_ERROR("ImGui viewport with ID {0} not found.", Id);
+			return Vector2();
+		}
+	}
+	Vector2 RazorImGui::GetViewportSize(unsigned int Id)
+	{
+		if (ImGuiViewport* Viewport = ImGui::FindViewportByID(Id))
+		{
+			return Vector2(Viewport->Size.x, Viewport->Size.y);
+		}
+		else
+		{
+			RZ_CORE_ERROR("ImGui viewport with ID {0} not found.", Id);
+			return Vector2();
+		}
+	}
+	void RazorImGui::SetWindowSize(const Vector2& Size)
+	{
+		ImGui::SetWindowSize(ToImVec2(Size));
 	}
 }

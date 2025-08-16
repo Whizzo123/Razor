@@ -60,7 +60,6 @@ namespace Razor
 		RazorGuiWindowFlags_NoDecoration = RazorGuiWindowFlags_NoTitleBar | RazorGuiWindowFlags_NoResize | RazorGuiWindowFlags_NoScrollbar | RazorGuiWindowFlags_NoCollapse,
 		RazorGuiWindowFlags_NoInputs = RazorGuiWindowFlags_NoMouseInputs | RazorGuiWindowFlags_NoNavInputs | RazorGuiWindowFlags_NoNavFocus,
 		
-		[Internal]
 		RazorGuiWindowFlags_NavFlattened = 1 << 23,  // [BETA] On child window: allow gamepad/keyboard navigation to cross over parent border to this child or between sibling child windows.
 		RazorGuiWindowFlags_ChildWindow = 1 << 24,  // Don't use! For internal use by BeginChild()
 		RazorGuiWindowFlags_Tooltip = 1 << 25,  // Don't use! For internal use by BeginTooltip()
@@ -69,6 +68,17 @@ namespace Razor
 		RazorGuiWindowFlags_ChildMenu = 1 << 28,  // Don't use! For internal use by BeginMenu()
 		RazorGuiWindowFlags_DockNodeHost = 1 << 29,  // Don't use! For internal use by Begin()/NewFrame()
 	};
+
+	inline RazorGuiWindowFlags_ operator|(RazorGuiWindowFlags_ a, RazorGuiWindowFlags_ b)
+	{
+		return static_cast<RazorGuiWindowFlags_>(static_cast<int>(a) | static_cast<int>(b));
+	}
+
+	inline RazorGuiWindowFlags_& operator|=(RazorGuiWindowFlags_& a, RazorGuiWindowFlags_ b)
+	{
+		a = a | b;
+		return a;
+	}
 
 	// TODO API-CHANGE create seperate ImGUI opengl and dx11 api as shouldn't be having a Razor generic class containing a platform specific operation
 	class RAZOR_API RazorImGui
@@ -99,11 +109,11 @@ namespace Razor
 		static bool MenuItem(const char* Name, const char* Shortcut = nullptr, bool Selected = false, bool Enabled = true);
 		static unsigned int DockSpace(unsigned int ID, Vector2 Pos, ImGuiDockNodeFlags Flags = 0);
 		static Vector2 GetItemRectMin();
-		static ImGuiViewport* GetMainViewport();
+		static unsigned int GetMainViewport();
 		static bool InputFloat(const char* Label, float* Value, float Step = 0.0f, float StepFast = 0.0f, const char* Format = "%.3f", ImGuiInputTextFlags Flags = 0);
 		static bool CollapsingHeader(const char* Label, ImGuiTreeNodeFlags Flags = 0);
 		static void SameLine(float OffsetFromStartX = 0.0f, float Spacing = -1.0f);
-		static bool Button(const char* Label, const Vector2& Size);
+		static bool Button(const char* Label, const Vector2& Size = Vector2(0, 0));
 		static bool BeginPopupModal(const char* Name, bool* pOpen = nullptr, ImGuiWindowFlags Flags = 0);
 		static void EndPopup();
 		static void OpenPopup(const char* Name, ImGuiPopupFlags Flags = 0);
@@ -112,11 +122,13 @@ namespace Razor
 		static bool TreeNode(const char* Label);
 		static void TreePop();
 		static bool BeginPopup(const char* Name, ImGuiWindowFlags Flags = 0);
-		static bool BeginTable(const char* Name, int Columns, ImGuiTableFlags Flags, const Vector2& OuterSize, int RowBgColor);
+		static bool BeginTable(const char* Name, int Columns, ImGuiTableFlags Flags = 0, const Vector2& OuterSize = Vector2(0, 0), int RowBgColor = -1);
 		static void EndTable();
 		static bool TableNextColumn();
-		static bool ImageButton(void* TextureID, const Vector2& Size, const Vector2& UV0, const Vector2& UV1, int Framepadding, const Vector4& BgColor, const Vector4& TintColor);
-
+		static bool ImageButton(void* TextureID, const Vector2& Size = Vector2(0, 0), const Vector2& UV0 = Vector2(0, 0), const Vector2& UV1 = Vector2(1, 1), int Framepadding = -1, const Vector4& BgColor = Vector4(0, 0, 0, 0), const Vector4& TintColor = Vector4(1, 1, 1, 1));
+		static Vector2 GetViewportPos(unsigned int Id);
+		static Vector2 GetViewportSize(unsigned int Id);
+		static void SetWindowSize(const Vector2& Size);
 	public:
 		// Function to hook our on such and such events to GLFW key events
 		void RegisterImGuiEvents();
@@ -126,6 +138,7 @@ namespace Razor
 		bool OnMouseScrolledEvent();
 		
 	private:
+		static ImGuiViewport& GetViewport(unsigned int ID);
 		float m_Time = 0.0f;
 	};
 

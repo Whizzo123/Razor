@@ -1,10 +1,12 @@
 #pragma once
-#include <yaml-cpp/yaml.h>
+
 #include "../Core/Entity.h"
 #include "Scene.h"
 
 namespace Razor
 {
+	class IYamlWrapper;
+
 	class RAZOR_API SceneSerializer
 	{
 	public:

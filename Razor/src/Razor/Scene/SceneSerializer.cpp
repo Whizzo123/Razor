@@ -2,6 +2,7 @@
 #include <fstream>
 #include "../Coordinator.h"
 #include "../Component.h"
+#include "../IO/YamlWrapper.h"
 
 namespace YAML
 {
@@ -161,10 +162,11 @@ namespace Razor
 		return Out;
 	}
 
-	void SceneSerializer::SerializeEntity(YAML::Emitter& Out, Entity InEntity)
+	void SceneSerializer::SerializeEntity(YamlEmitter* Out, Entity InEntity)
 	{
-		Out << YAML::BeginMap;
-		Out << YAML::Key << "Entity" << YAML::Value << (uint32_t)InEntity.EntityHandle;
+		yaml_emitter_begin_map(Out);
+		yaml_emitter_key(Out, "Entity");
+		yaml_emitter_value_int32(Out, (uint32_t)InEntity.EntityHandle);
 		if (InEntity.HasComponent<Transform>())
 		{
 			Out << YAML::Key << "Transform";
@@ -195,23 +197,25 @@ namespace Razor
 
 	void SceneSerializer::Serialize(Ref<Scene> OutScene)
 	{
-		YAML::Emitter Out;
-		Out << YAML::BeginMap;
-		Out << YAML::Key << "Scene" << YAML::Value << "Untitled";
-		Out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
+		YamlEmitter* Out = yaml_emitter_new();
+		yaml_emitter_begin_map(Out);
+		yaml_emitter_key(Out, "Scene");
+		yaml_emitter_value_string(Out, "Untitled");
+		yaml_emitter_key(Out, "Entities");
+		yaml_emitter_value_seq(Out);
 		auto View = OutScene->GetEntitiesWithComponents<Transform>();
 		for (auto Handle : View)
 		{
 			SerializeEntity(Out, *OutScene->GetEntity(Handle));
 		}
-		Out << YAML::EndSeq;
-		Out << YAML::EndMap;
+		yaml_emitter_end_seq(Out);
+		yaml_emitter_end_map(Out);
 
 		std::ofstream FOut(OutScene->GetPath().c_str());
 		const char* ErrorMsg = new char(' ');
 		std::perror(ErrorMsg);
 		RZ_CORE_WARN("Error Msg: {0}", ErrorMsg);
-		FOut << Out.c_str();
+		FOut << yaml_emitter_cstr(Out);
 		FOut.close();
 	}
 

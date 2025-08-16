@@ -2,10 +2,13 @@
 
 #include "PopupWindow.h"
 #include <string>
-#include "../EditorStorage.h"
+#include "Razor.h"
+
 
 namespace EdgeEditor
 {
+	struct EditorStorage;
+
 	class OpenProjectPopupWindow : public PopupWindow
 	{
 	public:
