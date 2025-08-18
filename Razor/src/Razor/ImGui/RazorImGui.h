@@ -2,6 +2,7 @@
 #include "../Window.h"
 #include "../IO/RazorIO.h"
 #include "../Renderer/IRenderer.h"
+#include "../Utils/Vector.h"
 
 typedef int ImGuiWindowFlags;
 typedef int ImGuiDockNodeFlags;
@@ -17,19 +18,6 @@ struct ImGuiViewport;
 
 namespace Razor
 {
-	struct Vector2
-	{
-		float X;
-		float Y;
-	};
-
-	struct Vector4
-	{
-		float X;
-		float Y;
-		float Z;
-		float W;
-	};
 
 	enum RazorGuiWindowFlags_
 	{

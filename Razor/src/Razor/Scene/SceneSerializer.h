@@ -6,6 +6,7 @@
 namespace Razor
 {
 	class IYamlWrapper;
+	struct YamlEmitter;
 
 	class RAZOR_API SceneSerializer
 	{
@@ -14,7 +15,7 @@ namespace Razor
 		static bool Deserialize(Ref<Scene> OutScene);
 
 	private:
-		static void SerializeEntity(YAML::Emitter& Out, Entity InEntity);
+		static void SerializeEntity(YamlEmitter* Out, Entity InEntity);
 	};
 }
 

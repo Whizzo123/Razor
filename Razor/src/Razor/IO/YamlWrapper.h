@@ -5,6 +5,9 @@
 namespace Razor
 {
 #pragma once
+	struct Vector2;
+	struct Vector3;
+	struct Vector4
 
 	// ====== Error API ======
 	RAZOR_API const char* yaml_get_last_error();
@@ -20,6 +23,8 @@ namespace Razor
 
 	// Free a node (and any children created via API)
 	RAZOR_API void yaml_free_node(YamlNode* node);
+
+	RAZOR_API void yaml_node_push_back(YamlNode* node, void* val);
 
 	// Query scalar types
 	RAZOR_API int yaml_as_string(YamlNode* node, char* buffer, int bufferSize);
@@ -56,6 +61,10 @@ namespace Razor
 	RAZOR_API void yaml_emitter_value_bool(YamlEmitter* emitter, int value);
 	RAZOR_API void yaml_emitter_value_seq(YamlEmitter* emitter);
 	RAZOR_API void yaml_emitter_value_int32(YamlEmitter* emitter, uint32_t value);
+	RAZOR_API void yaml_emitter_value_vec2(YamlEmitter* emitter, const Vector2& value);
+	RAZOR_API void yaml_emitter_value_vec3(YamlEmitter* emitter, const Vector3& value);
+	RAZOR_API void yaml_emitter_value_vec4(YamlEmitter* emitter, const Vector4& value);
+
 	RAZOR_API const char* yaml_emitter_cstr(YamlEmitter* emitter);
 
 	// Retrieve final emitted string
