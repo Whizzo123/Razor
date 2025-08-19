@@ -1,13 +1,15 @@
 #pragma once
 
 #include "../Core.h"
+#include <vector>
 
 namespace Razor
 {
-#pragma once
+
 	struct Vector2;
 	struct Vector3;
-	struct Vector4
+	struct Vector4;
+	struct ModelInfo;
 
 	// ====== Error API ======
 	RAZOR_API const char* yaml_get_last_error();
@@ -26,16 +28,18 @@ namespace Razor
 
 	RAZOR_API void yaml_node_push_back(YamlNode* node, void* val);
 
+	RAZOR_API std::vector<YamlNode*> yaml_get_children(YamlNode* node, const char* key);
+
 	// Query scalar types
-	RAZOR_API int yaml_as_string(YamlNode* node, char* buffer, int bufferSize);
+	RAZOR_API std::string yaml_as_string(YamlNode* node);
 	RAZOR_API int yaml_as_int(YamlNode* node, int default_val);
 	RAZOR_API double yaml_as_double(YamlNode* node, double default_val);
 	RAZOR_API int yaml_as_bool(YamlNode* node, int default_val);
+	RAZOR_API Vector3 yaml_as_vec3(YamlNode* node);
+	RAZOR_API ModelInfo yaml_as_modelinfo(YamlNode* node);
 
 	// Map access
 	RAZOR_API int yaml_map_size(YamlNode* node);
-	RAZOR_API const char* yaml_map_key_at(YamlNode* node, int index);
-	RAZOR_API YamlNode* yaml_map_value_at(YamlNode* node, int index);
 	RAZOR_API YamlNode* yaml_get_child(YamlNode* node, const char* key);
 
 	// Sequence access
@@ -64,10 +68,10 @@ namespace Razor
 	RAZOR_API void yaml_emitter_value_vec2(YamlEmitter* emitter, const Vector2& value);
 	RAZOR_API void yaml_emitter_value_vec3(YamlEmitter* emitter, const Vector3& value);
 	RAZOR_API void yaml_emitter_value_vec4(YamlEmitter* emitter, const Vector4& value);
+	RAZOR_API void yaml_emitter_value_modelinfo(YamlEmitter* emitter, const ModelInfo& value);
 
 	RAZOR_API const char* yaml_emitter_cstr(YamlEmitter* emitter);
 
 	// Retrieve final emitted string
 	RAZOR_API int yaml_emitter_get_string(YamlEmitter* emitter, char* buffer, int bufferSize);
-
 }

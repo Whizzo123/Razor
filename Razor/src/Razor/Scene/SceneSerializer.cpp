@@ -12,6 +12,11 @@ namespace Razor
 		return Vector3(Vec.x, Vec.y, Vec.z);
 	}
 
+	glm::vec3 ToGVec3(const Vector3& Vec)
+	{
+		return glm::vec3(Vec.X, Vec.Y, Vec.Z);
+	}
+
 	void SceneSerializer::SerializeEntity(YamlEmitter* Out, Entity InEntity)
 	{
 		yaml_emitter_begin_map(Out);
@@ -111,27 +116,25 @@ namespace Razor
 			return false;
 		}
 
-		std::string SceneName;
-		SceneName.reserve(50000);
-		yaml_as_string(yaml_get_child(Data, "Scene"), &SceneName[0], 50000);
+		std::string SceneName = yaml_as_string(yaml_get_child(Data, "Scene"));
 		RZ_CORE_TRACE("Deserializing scene '{0}'", SceneName);
 
-		auto Entities = Data["Entities"];
+		auto Entities = yaml_get_child(Data, "Entities");
 		if (Entities)
 		{
-			for (auto EntityNode : Entities)
+			for (auto EntityNode : yaml_get_children(Data, "Entities"))
 			{
 				Ref<Entity> DeserializedEntity = OutScene->CreateEntity();
-				auto TransformComponent = EntityNode["Transform"];
+				auto TransformComponent = yaml_get_child(Data, "Transform");
 				if (TransformComponent)
 				{
-					glm::vec3 Position = TransformComponent["Position"].as<glm::vec3>();
-					glm::vec3 Rotation = TransformComponent["Rotation"].as<glm::vec3>();
-					glm::vec3 Scale = TransformComponent["Scale"].as<glm::vec3>();
+					glm::vec3 Position = ToGVec3(yaml_as_vec3(yaml_get_child(TransformComponent, "Position")));
+					glm::vec3 Rotation = ToGVec3(yaml_as_vec3(yaml_get_child(TransformComponent, "Rotation")));
+					glm::vec3 Scale = ToGVec3(yaml_as_vec3(yaml_get_child(TransformComponent, "Scale")));
 					Transform EntityTransform = { Position, Scale, Rotation };
 					DeserializedEntity->AddComponent<Transform>(EntityTransform);
 				}
-				auto MeshComponent = EntityNode["Mesh"];
+				//auto MeshComponent = EntityNode["Mesh"];
 				/*if (MeshComponent)
 				{
 					std::vector<MeshData> Data = MeshComponent["Data"].as<std::vector<MeshData>>();

@@ -32,6 +32,11 @@ enum RazorMouseState
 	MOUSE_DOWN
 };
 
+template class RAZOR_API MulticastDelegate<RazorMouseButton, RazorMouseState>;
+template class RAZOR_API MulticastDelegate<RazorKey, RazorKeyState>;
+template class RAZOR_API MulticastDelegate<int>;
+template class RAZOR_API MulticastDelegate<double, double>;
+
 using OnMouseButtonPressedDelegate = MulticastDelegate<RazorMouseButton, RazorMouseState>;
 using OnMouseButtonReleasedDelegate = MulticastDelegate<int>;
 using OnKeyStateChangedDelegate = MulticastDelegate<RazorKey, RazorKeyState>;

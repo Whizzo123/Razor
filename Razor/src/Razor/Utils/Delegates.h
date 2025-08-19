@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../Core.h"
+
 #ifndef CPP_DELEGATES
 #define CPP_DELEGATES
 
@@ -292,7 +294,7 @@ private:
 
 //A handle to a delegate used for a multicast delegate
 //Static ID so that every handle is unique
-class DelegateHandle
+RAZOR_API class DelegateHandle
 {
 public:
 	constexpr DelegateHandle() noexcept

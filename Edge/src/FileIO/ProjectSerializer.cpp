@@ -1,6 +1,5 @@
 #include "ProjectSerializer.h"
 #include "../Project.h"
-#include <yaml-cpp/yaml.h>
 #include <fstream>
 #include <filesystem>
 
@@ -39,13 +38,17 @@ namespace EdgeEditor
 		Project->AssetDirectory = AssetFolderPath;
 		Project->DllDirectory = DllFolderPath;
 
-		YAML::Emitter Out;
-		Out << YAML::BeginMap;
-		Out << YAML::Key << "ProjectName" << YAML::Value << Project->ProjectName;
-		Out << YAML::Key << "AssetDirectory" << YAML::Value << Project->AssetDirectory;
-		Out << YAML::Key << "DllDirectory" << YAML::Value << Project->DllDirectory;
-		Out << YAML::Key << "MainScenePath" << YAML::Value << Project->MainScenePath;
-		Out << YAML::EndMap;
+		Razor::YamlEmitter* Out =  Razor::yaml_emitter_new();
+		Razor::yaml_emitter_begin_map(Out);
+		Razor::yaml_emitter_key(Out, "ProjectName");
+		Razor::yaml_emitter_value_string(Out, Project->ProjectName.c_str());
+		Razor::yaml_emitter_key(Out, "AssetDirectory");
+		Razor::yaml_emitter_value_string(Out, Project->AssetDirectory.c_str());
+		Razor::yaml_emitter_key(Out, "DllDirectory");
+		Razor::yaml_emitter_value_string(Out, Project->DllDirectory.c_str());
+		Razor::yaml_emitter_key(Out, "MainScenePath");
+		Razor::yaml_emitter_value_string(Out, Project->MainScenePath.c_str());
+		Razor::yaml_emitter_end_map(Out);
 
 
 		std::filesystem::create_directory(ProjectFolderPath);
@@ -56,35 +59,35 @@ namespace EdgeEditor
 		const char* ErrorMsg = new char(' ');
 		std::perror(ErrorMsg);
 		RZ_WARN("Error Msg: {0}", ErrorMsg);
-		FOut << Out.c_str();
+		FOut << Razor::yaml_emitter_cstr(Out);
 		FOut.close();
 	}
 
 	void ProjectSerializer::Deserialize(const std::string& Path, Razor::Ref<Project> OutProject)
 	{
 
-		YAML::Node Data;
+		Razor::YamlNode* Data;
 		const std::string PathPlusExt = Path + ".proj";
 		try
-		{
-			Data = YAML::LoadFile(PathPlusExt);
+		{	
+			Data = Razor::yaml_load_file(PathPlusExt.c_str());
 		}
-		catch (YAML::ParserException e)
+		catch (std::exception e)
 		{
 			RZ_ERROR("Failed to load .proj file '{0}'\n	{1}", PathPlusExt, e.what());
 			return;
 		}
 
-		if (!Data["ProjectName"])
+		if (Razor::yaml_get_child(Data, "ProjectName"))
 		{
 			RZ_ERROR("Incomplete .proj file missing 'ProjectName' key");
 			return;
 		}
-		
-		OutProject->ProjectName = Data["ProjectName"].as<std::string>();
-		OutProject->AssetDirectory = Data["AssetDirectory"].as<std::string>();
-		OutProject->DllDirectory = Data["DllDirectory"].as<std::string>();
-		OutProject->MainScenePath = Data["MainScenePath"].as<std::string>();
+
+		OutProject->ProjectName = Razor::yaml_as_string(Razor::yaml_get_child(Data, "ProjectName"));
+		OutProject->AssetDirectory = Razor::yaml_as_string(Razor::yaml_get_child(Data, "AssetDirectory"));
+		OutProject->DllDirectory = Razor::yaml_as_string(Razor::yaml_get_child(Data, "DllDirectory"));
+		OutProject->MainScenePath = Razor::yaml_as_string(Razor::yaml_get_child(Data, "MainScenePath"));
 	}
 
 }

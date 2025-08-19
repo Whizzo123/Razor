@@ -35,6 +35,31 @@ namespace YAML
     };
 
     template<>
+    struct convert<Razor::Vector3>
+    {
+        static Node encode(const Razor::Vector3& rhs)
+        {
+            Node node;
+            node.push_back(rhs.X);
+            node.push_back(rhs.Y);
+            node.push_back(rhs.Z);
+            node.SetStyle(EmitterStyle::Flow);
+            return node;
+        }
+
+        static bool decode(const Node& node, Razor::Vector3& rhs)
+        {
+            if (!node.IsSequence() || node.size() != 3)
+                return false;
+
+            rhs.X = node[0].as<float>();
+            rhs.Y = node[1].as<float>();
+            rhs.Z = node[2].as<float>();
+            return true;
+        }
+    };
+
+    template<>
     struct convert<glm::vec2>
     {
         static Node encode(const glm::vec2& rhs)
@@ -56,6 +81,8 @@ namespace YAML
             return true;
         }
     };
+
+
 
     template<>
     struct convert<Razor::MeshData::Vertex>
@@ -147,10 +174,89 @@ namespace YAML
             return true;
         }
     };
+
+    template<>
+    struct convert<Razor::MaterialData>
+    {
+        static Node encode(const Razor::MaterialData& rhs)
+        {
+            Node node;
+            node.push_back(rhs.MaterialName);
+            node.push_back(rhs.Ambient);
+            node.push_back(rhs.Diffuse);
+            node.push_back(rhs.Specular);
+            node.push_back(rhs.Shininess);
+            node.SetStyle(EmitterStyle::Flow);
+            return node;
+        }
+
+        static bool decode(const Node& node, Razor::MaterialData& rhs)
+        {
+            if (!node.IsSequence() || node.size() != 5)
+                return false;
+
+            rhs.MaterialName = node[0].as<std::string>();
+            rhs.Ambient = node[1].as<glm::vec3>();
+            rhs.Diffuse = node[2].as<glm::vec3>();
+            rhs.Specular = node[3].as<glm::vec3>();
+            rhs.Shininess = node[4].as<float>();
+            return true;
+        }
+    };
+
+    template<>
+    struct convert<Razor::Material>
+    {
+        static Node encode(const Razor::Material& rhs)
+        {
+            Node node;
+            node.push_back(rhs.Materials);
+            node.SetStyle(EmitterStyle::Flow);
+            return node;
+        }
+
+        static bool decode(const Node& node, Razor::Material& rhs)
+        {
+            if (!node.IsSequence() || node.size() != 1)
+                return false;
+
+            rhs.Materials = node[0].as<std::vector<Razor::MaterialData>>();
+            return true;
+        }
+    };
+
+    template<>
+    struct convert<Razor::ModelInfo>
+    {
+        static Node encode(const Razor::ModelInfo& rhs)
+        {
+            Node node;
+            node.push_back(rhs.ModelMeshData);
+            node.push_back(rhs.ModelMaterial);
+            node.SetStyle(EmitterStyle::Flow);
+            return node;
+        }
+
+        static bool decode(const Node& node, Razor::ModelInfo& rhs)
+        {
+            if (!node.IsSequence() || node.size() != 2)
+                return false;
+
+            rhs.ModelMeshData = node[0].as<std::vector<Razor::MeshData>>();
+            rhs.ModelMaterial = node[1].as<Razor::Material>();
+            return true;
+        }
+    };
 }
 
 namespace Razor
 {
+    template<typename T>
+    YAML::Emitter& operator<<(YAML::Emitter& Out, const T& rhs)
+    {
+        Out << YAML::convert<T>::encode(rhs);
+        return Out;
+    }
 
     // ===== Error Handling =====
     static thread_local std::string g_lastError;
@@ -211,16 +317,42 @@ namespace Razor
         delete reinterpret_cast<YamlNodeImpl*>(node);
     }
 
-    int yaml_as_string(YamlNode* node, char* buffer, int bufferSize) {
+	std::vector<YamlNode*> yaml_get_children(YamlNode* node, const char* key) 
+    {
+		std::vector<YamlNode*> outChildren;
+        if (!node || !key)
+        {
+            return outChildren;
+        }
+		auto impl = reinterpret_cast<YamlNodeImpl*>(node);
+		try 
+        {
+			YAML::Node children = impl->node[key];
+			if (children.IsSequence()) 
+            {
+				for (YAML::Node child : children) 
+                {
+					auto childImpl = new YamlNodeImpl();
+					childImpl->node = child;
+					outChildren.push_back(reinterpret_cast<YamlNode*>(childImpl));
+				}
+			}
+		}
+		catch (...) 
+        {
+			set_error("Error getting children from YAML node");
+		}
+
+		return outChildren;
+	}
+
+    std::string yaml_as_string(YamlNode* node) 
+    {
         if (!node) return 0;
         auto impl = reinterpret_cast<YamlNodeImpl*>(node);
         try {
             impl->cache = impl->node.as<std::string>();
-            if (buffer && bufferSize > 0) {
-                strncpy(buffer, impl->cache.c_str(), bufferSize - 1);
-                buffer[bufferSize - 1] = '\0';
-            }
-            return static_cast<int>(impl->cache.size());
+            return impl->cache;
         }
         catch (...) {
             return 0;
@@ -260,6 +392,35 @@ namespace Razor
         }
     }
 
+	Vector3 yaml_as_vec3(YamlNode* node) 
+    {
+        if (!node)
+        {
+            return Vector3();
+        }
+		auto impl = reinterpret_cast<YamlNodeImpl*>(node);
+		try 
+        {
+			return impl->node.as<Vector3>();
+		}
+		catch (...) 
+        {
+			return Vector3();
+		}
+	}
+
+    ModelInfo yaml_as_modelinfo(YamlNode* node)
+    {
+        if (!node)
+        {
+            if (YamlNodeImpl* impl = reinterpret_cast<YamlNodeImpl*>(node))
+            {
+                return impl->node.as<ModelInfo>();
+            }
+        }
+		return ModelInfo();
+    }
+
     // Map access
     int yaml_map_size(YamlNode* node) {
         if (!node) return 0;
@@ -268,52 +429,23 @@ namespace Razor
         return static_cast<int>(impl->node.size());
     }
 
-    const char* yaml_map_key_at(YamlNode* node, int index) {
-        if (!node) return nullptr;
-        auto impl = reinterpret_cast<YamlNodeImpl*>(node);
-        if (!impl->node.IsMap() || index < 0 || index >= (int)impl->node.size())
-            return nullptr;
-        try {
-            auto it = impl->node.begin();
-            std::advance(it, index);
-            impl->cache = it->first.as<std::string>();
-            return impl->cache.c_str();
-        }
-        catch (...) {
-            return nullptr;
-        }
-    }
-
-    YamlNode* yaml_map_value_at(YamlNode* node, int index) {
-        if (!node) return nullptr;
-        auto impl = reinterpret_cast<YamlNodeImpl*>(node);
-        if (!impl->node.IsMap() || index < 0 || index >= (int)impl->node.size())
-            return nullptr;
-        try {
-            auto it = impl->node.begin();
-            std::advance(it, index);
-            auto child = new YamlNodeImpl();
-            child->node = it->second;
-            return reinterpret_cast<YamlNode*>(child);
-        }
-        catch (...) {
-            return nullptr;
-        }
-    }
-
     YamlNode* yaml_get_child(YamlNode* node, const char* key) {
-        if (!node || !key) return nullptr;
-        auto impl = reinterpret_cast<YamlNodeImpl*>(node);
-        try {
+        if (!node || !key)
+        {
+            return nullptr;
+        }
+        if (YamlNodeImpl* impl = reinterpret_cast<YamlNodeImpl*>(node))
+        {
             YAML::Node childNode = impl->node[key];
-            if (!childNode) return nullptr;
-            auto child = new YamlNodeImpl();
+            if (!childNode)
+            {
+                return nullptr;
+            }
+            YamlNodeImpl* child = new YamlNodeImpl();
             child->node = childNode;
             return reinterpret_cast<YamlNode*>(child);
         }
-        catch (...) {
-            return nullptr;
-        }
+        return nullptr;
     }
 
     // Sequence access
@@ -407,6 +539,14 @@ namespace Razor
             auto impl = reinterpret_cast<YamlEmitterImpl*>(emitter);
             impl->out << YAML::Value << YAML::Flow << YAML::BeginSeq << vec.X << vec.Y << vec.Z << vec.W << YAML::EndSeq;
         }
+    }
+
+    RAZOR_API void yaml_emitter_value_modelinfo(YamlEmitter* emitter, const ModelInfo& value)
+    {
+		if (emitter) {
+			auto impl = reinterpret_cast<YamlEmitterImpl*>(emitter);
+            impl->out << YAML::Value << value;
+		}
     }
 
     int yaml_emitter_get_string(YamlEmitter* emitter, char* buffer, int bufferSize) {

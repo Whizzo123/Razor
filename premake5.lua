@@ -92,9 +92,9 @@ project "Razor"
 
 		defines
 		{
-			"RZ_BUILD_DLL",
 			"RZ_PLATFORM_WINDOWS",
-			"CORAL_WINDOWS"
+			"CORAL_WINDOWS",
+			"RZ_BUILD_DLL"
 		}
 
 	filter "configurations:Debug"
