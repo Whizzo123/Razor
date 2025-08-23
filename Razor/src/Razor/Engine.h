@@ -140,7 +140,7 @@ namespace Razor
 		/**
 		* Getter function for a Shader from Type
 		*
-		* @param Type - A const char* representing the type of the object
+		* @param Type - A std::string representing the type of the object
 		* 
 		* @return A shared ptr to the Shader object
 		*/
@@ -155,7 +155,7 @@ namespace Razor
 		std::unique_ptr<Window> EngineWindow;
 		std::shared_ptr<Coordinator> Coordinator;
 		std::unordered_map<uint8_t, std::shared_ptr<Shader>> ShaderIDMap;
-		std::unordered_map<const char*, std::shared_ptr<Shader>> ShaderTypeMap;
+		std::unordered_map<std::string, std::shared_ptr<Shader>> ShaderTypeMap;
 		std::shared_ptr<std::vector<Light*>> SceneLights;
 		std::unique_ptr<RazorImGui> RazorGUI;
 		float DeltaTime = 0.0f;

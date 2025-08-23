@@ -64,13 +64,13 @@ namespace Razor
 		//TODO don't like this being here
 		std::shared_ptr<Shader> D_MeshShader = std::make_shared<DefaultMeshShader>();
 		ShaderIDMap[D_MeshShader->ID] = D_MeshShader;
-		ShaderTypeMap[typeid(DefaultMeshShader).name()] = D_MeshShader;
+		ShaderTypeMap[std::string(typeid(DefaultMeshShader).name())] = D_MeshShader;
 		std::shared_ptr<Shader> D_DebugShader = std::make_shared<DebugLightShader>();
 		ShaderIDMap[D_DebugShader->ID] = D_DebugShader;
-		ShaderTypeMap[typeid(DebugLightShader).name()] = D_DebugShader;
+		ShaderTypeMap[std::string(typeid(DebugLightShader).name())] = D_DebugShader;
 		std::shared_ptr<Shader> PickShader = std::make_shared<PickBufferShader>();
 		ShaderIDMap[PickShader->ID] = PickShader;
-		ShaderTypeMap[typeid(PickBufferShader).name()] = PickShader;
+		ShaderTypeMap[std::string(typeid(PickBufferShader).name())] = PickShader;
 
 		CurrentScene = CreateRef<Scene>("Untitled.rzscn");
 
@@ -152,7 +152,7 @@ namespace Razor
 
 	std::shared_ptr<Shader> Engine::GetShaderForType(const char* Type)
 	{
-		return ShaderTypeMap[Type];
+		return ShaderTypeMap[std::string(Type)];
 	}
 
 	void Engine::RunRenderSystems(const RenderPipelineConfig& Config) 

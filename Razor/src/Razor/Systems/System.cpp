@@ -26,7 +26,7 @@ namespace Razor
 		{
 			for (const char* SystemType : StageConfig.StageSystemsToRun)
 			{
-				RenderPipeline.PipelineSystems[StageConfig.Stage][SystemType]->Render(RenderPipeline.EntityRenderProperties);
+				RenderPipeline.PipelineSystems[StageConfig.Stage][std::string(SystemType)]->Render(RenderPipeline.EntityRenderProperties);
 			}
 		}
 	}

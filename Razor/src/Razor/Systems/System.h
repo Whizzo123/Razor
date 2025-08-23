@@ -123,11 +123,11 @@ namespace Razor
 
 	struct RenderSystemPipeline
 	{
-		std::unordered_map <RenderStage, std::unordered_map<const char*, std::shared_ptr<RenderSystem>>> PipelineSystems{};
+		std::unordered_map <RenderStage, std::unordered_map<std::string, std::shared_ptr<RenderSystem>>> PipelineSystems{};
 		RenderPipelineEntityProperties EntityRenderProperties;
 		void RunSystemsFor(RenderStage Stage)
 		{
-			for (std::pair<const char*, std::shared_ptr<RenderSystem>> System : PipelineSystems[Stage])
+			for (std::pair<std::string, std::shared_ptr<RenderSystem>> System : PipelineSystems[Stage])
 			{
 				System.second->Render(EntityRenderProperties);
 			}

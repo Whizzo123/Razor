@@ -294,7 +294,7 @@ private:
 
 //A handle to a delegate used for a multicast delegate
 //Static ID so that every handle is unique
-RAZOR_API class DelegateHandle
+class RAZOR_API DelegateHandle
 {
 public:
 	constexpr DelegateHandle() noexcept

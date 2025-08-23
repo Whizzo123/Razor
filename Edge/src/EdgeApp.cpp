@@ -101,8 +101,12 @@ void Edge::Run()
 	SceneBuffer = Engine.Renderer->CreateFrameBuffer(300, 200);
 	PickBuffer = Engine.Renderer->CreateFrameBuffer(300, 200);
 
-	Razor::Model DefaultModel = Engine.ProcessModel("resources/models/Cube.obj");
-	DefaultModel.SetModelShader(Engine.GetShaderForType(typeid(Razor::DefaultMeshShader).name())->ID);
+	Razor::Model DefaultModel = Engine.ProcessModel("resources/models/Cube.obj"); // typeid name doesn't match up here due to dll things need to switch to 
+	// a different type
+	if (std::shared_ptr<Razor::Shader> DefaultShader = Engine.GetShaderForType(typeid(Razor::DefaultMeshShader).name()))
+	{
+		DefaultModel.SetModelShader(DefaultShader->ID);
+	}
 
 	Storage = std::make_shared<EdgeEditor::EditorStorage>();
 	Storage->DefaultModel = DefaultModel;
