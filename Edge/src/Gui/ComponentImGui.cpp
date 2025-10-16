@@ -1,6 +1,5 @@
 #include "ComponentImGui.h"
 
-
 namespace EdgeEditor
 {
 	std::unordered_map<std::string, ComponentDrawer> ComponentImGui::_ComponentDrawers = RegisterDrawers();

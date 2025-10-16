@@ -9,6 +9,8 @@
 #include "../IO/RazorIO.h"
 #include "../../Platform/OpenGL/OpenGLWindowProvider.h"
 #include "../Log.h"
+#include "../Renderer/IRenderer.h"
+#include "../Window.h"
 
 inline ImVec2 ToImVec2(const Razor::Vector2& Vec)
 {

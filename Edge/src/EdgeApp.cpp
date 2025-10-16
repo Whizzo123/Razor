@@ -50,8 +50,8 @@ private:
 	EdgeEditor::EditorCamera EditorCamera; /** Object to house and control the camera we will use for rendering the scene to the viewport */
 	Razor::Ref<Razor::Framebuffer> PickBuffer; /** Framebuffer object for picking objects */
 	Razor::Ref<Razor::Framebuffer> SceneBuffer; /** Framebuffer object for rendering scene */
-	Razor::Vector2 ViewportSize; /** 2D vector to hold size of viewport window */
-	Razor::Vector2 ViewportPos; /** 2D vector to hold position of image displaying scene texture for viewport*/
+	Razor::Vector2 ViewportSize { 0.0f, 0.0f }; /** 2D vector to hold size of viewport window */
+	Razor::Vector2 ViewportPos { 0.0f, 0.0f }; /** 2D vector to hold position of image displaying scene texture for viewport*/
 	Razor::Ref<EdgeEditor::EditorStorage> Storage; /** Container object to hold data to be shared among windows*/
 };
 
@@ -101,8 +101,8 @@ void Edge::Run()
 	SceneBuffer = Engine.Renderer->CreateFrameBuffer(300, 200);
 	PickBuffer = Engine.Renderer->CreateFrameBuffer(300, 200);
 
-	Razor::Model DefaultModel = Engine.ProcessModel("resources/models/Cube.obj"); // typeid name doesn't match up here due to dll things need to switch to 
-	// a different type
+	Razor::Model DefaultModel = Engine.ProcessModel("resources/models/Cube.obj");
+
 	if (std::shared_ptr<Razor::Shader> DefaultShader = Engine.GetShaderForType(typeid(Razor::DefaultMeshShader).name()))
 	{
 		DefaultModel.SetModelShader(DefaultShader->ID);
@@ -119,7 +119,7 @@ void Edge::Run()
 	Razor::SceneSerializer::Deserialize(Engine.CurrentScene);
 	while (!Engine.ShouldEngineClose())
 	{
-		std::shared_ptr<Razor::IRenderer>& Renderer = Engine.Renderer;
+		std::shared_ptr<Razor::IRenderer> Renderer = Engine.Renderer;
 
 		// TODO this potentially doesn't need to get called here cause we might not be pressing play yet
 		Engine.Step();
@@ -175,7 +175,7 @@ void Edge::Run()
 void Edge::RenderSceneViewport(Razor::Ref<Razor::Framebuffer> SceneBuffer)
 {
 	bool bIsOpen;
-	Razor::RazorImGui::Begin("Scene", &bIsOpen, Razor::RazorGuiWindowFlags_MenuBar || Razor::RazorGuiWindowFlags_NoScrollbar);
+	Razor::RazorImGui::Begin("Scene", &bIsOpen, Razor::RazorGuiWindowFlags_MenuBar && Razor::RazorGuiWindowFlags_NoScrollbar);
 	ViewportSize = Razor::Vector2(Razor::RazorImGui::GetContentRegionAvail().X, Razor::RazorImGui::GetContentRegionAvail().Y);
 	Razor::RazorImGui::Image(reinterpret_cast<void*>(SceneBuffer->GetTexture()), Razor::Vector2(ViewportSize.X, ViewportSize.Y), Razor::Vector2(0, 1), Razor::Vector2(1, 0));
 	ViewportPos = Razor::RazorImGui::GetItemRectMin();
@@ -188,9 +188,9 @@ void Edge::ProcessInput()
 
 	EditorCamera.ProcessInput(Razor::Engine::Get().GetDeltaTime());
 
-	if (RazorIO::Get().GetStateForMouseButton(LEFT) == MOUSE_DOWN)
+	if (Razor::RazorIO::Get().GetStateForMouseButton(Razor::LEFT) == Razor::MOUSE_DOWN)
 	{
-		Vector2D MousePos = RazorIO::Get().CurrentMousePos;
+		Razor::Vector2D MousePos = Razor::RazorIO::Get().CurrentMousePos;
 		unsigned int OffsetMousePosX = MousePos.X - ViewportPos.X;
 		unsigned int OffsetMousePosY = MousePos.Y - ViewportPos.Y;
 

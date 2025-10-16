@@ -5,6 +5,7 @@
 #include "../../Platform/OpenGL/OpenGLWindowProvider.h"
 #include "../Assert.h"
 #include "OpenGL/GLFramebuffer.h"
+#include "../Window.h"
 
 namespace Razor
 {

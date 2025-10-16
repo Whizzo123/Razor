@@ -24,3 +24,4 @@
 #include "Razor/Scripting/ScriptGlue.h"
 #include "Razor/ImGui/RazorImGui.h"
 #include "Razor/IO/YamlWrapper.h"
+#include "Razor/Core/Entity.h"

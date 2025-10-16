@@ -1,5 +1,10 @@
 #include "PickBufferShader.h"
+#include "../../ShaderReader.h"
 
-void Razor::PickBufferShader::Setup(CameraInfo* CameraInfo, glm::mat4 Model, MaterialData Mat, std::shared_ptr<std::vector<Light*>> Lights)
+namespace Razor
 {
+	PickBufferShader::PickBufferShader() : Shader()
+	{
+		ID = ShaderReader::CreateShaderProgram("pickbuffer.vert", "pickbuffer.frag");
+	}
 }

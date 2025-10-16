@@ -1,8 +1,8 @@
 #pragma once
-#include "../Window.h"
-#include "../IO/RazorIO.h"
-#include "../Renderer/IRenderer.h"
+
+#include "../Core.h"
 #include "../Utils/Vector.h"
+#include <memory>
 
 typedef int ImGuiWindowFlags;
 typedef int ImGuiDockNodeFlags;
@@ -18,6 +18,12 @@ struct ImGuiViewport;
 
 namespace Razor
 {
+
+	class IRenderer;
+	class Window;
+	class IWindowProvider;
+	enum RazorMouseButton;
+	enum RazorMouseState;
 
 	enum RazorGuiWindowFlags_
 	{

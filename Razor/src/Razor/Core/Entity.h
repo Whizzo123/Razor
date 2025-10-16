@@ -4,7 +4,7 @@
 
 namespace Razor
 {
-	class Entity
+	class RAZOR_API Entity
 	{
 	public:
 		Entity() {}

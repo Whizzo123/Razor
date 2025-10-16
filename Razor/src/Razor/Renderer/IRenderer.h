@@ -2,11 +2,12 @@
 
 #include "../Core.h"
 #include "../Component.h"
-#include "../Window.h"
-#include "Framebuffer.h"
+
 
 namespace Razor
 {
+	class Framebuffer;
+	class Window;
 
 	struct RendererInfo
 	{

@@ -2,7 +2,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "TextureReader.h"
-#include "Renderer/Shaders/DefaultMeshShader.h"
 
 namespace Razor
 {
@@ -50,24 +49,5 @@ namespace Razor
                 InitMesh(Mesh.Meshes);
             }
         }
-    }
-
-    void MeshRenderer::Run(float dt)
-    {
-       /* CameraInfo CamInfo = Renderer->GetCameraInfo();
-        for (auto const& Entity : Entities)
-        {
-            Mesh EntityMesh = Coordinator->GetComponent<Mesh>(Entity);
-            Transform EntityTransform = Coordinator->GetComponent<Transform>(Entity);
-            Material EntityMat = Coordinator->GetComponent<Material>(Entity);
-
-            for (const MeshData& Child : EntityMesh.Data)
-            {
-                glUseProgram(EntityMat.ShaderID);
-                const MaterialData& MeshMaterial = EntityMat.Materials.at(Child.MaterialId);
-                ShaderMap[EntityMat.ShaderID]->Setup(&CamInfo, EntityTransform.Get(), MeshMaterial, Lights);
-                Renderer->DrawMesh({Child});
-            }   
-        }*/
     }
 }

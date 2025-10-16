@@ -1,12 +1,12 @@
 #pragma once
-
-#include "../Core/Entity.h"
-#include "Scene.h"
+#include "../Core.h"
 
 namespace Razor
 {
 	class IYamlWrapper;
 	struct YamlEmitter;
+	class Scene;
+	class Entity;
 
 	class RAZOR_API SceneSerializer
 	{

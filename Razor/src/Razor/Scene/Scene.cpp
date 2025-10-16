@@ -1,6 +1,7 @@
 #include "Scene.h"
 #include "../Core/Entity.h"
 #include "../Component.h"
+#include <string>
 
 namespace Razor
 {

@@ -4,6 +4,8 @@
 #include "../Component.h"
 #include "../IO/YamlWrapper.h"
 #include "../Utils/Vector.h"
+#include "../Core/Entity.h"
+#include "Scene.h"
 
 namespace Razor
 {
