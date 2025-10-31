@@ -22,10 +22,10 @@ group "Dependencies"
 
 project "Razor"
 	location "Razor"
-	kind "StaticLib"
+	kind "SharedLib"
 	language "C++"
-	cppdialect "C++17"
-	staticruntime "on"
+	cppdialect "C++20"
+	staticruntime "off"
 	
 
 	targetdir("bin/" .. outputdir .. "/%{prj.name}")
@@ -76,16 +76,25 @@ project "Razor"
 
 	defines
 	{
-		"YAML_CPP_STATIC_DEFINE"
+		"YAML_CPP_STATIC_DEFINE",
+		"CORAL_WINDOWS"
 	}
+
+	 -- Automatically copy DLL from C# project after build
+    postbuildcommands {
+        '{COPY} "%{wks.location}Razor/vendor/Coral/Coral.Managed/bin/%{cfg.buildcfg}/Coral.Managed.dll" "%{wks.location}Edge/bin"',
+		'{COPY} "%{wks.location}Razor/vendor/Coral/Coral.Managed/Coral.Managed.runtimeconfig.json" "%{wks.location}Edge/bin"',
+		'{COPY} "%{cfg.buildtarget.relpath}" "%{wks.location}bin/' .. outputdir .. '/Edge"'
+    }
 
 	filter "system:windows"
 		systemversion "latest"
 
 		defines
 		{
-			"RZ_BUILD_DLL",
-			"RZ_PLATFORM_WINDOWS"
+			"RZ_PLATFORM_WINDOWS",
+			"CORAL_WINDOWS",
+			"RZ_BUILD_DLL"
 		}
 
 	filter "configurations:Debug"
@@ -107,8 +116,8 @@ project "Edge"
 	location "Edge"
 	kind "ConsoleApp"
 	language "C++"
-	cppdialect "C++17"
-	staticruntime "on"
+	cppdialect "C++20"
+	staticruntime "off"
 
 	targetdir("bin/" .. outputdir .. "/%{prj.name}")
 	objdir("intermediate/" .. outputdir .. "/%{prj.name}")
@@ -130,8 +139,7 @@ project "Edge"
 		"Razor/vendor/ImGui",
 		"Razor/vendor/yaml-cpp/include",
 		"Razor/src",
-		"Razor/vendor/entt/src",
-		"Razor/vendor/Coral/Coral.Native/Include"
+		"Razor/vendor/entt/src"
 	}
 	
 	links 
@@ -147,7 +155,6 @@ project "Edge"
 	}
 
 	filter "system:windows"
-		staticruntime "On"
 		systemversion "10.0.22621.0"
 
 		defines
@@ -175,8 +182,8 @@ project "Sandbox"
 	location "Sandbox"
 	kind "ConsoleApp"
 	language "C++"
-	cppdialect "C++17"
-	staticruntime "on"
+	cppdialect "C++20"
+	staticruntime "off"
 
 	targetdir("bin/" .. outputdir .. "/%{prj.name}")
 	objdir("intermediate/" .. outputdir .. "/%{prj.name}")

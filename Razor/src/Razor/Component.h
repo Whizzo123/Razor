@@ -1,6 +1,5 @@
 #pragma once
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+
 #include <glm/ext/vector_float3.hpp>
 #include <bitset>
 #include <unordered_map>
@@ -92,7 +91,7 @@ namespace Razor
 		float Radius;
 	};
 
-	struct Camera
+	struct RAZOR_API Camera
 	{
 		// TODO Potentially move this and pass responsiblity onto the developer
 		Camera()

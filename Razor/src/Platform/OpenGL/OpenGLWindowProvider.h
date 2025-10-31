@@ -5,7 +5,7 @@
 
 namespace Razor
 {
-	class OpenGLWindowProvider : public IWindowProvider
+	class RAZOR_API OpenGLWindowProvider : public IWindowProvider
 	{
 	public:
 		OpenGLWindowProvider() : Window(nullptr), Width(0), Height(0) {};

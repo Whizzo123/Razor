@@ -1,10 +1,12 @@
 #pragma once
-#include <Razor.h>
-#include "../Project.h"
+
+#include "Razor.h"
 #include "PopupWindow.h"
 
 namespace EdgeEditor
 {
+	struct Project;
+
 	/**
 	* Class for popup window to create new project inherits from base PopupWindow class
 	*/

@@ -1,8 +1,11 @@
 #include "OpenGLRenderer.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include "../Log.h"
 #include "../../Platform/OpenGL/OpenGLWindowProvider.h"
 #include "../Assert.h"
 #include "OpenGL/GLFramebuffer.h"
+#include "../Window.h"
 
 namespace Razor
 {

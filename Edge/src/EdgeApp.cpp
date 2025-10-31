@@ -8,7 +8,6 @@
 #include "Systems/RSEditorCamera.h"
 #include "EditorCamera.h"
 #include "FileIO/ProjectSerializer.h"
-#include "misc/cpp/imgui_stdlib.h"
 #include "Gui/NewProjectPopupWindow.h"
 #include "Gui/OpenProjectPopupWindow.h"
 
@@ -32,7 +31,7 @@ public:
 	* @param PickBuffer - Shared Ptr to the FrameBuffer used as the PickBuffer
 	* @param Offset - 2D vector to offset mouse position based on viewport position
 	*/
-	void PickObject(ImVec2 Offset);
+	void PickObject(Razor::Vector2 Offset);
 	/**
 	* Function to create an ImGui dockspace
 	* 
@@ -51,8 +50,8 @@ private:
 	EdgeEditor::EditorCamera EditorCamera; /** Object to house and control the camera we will use for rendering the scene to the viewport */
 	Razor::Ref<Razor::Framebuffer> PickBuffer; /** Framebuffer object for picking objects */
 	Razor::Ref<Razor::Framebuffer> SceneBuffer; /** Framebuffer object for rendering scene */
-	ImVec2 ViewportSize; /** 2D vector to hold size of viewport window */
-	ImVec2 ViewportPos; /** 2D vector to hold position of image displaying scene texture for viewport*/
+	Razor::Vector2 ViewportSize { 0.0f, 0.0f }; /** 2D vector to hold size of viewport window */
+	Razor::Vector2 ViewportPos { 0.0f, 0.0f }; /** 2D vector to hold position of image displaying scene texture for viewport*/
 	Razor::Ref<EdgeEditor::EditorStorage> Storage; /** Container object to hold data to be shared among windows*/
 };
 
@@ -102,8 +101,16 @@ void Edge::Run()
 	SceneBuffer = Engine.Renderer->CreateFrameBuffer(300, 200);
 	PickBuffer = Engine.Renderer->CreateFrameBuffer(300, 200);
 
-	Razor::Model DefaultModel = Engine.ProcessModel("resources/models/Cube.obj");
-	DefaultModel.SetModelShader(Engine.GetShaderForType(typeid(Razor::DefaultMeshShader).name())->ID);
+	const char* path = "resources/models/Cube.obj";
+	Razor::Model DefaultModel;
+	if (fopen(path, "r")) {
+		 DefaultModel = Engine.ProcessModel(path);
+	}
+
+	if (std::shared_ptr<Razor::Shader> DefaultShader = Engine.GetShaderForType(typeid(Razor::DefaultMeshShader).name()))
+	{
+		DefaultModel.SetModelShader(DefaultShader->ID);
+	}
 
 	Storage = std::make_shared<EdgeEditor::EditorStorage>();
 	Storage->DefaultModel = DefaultModel;
@@ -116,13 +123,13 @@ void Edge::Run()
 	Razor::SceneSerializer::Deserialize(Engine.CurrentScene);
 	while (!Engine.ShouldEngineClose())
 	{
-		std::shared_ptr<Razor::IRenderer>& Renderer = Engine.Renderer;
+		std::shared_ptr<Razor::IRenderer> Renderer = Engine.Renderer;
 
 		// TODO this potentially doesn't need to get called here cause we might not be pressing play yet
 		Engine.Step();
 
-		const uint32_t SizeX = (uint32_t)ViewportSize.x;
-		const uint32_t SizeY = (uint32_t)ViewportSize.y;
+		const uint32_t SizeX = (uint32_t)ViewportSize.X;
+		const uint32_t SizeY = (uint32_t)ViewportSize.Y;
 
 		PickBuffer->Refresh(SizeX, SizeY);
 		SceneBuffer->Refresh(SizeX, SizeY);
@@ -152,8 +159,8 @@ void Edge::Run()
 		SceneViewWindow.Render();
 		ProjectExplorerWindow.Render();
 		RenderSceneViewport(SceneBuffer);
-		ImGui::ShowMetricsWindow();
-		ImGui::End();
+		Razor::RazorImGui::ShowMetricsWindow();
+		Razor::RazorImGui::End();
 		if (CurrentPopup)
 		{
 			if (CurrentPopup->Draw() == false)
@@ -172,11 +179,11 @@ void Edge::Run()
 void Edge::RenderSceneViewport(Razor::Ref<Razor::Framebuffer> SceneBuffer)
 {
 	bool bIsOpen;
-	ImGui::Begin("Scene", &bIsOpen, ImGuiWindowFlags_MenuBar || ImGuiWindowFlags_NoScrollbar);
-	ViewportSize = ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y);
-	ImGui::Image(reinterpret_cast<void*>(SceneBuffer->GetTexture()), ImVec2(ViewportSize.x, ViewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
-	ViewportPos = ImGui::GetItemRectMin();
-	ImGui::End();
+	Razor::RazorImGui::Begin("Scene", &bIsOpen, Razor::RazorGuiWindowFlags_MenuBar && Razor::RazorGuiWindowFlags_NoScrollbar);
+	ViewportSize = Razor::Vector2(Razor::RazorImGui::GetContentRegionAvail().X, Razor::RazorImGui::GetContentRegionAvail().Y);
+	Razor::RazorImGui::Image(reinterpret_cast<void*>(SceneBuffer->GetTexture()), Razor::Vector2(ViewportSize.X, ViewportSize.Y), Razor::Vector2(0, 1), Razor::Vector2(1, 0));
+	ViewportPos = Razor::RazorImGui::GetItemRectMin();
+	Razor::RazorImGui::End();
 }
 
 void Edge::ProcessInput()
@@ -185,24 +192,24 @@ void Edge::ProcessInput()
 
 	EditorCamera.ProcessInput(Razor::Engine::Get().GetDeltaTime());
 
-	if (RazorIO::Get().GetStateForMouseButton(LEFT) == MOUSE_DOWN)
+	if (Razor::RazorIO::Get().GetStateForMouseButton(Razor::LEFT) == Razor::MOUSE_DOWN)
 	{
-		Vector2D MousePos = RazorIO::Get().CurrentMousePos;
-		unsigned int OffsetMousePosX = MousePos.X - ViewportPos.x;
-		unsigned int OffsetMousePosY = MousePos.Y - ViewportPos.y;
+		Razor::Vector2D MousePos = Razor::RazorIO::Get().CurrentMousePos;
+		unsigned int OffsetMousePosX = MousePos.X - ViewportPos.X;
+		unsigned int OffsetMousePosY = MousePos.Y - ViewportPos.Y;
 
 		if (OffsetMousePosX < 0 || OffsetMousePosX > PickBuffer->GetWidth() || OffsetMousePosY < 0 || OffsetMousePosY > PickBuffer->GetHeight())
 		{
 			return;
 		}
-		PickObject(ImVec2(OffsetMousePosX, OffsetMousePosY));
+		PickObject(Razor::Vector2(OffsetMousePosX, OffsetMousePosY));
 	}
 }
 
-void Edge::PickObject(ImVec2 MousePos)
+void Edge::PickObject(Razor::Vector2 MousePos)
 {
 	float Pixel[3];
-	Razor::Engine::Get().GetRenderer()->ReadPixels(MousePos.x, PickBuffer->GetHeight() - MousePos.y, 1, 1, Pixel, PickBuffer->GetID());
+	Razor::Engine::Get().GetRenderer()->ReadPixels(MousePos.X, PickBuffer->GetHeight() - MousePos.Y, 1, 1, Pixel, PickBuffer->GetID());
 	std::uint32_t PickedEntity = 0;
 	PickedEntity = static_cast<std::uint32_t>(Pixel[0] * 255.0f) + (std::uint32_t(Pixel[1] * 255.0f) << 8)
 			+ (std::uint32_t(Pixel[2] * 255.0f) << 16);
@@ -213,31 +220,31 @@ void Edge::CreateDockspace(const std::string& Title)
 {
 	bool bIsOpen;
 	bool bIsDockspaceOpen;
-	ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
-	ImGuiViewport* viewport = ImGui::GetMainViewport();
-	ImGui::SetNextWindowPos(viewport->Pos);
-	ImGui::SetNextWindowSize(viewport->Size);
-	ImGui::SetNextWindowViewport(viewport->ID);
-	window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-	window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-	ImGui::Begin(Title.c_str(), &bIsDockspaceOpen, window_flags);
-	if (ImGui::BeginMainMenuBar())
+	Razor::RazorGuiWindowFlags_ window_flags = Razor::RazorGuiWindowFlags_MenuBar | Razor::RazorGuiWindowFlags_NoDocking;
+	unsigned int viewportId = Razor::RazorImGui::GetMainViewport();
+	Razor::RazorImGui::SetNextWindowPos(Razor::RazorImGui::GetViewportPos(viewportId));
+	Razor::RazorImGui::SetNextWindowSize(Razor::RazorImGui::GetViewportSize(viewportId));
+	Razor::RazorImGui::SetNextWindowViewport(viewportId);
+	window_flags |= Razor::RazorGuiWindowFlags_NoTitleBar | Razor::RazorGuiWindowFlags_NoCollapse | Razor::RazorGuiWindowFlags_NoResize | Razor::RazorGuiWindowFlags_NoMove;
+	window_flags |= Razor::RazorGuiWindowFlags_NoBringToFrontOnFocus | Razor::RazorGuiWindowFlags_NoNavFocus;
+	Razor::RazorImGui::Begin(Title.c_str(), &bIsDockspaceOpen, window_flags);
+	if (Razor::RazorImGui::BeginMainMenuBar())
 	{
-		if (ImGui::BeginMenu("File"))
+		if (Razor::RazorImGui::BeginMenu("File"))
 		{
-			if (ImGui::MenuItem("Create Project"))
+			if (Razor::RazorImGui::MenuItem("Create Project"))
 			{
 				CurrentPopup = new EdgeEditor::NewProjectPopupWindow();
 			}
-			if (ImGui::MenuItem("Open Project"))
+			if (Razor::RazorImGui::MenuItem("Open Project"))
 			{
 				CurrentPopup = new EdgeEditor::OpenProjectPopupWindow(Storage);
 			}
-			ImGui::EndMenu();
+			Razor::RazorImGui::EndMenu();
 		}
-		ImGui::EndMainMenuBar();
+		Razor::RazorImGui::EndMainMenuBar();
 	}
-	ImGui::DockSpace(ImGui::GetID(Title.c_str()), ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
+	Razor::RazorImGui::DockSpace(Razor::RazorImGui::GetID(Title.c_str()), Razor::Vector2(0.0f, 0.0f), 0);
 }
 
 void Edge::OnNewProjectSet()
@@ -257,6 +264,31 @@ void Edge::OnNewProjectSet()
 	Razor::Engine::Get().CurrentScene = MainScene;
 	//TODO we haven't dealt with tearing down an old scene and loading a new one yet that's mainly just destroying old entities
 	//Load new dlls
-	Razor::ScriptEngine::LoadAssembly(ProjectPath + "/" + LoadedProject.DllDirectory + "/" + "Razor-ScriptBridge.dll");
-	Razor::ScriptEngine::LoadAssembly(ProjectPath + "/" + LoadedProject.DllDirectory + "/" + LoadedProject.ProjectName + ".dll");
+	// We need to move all Coral code into Razor behind an interface through which we will ask Coral things as we seem to be losing all of our function ptrs to the managed library over the DLL boundary
+	Razor::ScriptInterface& ScriptInterface = Razor::Engine::Get().GetScriptInterface();
+	Razor::ScriptAssembly ScriptBridgeAssembly = ScriptInterface.LoadAssembly(ProjectPath + "/" + LoadedProject.DllDirectory + "/" + "Razor-ScriptBridge.dll", true);
+	Razor::ScriptAssembly GameAssembly = ScriptInterface.LoadAssembly(ProjectPath + "/" + LoadedProject.DllDirectory + "/" + LoadedProject.ProjectName + ".dll", false);
+
+	std::vector<Razor::ScriptType> Types = ScriptInterface.GetTypes(GameAssembly);
+
+	if (!ScriptInterface.GetType(ScriptBridgeAssembly, "Razor.System"))
+	{
+		RZ_ERROR("Could not get System type");
+	}
+
+	for (Razor::ScriptType ScriptType : Types)
+	{
+		/*We are getting the type now however we are struggling to get base type as they are all null for some reason*/
+		RZ_INFO("Script Type {0} and name {1}", ScriptType.id, ScriptType.fullName);
+		RZ_INFO("Script Type Base Type {0} and name {1}", ScriptInterface.GetBaseType(ScriptType).id, ScriptInterface.GetBaseType(ScriptType).fullName);
+		RZ_INFO("Razor System Type Id {0}", ScriptInterface.GetType(ScriptBridgeAssembly, "Razor.System").id);
+		if (ScriptInterface.GetBaseType(ScriptType).id == ScriptInterface.GetType(ScriptBridgeAssembly, "Razor.System").id)
+		{
+			RZ_INFO("Instantiating system type");
+			Razor::ScriptObject TestObject = ScriptInterface.CreateInstance(ScriptType);
+			ScriptInterface.InvokeMethod(TestObject, "Run", 1.0f);
+		}
+	}
+
+	// We need to be able to iterate through types avaliable, create instances of a type, invoke methods on this type, load assemblies
 }

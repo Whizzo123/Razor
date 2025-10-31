@@ -11,7 +11,8 @@ namespace Sandbox
     {
         public override void Run(float deltaTime)
         {
-
+            Log logger = new Log();
+            logger.Print("Running print function from internal call");
         }
     }
 }

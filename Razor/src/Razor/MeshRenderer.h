@@ -1,11 +1,9 @@
 #pragma once
 
 #include "Systems/System.h"
-#include "Coordinator.h"
 #include "Component.h"
-#include "ShaderReader.h"
 #include "Renderer/Shaders/Shader.h"
-#include "Engine.h"
+
 
 namespace Razor
 {
@@ -19,7 +17,6 @@ namespace Razor
 			ShaderMap = IDToShaderMap;
 			Lights = SceneLights;
 		}
-		void Run(float dt) override;
 		void Init() override;
 		//Remove this back to private once we have some kind of import feature
 		static void InitMesh(std::vector<MeshData>& Meshes);

@@ -1,6 +1,5 @@
 #pragma once
 #include <functional>
-#include <entt/entt.hpp>
 #include "Razor.h"
 
 namespace EdgeEditor

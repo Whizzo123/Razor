@@ -1,6 +1,7 @@
 ﻿#include "ShaderReader.h"
 #include "Log.h"
 #include "Engine.h"
+#include "Renderer/Shaders/Shader.h"
 
 namespace Razor
 {

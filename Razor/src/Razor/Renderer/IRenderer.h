@@ -2,11 +2,12 @@
 
 #include "../Core.h"
 #include "../Component.h"
-#include "../Window.h"
-#include "Framebuffer.h"
+
 
 namespace Razor
 {
+	class Framebuffer;
+	class Window;
 
 	struct RendererInfo
 	{
@@ -55,7 +56,7 @@ namespace Razor
 		UNSIGNED_BYTE
 	};
 
-	class IRenderer
+	class RAZOR_API IRenderer
 	{
 	public:
 		virtual void InitRendererAPI() = 0;

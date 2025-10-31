@@ -1,9 +1,9 @@
 #pragma once
 #include <set>
 #include "../Core.h"
-#include <glm/glm.hpp>
 #include "../Utils/RazorMacros.h"
 #include "../Scene/Scene.h"
+#include "../Log.h"
 
 namespace Razor
 {
@@ -102,7 +102,7 @@ namespace Razor
 	};
 	
 
-	class System
+	class RAZOR_API System
 	{
 	public:
 		System(Ref<Scene> Scene) : CurrentScene(Scene) {}
@@ -113,7 +113,7 @@ namespace Razor
 		Ref<Scene> CurrentScene;
 	};
 
-	class RenderSystem : public System
+	class RAZOR_API RenderSystem : public System
 	{
 	public:
 		RenderSystem(Ref<Scene> Scene) : System(Scene) {}
@@ -123,11 +123,11 @@ namespace Razor
 
 	struct RenderSystemPipeline
 	{
-		std::unordered_map <RenderStage, std::unordered_map<const char*, std::shared_ptr<RenderSystem>>> PipelineSystems{};
+		std::unordered_map <RenderStage, std::unordered_map<std::string, std::shared_ptr<RenderSystem>>> PipelineSystems{};
 		RenderPipelineEntityProperties EntityRenderProperties;
 		void RunSystemsFor(RenderStage Stage)
 		{
-			for (std::pair<const char*, std::shared_ptr<RenderSystem>> System : PipelineSystems[Stage])
+			for (std::pair<std::string, std::shared_ptr<RenderSystem>> System : PipelineSystems[Stage])
 			{
 				System.second->Render(EntityRenderProperties);
 			}

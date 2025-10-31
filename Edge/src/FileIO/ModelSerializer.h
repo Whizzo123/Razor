@@ -1,6 +1,5 @@
 #pragma once
 #include "Razor.h"
-#include <yaml-cpp/yaml.h>
 
 namespace EdgeEditor
 {

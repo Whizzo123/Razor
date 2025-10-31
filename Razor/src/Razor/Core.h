@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <iostream>
-#include "Log.h"
 
 #ifdef RZ_DEBUG
 	#if defined(RZ_PLATFORM_WINDOWS)
@@ -21,6 +20,16 @@
 #define BIT(x) (1 << x)
 
 #define RZ_BIND_EVENT_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
+
+#ifdef RZ_PLATFORM_WINDOWS
+	#ifdef RZ_BUILD_DLL
+		#define RAZOR_API __declspec(dllexport)
+	#else
+		#define RAZOR_API __declspec(dllimport)
+	#endif
+#else
+	#define RAZOR_API
+#endif
 
 namespace Razor {
 

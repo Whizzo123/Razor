@@ -1,6 +1,7 @@
 ﻿#include "TextureReader.h"
 #include "stb_image.h"
 #include "Engine.h"
+#include "Renderer/IRenderer.h"
 
 namespace Razor
 {

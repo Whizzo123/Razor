@@ -1,7 +1,6 @@
 #include "NewProjectPopupWindow.h"
 #include "../FileIO/ProjectSerializer.h"
-//TODO move to Razor.h
-#include "misc/cpp/imgui_stdlib.h"
+#include "../Project.h"
 
 namespace EdgeEditor
 {
@@ -14,32 +13,32 @@ namespace EdgeEditor
 		{
 			Open();
 		}
-		if (ImGui::BeginPopupModal("New Project Window", nullptr))
+		if (Razor::RazorImGui::BeginPopupModal("New Project Window", nullptr))
 		{
-			ImGui::InputText("Project Name", &NewProject->ProjectName);
-			if (ImGui::Button("Create"))
+			//ImGui::InputText("Project Name", &NewProject->ProjectName);
+			if (Razor::RazorImGui::Button("Create"))
 			{
 				EdgeEditor::ProjectSerializer::Serialize(MagicalPathToFixWithActualSelectedPathSoon, NewProject);
 				/*TODO actually load project up*/
-				ImGui::CloseCurrentPopup();
+				Razor::RazorImGui::CloseCurrentPopup();
 			}
-			ImGui::SameLine();
-			if (ImGui::Button("Cancel"))
+			Razor::RazorImGui::SameLine();
+			if (Razor::RazorImGui::Button("Cancel"))
 			{ 
 				Close();
 				bIsOpen = false;
 			}
-			ImGui::EndPopup();
+			Razor::RazorImGui::EndPopup();
 		}
 		return bIsOpen;
 	}
 	void NewProjectPopupWindow::Open()
 	{
 		NewProject = Razor::CreateRef<Project>();
-		ImGui::OpenPopup("New Project Window");
+		Razor::RazorImGui::OpenPopup("New Project Window");
 	}
 	void NewProjectPopupWindow::Close()
 	{
-		ImGui::CloseCurrentPopup();
+		Razor::RazorImGui::CloseCurrentPopup();
 	}
 }

@@ -1,11 +1,10 @@
 #pragma once
-#include <string>
-#include <glm/ext/matrix_float4x4.hpp>
+
+#include "../IRenderer.h"
+
 #include <vector>
 #include <memory>
 #include <unordered_map>
-#include "../../Component.h"
-#include "../IRenderer.h"
 
 namespace Razor
 {
@@ -61,30 +60,6 @@ namespace Razor
 		void SetFloat(std::string Name, float Value);
 
 		void SetBool(std::string Name, bool Value);
-
-	private:
-		/*template<typename T>
-		std::shared_ptr<ShaderParameterArray<T>> GetParameterArray()
-		{
-			const char* TypeName = typeid(T).name();
-
-			std:shared_ptr<IShaderParameterArray> IArray = ShaderParameterArrays[TypeName];
-			if (!IArray)
-			{
-				RZ_CORE_ERROR("Attempting to grab shader parameter array of: " + TypeName + " but that array does not exist");
-				return nullptr;
-			}
-			std::shared_ptr<ShaderParameterArray<T>> ParameterArray = std::dynamic_pointer_cast<ShaderParameterArray<T>>(IArray);
-			return ParameterArray;
-		}
-		template<typename T>
-		std::shared_ptr<ShaderParameterArray<T>> CreateNewParameterArray()
-		{
-			const char* TypeName = typeid(T).name();
-			ShaderParameterTypes.insert({ TypeName, NextShaderParameterType });
-			ShaderParametersArrays.insert({ TypeName, std::make_shared<ShaderParameterArray<T>>() });
-			++NextShaderParameterType;
-		}*/
 
 	public:
 		template<typename T>

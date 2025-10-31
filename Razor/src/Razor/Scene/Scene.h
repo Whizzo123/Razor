@@ -1,5 +1,4 @@
 #pragma once
-#include <string>
 #include <entt/entt.hpp>
 #include "../Core.h"
 
@@ -7,7 +6,7 @@ namespace Razor
 {
 	class Entity;
 
-	class Scene
+	class RAZOR_API Scene
 	{
 	public:
 		Scene(const std::string& Path);
@@ -25,7 +24,7 @@ namespace Razor
 		}
 
 		template<typename T>
-		T GetComponent(entt::entity Entity)
+		T& GetComponent(entt::entity Entity)
 		{
 			return registry.get<T>(Entity);
 		}

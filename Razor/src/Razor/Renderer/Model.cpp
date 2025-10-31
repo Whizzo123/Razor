@@ -1,10 +1,13 @@
 #include "Model.h"
 #include <assimp/Importer.hpp>
+#include <assimp/mesh.h>
+#include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include "../Log.h"
 
 namespace Razor
 {

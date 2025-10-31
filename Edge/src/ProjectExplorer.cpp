@@ -24,20 +24,20 @@ namespace EdgeEditor
 	void ProjectExplorer::Render()
 	{
 		bool bIsOpen;
-		ImGui::Begin("Project Explorer", &bIsOpen, ImGuiWindowFlags_MenuBar);
-		ImGui::SetWindowSize(ImVec2(200.0f, 200.0f));
-		ImGui::BeginTable("FileTable", 4);
+		Razor::RazorImGui::Begin("Project Explorer", &bIsOpen, Razor::RazorGuiWindowFlags_MenuBar);
+		Razor::RazorImGui::SetWindowSize(Razor::Vector2(200.0f, 200.0f));
+		Razor::RazorImGui::BeginTable("FileTable", 4);
 		for (const std::string& Name : FileNames)
 		{
-			ImGui::TableNextColumn();
+			Razor::RazorImGui::TableNextColumn();
 			DrawFileGui(Name);
 		}
-		ImGui::EndTable();
-		if (ImGui::Button("Import", ImVec2(100.0f, 50.0f)))
+		Razor::RazorImGui::EndTable();
+		if (Razor::RazorImGui::Button("Import", Razor::Vector2(100.0f, 50.0f)))
 		{
 			OpenFile();
 		}
-		ImGui::End();
+		Razor::RazorImGui::End();
 	}
 
 	std::vector<std::string> ProjectExplorer::GrabFiles(const std::string& Path)
@@ -63,9 +63,9 @@ namespace EdgeEditor
 
 	void ProjectExplorer::DrawFileGui(const std::string& FileName)
 	{
-		const ImTextureID ButtonImage = 0;
-		ImGui::ImageButton(ButtonImage, ImVec2(100.0f, 100.0f));
-		ImGui::Text(FileName.c_str());
+		void* ButtonImage = 0;
+		Razor::RazorImGui::ImageButton(ButtonImage, Razor::Vector2(100.0f, 100.0f));
+		Razor::RazorImGui::Text(FileName.c_str());
 	}
 
 	// TODO this is windows only will want a linux version too should probably be hidden behind a platform generic interface

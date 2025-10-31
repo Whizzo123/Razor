@@ -1,5 +1,4 @@
 #include "ComponentImGui.h"
-#include <imgui.h>
 
 namespace EdgeEditor
 {
@@ -27,13 +26,13 @@ namespace EdgeEditor
 		if (InEntity->HasComponent<Razor::Transform>())
 		{
 			Razor::Transform& transform = InEntity->GetComponent<Razor::Transform>();
-			if (ImGui::CollapsingHeader("Transform"))
+			if (Razor::RazorImGui::CollapsingHeader("Transform"))
 			{
-				if (ImGui::CollapsingHeader("Position"))
+				if (Razor::RazorImGui::CollapsingHeader("Position"))
 				{
-					ImGui::InputFloat("X", &transform.Position.x);
-					ImGui::InputFloat("Y", &transform.Position.y);
-					ImGui::InputFloat("Z", &transform.Position.z);
+					Razor::RazorImGui::InputFloat("X", &transform.Position.x);
+					Razor::RazorImGui::InputFloat("Y", &transform.Position.y);
+					Razor::RazorImGui::InputFloat("Z", &transform.Position.z);
 				}
 			}
 		}
@@ -44,7 +43,7 @@ namespace EdgeEditor
 		if (InEntity->HasComponent<Razor::Mesh>())
 		{
 			Razor::Mesh& mesh = InEntity->GetComponent<Razor::Mesh>();
-			if (ImGui::CollapsingHeader("Mesh"))
+			if (Razor::RazorImGui::CollapsingHeader("Mesh"))
 			{
 				// Nothing really here to show just now maybe in the future but at least we know it's there
 			}
@@ -56,7 +55,7 @@ namespace EdgeEditor
 		if (InEntity->HasComponent<Razor::DirectionalLight>())
 		{
 			Razor::DirectionalLight& mesh = InEntity->GetComponent<Razor::DirectionalLight>();
-			if (ImGui::CollapsingHeader("Directional Light"))
+			if (Razor::RazorImGui::CollapsingHeader("Directional Light"))
 			{
 				// Nothing really here to show just now maybe in the future but at least we know it's there
 			}

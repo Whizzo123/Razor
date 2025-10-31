@@ -1,16 +1,22 @@
 #pragma once
-#include <Coral/HostInstance.hpp>
+#include "../Core.h"
 
+namespace Coral
+{
+	class ManagedAssembly;
+	class HostInstance;
+	class AssemblyLoadContext;
+}
 
 namespace Razor
 {
-	class ScriptEngine
+	class RAZOR_API ScriptEngine
 	{
 
 	public:
 		static void Init();
 		static void Shutdown();
-		static void LoadAssembly(const std::string& AssemblyPath);
+		static Razor::Ref<Coral::ManagedAssembly> LoadAssembly(const std::string& AssemblyPath);
 
 	private:
 		static Coral::HostInstance CoralInstance;

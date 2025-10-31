@@ -20,8 +20,17 @@
 #include "Systems/RSSpotLightingPass.h"
 #include "../Platform/OpenGL/OpenGLWindowProvider.h"
 #include "Scene/SceneSerializer.h"
-#include <imgui.h>
+#include "ImGui/RazorImGui.h"
 #include "../Platform/OpenGL/GLFWTimeProvider.h"
+#include "Window.h"
+#include "Coordinator.h"
+#include "Renderer/IRenderer.h"
+#include "Renderer/Shaders/Shader.h"
+#include "Scene/Scene.h"
+#include "entt/entt.hpp"
+#include "../Platform/Generic/ITimeProvider.h"
+#include "Log.h"
+#include "Scripting/ScriptInterface.h"
 
 namespace Razor
 {
@@ -33,6 +42,8 @@ namespace Razor
 
 	void Engine::Init()
 	{
+		ScriptInterface = std::make_unique<Razor::ScriptInterface>();
+
 		Renderer = std::make_shared<OpenGLRenderer>();
 		Renderer->InitRendererAPI();
 
@@ -56,13 +67,13 @@ namespace Razor
 		//TODO don't like this being here
 		std::shared_ptr<Shader> D_MeshShader = std::make_shared<DefaultMeshShader>();
 		ShaderIDMap[D_MeshShader->ID] = D_MeshShader;
-		ShaderTypeMap[typeid(DefaultMeshShader).name()] = D_MeshShader;
+		ShaderTypeMap[std::string(typeid(DefaultMeshShader).name())] = D_MeshShader;
 		std::shared_ptr<Shader> D_DebugShader = std::make_shared<DebugLightShader>();
 		ShaderIDMap[D_DebugShader->ID] = D_DebugShader;
-		ShaderTypeMap[typeid(DebugLightShader).name()] = D_DebugShader;
+		ShaderTypeMap[std::string(typeid(DebugLightShader).name())] = D_DebugShader;
 		std::shared_ptr<Shader> PickShader = std::make_shared<PickBufferShader>();
 		ShaderIDMap[PickShader->ID] = PickShader;
-		ShaderTypeMap[typeid(PickBufferShader).name()] = PickShader;
+		ShaderTypeMap[std::string(typeid(PickBufferShader).name())] = PickShader;
 
 		CurrentScene = CreateRef<Scene>("Untitled.rzscn");
 
@@ -83,6 +94,24 @@ namespace Razor
 		Coordinator->RegisterSystem<RSPointLightingPass>(RSPointLightingPass(CurrentScene));
 		Coordinator->RegisterSystem<RSSpotLightingPass>(RSSpotLightingPass(CurrentScene));
 		
+	}
+
+	Engine::Engine()
+	{}
+
+	Engine::~Engine()
+	{
+		RZ_CORE_INFO("Destroying razor");
+		delete GEngine;
+	}
+
+	Engine& Engine::Get()
+	{
+		if (GEngine == nullptr)
+		{
+			GEngine = new Engine();
+		}
+		return *GEngine;
 	}
 
 	void Engine::InitSystems()
@@ -126,6 +155,41 @@ namespace Razor
 
 	std::shared_ptr<Shader> Engine::GetShaderForType(const char* Type)
 	{
-		return ShaderTypeMap[Type];
+		return ShaderTypeMap[std::string(Type)];
+	}
+
+	void Engine::RunRenderSystems(const RenderPipelineConfig& Config) 
+	{
+		Coordinator->RunRenderSystems(Config); 
+	}
+
+	void Engine::RunSystems() 
+	{ 
+		Coordinator->RunSystems(DeltaTime); 
+	}
+
+	std::shared_ptr<Coordinator> Engine::GetCoordinator()
+	{
+		return Coordinator;
+	}
+
+	bool Engine::ShouldEngineClose() 
+	{ 
+		return EngineWindow->ShouldWindowClose(); 
+	}
+
+	Window& Engine::GetWindow() 
+	{ 
+		return *EngineWindow; 
+	}
+
+	std::shared_ptr<IRenderer> Engine::GetRenderer()
+	{
+		return Renderer;
+	}
+
+	ScriptInterface& Engine::GetScriptInterface()
+	{
+		return *ScriptInterface;
 	}
 }

@@ -1,11 +1,12 @@
 #include "DefaultMeshShader.h"
+#include "../../ShaderReader.h"
 
 namespace Razor
 {
 
-    void DefaultMeshShader::Setup(CameraInfo* CamInfo, glm::mat4 model, MaterialData Mat, std::shared_ptr<std::vector<Light*>> Lights)
+    DefaultMeshShader::DefaultMeshShader() : Shader()
     {
-
+        ID = ShaderReader::CreateShaderProgram("vertex.vert", "fragment.frag");
     }
 
 }
