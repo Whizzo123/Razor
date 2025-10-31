@@ -10,7 +10,7 @@ namespace Razor
     {
         public void Print(string message)
         {
-            InternalManager.Print_Message(message);
+            InternalCalls.LogMsg(message);
         }
     }
 }

@@ -10,15 +10,15 @@ namespace Razor
 		return true;
 	}
 
-	static void Print_Message(std::string message)
+	static void __cdecl Print_Message(const char* message)
 	{
 		RZ_INFO(message);
 	}
 	
 	void ScriptGlue::RegisterFunctions(Razor::Ref<Coral::ManagedAssembly> Assembly)
 	{
-		Assembly->AddInternalCall("Razor.InternalCalls", "Entity_HasComponent", &Entity_HasComponent);
-		Assembly->AddInternalCall("Razor.InternalCalls", "Print_Message", &Print_Message);
+		Assembly->AddInternalCall("Razor.InternalCalls", "Entity_HasComponent", (void*)Entity_HasComponent);
+		Assembly->AddInternalCall("Razor.InternalCalls", "Print_Message", (void*)Print_Message);
 
 		Assembly->UploadInternalCalls();
 	}

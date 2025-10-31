@@ -16,6 +16,7 @@ namespace Razor
 	class Shader;
 	class ITimeProvider;
 	class Scene;
+	class ScriptInterface;
 
 	struct Light;
 	struct RenderStageConfig;
@@ -146,6 +147,8 @@ namespace Razor
 		*/
 		std::shared_ptr<Shader> GetShaderForType(const char* Type);
 
+		ScriptInterface& GetScriptInterface();
+
 		Ref<Scene> CurrentScene; /** Ref to the current scene we have*/
 
 	private:
@@ -163,5 +166,6 @@ namespace Razor
 		static Engine* GEngine;
 		std::unique_ptr<IPlatformIO> PlatformIO;
 		std::unique_ptr<ITimeProvider> TimeProvider; /** Generic object to provide time functionality */
+		std::unique_ptr<ScriptInterface> ScriptInterface;
 	};
 }

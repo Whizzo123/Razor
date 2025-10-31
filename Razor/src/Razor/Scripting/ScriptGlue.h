@@ -10,7 +10,7 @@ namespace Coral
 namespace Razor
 {
 
-	class ScriptGlue
+	class RAZOR_API ScriptGlue
 	{
 	public:
 		static void RegisterComponents();

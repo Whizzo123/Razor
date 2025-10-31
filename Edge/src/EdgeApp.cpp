@@ -101,7 +101,11 @@ void Edge::Run()
 	SceneBuffer = Engine.Renderer->CreateFrameBuffer(300, 200);
 	PickBuffer = Engine.Renderer->CreateFrameBuffer(300, 200);
 
-	Razor::Model DefaultModel = Engine.ProcessModel("resources/models/Cube.obj");
+	const char* path = "resources/models/Cube.obj";
+	Razor::Model DefaultModel;
+	if (fopen(path, "r")) {
+		 DefaultModel = Engine.ProcessModel(path);
+	}
 
 	if (std::shared_ptr<Razor::Shader> DefaultShader = Engine.GetShaderForType(typeid(Razor::DefaultMeshShader).name()))
 	{
@@ -242,14 +246,6 @@ void Edge::CreateDockspace(const std::string& Title)
 	}
 	Razor::RazorImGui::DockSpace(Razor::RazorImGui::GetID(Title.c_str()), Razor::Vector2(0.0f, 0.0f), 0);
 }
-//
-//template <>
-//struct fmt::formatter<Coral::String> : fmt::formatter<std::string> {
-//	auto format(const Coral::String& s, fmt::format_context& ctx) {
-//		// Use your std::string conversion operator
-//		return fmt::formatter<std::string>::format(std::string(s), ctx);
-//	}
-//};
 
 void Edge::OnNewProjectSet()
 {
@@ -268,31 +264,31 @@ void Edge::OnNewProjectSet()
 	Razor::Engine::Get().CurrentScene = MainScene;
 	//TODO we haven't dealt with tearing down an old scene and loading a new one yet that's mainly just destroying old entities
 	//Load new dlls
-	/*Razor::Ref<Coral::ManagedAssembly> ScriptBridgeAssembly = Razor::ScriptEngine::LoadAssembly(ProjectPath + "/" + LoadedProject.DllDirectory + "/" + "Razor-ScriptBridge.dll");
-	Razor::Ref<Coral::ManagedAssembly> GameAssembly = Razor::ScriptEngine::LoadAssembly(ProjectPath + "/" + LoadedProject.DllDirectory + "/" + LoadedProject.ProjectName + ".dll");
-	if (ScriptBridgeAssembly)
+	// We need to move all Coral code into Razor behind an interface through which we will ask Coral things as we seem to be losing all of our function ptrs to the managed library over the DLL boundary
+	Razor::ScriptInterface& ScriptInterface = Razor::Engine::Get().GetScriptInterface();
+	Razor::ScriptAssembly ScriptBridgeAssembly = ScriptInterface.LoadAssembly(ProjectPath + "/" + LoadedProject.DllDirectory + "/" + "Razor-ScriptBridge.dll", true);
+	Razor::ScriptAssembly GameAssembly = ScriptInterface.LoadAssembly(ProjectPath + "/" + LoadedProject.DllDirectory + "/" + LoadedProject.ProjectName + ".dll", false);
+
+	std::vector<Razor::ScriptType> Types = ScriptInterface.GetTypes(GameAssembly);
+
+	if (!ScriptInterface.GetType(ScriptBridgeAssembly, "Razor.System"))
 	{
-		Razor::ScriptGlue::RegisterFunctions(*ScriptBridgeAssembly);
-	}*/
+		RZ_ERROR("Could not get System type");
+	}
 
-	//const std::vector<Coral::Type*> Types = GameAssembly->GetTypes();
+	for (Razor::ScriptType ScriptType : Types)
+	{
+		/*We are getting the type now however we are struggling to get base type as they are all null for some reason*/
+		RZ_INFO("Script Type {0} and name {1}", ScriptType.id, ScriptType.fullName);
+		RZ_INFO("Script Type Base Type {0} and name {1}", ScriptInterface.GetBaseType(ScriptType).id, ScriptInterface.GetBaseType(ScriptType).fullName);
+		RZ_INFO("Razor System Type Id {0}", ScriptInterface.GetType(ScriptBridgeAssembly, "Razor.System").id);
+		if (ScriptInterface.GetBaseType(ScriptType).id == ScriptInterface.GetType(ScriptBridgeAssembly, "Razor.System").id)
+		{
+			RZ_INFO("Instantiating system type");
+			Razor::ScriptObject TestObject = ScriptInterface.CreateInstance(ScriptType);
+			ScriptInterface.InvokeMethod(TestObject, "Run", 1.0f);
+		}
+	}
 
-	//if (!ScriptBridgeAssembly->GetType("Razor.System"))
-	//{
-	//	RZ_ERROR("Could not get System type");
-	//}
-
-	//for (Coral::Type* ScriptType : Types)
-	//{
-	//	/*We are getting the type now however we are struggling to get base type as they are all null for some reason*/
-	//	RZ_INFO("Script Type {0} and name {1}", ScriptType->GetTypeId(), ScriptType->GetFullName());
-	//	RZ_INFO("Script Type Base Type {0} and name {1}", ScriptType->GetBaseType().GetTypeId(), ScriptType->GetBaseType().GetFullName());
-	//	RZ_INFO("Razor System Type Id {0}", ScriptBridgeAssembly->GetType("Razor.System").GetTypeId());
-	//	if (ScriptType->GetBaseType().GetTypeId() == ScriptBridgeAssembly->GetType("Razor.System").GetTypeId())
-	//	{
-	//		RZ_INFO("Instantiating system type");
-	//		Coral::ManagedObject Instance = ScriptType->CreateInstance();
-	//		Instance.InvokeMethod("Run", 1.0f);
-	//	}
-	//}
+	// We need to be able to iterate through types avaliable, create instances of a type, invoke methods on this type, load assemblies
 }

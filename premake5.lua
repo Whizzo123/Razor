@@ -139,8 +139,7 @@ project "Edge"
 		"Razor/vendor/ImGui",
 		"Razor/vendor/yaml-cpp/include",
 		"Razor/src",
-		"Razor/vendor/entt/src",
-		"Razor/vendor/Coral/Coral.Native/Include"
+		"Razor/vendor/entt/src"
 	}
 	
 	links 
@@ -156,7 +155,6 @@ project "Edge"
 	}
 
 	filter "system:windows"
-		staticruntime "On"
 		systemversion "10.0.22621.0"
 
 		defines

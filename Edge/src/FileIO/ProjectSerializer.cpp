@@ -78,7 +78,7 @@ namespace EdgeEditor
 			return;
 		}
 
-		if (Razor::yaml_get_child(Data, "ProjectName"))
+		if (!Razor::yaml_get_child(Data, "ProjectName"))
 		{
 			RZ_ERROR("Incomplete .proj file missing 'ProjectName' key");
 			return;

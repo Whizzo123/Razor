@@ -3,13 +3,12 @@ project "Razor-ScriptBridge"
         kind "SharedLib"
         language "C#"
         dotnetframework "net8.0"
+        clr "UnSafe"
         
         targetdir("../Edge/Resources/Scripts")
         objdir("../Edge/Resources/Scripts/Intermediates")
 
         architecture "x86_64"
-
-        buildoptions { "/unsafe" }
 
         files 
         {

@@ -30,6 +30,7 @@
 #include "entt/entt.hpp"
 #include "../Platform/Generic/ITimeProvider.h"
 #include "Log.h"
+#include "Scripting/ScriptInterface.h"
 
 namespace Razor
 {
@@ -41,6 +42,8 @@ namespace Razor
 
 	void Engine::Init()
 	{
+		ScriptInterface = std::make_unique<Razor::ScriptInterface>();
+
 		Renderer = std::make_shared<OpenGLRenderer>();
 		Renderer->InitRendererAPI();
 
@@ -183,5 +186,10 @@ namespace Razor
 	std::shared_ptr<IRenderer> Engine::GetRenderer()
 	{
 		return Renderer;
+	}
+
+	ScriptInterface& Engine::GetScriptInterface()
+	{
+		return *ScriptInterface;
 	}
 }
