@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Razor.h>
-#include "Project.h"
 
 namespace EdgeEditor
 {
@@ -14,20 +13,20 @@ namespace EdgeEditor
 		Razor::Ref<Razor::Entity> SelectedEntity;
 		Razor::Model DefaultModel;
 	private:
-		Project CurrentProject;
+		std::string CurrentProjectPath;
 		OnProjectSetDelegate ProjectSetDelegate;
 	public:
 		OnProjectSetDelegate& OnProjectSet()
 		{
 			return ProjectSetDelegate;
 		}
-		Project& GetProject()
+		std::string GetProject()
 		{
-			return CurrentProject;
+			return CurrentProjectPath;
 		}
-		void SetProject(Project& Proj)
+		void SetProject(const std::string& Proj)
 		{
-			CurrentProject = Proj;
+			CurrentProjectPath = Proj;
 			ProjectSetDelegate.Broadcast();
 		}
 	};

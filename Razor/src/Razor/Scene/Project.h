@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace EdgeEditor
+namespace Razor
 {
 	/**
 	* Struct to hold data about this game project

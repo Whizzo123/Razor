@@ -38,11 +38,11 @@ namespace Razor
 		}
 
 		MeshData(std::vector<Vertex> Vertices, std::vector<unsigned int> Indices, std::vector<Texture> Textures, unsigned int MaterialID)
+			: Vertices(Vertices),
+			  Indices(Indices), 
+			  Textures(Textures), 
+			  MaterialId(MaterialID)
 		{
-			this->Vertices = Vertices;
-			this->Indices = Indices;
-			this->Textures = Textures;
-			MaterialId = MaterialID;
 		}
 
 		std::vector<Vertex> Vertices;

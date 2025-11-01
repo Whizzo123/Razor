@@ -31,6 +31,8 @@
 #include "../Platform/Generic/ITimeProvider.h"
 #include "Log.h"
 #include "Scripting/ScriptInterface.h"
+#include "Scene/Project.h"
+#include "IO/File/ProjectSerializer.h"
 
 namespace Razor
 {
@@ -191,5 +193,60 @@ namespace Razor
 	ScriptInterface& Engine::GetScriptInterface()
 	{
 		return *ScriptInterface;
+	}
+
+	void Engine::LoadProject(const std::string& ProjectPath)
+	{
+		if (ProjectPath.empty())
+		{
+			RZ_CORE_ERROR("Project path is empty");
+			return;
+		}
+
+		if (LoadedProject == nullptr)
+		{
+			LoadedProject = CreateRef<Project>();
+		}
+
+		ProjectSerializer::Deserialize(ProjectPath, LoadedProject);
+
+		RZ_CORE_INFO("Loading up project: " + LoadedProject->ProjectName);
+		const std::string Path = "../Sandbox";
+		//Load new scene
+		Ref<Scene> MainScene = CreateRef<Scene>(Path + LoadedProject->MainScenePath);
+		if (SceneSerializer::Deserialize(MainScene) == false)
+		{
+			LoadedProject->MainScenePath = "/assets/scenes/Main.rzscn";
+			MainScene = CreateRef<Scene>(LoadedProject->MainScenePath);
+			SceneSerializer::Serialize(MainScene);
+			ProjectSerializer::Serialize("../", LoadedProject);
+		}
+		CurrentScene = MainScene;
+		//TODO we haven't dealt with tearing down an old scene and loading a new one yet that's mainly just destroying old entities
+		//Load new dlls
+		// We need to move all Coral code into Razor behind an interface through which we will ask Coral things as we seem to be losing all of our function ptrs to the managed library over the DLL boundary
+		BridgeAssembly = CreateScope<ScriptAssembly>(ScriptInterface->LoadAssembly(Path + "/" + LoadedProject->DllDirectory + "/" + "Razor-ScriptBridge.dll", true));
+		GameAssembly = CreateScope<ScriptAssembly>(ScriptInterface->LoadAssembly(Path + "/" + LoadedProject->DllDirectory + "/" + LoadedProject->ProjectName + ".dll", false));
+
+		std::vector<ScriptType> Types = ScriptInterface->GetTypes(*(GameAssembly.get()));
+
+		if (!ScriptInterface->GetType(*(BridgeAssembly.get()), "Razor.System"))
+		{
+			RZ_CORE_ERROR("Could not get System type");
+		}
+
+		for (Razor::ScriptType ScriptType : Types)
+		{
+			/*We are getting the type now however we are struggling to get base type as they are all null for some reason*/
+			RZ_CORE_INFO("Script Type {0} and name {1}", ScriptType.id, ScriptType.fullName);
+			RZ_CORE_INFO("Script Type Base Type {0} and name {1}", ScriptInterface->GetBaseType(ScriptType).id, ScriptInterface->GetBaseType(ScriptType).fullName);
+			RZ_CORE_INFO("Razor System Type Id {0}", ScriptInterface->GetType(*(BridgeAssembly.get()), "Razor.System").id);
+			if (ScriptInterface->GetBaseType(ScriptType).id == ScriptInterface->GetType(*(BridgeAssembly.get()), "Razor.System").id)
+			{
+				RZ_INFO("Instantiating system type");
+				Razor::ScriptObject TestObject = ScriptInterface->CreateInstance(ScriptType);
+				ScriptInterface->InvokeMethod(TestObject, "Run", 1.0f);
+			}
+		}
 	}
 }

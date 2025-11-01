@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include "Core.h"
 #include "../Platform/Generic/IPlatformIO.h"
+#include "Scene/Project.h"
 
 namespace Razor
 {
@@ -20,6 +21,8 @@ namespace Razor
 
 	struct Light;
 	struct RenderStageConfig;
+
+	struct ScriptAssembly;
 
 	using RenderPipelineConfig = std::vector<RenderStageConfig>;
 
@@ -149,6 +152,8 @@ namespace Razor
 
 		ScriptInterface& GetScriptInterface();
 
+		void LoadProject(const std::string& ProjectPath);
+
 		Ref<Scene> CurrentScene; /** Ref to the current scene we have*/
 
 	private:
@@ -167,5 +172,8 @@ namespace Razor
 		std::unique_ptr<IPlatformIO> PlatformIO;
 		std::unique_ptr<ITimeProvider> TimeProvider; /** Generic object to provide time functionality */
 		std::unique_ptr<ScriptInterface> ScriptInterface;
+		Ref<Project> LoadedProject;
+		Scope<ScriptAssembly> BridgeAssembly;
+		Scope<ScriptAssembly> GameAssembly;
 	};
 }

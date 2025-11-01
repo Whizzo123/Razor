@@ -7,7 +7,6 @@
 #include "ProjectExplorer.h"
 #include "Systems/RSEditorCamera.h"
 #include "EditorCamera.h"
-#include "FileIO/ProjectSerializer.h"
 #include "Gui/NewProjectPopupWindow.h"
 #include "Gui/OpenProjectPopupWindow.h"
 
@@ -150,7 +149,7 @@ void Edge::Run()
 
 		Renderer->PollForEvents();
 
-		// TODO runtime
+		
 		Engine.RunSystems();
 
 		Engine.GetGUI().BeginNewFrame();
@@ -249,46 +248,7 @@ void Edge::CreateDockspace(const std::string& Title)
 
 void Edge::OnNewProjectSet()
 {
-	EdgeEditor::Project& LoadedProject = Storage->GetProject();
-	RZ_INFO("Loading up project: " + LoadedProject.ProjectName);
-	const std::string ProjectPath = "../Sandbox";
-	//Load new scene
-	Razor::Ref<Razor::Scene> MainScene = Razor::CreateRef<Razor::Scene>(ProjectPath + LoadedProject.MainScenePath);
-	if (Razor::SceneSerializer::Deserialize(MainScene) == false)
-	{
-		LoadedProject.MainScenePath = "/assets/scenes/Main.rzscn";
-		MainScene = Razor::CreateRef<Razor::Scene>(LoadedProject.MainScenePath);
-		Razor::SceneSerializer::Serialize(MainScene);
-		EdgeEditor::ProjectSerializer::Serialize("../", Razor::CreateRef<EdgeEditor::Project>(LoadedProject));
-	}
-	Razor::Engine::Get().CurrentScene = MainScene;
-	//TODO we haven't dealt with tearing down an old scene and loading a new one yet that's mainly just destroying old entities
-	//Load new dlls
-	// We need to move all Coral code into Razor behind an interface through which we will ask Coral things as we seem to be losing all of our function ptrs to the managed library over the DLL boundary
-	Razor::ScriptInterface& ScriptInterface = Razor::Engine::Get().GetScriptInterface();
-	Razor::ScriptAssembly ScriptBridgeAssembly = ScriptInterface.LoadAssembly(ProjectPath + "/" + LoadedProject.DllDirectory + "/" + "Razor-ScriptBridge.dll", true);
-	Razor::ScriptAssembly GameAssembly = ScriptInterface.LoadAssembly(ProjectPath + "/" + LoadedProject.DllDirectory + "/" + LoadedProject.ProjectName + ".dll", false);
-
-	std::vector<Razor::ScriptType> Types = ScriptInterface.GetTypes(GameAssembly);
-
-	if (!ScriptInterface.GetType(ScriptBridgeAssembly, "Razor.System"))
-	{
-		RZ_ERROR("Could not get System type");
-	}
-
-	for (Razor::ScriptType ScriptType : Types)
-	{
-		/*We are getting the type now however we are struggling to get base type as they are all null for some reason*/
-		RZ_INFO("Script Type {0} and name {1}", ScriptType.id, ScriptType.fullName);
-		RZ_INFO("Script Type Base Type {0} and name {1}", ScriptInterface.GetBaseType(ScriptType).id, ScriptInterface.GetBaseType(ScriptType).fullName);
-		RZ_INFO("Razor System Type Id {0}", ScriptInterface.GetType(ScriptBridgeAssembly, "Razor.System").id);
-		if (ScriptInterface.GetBaseType(ScriptType).id == ScriptInterface.GetType(ScriptBridgeAssembly, "Razor.System").id)
-		{
-			RZ_INFO("Instantiating system type");
-			Razor::ScriptObject TestObject = ScriptInterface.CreateInstance(ScriptType);
-			ScriptInterface.InvokeMethod(TestObject, "Run", 1.0f);
-		}
-	}
-
+	Razor::Engine& Engine = Razor::Engine::Get();
+	Engine.LoadProject(Storage->GetProject());
 	// We need to be able to iterate through types avaliable, create instances of a type, invoke methods on this type, load assemblies
 }

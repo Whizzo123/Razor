@@ -1,6 +1,4 @@
 #include "NewProjectPopupWindow.h"
-#include "../FileIO/ProjectSerializer.h"
-#include "../Project.h"
 
 namespace EdgeEditor
 {
@@ -9,16 +7,16 @@ namespace EdgeEditor
 		const std::string MagicalPathToFixWithActualSelectedPathSoon = "../../Sandboxes/";
 
 		bool bIsOpen = true;
-		if (NewProject == nullptr)
+		/*if (NewProject == nullptr)
 		{
 			Open();
-		}
+		}*/
 		if (Razor::RazorImGui::BeginPopupModal("New Project Window", nullptr))
 		{
 			//ImGui::InputText("Project Name", &NewProject->ProjectName);
 			if (Razor::RazorImGui::Button("Create"))
 			{
-				EdgeEditor::ProjectSerializer::Serialize(MagicalPathToFixWithActualSelectedPathSoon, NewProject);
+				//EdgeEditor::ProjectSerializer::Serialize(MagicalPathToFixWithActualSelectedPathSoon, NewProject);
 				/*TODO actually load project up*/
 				Razor::RazorImGui::CloseCurrentPopup();
 			}
@@ -34,7 +32,7 @@ namespace EdgeEditor
 	}
 	void NewProjectPopupWindow::Open()
 	{
-		NewProject = Razor::CreateRef<Project>();
+		//NewProject = Razor::CreateRef<Project>();
 		Razor::RazorImGui::OpenPopup("New Project Window");
 	}
 	void NewProjectPopupWindow::Close()
