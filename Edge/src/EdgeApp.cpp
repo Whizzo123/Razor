@@ -124,9 +124,6 @@ void Edge::Run()
 	{
 		std::shared_ptr<Razor::IRenderer> Renderer = Engine.Renderer;
 
-		// TODO this potentially doesn't need to get called here cause we might not be pressing play yet
-		Engine.Step();
-
 		const uint32_t SizeX = (uint32_t)ViewportSize.X;
 		const uint32_t SizeY = (uint32_t)ViewportSize.Y;
 
@@ -134,23 +131,13 @@ void Edge::Run()
 		SceneBuffer->Refresh(SizeX, SizeY);
 		Renderer->SetViewport(0, 0, SizeX, SizeY);
 
-		Renderer->BindFrameBuffer(PickBuffer->GetID());
-		Renderer->ClearBuffer();
-		Engine.RunRenderSystems(PickPipelineConfig);
+		Engine.Render(PickBuffer->GetID(), PickPipelineConfig);
 
 		ProcessInput();
 
-		Renderer->BindFrameBuffer(SceneBuffer->GetID());
-		Renderer->ClearBuffer();
-		Engine.RunRenderSystems(EditorPipelineConfig);
-
-		Renderer->BindFrameBuffer();
-		Renderer->ClearBuffer();
+		Engine.Render(SceneBuffer->GetID(), EditorPipelineConfig);
 
 		Renderer->PollForEvents();
-
-		
-		Engine.RunSystems();
 
 		Engine.GetGUI().BeginNewFrame();
 		CreateDockspace("Edge");
@@ -238,6 +225,18 @@ void Edge::CreateDockspace(const std::string& Title)
 			if (Razor::RazorImGui::MenuItem("Open Project"))
 			{
 				CurrentPopup = new EdgeEditor::OpenProjectPopupWindow(Storage);
+			}
+			Razor::RazorImGui::EndMenu();
+		}
+		if (Razor::RazorImGui::BeginMenu("Run"))
+		{
+			if (Razor::RazorImGui::MenuItem("Play"))
+			{
+				Razor::Engine::Get().RuntimeStart();
+			}
+			if (Razor::RazorImGui::MenuItem("Stop"))
+			{
+				Razor::Engine::Get().RuntimeStop();
 			}
 			Razor::RazorImGui::EndMenu();
 		}

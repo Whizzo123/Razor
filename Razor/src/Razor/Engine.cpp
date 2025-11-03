@@ -160,14 +160,19 @@ namespace Razor
 		return ShaderTypeMap[std::string(Type)];
 	}
 
-	void Engine::RunRenderSystems(const RenderPipelineConfig& Config) 
+	void Engine::Render(int32_t targetId, const RenderPipelineConfig& Config) 
 	{
+		Renderer->BindFrameBuffer(targetId);
+		Renderer->ClearBuffer();
 		Coordinator->RunRenderSystems(Config); 
+		Renderer->BindFrameBuffer();
+		Renderer->ClearBuffer();
 	}
 
 	void Engine::RunSystems() 
 	{ 
-		Coordinator->RunSystems(DeltaTime); 
+		Coordinator->RunSystems(DeltaTime);
+		CurrentScene->RunSystems(DeltaTime);
 	}
 
 	std::shared_ptr<Coordinator> Engine::GetCoordinator()
@@ -222,31 +227,42 @@ namespace Razor
 			ProjectSerializer::Serialize("../", LoadedProject);
 		}
 		CurrentScene = MainScene;
-		//TODO we haven't dealt with tearing down an old scene and loading a new one yet that's mainly just destroying old entities
-		//Load new dlls
-		// We need to move all Coral code into Razor behind an interface through which we will ask Coral things as we seem to be losing all of our function ptrs to the managed library over the DLL boundary
+		
 		BridgeAssembly = CreateScope<ScriptAssembly>(ScriptInterface->LoadAssembly(Path + "/" + LoadedProject->DllDirectory + "/" + "Razor-ScriptBridge.dll", true));
 		GameAssembly = CreateScope<ScriptAssembly>(ScriptInterface->LoadAssembly(Path + "/" + LoadedProject->DllDirectory + "/" + LoadedProject->ProjectName + ".dll", false));
+	}
 
-		std::vector<ScriptType> Types = ScriptInterface->GetTypes(*(GameAssembly.get()));
-
-		if (!ScriptInterface->GetType(*(BridgeAssembly.get()), "Razor.System"))
+	void Engine::RuntimeStart()
+	{
+		if(bIsRuntimeRunning.load())
 		{
-			RZ_CORE_ERROR("Could not get System type");
+			RZ_CORE_WARN("Runtime is already running");
+			return;
 		}
+		RZ_CORE_INFO("Starting Runtime");
+		bIsRuntimeRunning.store(true);
+		RuntimeThread = std::thread(&Engine::RunRuntime, this);
+	}
 
-		for (Razor::ScriptType ScriptType : Types)
+	void Engine::RunRuntime()
+	{
+		while (bIsRuntimeRunning)
 		{
-			/*We are getting the type now however we are struggling to get base type as they are all null for some reason*/
-			RZ_CORE_INFO("Script Type {0} and name {1}", ScriptType.id, ScriptType.fullName);
-			RZ_CORE_INFO("Script Type Base Type {0} and name {1}", ScriptInterface->GetBaseType(ScriptType).id, ScriptInterface->GetBaseType(ScriptType).fullName);
-			RZ_CORE_INFO("Razor System Type Id {0}", ScriptInterface->GetType(*(BridgeAssembly.get()), "Razor.System").id);
-			if (ScriptInterface->GetBaseType(ScriptType).id == ScriptInterface->GetType(*(BridgeAssembly.get()), "Razor.System").id)
-			{
-				RZ_INFO("Instantiating system type");
-				Razor::ScriptObject TestObject = ScriptInterface->CreateInstance(ScriptType);
-				ScriptInterface->InvokeMethod(TestObject, "Run", 1.0f);
-			}
+			Step();
+			//Somehow pick up input and forward?
+			//ProcessInputForGame()
+			RunSystems();
+		}
+		RZ_CORE_INFO("Exiting Runtime Thread");
+	}
+
+	void Engine::RuntimeStop()
+	{
+		RZ_CORE_INFO("Stopping Runtime");
+		bIsRuntimeRunning.store(false);
+		if(RuntimeThread.joinable())
+		{
+			RuntimeThread.join();
 		}
 	}
 }
