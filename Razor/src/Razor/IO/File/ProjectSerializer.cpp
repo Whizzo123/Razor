@@ -87,7 +87,6 @@ namespace Razor
 		}
 
 		OutProject->ProjectName = Razor::yaml_as_string(Razor::yaml_get_child(Data, "ProjectName"));
-		RZ_CORE_ERROR("ProjectName {0}", OutProject->ProjectName);
 		OutProject->AssetDirectory = Razor::yaml_as_string(Razor::yaml_get_child(Data, "AssetDirectory"));
 		OutProject->DllDirectory = Razor::yaml_as_string(Razor::yaml_get_child(Data, "DllDirectory"));
 		OutProject->MainScenePath = Razor::yaml_as_string(Razor::yaml_get_child(Data, "MainScenePath"));

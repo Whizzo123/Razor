@@ -60,6 +60,29 @@ namespace YAML
     };
 
     template<>
+    struct convert<Razor::Vector2>
+    {
+        static Node encode(const Razor::Vector2& rhs)
+        {
+            Node node;
+            node.push_back(rhs.X);
+            node.push_back(rhs.Y);
+            node.SetStyle(EmitterStyle::Flow);
+            return node;
+        }
+
+        static bool decode(const Node& node, Razor::Vector2& rhs)
+        {
+            if (!node.IsSequence() || node.size() != 2)
+                return false;
+
+            rhs.X = node[0].as<float>();
+            rhs.Y = node[1].as<float>();
+            return true;
+        }
+    };
+
+    template<>
     struct convert<glm::vec2>
     {
         static Node encode(const glm::vec2& rhs)
@@ -359,11 +382,47 @@ namespace Razor
         }
     }
 
+    char yaml_as_char(YamlNode* node)
+    {
+        if (!node) return 0;
+        auto impl = reinterpret_cast<YamlNodeImpl*>(node);
+        try {
+            return impl->node.as<char>();
+        }
+        catch (...) {
+            return 0;
+        }
+    }
+
     int yaml_as_int(YamlNode* node, int default_val) {
         if (!node) return default_val;
         auto impl = reinterpret_cast<YamlNodeImpl*>(node);
         try {
             return impl->node.as<int>();
+        }
+        catch (...) {
+            return default_val;
+        }
+    }
+
+    uint32_t yaml_as_int32(YamlNode* node, uint32_t default_val) {
+        if (!node) return default_val;
+        auto impl = reinterpret_cast<YamlNodeImpl*>(node);
+        try {
+            return impl->node.as<uint32_t>();
+        }
+        catch (...) {
+            return default_val;
+        }
+    }
+
+    float yaml_as_float(YamlNode* node, float default_val)
+    {
+        if (!node) return default_val;
+        auto impl = reinterpret_cast<YamlNodeImpl*>(node);
+        try {
+            impl->cache = impl->node.as<float>();
+            return impl->node.as<float>();
         }
         catch (...) {
             return default_val;
@@ -389,6 +448,23 @@ namespace Razor
         }
         catch (...) {
             return default_val;
+        }
+    }
+
+    Vector2 yaml_as_vec2(YamlNode* node)
+    {
+        if (!node)
+        {
+            return Vector2();
+        }
+        auto impl = reinterpret_cast<YamlNodeImpl*>(node);
+        try
+        {
+            return impl->node.as<Vector2>();
+        }
+        catch (...)
+        {
+            return Vector2();
         }
     }
 
@@ -504,11 +580,19 @@ namespace Razor
         if (emitter && value) reinterpret_cast<YamlEmitterImpl*>(emitter)->out << YAML::Value << value;
     }
 
+    void yaml_emitter_value_char(YamlEmitter* emitter, char value) {
+        if (emitter && value) reinterpret_cast<YamlEmitterImpl*>(emitter)->out << YAML::Value << value;
+    }
+
     void yaml_emitter_value_int(YamlEmitter* emitter, int value) {
         if (emitter) reinterpret_cast<YamlEmitterImpl*>(emitter)->out << YAML::Value << value;
     }
 
     void yaml_emitter_value_double(YamlEmitter* emitter, double value) {
+        if (emitter) reinterpret_cast<YamlEmitterImpl*>(emitter)->out << YAML::Value << value;
+    }
+
+    void yaml_emitter_value_float(YamlEmitter* emitter, float value) {
         if (emitter) reinterpret_cast<YamlEmitterImpl*>(emitter)->out << YAML::Value << value;
     }
 

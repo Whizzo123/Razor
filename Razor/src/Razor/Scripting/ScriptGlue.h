@@ -14,7 +14,7 @@ namespace Razor
 	{
 	public:
 		static void RegisterComponents();
-		static void RegisterFunctions(Razor::Ref<Coral::ManagedAssembly> Assembly);
+		static void RegisterFunctions(Ref<Coral::ManagedAssembly> Assembly);
 
 
 	};

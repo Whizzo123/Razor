@@ -4,6 +4,7 @@
 #include <string>
 #include "../Engine.h"
 #include "../Scripting/ScriptInterface.h"
+#include "../Log.h"
 
 namespace Razor
 {
@@ -38,20 +39,9 @@ namespace Razor
 		}
 	}
 
-	void Scene::CreateSystemObject()
+	void Scene::CreateSystemObject(const Razor::ScriptType& Type)
 	{
-		/*for (Razor::ScriptType ScriptType : Types)
-		{
-			RZ_CORE_INFO("Script Type {0} and name {1}", ScriptType.id, ScriptType.fullName);
-			RZ_CORE_INFO("Script Type Base Type {0} and name {1}", ScriptInterface->GetBaseType(ScriptType).id, ScriptInterface->GetBaseType(ScriptType).fullName);
-			RZ_CORE_INFO("Razor System Type Id {0}", ScriptInterface->GetType(*(BridgeAssembly.get()), "Razor.System").id);
-			if (ScriptInterface->GetBaseType(ScriptType).id == ScriptInterface->GetType(*(BridgeAssembly.get()), "Razor.System").id)
-			{
-				RZ_INFO("Instantiating system type");
-				Razor::ScriptObject TestObject = ScriptInterface->CreateInstance(ScriptType);
-
-				// 2 real questions here is how do we hold all these system objects and how do we give them the entities to work with
-			}
-		}*/
+		RZ_CORE_INFO("Instantiating system type {0}", Type.fullName);
+		SystemObjects.push_back(Engine::Get().GetScriptInterface().CreateInstance(Type));
 	}
 }

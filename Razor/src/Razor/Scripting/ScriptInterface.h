@@ -53,7 +53,7 @@ namespace Razor
 	private:
 		std::vector<Razor::Ref<Coral::ManagedObject>> ObjectPool;
 		std::unordered_map<int32_t, ScriptType> TypePool;
-		std::vector<Razor::Ref<Coral::ManagedAssembly>> AssemblyPool;
+		std::vector<Ref<Coral::ManagedAssembly>> AssemblyPool;
 	};
 }
 

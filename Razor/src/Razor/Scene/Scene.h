@@ -7,6 +7,7 @@ namespace Razor
 {
 	class Entity;
 	struct ScriptObject;
+	struct ScriptType;
 
 	class RAZOR_API Scene
 	{
@@ -32,7 +33,7 @@ namespace Razor
 		}
 
 		void RunSystems(float DeltaTime);
-		void CreateSystemObject();
+		void CreateSystemObject(const Razor::ScriptType& Type);
 
 		entt::registry registry;
 	private:
