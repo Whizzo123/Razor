@@ -1,3 +1,12 @@
 Scene: Untitled
 Entities:
-  []
+  - Entity: 1
+    Transform:
+      Position: [10, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [0, 0, 0]
+  - Entity: 0
+    Transform:
+      Position: [0, 10, 0]
+      Rotation: [0, 0, 0]
+      Scale: [0, 0, 0]
