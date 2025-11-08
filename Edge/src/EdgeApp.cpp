@@ -226,6 +226,10 @@ void Edge::CreateDockspace(const std::string& Title)
 			{
 				CurrentPopup = new EdgeEditor::OpenProjectPopupWindow(Storage);
 			}
+			if (Razor::RazorImGui::MenuItem("Save Project"))
+			{
+				Razor::Engine::Get().SaveProject();
+			}
 			Razor::RazorImGui::EndMenu();
 		}
 		if (Razor::RazorImGui::BeginMenu("Run"))

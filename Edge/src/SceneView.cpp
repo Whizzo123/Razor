@@ -24,6 +24,11 @@ namespace EdgeEditor
 
 		Razor::Ref<Razor::Scene> CurrentScene = Engine.CurrentScene;
 
+		if(Razor::RazorImGui::Button("Add Entity"))
+		{
+			CurrentScene->CreateEntity();
+		}
+
 		if (Razor::RazorImGui::TreeNode("Entities"))
 		{
 			// Need wrapper for the view type not lovely to have

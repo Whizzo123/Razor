@@ -200,6 +200,17 @@ namespace Razor
 		return *ScriptInterface;
 	}
 
+	void Engine::SaveProject()
+	{
+		if (LoadedProject == nullptr)
+		{
+			RZ_CORE_ERROR("Attempting to save project when no project is loaded");
+			return;
+		}
+
+		ProjectSerializer::Serialize(LoadedProject->m_ProjectPath, LoadedProject);
+	}
+
 	void Engine::LoadProject(const std::string& ProjectPath)
 	{
 		if (ProjectPath.empty())
@@ -216,17 +227,17 @@ namespace Razor
 		const std::string Path = "../Sandbox";
 
 		ProjectSerializer::Deserialize(ProjectPath, LoadedProject);
-		RZ_CORE_INFO("Loading up project: {0}", LoadedProject->ProjectName);
+		RZ_CORE_INFO("Loading up project: {0}", LoadedProject->m_ProjectName);
 		// TODO move assembly holding into ScriptEngine
-		BridgeAssembly = CreateScope<ScriptAssembly>(ScriptInterface->LoadAssembly(Path + "/" + LoadedProject->DllDirectory + "/" + "Razor-ScriptBridge.dll", true));
-		GameAssembly = CreateScope<ScriptAssembly>(ScriptInterface->LoadAssembly(Path + "/" + LoadedProject->DllDirectory + "/" + LoadedProject->ProjectName + ".dll", false));
+		BridgeAssembly = CreateScope<ScriptAssembly>(ScriptInterface->LoadAssembly(Path + "/" + LoadedProject->m_DllDirectory + "/" + "Razor-ScriptBridge.dll", true));
+		GameAssembly = CreateScope<ScriptAssembly>(ScriptInterface->LoadAssembly(Path + "/" + LoadedProject->m_DllDirectory + "/" + LoadedProject->m_ProjectName + ".dll", false));
 
 		// Load main scene
-		Ref<Scene> MainScene = CreateRef<Scene>(Path + LoadedProject->MainScenePath);
+		Ref<Scene> MainScene = CreateRef<Scene>(Path + LoadedProject->m_MainScenePath);
 		if (SceneSerializer::Deserialize(MainScene) == false)
 		{
-			LoadedProject->MainScenePath = "/assets/scenes/Main.rzscn";
-			MainScene = CreateRef<Scene>(LoadedProject->MainScenePath);
+			LoadedProject->m_MainScenePath = "/assets/scenes/Main.rzscn";
+			MainScene = CreateRef<Scene>(LoadedProject->m_MainScenePath);
 			SceneSerializer::Serialize(MainScene);
 			ProjectSerializer::Serialize("../", LoadedProject);
 		}

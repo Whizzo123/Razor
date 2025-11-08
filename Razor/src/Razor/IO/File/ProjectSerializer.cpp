@@ -17,45 +17,44 @@ namespace Razor
 			return;
 		}
 
-		if (Project->ProjectName == "")
+		if (Project->m_ProjectName == "")
 		{
 			RZ_CORE_ERROR("ProjectSerializer::Serialize Error: Project Name cannot be an empty string");
 			return;
 		}
 
-		const std::string ProjectFolderPath = Path + "/" + Project->ProjectName;
-		std::string AssetFolderPath = Project->AssetDirectory;
-		std::string DllFolderPath = Project->DllDirectory;
-		if (Project->AssetDirectory.empty())
+		std::string AssetFolderPath = Project->m_AssetDirectory;
+		std::string DllFolderPath = Project->m_DllDirectory;
+		if (Project->m_AssetDirectory.empty())
 		{
-			AssetFolderPath = ProjectFolderPath + "/" + "assets";
+			AssetFolderPath = Path + "/" + "assets";
 			std::filesystem::create_directory(AssetFolderPath);
 		}
-		if (Project->DllDirectory.empty())
+		if (Project->m_DllDirectory.empty())
 		{
-			DllFolderPath = ProjectFolderPath + "/" + "assembly";
+			DllFolderPath = Path + "/" + "assembly";
 			std::filesystem::create_directory(DllFolderPath);
 		}
 
-		Project->AssetDirectory = AssetFolderPath;
-		Project->DllDirectory = DllFolderPath;
+		Project->m_AssetDirectory = AssetFolderPath;
+		Project->m_DllDirectory = DllFolderPath;
 
 		YamlEmitter* Out =  yaml_emitter_new();
 		yaml_emitter_begin_map(Out);
 		yaml_emitter_key(Out, "ProjectName");
-		yaml_emitter_value_string(Out, Project->ProjectName.c_str());
+		yaml_emitter_value_string(Out, Project->m_ProjectName.c_str());
 		yaml_emitter_key(Out, "AssetDirectory");
-		yaml_emitter_value_string(Out, Project->AssetDirectory.c_str());
+		yaml_emitter_value_string(Out, Project->m_AssetDirectory.c_str());
 		yaml_emitter_key(Out, "DllDirectory");
-		yaml_emitter_value_string(Out, Project->DllDirectory.c_str());
+		yaml_emitter_value_string(Out, Project->m_DllDirectory.c_str());
 		yaml_emitter_key(Out, "MainScenePath");
-		yaml_emitter_value_string(Out, Project->MainScenePath.c_str());
+		yaml_emitter_value_string(Out, Project->m_MainScenePath.c_str());
 		yaml_emitter_end_map(Out);
 
 
-		std::filesystem::create_directory(ProjectFolderPath);
+		std::filesystem::create_directory(Path);
 
-		const std::string PathPlusExt = ProjectFolderPath + "/" + Project->ProjectName + ".proj";
+		const std::string PathPlusExt = Path + "/" + Project->m_ProjectName + ".proj";
 
 		std::ofstream FOut(PathPlusExt.c_str());
 		const char* ErrorMsg = new char(' ');
@@ -86,10 +85,11 @@ namespace Razor
 			return;
 		}
 
-		OutProject->ProjectName = Razor::yaml_as_string(Razor::yaml_get_child(Data, "ProjectName"));
-		OutProject->AssetDirectory = Razor::yaml_as_string(Razor::yaml_get_child(Data, "AssetDirectory"));
-		OutProject->DllDirectory = Razor::yaml_as_string(Razor::yaml_get_child(Data, "DllDirectory"));
-		OutProject->MainScenePath = Razor::yaml_as_string(Razor::yaml_get_child(Data, "MainScenePath"));
+		OutProject->m_ProjectName = Razor::yaml_as_string(Razor::yaml_get_child(Data, "ProjectName"));
+		OutProject->m_AssetDirectory = Razor::yaml_as_string(Razor::yaml_get_child(Data, "AssetDirectory"));
+		OutProject->m_DllDirectory = Razor::yaml_as_string(Razor::yaml_get_child(Data, "DllDirectory"));
+		OutProject->m_MainScenePath = Razor::yaml_as_string(Razor::yaml_get_child(Data, "MainScenePath"));
+		OutProject->m_ProjectPath = Path.substr(0, Path.find_last_of("/\\"));
 	}
 
 }

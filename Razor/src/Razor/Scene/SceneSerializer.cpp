@@ -196,7 +196,7 @@ namespace Razor
 		{
 			for (auto EntityNode : yaml_get_children(Data, "Entities"))
 			{
-				
+				DeserializeEntity(EntityNode, OutScene);
 			}
 		}
 		return true;
@@ -206,13 +206,13 @@ namespace Razor
 	{
 		Ref<Entity> DeserializedEntity = OutScene->CreateEntity();
 		auto TransformComponent = yaml_get_child(EntityNode, "Transform");
+		/* This is a one-off case as all entities are created with transform components so we don't need to add one just pass data */
 		if (TransformComponent)
 		{
-			glm::vec3 Position = ToGVec3(yaml_as_vec3(yaml_get_child(TransformComponent, "Position")));
-			glm::vec3 Rotation = ToGVec3(yaml_as_vec3(yaml_get_child(TransformComponent, "Rotation")));
-			glm::vec3 Scale = ToGVec3(yaml_as_vec3(yaml_get_child(TransformComponent, "Scale")));
-			Transform EntityTransform = { Position, Scale, Rotation };
-			DeserializedEntity->AddComponent<Transform>(EntityTransform);
+			Transform& comp = DeserializedEntity->GetComponent<Transform>();
+			comp.Position = ToGVec3(yaml_as_vec3(yaml_get_child(TransformComponent, "Position")));
+			comp.Rotation = ToGVec3(yaml_as_vec3(yaml_get_child(TransformComponent, "Rotation")));
+			comp.Scale = ToGVec3(yaml_as_vec3(yaml_get_child(TransformComponent, "Scale")));
 		}
 		auto ScriptComponent = yaml_get_child(EntityNode, "ScriptComponent");
 		if (ScriptComponent)
