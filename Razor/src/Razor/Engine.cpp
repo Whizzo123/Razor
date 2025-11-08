@@ -31,6 +31,8 @@
 #include "../Platform/Generic/ITimeProvider.h"
 #include "Log.h"
 #include "Scripting/ScriptInterface.h"
+#include "Scene/Project.h"
+#include "IO/File/ProjectSerializer.h"
 
 namespace Razor
 {
@@ -158,14 +160,19 @@ namespace Razor
 		return ShaderTypeMap[std::string(Type)];
 	}
 
-	void Engine::RunRenderSystems(const RenderPipelineConfig& Config) 
+	void Engine::Render(int32_t targetId, const RenderPipelineConfig& Config) 
 	{
+		Renderer->BindFrameBuffer(targetId);
+		Renderer->ClearBuffer();
 		Coordinator->RunRenderSystems(Config); 
+		Renderer->BindFrameBuffer();
+		Renderer->ClearBuffer();
 	}
 
 	void Engine::RunSystems() 
 	{ 
-		Coordinator->RunSystems(DeltaTime); 
+		Coordinator->RunSystems(DeltaTime);
+		CurrentScene->RunSystems(DeltaTime);
 	}
 
 	std::shared_ptr<Coordinator> Engine::GetCoordinator()
@@ -191,5 +198,72 @@ namespace Razor
 	ScriptInterface& Engine::GetScriptInterface()
 	{
 		return *ScriptInterface;
+	}
+
+	void Engine::LoadProject(const std::string& ProjectPath)
+	{
+		if (ProjectPath.empty())
+		{
+			RZ_CORE_ERROR("Project path is empty");
+			return;
+		}
+
+		if (LoadedProject == nullptr)
+		{
+			LoadedProject = CreateRef<Project>();
+		}
+
+		const std::string Path = "../Sandbox";
+
+		ProjectSerializer::Deserialize(ProjectPath, LoadedProject);
+		RZ_CORE_INFO("Loading up project: {0}", LoadedProject->ProjectName);
+		// TODO move assembly holding into ScriptEngine
+		BridgeAssembly = CreateScope<ScriptAssembly>(ScriptInterface->LoadAssembly(Path + "/" + LoadedProject->DllDirectory + "/" + "Razor-ScriptBridge.dll", true));
+		GameAssembly = CreateScope<ScriptAssembly>(ScriptInterface->LoadAssembly(Path + "/" + LoadedProject->DllDirectory + "/" + LoadedProject->ProjectName + ".dll", false));
+
+		// Load main scene
+		Ref<Scene> MainScene = CreateRef<Scene>(Path + LoadedProject->MainScenePath);
+		if (SceneSerializer::Deserialize(MainScene) == false)
+		{
+			LoadedProject->MainScenePath = "/assets/scenes/Main.rzscn";
+			MainScene = CreateRef<Scene>(LoadedProject->MainScenePath);
+			SceneSerializer::Serialize(MainScene);
+			ProjectSerializer::Serialize("../", LoadedProject);
+		}
+		CurrentScene = MainScene;
+	}
+
+	void Engine::RuntimeStart()
+	{
+		if(bIsRuntimeRunning.load())
+		{
+			RZ_CORE_WARN("Runtime is already running");
+			return;
+		}
+		RZ_CORE_INFO("Starting Runtime");
+		bIsRuntimeRunning.store(true);
+		RuntimeThread = std::thread(&Engine::RunRuntime, this);
+	}
+
+	void Engine::RunRuntime()
+	{
+		while (bIsRuntimeRunning)
+		{
+			Step();
+			//Somehow pick up input and forward?
+			//ProcessInputForGame()
+			RunSystems();
+		}
+		RZ_CORE_INFO("Exiting Runtime Thread");
+	}
+
+	void Engine::RuntimeStop()
+	{
+		RZ_CORE_INFO("Stopping Runtime");
+		bIsRuntimeRunning.store(false);
+		if(RuntimeThread.joinable())
+		{
+			RuntimeThread.join();
+		}
 	}
 }

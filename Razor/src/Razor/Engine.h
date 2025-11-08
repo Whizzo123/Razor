@@ -4,6 +4,9 @@
 #include <unordered_map>
 #include "Core.h"
 #include "../Platform/Generic/IPlatformIO.h"
+#include "Scene/Project.h"
+#include <thread>
+#include <atomic>
 
 namespace Razor
 {
@@ -20,6 +23,8 @@ namespace Razor
 
 	struct Light;
 	struct RenderStageConfig;
+
+	struct ScriptAssembly;
 
 	using RenderPipelineConfig = std::vector<RenderStageConfig>;
 
@@ -85,7 +90,7 @@ namespace Razor
 		* 
 		* @param Config - The pipeline configuration we want to run with this render
 		*/
-		void RunRenderSystems(const RenderPipelineConfig& Config);
+		void Render(int32_t targetId, const RenderPipelineConfig& Config);
 		/**
 		* Getter function for the RazorImGui object
 		* 
@@ -149,11 +154,17 @@ namespace Razor
 
 		ScriptInterface& GetScriptInterface();
 
+		void LoadProject(const std::string& ProjectPath);
+
+		void RuntimeStart();
+		void RuntimeStop();
+
 		Ref<Scene> CurrentScene; /** Ref to the current scene we have*/
 
 	private:
 		
 		void RenderImGui(uint64_t SceneTexture);
+		void RunRuntime();
 
 		std::unique_ptr<Window> EngineWindow;
 		std::shared_ptr<Coordinator> Coordinator;
@@ -167,5 +178,11 @@ namespace Razor
 		std::unique_ptr<IPlatformIO> PlatformIO;
 		std::unique_ptr<ITimeProvider> TimeProvider; /** Generic object to provide time functionality */
 		std::unique_ptr<ScriptInterface> ScriptInterface;
+		Ref<Project> LoadedProject;
+		Scope<ScriptAssembly> BridgeAssembly;
+		Scope<ScriptAssembly> GameAssembly;
+
+		std::atomic<bool> bIsRuntimeRunning { false };
+		std::thread RuntimeThread;
 	};
 }

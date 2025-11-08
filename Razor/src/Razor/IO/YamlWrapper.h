@@ -32,9 +32,13 @@ namespace Razor
 
 	// Query scalar types
 	RAZOR_API std::string yaml_as_string(YamlNode* node);
+	RAZOR_API char yaml_as_char(YamlNode* node);
 	RAZOR_API int yaml_as_int(YamlNode* node, int default_val);
+	RAZOR_API uint32_t yaml_as_int32(YamlNode* node, uint32_t default_val);
+	RAZOR_API float yaml_as_float(YamlNode* node, float default_val);
 	RAZOR_API double yaml_as_double(YamlNode* node, double default_val);
-	RAZOR_API int yaml_as_bool(YamlNode* node, int default_val);
+	RAZOR_API int yaml_as_bool(YamlNode* node, int default_val); 
+	RAZOR_API Vector2 yaml_as_vec2(YamlNode* node);
 	RAZOR_API Vector3 yaml_as_vec3(YamlNode* node);
 	RAZOR_API ModelInfo yaml_as_modelinfo(YamlNode* node);
 
@@ -60,8 +64,10 @@ namespace Razor
 	RAZOR_API void yaml_emitter_key(YamlEmitter* emitter, const char* key);
 
 	RAZOR_API void yaml_emitter_value_string(YamlEmitter* emitter, const char* value);
+	RAZOR_API void yaml_emitter_value_char(YamlEmitter* emitter, char value);
 	RAZOR_API void yaml_emitter_value_int(YamlEmitter* emitter, int value);
 	RAZOR_API void yaml_emitter_value_double(YamlEmitter* emitter, double value);
+	RAZOR_API void yaml_emitter_value_float(YamlEmitter* emitter, float value);
 	RAZOR_API void yaml_emitter_value_bool(YamlEmitter* emitter, int value);
 	RAZOR_API void yaml_emitter_value_seq(YamlEmitter* emitter);
 	RAZOR_API void yaml_emitter_value_int32(YamlEmitter* emitter, uint32_t value);

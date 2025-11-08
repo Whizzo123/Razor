@@ -13,17 +13,21 @@ namespace Razor
 
 	ScriptAssembly ScriptInterface::LoadAssembly(std::string assemblyPath, bool isBridgeAssembly)
 	{
-		Razor::Ref<Coral::ManagedAssembly> Assembly = ScriptEngine::LoadAssembly(assemblyPath);
-		if (Assembly == nullptr)
+		AssemblyPool.push_back(CreateRef<Coral::ManagedAssembly>(ScriptEngine::LoadAssembly(assemblyPath)));
+
+		Ref<Coral::ManagedAssembly> Assembly = AssemblyPool.back();
+		if (Assembly->GetLoadStatus() == Coral::AssemblyLoadStatus::UnknownError)
 		{
 			RZ_CORE_ERROR("ScriptInterface: -> Failed to load assembly at path: {0}", assemblyPath);
-			return ScriptAssembly { -1 };
+			return ScriptAssembly{ -1 };
 		}
+
 		if (isBridgeAssembly)
 		{
 			ScriptGlue::RegisterFunctions(Assembly);
 		}
-		AssemblyPool.push_back(Assembly);
+		// This is a nightmare how do we fix it hahaha
+		;
 		return ScriptAssembly { static_cast<int>(AssemblyPool.size()) - 1};
 	}
 
@@ -33,7 +37,7 @@ namespace Razor
 		{
 			return ScriptType();
 		}
-		Razor::Ref<Coral::ManagedAssembly> searchingAssembly = AssemblyPool[assembly.assemblyIndex];
+		Ref<Coral::ManagedAssembly> searchingAssembly = AssemblyPool[assembly.assemblyIndex];
 
 		Coral::Type& returnedType = searchingAssembly->GetType(typeName);
 
@@ -96,7 +100,7 @@ namespace Razor
 
 	ScriptObject ScriptInterface::CreateInstance(ScriptType type)
 	{
-		Razor::Ref<Coral::ManagedAssembly> instanceAssembly = AssemblyPool[type.assembly.assemblyIndex];
+		Ref<Coral::ManagedAssembly> instanceAssembly = AssemblyPool[type.assembly.assemblyIndex];
 		Coral::Type& instanceType = instanceAssembly->GetType(type.fullName);
 		ObjectPool.push_back(std::move(Razor::CreateRef<Coral::ManagedObject>(instanceType.CreateInstance())));
 		return ScriptObject {static_cast<int>(ObjectPool.size()) - 1, type};

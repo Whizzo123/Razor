@@ -1,12 +1,13 @@
 #include "ScriptEngine.h"
-#include <Coral/HostInstance.hpp>
-#include "../Log.h"
+#include "ScriptInterface.h"
+#include "../Core/Entity.h"
 
 namespace Razor
 {
 	Coral::HostInstance ScriptEngine::CoralInstance = Coral::HostInstance();
 	Coral::AssemblyLoadContext ScriptEngine::Context = Coral::AssemblyLoadContext();
 	bool ScriptEngine::ScriptEngineInitialised = false;
+	Scope<ScriptEngineData> ScriptEngine::s_Data = CreateScope<ScriptEngineData>();
 
 	void CoralMessageCallback(std::string_view message, Coral::MessageLevel level)
 	{
@@ -38,29 +39,54 @@ namespace Razor
 		ScriptEngineInitialised = true;
 	}
 
-	Razor::Ref<Coral::ManagedAssembly> ScriptEngine::LoadAssembly(const std::string& AssemblyPath)
+	Coral::ManagedAssembly& ScriptEngine::LoadAssembly(const std::string& AssemblyPath)
 	{
 		if (!ScriptEngineInitialised)
 		{
 			RZ_CORE_ERROR("ScriptEngine: -> Attempting to load assembly before scriptengine is initialised");
-			return nullptr;
+			Coral::ManagedAssembly emptyAssembly;
+			return emptyAssembly;
 		}
-		return Razor::Ref<Coral::ManagedAssembly>(&Context.LoadAssembly(AssemblyPath));
-		//Coral::ManagedAssembly loadedAssembly = Context.LoadAssembly(AssemblyPath);
-		/*if (loadedAssembly.GetLoadStatus() != Coral::AssemblyLoadStatus::Success)
+		Coral::ManagedAssembly& assembly = Context.LoadAssembly(AssemblyPath);
+
+		for (Coral::Type* Type : assembly.GetTypes())
 		{
-			RZ_CORE_ERROR("ScriptEngine: -> Failed to load assembly at path: {0}", AssemblyPath);
-			return nullptr;
+			std::string Name = Type->GetFullName();
+			const char* splitter = ".";
+			Ref<ScriptClass> Class = CreateRef<ScriptClass>(std::strtok(&Name[0], splitter), Type->GetFullName());
+			s_Data->ScriptClasses[Type->GetFullName()] = Class;
+
+			for (Coral::FieldInfo& Field : Type->GetFields())
+			{
+				Class->m_Fields[Field.GetName()] = { Field.GetType(), Field.GetName(), Field };
+			}
 		}
-		else
-		{
-			return Razor::Ref<Coral::ManagedAssembly>(&loadedAssembly);
-		}*/
+
+		return assembly;
 	}
 
 	void ScriptEngine::Shutdown()
 	{
 		CoralInstance.UnloadAssemblyLoadContext(Context);
 		CoralInstance.Shutdown();
+	}
+
+	Ref<ScriptClass> ScriptEngine::GetEntityClass(const std::string& name)
+	{
+		if (s_Data->ScriptClasses.find(name) == s_Data->ScriptClasses.end())
+			return nullptr;
+
+		return s_Data->ScriptClasses.at(name);
+	}
+
+	ScriptFieldMap& ScriptEngine::GetScriptFieldMap(Entity entity)
+	{
+		return s_Data->EntityScriptFields[static_cast<uint32_t>(entity.EntityHandle)];
+	}
+
+	ScriptClass::ScriptClass(const std::string& classNamespace, const std::string& className, bool isCore)
+		: m_ClassNamespace(classNamespace), m_ClassName(className)
+	{
+		
 	}
 }

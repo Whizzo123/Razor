@@ -129,4 +129,12 @@ namespace Razor
 		// MouseBut [Key] -> State (0, 1)
 		// MousePos -> Pos
 	};
+
+	struct ScriptComponent
+	{
+		std::string ClassName;
+
+		ScriptComponent() = default;
+		ScriptComponent(const ScriptComponent&) = default;
+	};
 }

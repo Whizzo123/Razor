@@ -1,6 +1,4 @@
 #include "OpenProjectPopupWindow.h"
-#include "../FileIO/ProjectSerializer.h"
-#include "../Project.h"
 #include "../EditorStorage.h"
 
 
@@ -17,9 +15,7 @@ namespace EdgeEditor
 			// TODO will create big old file explorer for now we just wanna have a button we click which directs us to the current Sandbox
 			if (Razor::RazorImGui::Button("Create"))
 			{
-				Razor::Ref<Project> LoadedProject = Razor::CreateRef<Project>();
-				ProjectSerializer::Deserialize("../Sandbox/Sandbox", LoadedProject);
-				Storage->SetProject(*LoadedProject);
+				Storage->SetProject("../Sandbox/Sandbox");
 				Razor::RazorImGui::CloseCurrentPopup();
 			}
 			Razor::RazorImGui::SameLine();

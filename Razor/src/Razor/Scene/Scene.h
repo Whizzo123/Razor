@@ -1,10 +1,13 @@
 #pragma once
 #include <entt/entt.hpp>
 #include "../Core.h"
+#include <vector>
 
 namespace Razor
 {
 	class Entity;
+	struct ScriptObject;
+	struct ScriptType;
 
 	class RAZOR_API Scene
 	{
@@ -29,9 +32,13 @@ namespace Razor
 			return registry.get<T>(Entity);
 		}
 
+		void RunSystems(float DeltaTime);
+		void CreateSystemObject(const Razor::ScriptType& Type);
+
 		entt::registry registry;
 	private:
 		std::string FilePath;
+		std::vector<ScriptObject> SystemObjects;
 	};
 }
 

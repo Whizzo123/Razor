@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Razor.h"
+#include "../../Core.h"
 
-namespace EdgeEditor
+namespace Razor
 {
 	struct Project;
 
