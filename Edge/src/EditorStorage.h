@@ -20,7 +20,7 @@ namespace EdgeEditor
 		{
 			return ProjectSetDelegate;
 		}
-		std::string GetProject()
+		const std::string& GetProject() const
 		{
 			return CurrentProjectPath;
 		}

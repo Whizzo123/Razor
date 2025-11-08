@@ -33,7 +33,7 @@ namespace Razor
 	
 	void Scene::RunSystems(float DeltaTime)
 	{
-		for (auto system : SystemObjects)
+		for (const auto& system : SystemObjects)
 		{
 			Engine::Get().GetScriptInterface().InvokeMethod(system, "Run", DeltaTime);
 		}
