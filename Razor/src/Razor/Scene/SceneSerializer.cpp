@@ -9,6 +9,7 @@
 #include "../Scripting/ScriptEngine.h"
 #include "../Scripting/ScriptInterface.h"
 #include "../Assert.h"
+#include "../Engine.h"
 
 namespace Razor
 {
@@ -205,6 +206,22 @@ namespace Razor
 			for (auto EntityNode : yaml_get_children(Data, "Entities"))
 			{
 				DeserializeEntity(EntityNode, OutScene);
+			}
+		}
+
+		auto Systems = yaml_get_child(Data, "Systems");
+		for (auto SystemNode : yaml_get_children(Data, "Systems"))
+		{
+			std::string typeName = yaml_as_string(SystemNode);
+			Razor::ScriptClass type = Engine::Get().GetScriptInterface().GetType(typeName);
+			if (type)
+			{
+				RZ_CORE_INFO("Creating System Object for type: {0}", typeName);
+				OutScene->CreateSystemObject(type);
+			}
+			else
+			{
+				RZ_CORE_WARN("Could not find type for system: {0}", typeName);
 			}
 		}
 		return true;

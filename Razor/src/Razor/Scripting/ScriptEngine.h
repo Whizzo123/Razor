@@ -74,6 +74,7 @@ namespace Razor
 
 	using ScriptFieldMap = std::unordered_map<std::string, ScriptFieldInstance>;
 
+
 	class ScriptClass
 	{
 	public:
@@ -83,6 +84,10 @@ namespace Razor
 		const std::map<std::string, ScriptField>& GetFields() const { return m_Fields; }
 
 		bool IsSystemClass() const { return m_IsSystemClass; }
+
+		const std::string& GetName() const { return m_ClassName; }
+
+		operator bool() const { return !m_ClassName.empty(); }
 	private:
 		bool m_IsSystemClass = false;
 		std::string m_ClassNamespace;

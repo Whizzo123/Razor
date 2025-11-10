@@ -4,6 +4,7 @@
 #include <string>
 #include "../Engine.h"
 #include "../Scripting/ScriptInterface.h"
+#include "../Scripting/ScriptEngine.h"
 #include "../Log.h"
 
 namespace Razor
@@ -40,9 +41,9 @@ namespace Razor
 		}
 	}
 
-	void Scene::CreateSystemObject(const Razor::ScriptType& Type)
+	void Scene::CreateSystemObject(const Razor::ScriptClass& Type)
 	{
-		RZ_CORE_INFO("Instantiating system type {0}", Type.fullName);
+		RZ_CORE_INFO("Instantiating system type {0}", Type.GetName());
 		SystemObjects.push_back(Engine::Get().GetScriptInterface().CreateInstance(Type));
 	}
 }

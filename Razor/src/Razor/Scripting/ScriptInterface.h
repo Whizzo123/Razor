@@ -11,6 +11,8 @@ namespace Coral
 
 namespace Razor
 {
+	class ScriptClass;
+
 	struct ScriptAssembly
 	{
 		int assemblyIndex = -1;
@@ -44,10 +46,9 @@ namespace Razor
 	public:
 		ScriptInterface();
 		ScriptAssembly LoadAssembly(std::string assemblyPath, bool isBridgeAssembly);
-		ScriptType GetType(ScriptAssembly assembly, const std::string& typeName);
-		ScriptType GetBaseType(ScriptType type);
-		std::vector<ScriptType> GetTypes(ScriptAssembly assembly);
-		ScriptObject CreateInstance(ScriptType type);
+		ScriptClass GetType(const std::string& typeName);
+		ScriptClass GetBaseType(ScriptClass type);
+		ScriptObject CreateInstance(ScriptClass type);
 		void InvokeMethod(ScriptObject object, const std::string& methodName, float param);
 
 	private:
