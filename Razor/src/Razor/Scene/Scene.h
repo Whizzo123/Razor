@@ -39,6 +39,8 @@ namespace Razor
 	private:
 		std::string FilePath;
 		std::vector<ScriptObject> SystemObjects;
+
+		friend class SceneSerializer;
 	};
 }
 

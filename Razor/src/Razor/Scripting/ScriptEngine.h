@@ -78,10 +78,13 @@ namespace Razor
 	{
 	public:
 		ScriptClass() = default;
-		ScriptClass(const std::string& classNamespace, const std::string& className, bool isCore = false);
+		ScriptClass(const std::string& classNamespace, const std::string& className, bool IsSystemClass = false, bool isCore = false);
 
 		const std::map<std::string, ScriptField>& GetFields() const { return m_Fields; }
+
+		bool IsSystemClass() const { return m_IsSystemClass; }
 	private:
+		bool m_IsSystemClass = false;
 		std::string m_ClassNamespace;
 		std::string m_ClassName;
 
