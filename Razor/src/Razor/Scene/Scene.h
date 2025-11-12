@@ -34,6 +34,7 @@ namespace Razor
 
 		void RunSystems(float DeltaTime);
 		void CreateSystemObject(const Razor::ScriptClass& Type);
+		std::vector<std::string> GetSystemNames() const;
 
 		entt::registry registry;
 	private:

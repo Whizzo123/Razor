@@ -67,4 +67,9 @@ namespace Razor
 	{
 		ObjectPool[object.id]->InvokeMethod(methodName, param);
 	}
+
+	std::vector<ScriptClass> ScriptInterface::GetSystemTypes()
+	{
+		return ScriptEngine::GetSystemClasses();
+	}
 }

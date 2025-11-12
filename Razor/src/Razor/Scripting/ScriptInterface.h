@@ -1,5 +1,6 @@
 #pragma once
 #include "../Core.h"
+#include "ScriptClass.h"
 #include <vector>
 #include <unordered_map>
 
@@ -11,7 +12,6 @@ namespace Coral
 
 namespace Razor
 {
-	class ScriptClass;
 
 	struct ScriptAssembly
 	{
@@ -38,7 +38,7 @@ namespace Razor
 	struct ScriptObject
 	{
 		int id;
-		ScriptType type;
+		ScriptClass type;
 	};
 
 	class RAZOR_API ScriptInterface
@@ -48,6 +48,7 @@ namespace Razor
 		ScriptAssembly LoadAssembly(std::string assemblyPath, bool isBridgeAssembly);
 		ScriptClass GetType(const std::string& typeName);
 		ScriptClass GetBaseType(ScriptClass type);
+		std::vector<ScriptClass> GetSystemTypes();
 		ScriptObject CreateInstance(ScriptClass type);
 		void InvokeMethod(ScriptObject object, const std::string& methodName, float param);
 

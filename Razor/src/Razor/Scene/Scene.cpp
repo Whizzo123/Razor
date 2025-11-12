@@ -46,4 +46,14 @@ namespace Razor
 		RZ_CORE_INFO("Instantiating system type {0}", Type.GetName());
 		SystemObjects.push_back(Engine::Get().GetScriptInterface().CreateInstance(Type));
 	}
+
+	std::vector<std::string> Scene::GetSystemNames() const
+	{
+		std::vector<std::string> Names(SystemObjects.size());
+		for (const auto& obj : SystemObjects)
+		{
+			Names.push_back(obj.type.GetName());
+		}
+		return Names;
+	}
 }

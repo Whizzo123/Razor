@@ -146,7 +146,7 @@ namespace Razor
 		yaml_emitter_value_seq(Out);
 		for (const auto& SystemObj : OutScene->SystemObjects)
 		{
-			yaml_emitter_value_string(Out, SystemObj.type.fullName.c_str());
+			yaml_emitter_value_string(Out, SystemObj.type.GetName().c_str());
 		}
 		yaml_emitter_end_seq(Out);
 		yaml_emitter_end_map(Out);
