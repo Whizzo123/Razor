@@ -11,8 +11,12 @@ namespace Sandbox
     {
         public override void Run(float deltaTime)
         {
+            List<UInt32> entities = Scene.GetEntitiesWithTransforms();
             Log logger = new Log();
-            logger.Print("Running print function from internal call");
+            foreach (var entity in entities)
+            {
+                logger.Print("Running print function from internal call entity id " + entity);
+            }
         }
     }
 }
