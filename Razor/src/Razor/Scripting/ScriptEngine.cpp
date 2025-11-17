@@ -54,6 +54,7 @@ namespace Razor
 			std::string Name = Type->GetFullName();
 			const char* splitter = ".";
 			bool bIsSystem = false;
+			bool bIsComponent = false;
 			Coral::Type& baseType = Type->GetBaseType();
 			while (baseType) 
 			{
@@ -62,10 +63,15 @@ namespace Razor
 					bIsSystem = true;
 					break;
 				}
+				if (baseType.GetFullName() == "Razor.Component") {
+					RZ_CORE_INFO("Found Component Class: {0}", std::string(Type->GetFullName()));
+					bIsComponent = true;
+					break;
+				}
 				baseType = baseType.GetBaseType();
 			}
 
-			Ref<ScriptClass> Class = CreateRef<ScriptClass>(std::strtok(&Name[0], splitter), Type->GetFullName(), bIsSystem);
+			Ref<ScriptClass> Class = CreateRef<ScriptClass>(std::strtok(&Name[0], splitter), Type->GetFullName(), bIsSystem, bIsComponent);
 			s_Data->ScriptClasses[Type->GetFullName()] = Class;
 
 			for (Coral::FieldInfo& Field : Type->GetFields())
@@ -94,12 +100,6 @@ namespace Razor
 	ScriptFieldMap& ScriptEngine::GetScriptFieldMap(Entity entity)
 	{
 		return s_Data->EntityScriptFields[static_cast<uint32_t>(entity.EntityHandle)];
-	}
-
-	ScriptClass::ScriptClass(const std::string& classNamespace, const std::string& className, bool isSystemClass, bool isCore)
-		: m_ClassNamespace(classNamespace), m_ClassName(className), m_IsSystemClass(isSystemClass)
-	{
-		
 	}
 
 	std::vector<ScriptClass> ScriptEngine::GetSystemClasses()
