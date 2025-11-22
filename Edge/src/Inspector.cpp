@@ -52,6 +52,13 @@ namespace EdgeEditor
 			{
 				Storage->SelectedEntity->AddComponent<Razor::DirectionalLight>();
 			}
+			for (const auto& component : Engine.GetScriptInterface().GetComponentTypes())
+			{
+				if (Razor::RazorImGui::Button(component.GetName().c_str()))
+				{
+					Storage->SelectedEntity->AddScriptComponent(component.GetName());
+				}
+			}
 			Razor::RazorImGui::EndPopup();
 		}
 		Razor::RazorImGui::End();

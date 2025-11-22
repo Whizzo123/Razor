@@ -2,23 +2,25 @@
 
 #include <string>
 #include <map>
+#include <vector>
+#include "../Log.h"
 
 namespace Razor
 {
-	enum class ScriptFieldType
+	enum class RAZOR_API ScriptFieldType
 	{
 		None = 0,
 		Float, Double,
 		Bool, Char, Byte, Short, Int, Long,
 		UByte, UShort, UInt, ULong,
 		Vector2, Vector3, Vector4,
-		Entity,
+		Entity, String,
 	};
 
-	struct ScriptField
+	struct RAZOR_API ScriptField
 	{
 		//Figure out how ScriptClass and ScriptField fits together
-		//ScriptClass Type;
+		std::string Type;
 		std::string Name;
 		//Coral::FieldInfo ClassField;
 
@@ -26,7 +28,7 @@ namespace Razor
 	};
 
 	// ScriptField + data storage
-	struct ScriptFieldInstance
+	struct RAZOR_API ScriptFieldInstance
 	{
 		ScriptField Field;
 
@@ -38,18 +40,37 @@ namespace Razor
 		template<typename T>
 		T GetValue()
 		{
-			static_assert(sizeof(T) <= 16, "Type too large!");
+			static_assert(sizeof(T) <= 64, "Type too large!");
 			return *(T*)m_Buffer;
 		}
 
 		template<typename T>
 		void SetValue(T value)
 		{
-			static_assert(sizeof(T) <= 16, "Type too large!");
+			static_assert(sizeof(T) <= 64, "Type too large!");
 			memcpy(m_Buffer, &value, sizeof(T));
 		}
 	private:
-		uint8_t m_Buffer[16];
+		uint8_t m_Buffer[64];
+	};
+
+
+	struct RAZOR_API ScriptInstance {
+		uint64_t handle;
+		std::string className;
+
+		std::vector<ScriptFieldInstance> fields;
+
+		ScriptFieldInstance& GetFieldInstance(const std::string& name) {
+			for (auto& fieldInstance : fields) {
+				if (fieldInstance.Field.Name == name) {
+					return fieldInstance;
+				}
+			}
+			RZ_CORE_ERROR("Field not found: {0}", name);
+			ScriptFieldInstance dummy;
+			return dummy;
+		}
 	};
 
 	class ScriptClass
@@ -67,6 +88,8 @@ namespace Razor
 		operator bool() const { return !m_ClassName.empty(); }
 	private:
 		bool m_IsSystemClass = false;
+		bool m_IsComponentClass = false;
+		bool m_IsCore = false;
 		std::string m_ClassNamespace;
 		std::string m_ClassName;
 

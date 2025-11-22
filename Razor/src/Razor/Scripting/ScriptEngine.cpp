@@ -76,7 +76,7 @@ namespace Razor
 
 			for (Coral::FieldInfo& Field : Type->GetFields())
 			{
-				Class->m_Fields[Field.GetName()] = { Field.GetName()};
+				Class->m_Fields[Field.GetName()] = { Field.GetType().GetFullName(), Field.GetName()};
 			}
 		}
 
@@ -115,19 +115,16 @@ namespace Razor
 		return systemClasses;
 	}
 
-	ScriptFieldType ScriptField::GetType() const
+	std::vector<ScriptClass> ScriptEngine::GetComponentClasses()
 	{
-		/*Coral::ManagedType managedType = Type.GetManagedType();
-		switch (managedType)
+		std::vector<ScriptClass> componentClasses;
+		for (const auto& [name, scriptClass] : s_Data->ScriptClasses)
 		{
-		case Coral::ManagedType::Float:		return ScriptFieldType::Float;
-		case Coral::ManagedType::Double:	return ScriptFieldType::Double;
-		case Coral::ManagedType::Bool:		return ScriptFieldType::Bool;
-		case Coral::ManagedType::Byte:		return ScriptFieldType::Char;
-		case Coral::ManagedType::UInt:		return ScriptFieldType::UInt;
-		case Coral::ManagedType::Int:		return ScriptFieldType::Int;
-		default:*/
-			return ScriptFieldType::None;
-		//}
+			if (scriptClass->m_IsComponentClass)
+			{
+				componentClasses.push_back(*scriptClass);
+			}
+		}
+		return componentClasses;
 	}
 }

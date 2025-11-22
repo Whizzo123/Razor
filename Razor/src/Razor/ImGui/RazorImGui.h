@@ -124,6 +124,7 @@ namespace Razor
 		static Vector2 GetViewportSize(unsigned int Id);
 		static void SetWindowSize(const Vector2& Size);
 		static bool Combo(const char* label, const char** data, int dataLength, int* selectedIdx);
+		static bool InputText(const char* label, char* buf, size_t bufSize);
 	public:
 		// Function to hook our on such and such events to GLFW key events
 		void RegisterImGuiEvents();

@@ -328,7 +328,7 @@ namespace Razor
 	}
 
 	bool RazorImGui::Combo(const char* label, const char** data, int dataLength, int* selectedIdx)
-	{	
+	{
 		const char* combo_preview_value = data[*selectedIdx];
 		if (ImGui::BeginCombo(label, combo_preview_value, 0))
 		{
@@ -342,6 +342,15 @@ namespace Razor
 					ImGui::SetItemDefaultFocus();
 			}
 			ImGui::EndCombo();
+			return true;
+		}
+		return false;
+	}
+
+	bool RazorImGui::InputText(const char* label, char* buf, size_t bufSize)
+	{
+		if (ImGui::InputText(label, buf, bufSize))
+		{
 			return true;
 		}
 		return false;

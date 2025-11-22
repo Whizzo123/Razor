@@ -10,6 +10,7 @@ namespace EdgeEditor
 		map["Transform"] = DrawTransform;
 		map["Mesh"] = DrawMesh;
 		map["DirectionalLight"] = DrawDirectionalLight;
+		map["ScriptComponent"] = DrawScriptComponent;
 		return map;
 	}
 
@@ -59,6 +60,36 @@ namespace EdgeEditor
 			{
 				// Nothing really here to show just now maybe in the future but at least we know it's there
 			}
+		}
+	}
+
+	void ComponentImGui::DrawScriptComponent(Razor::Ref<Razor::Entity> InEntity)
+	{
+		if (InEntity->HasComponent<Razor::ScriptComponent>())
+		{
+			Razor::ScriptComponent& scriptComp = InEntity->GetComponent<Razor::ScriptComponent>();
+			for (uint64_t instanceID : scriptComp.mScriptInstances)
+			{
+				Razor::ScriptInstance& instance = Razor::Engine::Get().GetScriptInterface().GetScriptInstance(instanceID);
+				if (Razor::RazorImGui::CollapsingHeader(instance.className.c_str()))
+				{
+					for (Razor::ScriptFieldInstance& field : instance.fields)
+					{
+						Razor::ScriptFieldType type = field.Field.GetType();
+						if (type == Razor::ScriptFieldType::String)
+						{
+							std::string value = field.GetValue<std::string>();
+							char buffer[256];
+							strncpy(buffer, value.c_str(), sizeof(buffer));
+							if (Razor::RazorImGui::InputText(field.Field.Name.c_str(), buffer, sizeof(buffer)))
+							{
+								field.SetValue<std::string>(std::string(buffer));
+							}
+						}
+					}
+				}
+			}
+			
 		}
 	}
 }

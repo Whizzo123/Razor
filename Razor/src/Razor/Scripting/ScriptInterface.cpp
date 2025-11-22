@@ -61,6 +61,31 @@ namespace Razor
 			}
 		}
 		RZ_CORE_ERROR("ScriptInterface(CreateInstance): -> Failed to create instance of type: {0}", type.GetName());
+		return ScriptObject{ -1, ScriptClass() };
+	}
+
+	uint64_t ScriptInterface::CreateScriptInstance(ScriptClass type)
+	{
+		for (auto& assembly : AssemblyPool)
+		{
+			Coral::Type& objType = assembly->GetType(type.GetName());
+			if (objType)
+			{
+				ScriptObject obj = CreateInstance(type);
+				if (obj.id == -1)
+					break;
+				ScriptInstance inst = ScriptInstance{ static_cast<uint64_t>(obj.id), type.GetName()};
+				for (const auto& [fieldName, field] : type.GetFields())
+				{
+					ScriptFieldInstance fieldInstance;
+					fieldInstance.Field = field;
+					inst.fields.push_back(fieldInstance);
+				}
+				ScriptInstancePool.push_back(inst);
+				return ScriptInstancePool.size() - 1;
+			}
+		}
+		return -1;
 	}
 
 	void ScriptInterface::InvokeMethod(ScriptObject object, const std::string& methodName, float param)
@@ -71,5 +96,20 @@ namespace Razor
 	std::vector<ScriptClass> ScriptInterface::GetSystemTypes()
 	{
 		return ScriptEngine::GetSystemClasses();
+	}
+
+	std::vector<ScriptClass> ScriptInterface::GetComponentTypes()
+	{
+		return ScriptEngine::GetComponentClasses();
+	}
+
+	ScriptInstance& ScriptInterface::GetScriptInstance(uint64_t instanceId)
+	{
+		if (instanceId >= ScriptInstancePool.size())
+		{
+			RZ_CORE_ERROR("ScriptInterface(GetScriptInstance): -> Invalid instance ID: {0}", instanceId);
+			throw std::out_of_range("Invalid ScriptInstance ID");
+		}
+		return ScriptInstancePool[instanceId];
 	}
 }

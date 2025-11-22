@@ -17,6 +17,8 @@ namespace Razor
 			return component;
 		}
 
+		void AddScriptComponent(std::string className);
+
 		template<typename T>
 		bool HasComponent()
 		{

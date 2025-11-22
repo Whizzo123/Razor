@@ -23,6 +23,7 @@ namespace Razor
 		auto entityHandle = registry.create();
 		Ref<Entity> ent = CreateRef<Entity>(entityHandle, this);
 		ent->AddComponent<Transform>();
+		ent->AddComponent<ScriptComponent>();
 		return ent;
 	}
 	

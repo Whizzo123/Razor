@@ -28,6 +28,7 @@ namespace Razor
 		std::unordered_map<std::string, Ref<ScriptClass>> ScriptClasses;
 		//std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;
 		std::unordered_map<uint32_t, ScriptFieldMap> EntityScriptFields;
+		std::vector<ScriptInstance> ScriptInstances;
 
 		//Scope<filewatch::FileWatch<std::string>> AppAssemblyFileWatcher;
 		//bool AssemblyReloadPending = false;
@@ -47,6 +48,7 @@ namespace Razor
 		static Ref<ScriptClass> GetEntityClass(const std::string& name);
 		static ScriptFieldMap& GetScriptFieldMap(Entity entity);
 		static std::vector<ScriptClass> GetSystemClasses();
+		static std::vector<ScriptClass> GetComponentClasses();
 
 	private:
 		static Coral::HostInstance CoralInstance;
@@ -63,22 +65,23 @@ namespace Razor
 			switch (fieldType)
 			{
 			case ScriptFieldType::None:    return "None";
-			case ScriptFieldType::Float:   return "Float";
-			case ScriptFieldType::Double:  return "Double";
-			case ScriptFieldType::Bool:    return "Bool";
-			case ScriptFieldType::Char:    return "Char";
-			case ScriptFieldType::Byte:    return "Byte";
-			case ScriptFieldType::Short:   return "Short";
-			case ScriptFieldType::Int:     return "Int";
-			case ScriptFieldType::Long:    return "Long";
-			case ScriptFieldType::UByte:   return "UByte";
-			case ScriptFieldType::UShort:  return "UShort";
-			case ScriptFieldType::UInt:    return "UInt";
-			case ScriptFieldType::ULong:   return "ULong";
-			case ScriptFieldType::Vector2: return "Vector2";
-			case ScriptFieldType::Vector3: return "Vector3";
-			case ScriptFieldType::Vector4: return "Vector4";
-			case ScriptFieldType::Entity:  return "Entity";
+			case ScriptFieldType::Float:   return "System.Float";
+			case ScriptFieldType::Double:  return "System.Double";
+			case ScriptFieldType::Bool:    return "System.Bool";
+			case ScriptFieldType::Char:    return "System.Char";
+			case ScriptFieldType::String:    return "System.String";
+			case ScriptFieldType::Byte:    return "System.Byte";
+			case ScriptFieldType::Short:   return "System.Short";
+			case ScriptFieldType::Int:     return "System.Int";
+			case ScriptFieldType::Long:    return "System.Long";
+			case ScriptFieldType::UByte:   return "System.UByte";
+			case ScriptFieldType::UShort:  return "System.UShort";
+			case ScriptFieldType::UInt:    return "System.UInt";
+			case ScriptFieldType::ULong:   return "System.ULong";
+			case ScriptFieldType::Vector2: return "Razor.Vector2";
+			case ScriptFieldType::Vector3: return "Razor.Vector3";
+			case ScriptFieldType::Vector4: return "Razor.Vector4";
+			case ScriptFieldType::Entity:  return "Razor.Entity";
 			}
 			RZ_CORE_ERROR("Unknown ScriptFieldType");
 			return "None";
@@ -87,22 +90,23 @@ namespace Razor
 		inline ScriptFieldType ScriptFieldTypeFromString(std::string_view fieldType)
 		{
 			if (fieldType == "None")    return ScriptFieldType::None;
-			if (fieldType == "Float")   return ScriptFieldType::Float;
-			if (fieldType == "Double")  return ScriptFieldType::Double;
-			if (fieldType == "Bool")    return ScriptFieldType::Bool;
-			if (fieldType == "Char")    return ScriptFieldType::Char;
-			if (fieldType == "Byte")    return ScriptFieldType::Byte;
-			if (fieldType == "Short")   return ScriptFieldType::Short;
-			if (fieldType == "Int")     return ScriptFieldType::Int;
-			if (fieldType == "Long")    return ScriptFieldType::Long;
-			if (fieldType == "UByte")   return ScriptFieldType::UByte;
-			if (fieldType == "UShort")  return ScriptFieldType::UShort;
-			if (fieldType == "UInt")    return ScriptFieldType::UInt;
-			if (fieldType == "ULong")   return ScriptFieldType::ULong;
-			if (fieldType == "Vector2") return ScriptFieldType::Vector2;
-			if (fieldType == "Vector3") return ScriptFieldType::Vector3;
-			if (fieldType == "Vector4") return ScriptFieldType::Vector4;
-			if (fieldType == "Entity")  return ScriptFieldType::Entity;
+			if (fieldType == "System.Float")   return ScriptFieldType::Float;
+			if (fieldType == "System.Double")  return ScriptFieldType::Double;
+			if (fieldType == "System.Bool")    return ScriptFieldType::Bool;
+			if (fieldType == "System.Char")    return ScriptFieldType::Char;
+			if (fieldType == "System.String")  return ScriptFieldType::String;
+			if (fieldType == "System.Byte")    return ScriptFieldType::Byte;
+			if (fieldType == "System.Short")   return ScriptFieldType::Short;
+			if (fieldType == "System.Int")     return ScriptFieldType::Int;
+			if (fieldType == "System.Long")    return ScriptFieldType::Long;
+			if (fieldType == "System.UByte")   return ScriptFieldType::UByte;
+			if (fieldType == "System.UShort")  return ScriptFieldType::UShort;
+			if (fieldType == "System.UInt")    return ScriptFieldType::UInt;
+			if (fieldType == "System.ULong")   return ScriptFieldType::ULong;
+			if (fieldType == "System.Vector2") return ScriptFieldType::Vector2;
+			if (fieldType == "System.Vector3") return ScriptFieldType::Vector3;
+			if (fieldType == "System.Vector4") return ScriptFieldType::Vector4;
+			if (fieldType == "Razor.Entity")  return ScriptFieldType::Entity;
 
 			RZ_CORE_ERROR("Unknown ScriptFieldType");
 			return ScriptFieldType::None;

@@ -49,13 +49,17 @@ namespace Razor
 		ScriptClass GetType(const std::string& typeName);
 		ScriptClass GetBaseType(ScriptClass type);
 		std::vector<ScriptClass> GetSystemTypes();
+		std::vector<ScriptClass> GetComponentTypes();
 		ScriptObject CreateInstance(ScriptClass type);
+		uint64_t CreateScriptInstance(ScriptClass type);
 		void InvokeMethod(ScriptObject object, const std::string& methodName, float param);
+		ScriptInstance& GetScriptInstance(uint64_t instanceId);
 
 	private:
 		std::vector<Razor::Ref<Coral::ManagedObject>> ObjectPool;
 		std::unordered_map<int32_t, ScriptType> TypePool;
 		std::vector<Ref<Coral::ManagedAssembly>> AssemblyPool;
+		std::vector<ScriptInstance> ScriptInstancePool;
 	};
 }
 
