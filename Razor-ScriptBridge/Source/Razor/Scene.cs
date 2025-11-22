@@ -12,5 +12,15 @@ namespace Razor
         {
             return InternalCalls.GetEntitiesWithTransforms();
         }
+
+        public static uint[] GetEntitiesWithScriptComponent<T>()
+        {
+            return InternalCalls.GetEntitiesWithComponent<T>();
+        }
+
+        public static T GetComponent<T>(uint entity) where T : Component
+        {
+            return InternalCalls.GetComponent<T>(entity);
+        }
     }
 }

@@ -71,10 +71,7 @@ namespace Razor
 			Coral::Type& objType = assembly->GetType(type.GetName());
 			if (objType)
 			{
-				ScriptObject obj = CreateInstance(type);
-				if (obj.id == -1)
-					break;
-				ScriptInstance inst = ScriptInstance{ static_cast<uint64_t>(obj.id), type.GetName()};
+				ScriptInstance inst = ScriptInstance{ 0, type.GetName()};
 				for (const auto& [fieldName, field] : type.GetFields())
 				{
 					ScriptFieldInstance fieldInstance;
@@ -111,5 +108,28 @@ namespace Razor
 			throw std::out_of_range("Invalid ScriptInstance ID");
 		}
 		return ScriptInstancePool[instanceId];
+	}
+
+	int ScriptInterface::GetManagedTypeId(ScriptClass type)
+	{
+		for (auto& assembly : AssemblyPool)
+		{
+			Coral::Type& objType = assembly->GetType(type.GetName());
+			if (objType)
+			{
+				return objType.GetTypeId();
+			}
+		}
+		return -1;
+	}
+	
+	Ref<Coral::ManagedObject> ScriptInterface::GetManagedObject(int handle)
+	{
+		if (handle < 0 || handle >= ObjectPool.size())
+		{
+			RZ_CORE_ERROR("ScriptInterface(GetManagedObject): -> Invalid object handle: {0}", handle);
+			return nullptr;
+		}
+		return ObjectPool[handle];
 	}
 }

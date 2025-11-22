@@ -4,6 +4,9 @@
 #include "../Engine.h"
 #include "../Scene/Scene.h"
 #include "../Component.h"
+#include "../Core/Entity.h"
+#include "ScriptClass.h"
+#include "ScriptInterface.h"
 
 namespace Razor
 {
@@ -30,12 +33,73 @@ namespace Razor
 		*count = static_cast<int>(ids.size());
 		return ids.data();
 	}
+
+	static int Scene_GetEntitiesWithScriptComponent(int id, uint32_t* outBuffer, int* outCount)
+	{
+		static std::vector<uint32_t> ids;
+		ids.clear();
+		Ref<Scene> scene = Engine::Get().CurrentScene;
+		ScriptInterface& interface = Engine::Get().GetScriptInterface();
+		auto entities = scene->GetEntitiesWithComponents<ScriptComponent>();
+		for (const entt::entity& entity : entities)
+		{
+			ScriptComponent& comp = scene->GetEntity(entity)->GetComponent<ScriptComponent>();
+			for (uint64_t instanceHandle : comp.mScriptInstances)
+			{
+				ScriptInstance& instance = interface.GetScriptInstance(instanceHandle);
+				if (interface.GetManagedTypeId(interface.GetType(instance.className)) == id)
+				{
+					ids.push_back(static_cast<uint32_t>(entity));
+				}
+			}
+		}
+		
+		if (outBuffer == nullptr)
+		{
+			*outCount = (int)ids.size();
+			return 0;
+		}
+
+		int writeCount = std::min(*outCount, (int)ids.size());
+		memcpy(outBuffer, ids.data(), writeCount * sizeof(uint32_t));
+
+		*outCount = (int)ids.size();
+		return writeCount;
+	}
+
+	static int Util_GetTypeIdForManagedType(const char* fullName)
+	{
+		ScriptInterface& interface = Engine::Get().GetScriptInterface();
+		return interface.GetManagedTypeId(interface.GetType(fullName));
+	}
+
+	static void* Scene_GetComponentOnEntity(int typeId, uint32_t entityId)
+	{
+		Ref<Scene> scene = Engine::Get().CurrentScene;
+		ScriptInterface& interface = Engine::Get().GetScriptInterface();
+
+		Ref<Entity> entity = scene->GetEntity(static_cast<entt::entity>(entityId));
+		ScriptComponent& comp = entity->GetComponent<ScriptComponent>();
+		for (uint64_t instanceHandle : comp.mScriptInstances)
+		{
+			ScriptInstance& instance = interface.GetScriptInstance(instanceHandle);
+			if (interface.GetManagedTypeId(interface.GetType(instance.className)) == typeId)
+			{
+				return interface.GetManagedObject(instance.handle)->GetHandle();
+			}
+		}
+
+		return nullptr;
+	}
 	
 	void ScriptGlue::RegisterFunctions(Ref<Coral::ManagedAssembly> Assembly)
 	{
 		Assembly->AddInternalCall("Razor.InternalCalls", "Entity_HasComponent", (void*)Entity_HasComponent);
 		Assembly->AddInternalCall("Razor.InternalCalls", "Print_Message", (void*)Print_Message);
 		Assembly->AddInternalCall("Razor.InternalCalls", "Scene_GetEntitiesWithTransforms", (void*)Scene_GetEntitiesWithTransforms);
+		Assembly->AddInternalCall("Razor.InternalCalls", "Scene_GetEntitiesWithScriptComponent", (void*)Scene_GetEntitiesWithScriptComponent);
+		Assembly->AddInternalCall("Razor.InternalCalls", "Util_GetTypeIdForManagedType", (void*)Util_GetTypeIdForManagedType);
+		Assembly->AddInternalCall("Razor.InternalCalls", "Scene_GetComponentOnEntity", (void*)Scene_GetComponentOnEntity);
 
 		Assembly->UploadInternalCalls();
 	}

@@ -54,6 +54,8 @@ namespace Razor
 		uint64_t CreateScriptInstance(ScriptClass type);
 		void InvokeMethod(ScriptObject object, const std::string& methodName, float param);
 		ScriptInstance& GetScriptInstance(uint64_t instanceId);
+		int GetManagedTypeId(ScriptClass type);
+		Ref<Coral::ManagedObject> GetManagedObject(int handle);
 
 	private:
 		std::vector<Razor::Ref<Coral::ManagedObject>> ObjectPool;

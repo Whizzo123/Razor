@@ -49,6 +49,7 @@ namespace Razor
 		static ScriptFieldMap& GetScriptFieldMap(Entity entity);
 		static std::vector<ScriptClass> GetSystemClasses();
 		static std::vector<ScriptClass> GetComponentClasses();
+		static Coral::Type* GetManagedType(ScriptClass type);
 
 	private:
 		static Coral::HostInstance CoralInstance;
