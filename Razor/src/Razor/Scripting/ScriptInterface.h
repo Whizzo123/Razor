@@ -39,6 +39,10 @@ namespace Razor
 	{
 		int id;
 		ScriptClass type;
+		operator bool() const
+		{
+			return id >= 0;
+		}
 	};
 
 	class RAZOR_API ScriptInterface
@@ -56,6 +60,8 @@ namespace Razor
 		ScriptInstance& GetScriptInstance(uint64_t instanceId);
 		int GetManagedTypeId(ScriptClass type);
 		Ref<Coral::ManagedObject> GetManagedObject(int handle);
+		void DestroyInstanceObject(int handle);
+		void ClearObjectPool();
 
 	private:
 		std::vector<Razor::Ref<Coral::ManagedObject>> ObjectPool;

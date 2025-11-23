@@ -26,14 +26,8 @@ namespace Razor
 		ScriptClass EntityClass;
 
 		std::unordered_map<std::string, Ref<ScriptClass>> ScriptClasses;
-		//std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;
 		std::unordered_map<uint32_t, ScriptFieldMap> EntityScriptFields;
 		std::vector<ScriptInstance> ScriptInstances;
-
-		//Scope<filewatch::FileWatch<std::string>> AppAssemblyFileWatcher;
-		//bool AssemblyReloadPending = false;
-
-		// Runtime
 
 		Scene* SceneContext = nullptr;
 	};

@@ -255,82 +255,12 @@ namespace Razor
 		}
 		RZ_CORE_INFO("Starting Runtime");
 		bIsRuntimeRunning.store(true);
+		CurrentScene->StartScene();
 		RuntimeThread = std::thread(&Engine::RunRuntime, this);
 	}
 
 	void Engine::RunRuntime()
 	{
-		for (auto entity : CurrentScene->GetEntitiesWithComponents<ScriptComponent>())
-		{
-			for (auto handle : CurrentScene->GetEntity(entity)->GetComponent<ScriptComponent>().mScriptInstances)
-			{
-				ScriptInstance& instance = ScriptInterface->GetScriptInstance(handle);
-				ScriptObject obj = ScriptInterface->CreateInstance(ScriptInterface->GetType(instance.className));
-				Ref<Coral::ManagedObject> manObj = ScriptInterface->GetManagedObject(obj.id);
-				for (auto field : instance.fields)
-				{
-					switch (field.Field.GetType())
-					{
-					case ScriptFieldType::Float:
-					{
-						float value = field.GetValue<float>();
-						manObj->SetFieldValue<float>(field.Field.Name, value);
-						break;
-					}
-					case ScriptFieldType::Double:
-					{
-						double value = field.GetValue<double>();
-						manObj->SetFieldValue<double>(field.Field.Name, value);
-						break;
-					}
-					case ScriptFieldType::Bool:
-					{
-						bool value = field.GetValue<bool>();
-						manObj->SetFieldValue<bool>(field.Field.Name, value);
-						break;
-					}
-					case ScriptFieldType::Char:
-					{
-						char value = field.GetValue<char>();
-						manObj->SetFieldValue<char>(field.Field.Name, value);
-						break;
-					}
-					case ScriptFieldType::String:
-					{
-						std::string value = field.GetValue<std::string>();
-						Coral::String valueStr = Coral::String::New(value);
-						manObj->SetFieldValue<Coral::String>(field.Field.Name, valueStr);
-						break;
-					}
-					case ScriptFieldType::Int:
-					{
-						int value = field.GetValue<int>();
-						manObj->SetFieldValue<int>(field.Field.Name, value);
-						break;
-					}
-					case ScriptFieldType::Vector2:
-					{
-						Vector2 value = field.GetValue<Vector2>();
-						manObj->SetFieldValue<Vector2>(field.Field.Name, value);
-						break;
-					}
-					case ScriptFieldType::Vector3:
-					{
-						Vector3 value = field.GetValue<Vector3>();
-						manObj->SetFieldValue<Vector3>(field.Field.Name, value);
-						break;
-					}
-					case ScriptFieldType::Entity:
-					{
-						Entity value = field.GetValue<Entity>();
-						manObj->SetFieldValue<Entity>(field.Field.Name, value);
-						break;
-					}
-					}
-				}
-				instance.handle = obj.id;
-			}
-		}
 		while (bIsRuntimeRunning)
 		{
 			Step();
@@ -349,5 +279,6 @@ namespace Razor
 		{
 			RuntimeThread.join();
 		}
+		CurrentScene->StopScene();
 	}
 }

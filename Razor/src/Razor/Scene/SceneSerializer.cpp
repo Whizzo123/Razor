@@ -148,9 +148,10 @@ namespace Razor
 		yaml_emitter_end_seq(Out);
 		yaml_emitter_key(Out, "Systems");
 		yaml_emitter_value_seq(Out);
-		for (const auto& SystemObj : OutScene->SystemObjects)
+		for (uint64_t handle : OutScene->mSystemInstanceHandles)
 		{
-			yaml_emitter_value_string(Out, SystemObj.type.GetName().c_str());
+			ScriptInstance& instance = Engine::Get().GetScriptInterface().GetScriptInstance(handle);
+			yaml_emitter_value_string(Out, instance.className.c_str());
 		}
 		yaml_emitter_end_seq(Out);
 		yaml_emitter_end_map(Out);
@@ -221,7 +222,7 @@ namespace Razor
 			if (type)
 			{
 				RZ_CORE_INFO("Creating System Object for type: {0}", typeName);
-				OutScene->CreateSystemObject(type);
+				OutScene->CreateSystemInstance(type);
 			}
 			else
 			{

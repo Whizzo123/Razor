@@ -47,6 +47,7 @@ namespace Razor
 				return GetType(objType.GetBaseType().GetFullName());
 			}
 		}
+		return ScriptClass();
 	}
 
 	ScriptObject ScriptInterface::CreateInstance(ScriptClass type)
@@ -131,5 +132,18 @@ namespace Razor
 			return nullptr;
 		}
 		return ObjectPool[handle];
+	}
+
+	void ScriptInterface::DestroyInstanceObject(int handle)
+	{
+		ScriptInstance& instance = GetScriptInstance(handle);
+		Ref<Coral::ManagedObject> object = GetManagedObject(handle);
+		object->Destroy();
+		instance.handle = 0;
+	}
+
+	void ScriptInterface::ClearObjectPool()
+	{
+		ObjectPool.clear();
 	}
 }

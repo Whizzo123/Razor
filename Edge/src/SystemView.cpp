@@ -26,14 +26,11 @@ namespace EdgeEditor
 		}
 		int selectedIdx = 0;
 		const char** data = SystemClassNames.data();
-		if (Razor::RazorImGui::Combo("Add System", data, SystemClassNames.size(),  &selectedIdx))
-		{
-			
-		}
+		if (Razor::RazorImGui::Combo("Add System", data, SystemClassNames.size(),  &selectedIdx)) {}
 
 		if (Razor::RazorImGui::Button("Add"))
 		{
-			CurrentScene->CreateSystemObject(Engine.GetScriptInterface().GetType(SystemClassNames[selectedIdx]));
+			CurrentScene->CreateSystemInstance(Engine.GetScriptInterface().GetType(SystemClassNames[selectedIdx]));
 		}
 
 		if (Razor::RazorImGui::TreeNode("Systems"))
