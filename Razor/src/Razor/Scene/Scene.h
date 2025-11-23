@@ -7,7 +7,8 @@ namespace Razor
 {
 	class Entity;
 	struct ScriptObject;
-	struct ScriptType;
+	struct ScriptClass;
+	struct ScriptInstance;
 
 	class RAZOR_API Scene
 	{
@@ -33,12 +34,20 @@ namespace Razor
 		}
 
 		void RunSystems(float DeltaTime);
-		void CreateSystemObject(const Razor::ScriptType& Type);
+		void CreateSystemInstance(const Razor::ScriptClass& Type);
+		std::vector<std::string> GetSystemNames() const;
+
+		void StartScene();
+		void CreateInstanceObjects(std::vector<uint64_t> handles);
+		void PopulateObjectFields(ScriptInstance& instance, uint64_t objId);
+		void StopScene();
 
 		entt::registry registry;
 	private:
 		std::string FilePath;
-		std::vector<ScriptObject> SystemObjects;
+		std::vector<uint64_t> mSystemInstanceHandles;
+
+		friend class SceneSerializer;
 	};
 }
 

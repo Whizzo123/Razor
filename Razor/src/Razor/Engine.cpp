@@ -33,6 +33,8 @@
 #include "Scripting/ScriptInterface.h"
 #include "Scene/Project.h"
 #include "IO/File/ProjectSerializer.h"
+#include "Core/Entity.h"
+#include <Coral/ManagedObject.hpp>
 
 namespace Razor
 {
@@ -253,6 +255,7 @@ namespace Razor
 		}
 		RZ_CORE_INFO("Starting Runtime");
 		bIsRuntimeRunning.store(true);
+		CurrentScene->StartScene();
 		RuntimeThread = std::thread(&Engine::RunRuntime, this);
 	}
 
@@ -276,5 +279,6 @@ namespace Razor
 		{
 			RuntimeThread.join();
 		}
+		CurrentScene->StopScene();
 	}
 }

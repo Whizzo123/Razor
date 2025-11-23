@@ -53,12 +53,30 @@ namespace Razor
 		{
 			std::string Name = Type->GetFullName();
 			const char* splitter = ".";
-			Ref<ScriptClass> Class = CreateRef<ScriptClass>(std::strtok(&Name[0], splitter), Type->GetFullName());
+			bool bIsSystem = false;
+			bool bIsComponent = false;
+			Coral::Type& baseType = Type->GetBaseType();
+			while (baseType) 
+			{
+				if (baseType.GetFullName() == "Razor.System") {
+					RZ_CORE_INFO("Found System Class: {0}",  std::string(Type->GetFullName()));
+					bIsSystem = true;
+					break;
+				}
+				if (baseType.GetFullName() == "Razor.Component") {
+					RZ_CORE_INFO("Found Component Class: {0}", std::string(Type->GetFullName()));
+					bIsComponent = true;
+					break;
+				}
+				baseType = baseType.GetBaseType();
+			}
+
+			Ref<ScriptClass> Class = CreateRef<ScriptClass>(std::strtok(&Name[0], splitter), Type->GetFullName(), bIsSystem, bIsComponent);
 			s_Data->ScriptClasses[Type->GetFullName()] = Class;
 
 			for (Coral::FieldInfo& Field : Type->GetFields())
 			{
-				Class->m_Fields[Field.GetName()] = { Field.GetType(), Field.GetName(), Field };
+				Class->m_Fields[Field.GetName()] = { Field.GetType().GetFullName(), Field.GetName()};
 			}
 		}
 
@@ -84,9 +102,29 @@ namespace Razor
 		return s_Data->EntityScriptFields[static_cast<uint32_t>(entity.EntityHandle)];
 	}
 
-	ScriptClass::ScriptClass(const std::string& classNamespace, const std::string& className, bool isCore)
-		: m_ClassNamespace(classNamespace), m_ClassName(className)
+	std::vector<ScriptClass> ScriptEngine::GetSystemClasses()
 	{
-		
+		std::vector<ScriptClass> systemClasses;
+		for (const auto& [name, scriptClass] : s_Data->ScriptClasses)
+		{
+			if (scriptClass->IsSystemClass())
+			{
+				systemClasses.push_back(*scriptClass);
+			}
+		}
+		return systemClasses;
+	}
+
+	std::vector<ScriptClass> ScriptEngine::GetComponentClasses()
+	{
+		std::vector<ScriptClass> componentClasses;
+		for (const auto& [name, scriptClass] : s_Data->ScriptClasses)
+		{
+			if (scriptClass->m_IsComponentClass)
+			{
+				componentClasses.push_back(*scriptClass);
+			}
+		}
+		return componentClasses;
 	}
 }

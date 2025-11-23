@@ -1,5 +1,6 @@
 #pragma once
 #include "../Core.h"
+#include "ScriptClass.h"
 #include <vector>
 #include <unordered_map>
 
@@ -11,6 +12,7 @@ namespace Coral
 
 namespace Razor
 {
+
 	struct ScriptAssembly
 	{
 		int assemblyIndex = -1;
@@ -36,7 +38,11 @@ namespace Razor
 	struct ScriptObject
 	{
 		int id;
-		ScriptType type;
+		ScriptClass type;
+		operator bool() const
+		{
+			return id >= 0;
+		}
 	};
 
 	class RAZOR_API ScriptInterface
@@ -44,16 +50,24 @@ namespace Razor
 	public:
 		ScriptInterface();
 		ScriptAssembly LoadAssembly(std::string assemblyPath, bool isBridgeAssembly);
-		ScriptType GetType(ScriptAssembly assembly, const std::string& typeName);
-		ScriptType GetBaseType(ScriptType type);
-		std::vector<ScriptType> GetTypes(ScriptAssembly assembly);
-		ScriptObject CreateInstance(ScriptType type);
+		ScriptClass GetType(const std::string& typeName);
+		ScriptClass GetBaseType(ScriptClass type);
+		std::vector<ScriptClass> GetSystemTypes();
+		std::vector<ScriptClass> GetComponentTypes();
+		ScriptObject CreateInstance(ScriptClass type);
+		uint64_t CreateScriptInstance(ScriptClass type);
 		void InvokeMethod(ScriptObject object, const std::string& methodName, float param);
+		ScriptInstance& GetScriptInstance(uint64_t instanceId);
+		int GetManagedTypeId(ScriptClass type);
+		Ref<Coral::ManagedObject> GetManagedObject(int handle);
+		void DestroyInstanceObject(int handle);
+		void ClearObjectPool();
 
 	private:
 		std::vector<Razor::Ref<Coral::ManagedObject>> ObjectPool;
 		std::unordered_map<int32_t, ScriptType> TypePool;
 		std::vector<Ref<Coral::ManagedAssembly>> AssemblyPool;
+		std::vector<ScriptInstance> ScriptInstancePool;
 	};
 }
 

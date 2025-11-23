@@ -2,11 +2,25 @@ Scene: Untitled
 Entities:
   - Entity: 1
     Transform:
-      Position: [10, 0, 0]
+      Position: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [0, 0, 0]
+    ScriptComponent:
+      - Sandbox.Player:
+          ScriptFields:
+            - Name:
+                Type: System.String
+                Data: Joey
   - Entity: 0
     Transform:
-      Position: [0, 10, 0]
+      Position: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [0, 0, 0]
+    ScriptComponent:
+      - Sandbox.Player:
+          ScriptFields:
+            - Name:
+                Type: System.String
+                Data: Laurz
+Systems:
+  - Sandbox.PlayerMovement

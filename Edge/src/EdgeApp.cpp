@@ -9,6 +9,7 @@
 #include "EditorCamera.h"
 #include "Gui/NewProjectPopupWindow.h"
 #include "Gui/OpenProjectPopupWindow.h"
+#include "SystemView.h"
 
 
 
@@ -118,6 +119,7 @@ void Edge::Run()
 	EdgeEditor::Inspector InspectorWindow(Storage);
 	EdgeEditor::SceneView SceneViewWindow(Storage);
 	EdgeEditor::ProjectExplorer ProjectExplorerWindow(Storage);
+	EdgeEditor::SystemView SystemViewWindow;
 
 	Razor::SceneSerializer::Deserialize(Engine.CurrentScene);
 	while (!Engine.ShouldEngineClose())
@@ -144,6 +146,7 @@ void Edge::Run()
 		InspectorWindow.Render();
 		SceneViewWindow.Render();
 		ProjectExplorerWindow.Render();
+		SystemViewWindow.Render();
 		RenderSceneViewport(SceneBuffer);
 		Razor::RazorImGui::ShowMetricsWindow();
 		Razor::RazorImGui::End();

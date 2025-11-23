@@ -2,6 +2,7 @@
 
 #include "../Core.h"
 #include <vector>
+#include <unordered_map>
 
 namespace Razor
 {
@@ -29,6 +30,9 @@ namespace Razor
 	RAZOR_API void yaml_node_push_back(YamlNode* node, void* val);
 
 	RAZOR_API std::vector<YamlNode*> yaml_get_children(YamlNode* node, const char* key);
+	RAZOR_API std::vector<YamlNode*> yaml_get_children(YamlNode* node);
+	RAZOR_API std::unordered_map<const char*, YamlNode*> yaml_get_children_map(YamlNode* node, const char* key);
+	RAZOR_API std::vector<std::pair<std::string, YamlNode*>> yaml_get_children_map(YamlNode* node);
 
 	// Query scalar types
 	RAZOR_API std::string yaml_as_string(YamlNode* node);
@@ -70,6 +74,7 @@ namespace Razor
 	RAZOR_API void yaml_emitter_value_float(YamlEmitter* emitter, float value);
 	RAZOR_API void yaml_emitter_value_bool(YamlEmitter* emitter, int value);
 	RAZOR_API void yaml_emitter_value_seq(YamlEmitter* emitter);
+	RAZOR_API void yaml_emitter_value_map(YamlEmitter* emitter);
 	RAZOR_API void yaml_emitter_value_int32(YamlEmitter* emitter, uint32_t value);
 	RAZOR_API void yaml_emitter_value_vec2(YamlEmitter* emitter, const Vector2& value);
 	RAZOR_API void yaml_emitter_value_vec3(YamlEmitter* emitter, const Vector3& value);
@@ -80,4 +85,6 @@ namespace Razor
 
 	// Retrieve final emitted string
 	RAZOR_API int yaml_emitter_get_string(YamlEmitter* emitter, char* buffer, int bufferSize);
+
+	std::pair<std::string, YamlNode*> yaml_map_entry(YamlNode* node, size_t index);
 }

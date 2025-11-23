@@ -369,6 +369,114 @@ namespace Razor
 		return outChildren;
 	}
 
+    std::vector<YamlNode*> yaml_get_children(YamlNode* node)
+    {
+        std::vector<YamlNode*> result;
+        if (!node)
+            return result;
+
+        auto impl = reinterpret_cast<YamlNodeImpl*>(node);
+
+        for (int i = 0; i < impl->node.size(); i++)
+        {
+            auto childImpl = new YamlNodeImpl();
+            childImpl->node = impl->node[i];
+            result.push_back(reinterpret_cast<YamlNode*>(childImpl));
+        }
+
+        return result;
+    }
+
+    std::vector<std::pair<std::string, YamlNode*>> yaml_get_children_map(YamlNode* node)
+    {
+        std::vector<std::pair<std::string, YamlNode*>> result;
+        if (!node)
+            return result;
+
+        auto impl = reinterpret_cast<YamlNodeImpl*>(node);
+
+        if (!impl->node.IsMap())
+            return result;
+
+        size_t count = yaml_map_size(node);
+
+        for (size_t i = 0; i < count; i++)
+        {
+			std::pair<std::string, YamlNode*> pair = yaml_map_entry(node, i);
+
+            if (!pair.first.empty() && pair.second)
+                result.push_back(pair);
+        }
+
+        return result;
+    }
+
+    std::pair<std::string, YamlNode*> yaml_map_entry(YamlNode* node, size_t index)
+    {
+        std::pair<std::string, YamlNode*> result{ "", nullptr };
+
+        if (!node)
+            return result;
+
+        auto impl = reinterpret_cast<YamlNodeImpl*>(node);
+
+        if (!impl->node.IsMap())
+            return result;
+            
+        int i = 0;
+        for (auto it = impl->node.begin(); it != impl->node.end(); ++it, ++i)
+        {
+            if (i == index)
+            {
+                YamlNodeImpl* child = new YamlNodeImpl();
+                child->node = it->second;
+                std::string name = it->first.as<std::string>();
+                return result = { name, reinterpret_cast<YamlNode*>(child) };
+            }
+        }
+
+        return result;
+    }
+
+    std::unordered_map<const char*, YamlNode*> yaml_get_children_map(YamlNode* node, const char* key)
+    {
+        std::unordered_map<const char*, YamlNode*> outChildren;
+        if (!node || !key)
+        {
+            return outChildren;
+        }
+        auto impl = reinterpret_cast<YamlNodeImpl*>(node);
+        try
+        {
+            YAML::Node children = impl->node[key];
+            if (children.IsSequence())
+            {
+                for (int i = 0; i < children.size(); i++) 
+                {
+                    auto childImpl = new YamlNodeImpl();
+                    childImpl->node = children[i];
+                    std::string name = children[i].as<std::string>();
+                    outChildren[name.c_str()] = reinterpret_cast<YamlNode*>(childImpl);
+                }
+            }
+            if (children.IsMap())
+            {
+                for (auto it = children.begin(); it != children.end(); ++it)
+                {
+                    auto childImpl = new YamlNodeImpl();
+                    childImpl->node = it->second;
+                    outChildren[it->first.as<std::string>().c_str()] = reinterpret_cast<YamlNode*>(childImpl);
+                }
+            }
+        }
+        catch (...)
+        {
+            set_error("Error getting children from YAML node");
+        }
+
+        return outChildren;
+    }
+
     std::string yaml_as_string(YamlNode* node) 
     {
         if (!node) return 0;
@@ -648,6 +756,11 @@ namespace Razor
     {
 		if (emitter) reinterpret_cast<YamlEmitterImpl*>(emitter)->out << YAML::Value << YAML::BeginSeq;
 	}
+
+    void yaml_emitter_value_map(YamlEmitter* emitter)
+    {
+        if (emitter) reinterpret_cast<YamlEmitterImpl*>(emitter)->out << YAML::Value << YAML::BeginMap;
+    }
 
 	const char* yaml_emitter_cstr(YamlEmitter* emitter) {
 		if (!emitter) return nullptr;

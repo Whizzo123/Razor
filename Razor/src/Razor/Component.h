@@ -132,7 +132,7 @@ namespace Razor
 
 	struct ScriptComponent
 	{
-		std::string ClassName;
+		std::vector<uint64_t> mScriptInstances;
 
 		ScriptComponent() = default;
 		ScriptComponent(const ScriptComponent&) = default;
