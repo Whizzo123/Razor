@@ -1,5 +1,6 @@
 #include "RSPickBufferMaterialPass.h"
 #include "../Component.h"
+#include "../Engine.h"
 
 namespace Razor
 {
@@ -8,7 +9,9 @@ namespace Razor
 		auto View = CurrentScene->GetEntitiesWithComponents<Mesh>();
 		for (auto RenderingEntity : View)
 		{
-			Material& EntityMat = CurrentScene->GetComponent<Mesh>(RenderingEntity).Model->GetMaterial();
+			Mesh& EntityMesh = CurrentScene->GetComponent<Mesh>(RenderingEntity);
+			AssetWrapper<Model>* Model = Engine::Get().GetAssetDirectory()->ProcessRequest<Razor::Model>(EntityMesh.mKey);
+			Material& EntityMat = Model->asset.GetMaterial();
 			auto View = CurrentScene->GetEntitiesWithComponents<Material>();
 
 			if (Properties.Properties.find(RenderingEntity) == Properties.Properties.end())

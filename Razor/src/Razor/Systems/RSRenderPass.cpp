@@ -1,4 +1,6 @@
 #include "RSRenderPass.h"
+#include "../Assets/AssetDirectory.h"
+#include "../Engine.h"
 
 namespace Razor
 {
@@ -9,8 +11,9 @@ namespace Razor
 		for (auto EntityToRender : View)
 		{
 			Mesh& EntityMesh = CurrentScene->GetComponent<Mesh>(EntityToRender);
-			Material& EntityMaterial = EntityMesh.Model->GetMaterial();
-			for (const MeshData& Child : EntityMesh.Model->GetModelMeshData())
+			AssetWrapper<Model>* Model = Engine::Get().GetAssetDirectory()->ProcessRequest<Razor::Model>(EntityMesh.mKey);
+			Material& EntityMaterial = Model->asset.GetMaterial();
+			for (const MeshData& Child : Model->asset.GetModelMeshData())
 			{
 				Renderer->UseShader(EntityMaterial.ShaderID);
 				if (Properties.Properties.find(EntityToRender) == Properties.Properties.end())

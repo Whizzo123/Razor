@@ -9,6 +9,7 @@
 #include <memory>
 #include "IO/RazorIO.h"
 #include "Renderer/Model.h"
+#include "Assets/AssetDirectory.h"
 
 namespace Razor
 {
@@ -81,9 +82,9 @@ namespace Razor
 
 	struct Mesh
 	{
-		Mesh() {}
-		Mesh(Ref<Model> Model) : Model(Model) {}
-		Ref<Model> Model;
+		Mesh() : mKey(AssetKey("")) {}
+		Mesh(AssetKey assetKey) : mKey(assetKey) {}
+		AssetKey mKey;
 	};
 
 	struct Collider

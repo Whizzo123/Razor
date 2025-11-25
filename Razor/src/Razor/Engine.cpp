@@ -35,6 +35,7 @@
 #include "IO/File/ProjectSerializer.h"
 #include "Core/Entity.h"
 #include <Coral/ManagedObject.hpp>
+#include "Assets/AssetDirectory.h"
 
 namespace Razor
 {
@@ -280,5 +281,10 @@ namespace Razor
 			RuntimeThread.join();
 		}
 		CurrentScene->StopScene();
+	}
+
+	Ref<AssetDirectory> Engine::GetAssetDirectory()
+	{
+		return _mAssetDirectory;
 	}
 }

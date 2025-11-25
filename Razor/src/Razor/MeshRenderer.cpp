@@ -11,7 +11,7 @@ namespace Razor
         for (auto Entity : View)
         {
             Mesh& EntityMesh = CurrentScene->GetComponent<Mesh>(Entity);
-            InitMesh(EntityMesh.Model->GetModelMeshData());
+
         }
     }
 

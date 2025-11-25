@@ -20,6 +20,7 @@ namespace Razor
 	class ITimeProvider;
 	class Scene;
 	class ScriptInterface;
+	class AssetDirectory;
 
 	struct Light;
 	struct RenderStageConfig;
@@ -162,6 +163,8 @@ namespace Razor
 
 		Ref<Scene> CurrentScene; /** Ref to the current scene we have*/
 
+		Ref<AssetDirectory> GetAssetDirectory();
+
 	private:
 		
 		void RenderImGui(uint64_t SceneTexture);
@@ -182,6 +185,7 @@ namespace Razor
 		Ref<Project> LoadedProject;
 		Scope<ScriptAssembly> BridgeAssembly;
 		Scope<ScriptAssembly> GameAssembly;
+		Ref<AssetDirectory> _mAssetDirectory;
 
 		std::atomic<bool> bIsRuntimeRunning { false };
 		std::thread RuntimeThread;

@@ -11,7 +11,8 @@ namespace Razor
 		for (auto EntityToRender : View)
 		{
 			Mesh& EntityMesh = CurrentScene->GetComponent<Mesh>(EntityToRender);
-			for (const MeshData& Child : EntityMesh.Model->GetModelMeshData())
+			AssetWrapper<Model>* Model = Engine::Get().GetAssetDirectory()->ProcessRequest<Razor::Model>(EntityMesh.mKey);
+			for (const MeshData& Child : Model->asset.GetModelMeshData())
 			{
 				Renderer->UseShader(Engine::Get().GetShaderForType(typeid(PickBufferShader).name())->ID);
 				if (Properties.Properties.find(EntityToRender) == Properties.Properties.end())

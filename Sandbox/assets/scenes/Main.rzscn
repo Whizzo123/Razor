@@ -10,7 +10,7 @@ Entities:
           ScriptFields:
             - Name:
                 Type: System.String
-                Data: Joey
+                Data: Laurz
   - Entity: 0
     Transform:
       Position: [0, 0, 0]
@@ -21,6 +21,6 @@ Entities:
           ScriptFields:
             - Name:
                 Type: System.String
-                Data: Laurz
+                Data: Joey
 Systems:
   - Sandbox.PlayerMovement
