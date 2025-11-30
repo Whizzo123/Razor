@@ -53,6 +53,7 @@ private:
 	Razor::Vector2 ViewportSize { 0.0f, 0.0f }; /** 2D vector to hold size of viewport window */
 	Razor::Vector2 ViewportPos { 0.0f, 0.0f }; /** 2D vector to hold position of image displaying scene texture for viewport*/
 	Razor::Ref<EdgeEditor::EditorStorage> Storage; /** Container object to hold data to be shared among windows*/
+	EdgeEditor::ProjectExplorer _mProjectExplorerWindow;
 };
 
 Razor::Application* Razor::CreateApplication()
@@ -118,7 +119,7 @@ void Edge::Run()
 
 	EdgeEditor::Inspector InspectorWindow(Storage);
 	EdgeEditor::SceneView SceneViewWindow(Storage);
-	EdgeEditor::ProjectExplorer ProjectExplorerWindow(Storage);
+	_mProjectExplorerWindow = EdgeEditor::ProjectExplorer(Storage);
 	EdgeEditor::SystemView SystemViewWindow;
 
 	Razor::SceneSerializer::Deserialize(Engine.CurrentScene);
@@ -145,7 +146,7 @@ void Edge::Run()
 		CreateDockspace("Edge");
 		InspectorWindow.Render();
 		SceneViewWindow.Render();
-		ProjectExplorerWindow.Render();
+		_mProjectExplorerWindow.Render();
 		SystemViewWindow.Render();
 		RenderSceneViewport(SceneBuffer);
 		Razor::RazorImGui::ShowMetricsWindow();
@@ -255,6 +256,7 @@ void Edge::CreateDockspace(const std::string& Title)
 void Edge::OnNewProjectSet()
 {
 	Razor::Engine& Engine = Razor::Engine::Get();
-	Engine.LoadProject(Storage->GetProject());
-	// We need to be able to iterate through types avaliable, create instances of a type, invoke methods on this type, load assemblies
+	Engine.LoadProject(Storage->GetProjectPath());
+	_mProjectExplorerWindow.Refresh(Engine.GetAssetDirectory()->GetRootFolder());
+	
 }

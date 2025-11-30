@@ -12,6 +12,10 @@ namespace Razor
 		{
 			Mesh& EntityMesh = CurrentScene->GetComponent<Mesh>(RenderingEntity);
 			AssetWrapper<Model>* Model = Engine::Get().GetAssetDirectory()->ProcessRequest<Razor::Model>(EntityMesh.mKey);
+			if (!Model)
+			{
+				continue;
+			}
 			Material& EntityMat = Model->asset.GetMaterial();
 			if (Properties.Properties.find(RenderingEntity) == Properties.Properties.end())
 			{

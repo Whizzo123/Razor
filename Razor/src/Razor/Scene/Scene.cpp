@@ -181,4 +181,11 @@ namespace Razor
 
 		interface.ClearObjectPool();
 	}
+
+	void Scene::MoveFrom(Scene&& other)
+	{
+		this->registry = std::move(other.registry);
+		this->FilePath = std::move(other.FilePath);
+		this->mSystemInstanceHandles = std::move(other.mSystemInstanceHandles);
+	}
 }

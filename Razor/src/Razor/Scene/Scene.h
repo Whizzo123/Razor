@@ -15,6 +15,20 @@ namespace Razor
 	public:
 		Scene(const std::string& Path);
 		~Scene();
+
+		Scene(const Scene&) = delete; // No copy construction
+		Scene& operator=(const Scene&) = delete; // No copy assigment
+
+		Scene(Scene&& other) noexcept { MoveFrom(std::move(other)); }
+		Scene& operator=(Scene && other) noexcept 
+		{
+			if (this != &other)
+			{
+				MoveFrom(std::move(other));
+			}
+			return *this;
+		}
+
 		std::string& GetPath() { return FilePath; }
 
 		Ref<Entity> CreateEntity();
@@ -42,7 +56,12 @@ namespace Razor
 		void PopulateObjectFields(ScriptInstance& instance, uint64_t objId);
 		void StopScene();
 
+		
+
 		entt::registry registry;
+	private:
+		void MoveFrom(Scene&& other);
+
 	private:
 		std::string FilePath;
 		std::vector<uint64_t> mSystemInstanceHandles;

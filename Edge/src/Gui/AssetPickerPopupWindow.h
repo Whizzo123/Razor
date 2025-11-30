@@ -3,7 +3,6 @@
 #include <stack>
 #include <string>
 #include <vector>
-#include "Razor.h"
 
 namespace EdgeEditor
 {

@@ -1,6 +1,6 @@
 #include "AssetPickerPopupWindow.h"
 #include <filesystem>
-
+#include "Razor.h"
 
 
 namespace EdgeEditor
@@ -61,14 +61,15 @@ namespace EdgeEditor
 
 		for (const std::filesystem::directory_entry& DirectoryEntry : std::filesystem::directory_iterator(Path))
 		{
-			std::filesystem::path FilePath = DirectoryEntry.path();
-			std::string fileName = FilePath.string();
+			std::filesystem::path filePath = DirectoryEntry.path();
+			std::string fileName = filePath.string();
+			Razor::FilePath path(fileName);
 			bool bIsDirectory = false;
-			if (stat(fileName.c_str(), &sb) == 0 && (sb.st_mode & S_IFDIR))
+			if (stat(static_cast<std::string>(path).c_str(), &sb) == 0 && (sb.st_mode & S_IFDIR))
 			{
 				bIsDirectory = true;
 			}
-			fileNames.push_back({ fileName, bIsDirectory });
+			fileNames.push_back({ path, bIsDirectory });
 		}
 
 		return fileNames;

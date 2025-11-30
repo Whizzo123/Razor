@@ -25,6 +25,11 @@ namespace Razor
 			return key;
 		}
 
+		operator bool() const
+		{
+			return !key.empty();
+		}
+
 	private:
 		std::string key;
 
@@ -36,6 +41,13 @@ namespace Razor
 		size_t operator()(const AssetKey& key) const noexcept
 		{
 			return std::hash<std::string>()(key.GetKey());
+		}
+	};
+
+	struct AssetKeyEqual
+	{
+		bool operator()(AssetKey const& lhs, AssetKey const& rhs) const noexcept {
+			return lhs.GetKey() == rhs.GetKey() && lhs.GetKey() == rhs.GetKey();
 		}
 	};
 
@@ -54,17 +66,24 @@ namespace Razor
 		template<typename T> 
 		AssetWrapper<T>* ProcessRequest(AssetKey requestkey)
 		{
+			if (!requestkey)
+			{
+				return nullptr;
+			}
 			if constexpr (std::is_same_v<T, Model>)
 			{
 				if (_mModelCache.find(requestkey) == _mModelCache.end())
 				{
 					LoadModel(requestkey.key);
 				}
+				return &(_mModelCache[requestkey]);
 			}
-			return &(_mModelCache[requestkey]);
+			return nullptr;
 		}
 
 		std::vector<AssetKey> RequestKeys(const std::string& directoryPath);
+		
+		std::string GetRootFolder() const { return _mRootFolder; }
 
 	private:
 		template<typename T>

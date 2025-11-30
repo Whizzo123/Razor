@@ -1,5 +1,6 @@
 #include "AssetDirectory.h"
 #include "../MeshRenderer.h"
+#include "ModelSerializer.h"
 
 namespace Razor
 {
@@ -24,9 +25,9 @@ namespace Razor
 	}
 	void AssetDirectory::LoadModel(const std::string& assetPath)
 	{
-		Model model = Model();
-		model.LoadMesh(assetPath);
-		MeshRenderer::InitMesh(model.GetModelMeshData());
-		_mModelCache[AssetKey(assetPath)] = AssetWrapper<Model>({ model });
+		Ref<Model> model = CreateRef<Model>();
+		ModelSerializer::Deserialize(assetPath, model);
+		MeshRenderer::InitMesh(model->GetModelMeshData());
+		_mModelCache[assetPath] = AssetWrapper<Model>({ *model });
 	}
 }

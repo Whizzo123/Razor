@@ -24,3 +24,5 @@
 #include "Razor/ImGui/RazorImGui.h"
 #include "Razor/IO/YamlWrapper.h"
 #include "Razor/Core/Entity.h"
+#include "Razor/Assets/FilePath.h"
+#include "Razor/Assets/ModelSerializer.h"

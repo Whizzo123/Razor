@@ -11,6 +11,10 @@ namespace Razor
 		{
 			Mesh& EntityMesh = CurrentScene->GetComponent<Mesh>(RenderingEntity);
 			AssetWrapper<Model>* Model = Engine::Get().GetAssetDirectory()->ProcessRequest<Razor::Model>(EntityMesh.mKey);
+			if (!Model)
+			{
+				continue;
+			}
 			Material& EntityMat = Model->asset.GetMaterial();
 			auto View = CurrentScene->GetEntitiesWithComponents<Material>();
 

@@ -244,7 +244,8 @@ namespace Razor
 			SceneSerializer::Serialize(MainScene);
 			ProjectSerializer::Serialize("../", LoadedProject);
 		}
-		CurrentScene = MainScene;
+		*CurrentScene = std::move(*MainScene);
+		_mAssetDirectory = CreateRef<AssetDirectory>(Path + "/" + LoadedProject->m_AssetDirectory);
 	}
 
 	void Engine::RuntimeStart()
