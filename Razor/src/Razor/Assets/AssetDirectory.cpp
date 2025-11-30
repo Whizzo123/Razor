@@ -1,6 +1,8 @@
 #include "AssetDirectory.h"
 #include "../MeshRenderer.h"
 #include "ModelSerializer.h"
+#include "../Engine.h"
+#include "../Renderer/Shaders/DefaultMeshShader.h"
 
 namespace Razor
 {
@@ -28,6 +30,7 @@ namespace Razor
 		Ref<Model> model = CreateRef<Model>();
 		ModelSerializer::Deserialize(assetPath, model);
 		MeshRenderer::InitMesh(model->GetModelMeshData());
+		model->SetModelShader(Engine::Get().GetShaderForType(typeid(DefaultMeshShader).name())->ID);
 		_mModelCache[assetPath] = AssetWrapper<Model>({ *model });
 	}
 }

@@ -10,19 +10,19 @@ namespace EdgeEditor
 
 		if (Razor::RazorIO::Get().GetStateForKey(Razor::RazorKey::W) == Razor::KEY_PRESSED || Razor::RazorIO::Get().GetStateForKey(Razor::RazorKey::W) == Razor::KEY_HELD)
 		{
-			Camera.CameraPos += CameraSpeed * CameraFront;
+			//Camera.CameraPos += CameraSpeed * CameraFront;
 		}
 		if (Razor::RazorIO::Get().GetStateForKey(Razor::RazorKey::S) == Razor::KEY_PRESSED || Razor::RazorIO::Get().GetStateForKey(Razor::RazorKey::S) == Razor::KEY_HELD)
 		{
-			Camera.CameraPos -= CameraSpeed * CameraFront;
+			//Camera.CameraPos -= CameraSpeed * CameraFront;
 		}
 		if (Razor::RazorIO::Get().GetStateForKey(Razor::RazorKey::A) == Razor::KEY_PRESSED || Razor::RazorIO::Get().GetStateForKey(Razor::RazorKey::A) == Razor::KEY_HELD)
 		{
-			Camera.CameraPos -= glm::normalize(glm::cross(CameraFront, CameraUp)) * CameraSpeed;
+			//Camera.CameraPos -= glm::normalize(glm::cross(CameraFront, CameraUp)) * CameraSpeed;
 		}
 		if (Razor::RazorIO::Get().GetStateForKey(Razor::RazorKey::D) == Razor::KEY_PRESSED || Razor::RazorIO::Get().GetStateForKey(Razor::RazorKey::D) == Razor::KEY_HELD)
 		{
-			Camera.CameraPos += glm::normalize(glm::cross(CameraFront, CameraUp)) * CameraSpeed;
+			//Camera.CameraPos += glm::normalize(glm::cross(CameraFront, CameraUp)) * CameraSpeed;
 		}
 
 		const Razor::Vector2D CurrentMouseCoords = Razor::RazorIO::Get().CurrentMousePos;

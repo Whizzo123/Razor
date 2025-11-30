@@ -595,7 +595,7 @@ namespace Razor
 
     ModelInfo yaml_as_modelinfo(YamlNode* node)
     {
-        if (!node)
+        if (node)
         {
             if (YamlNodeImpl* impl = reinterpret_cast<YamlNodeImpl*>(node))
             {

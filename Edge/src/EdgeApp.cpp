@@ -65,6 +65,8 @@ void Edge::Run()
 {
 	Razor::Engine& Engine = Razor::Engine::Get();
 
+	Engine.GetCoordinator()->RegisterSystem<EdgeEditor::RSEditorCamera>(EdgeEditor::RSEditorCamera(Engine.CurrentScene, Engine.GetRenderer(), EditorCamera.GetCamera()));
+
 	Razor::RenderPipelineConfig PipelineConfig;
 	PipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_MATERIAL_PASS, std::vector<const char*> { typeid(Razor::RSMaterialPass).name() } });
 	PipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_LIGHTING_PASS, std::vector<const char*>
@@ -74,7 +76,7 @@ void Edge::Run()
 		typeid(Razor::RSSpotLightingPass).name()
 	} });
 	PipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_TRANSFORMATION_PASS, std::vector<const char*> { typeid(Razor::RSTransformationsPass).name() } });
-	PipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_CAMERA_PASS, std::vector<const char*> { typeid(Razor::RSCameraPass).name() } });
+	PipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_CAMERA_PASS, std::vector<const char*> { typeid(EdgeEditor::RSEditorCamera).name() } });
 	PipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_RENDER, std::vector<const char*> { typeid(Razor::RSRenderPass).name() } });
 
 	Razor::RenderPipelineConfig EditorPipelineConfig;
@@ -95,7 +97,7 @@ void Edge::Run()
 	PickPipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_CAMERA_PASS, std::vector<const char*> { typeid(EdgeEditor::RSEditorCamera).name() } });
 	PickPipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_RENDER, std::vector<const char*> { typeid(Razor::RSPickBufferRenderPass).name() } });
 
-	Engine.GetCoordinator()->RegisterSystem<EdgeEditor::RSEditorCamera>(EdgeEditor::RSEditorCamera(Engine.CurrentScene, Engine.GetRenderer(), EditorCamera.GetCamera()));
+	
 
 	Engine.InitSystems();
 
@@ -180,7 +182,7 @@ void Edge::ProcessInput()
 {
 	Razor::Engine::Get().ProcessInput();
 
-	EditorCamera.ProcessInput(Razor::Engine::Get().GetDeltaTime());
+	EditorCamera.ProcessInput(0.01);
 
 	if (Razor::RazorIO::Get().GetStateForMouseButton(Razor::LEFT) == Razor::MOUSE_DOWN)
 	{

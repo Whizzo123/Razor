@@ -2,7 +2,7 @@ Scene: Untitled
 Entities:
   - Entity: 1
     Transform:
-      Position: [0, 0, 0]
+      Position: [0, 0, -5]
       Rotation: [0, 0, 0]
       Scale: [0, 0, 0]
     ScriptComponent:
@@ -11,6 +11,11 @@ Entities:
             - Name:
                 Type: System.String
                 Data: Joey
+      - Sandbox.Player:
+          ScriptFields:
+            - Name:
+                Type: System.String
+                Data: ""
   - Entity: 0
     Transform:
       Position: [0, 0, -10]
