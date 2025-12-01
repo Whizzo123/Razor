@@ -3,6 +3,7 @@
 #include "ModelSerializer.h"
 #include "../Engine.h"
 #include "../Renderer/Shaders/DefaultMeshShader.h"
+#include "FilePath.h"
 
 namespace Razor
 {
@@ -28,7 +29,8 @@ namespace Razor
 	void AssetDirectory::LoadModel(const std::string& assetPath)
 	{
 		Ref<Model> model = CreateRef<Model>();
-		ModelSerializer::Deserialize(assetPath, model);
+		FilePath path = FilePath(_mRootFolder) + FilePath(assetPath);
+		ModelSerializer::Deserialize(path, model);
 		MeshRenderer::InitMesh(model->GetModelMeshData());
 		model->SetModelShader(Engine::Get().GetShaderForType(typeid(DefaultMeshShader).name())->ID);
 		_mModelCache[assetPath] = AssetWrapper<Model>({ *model });

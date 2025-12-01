@@ -78,11 +78,17 @@ namespace EdgeEditor
 	bool AssetPickerPopupWindow::DrawFileGui(const FileEntry& file)
 	{
 		void* ButtonImage = 0;
+		Razor::FilePath path(file.mName);
 		if (Razor::RazorImGui::ImageButton(ButtonImage, Razor::Vector2(100.0f, 100.0f)))
 		{
 			if (!file.mbIsDirectory)
-			{
-				_mSelectedAssetPath = file.mName;
+			{		
+				while (_mSearchStack.size() > 1)
+				{
+					_mSearchStack.pop();
+				}
+				path = path.RemoveFromPath(Razor::FilePath(_mSearchStack.top()));
+				_mSelectedAssetPath = path;
 				return true;
 			}
 			else
@@ -90,7 +96,8 @@ namespace EdgeEditor
 				_mSearchStack.push(file.mName);
 			}
 		}
-		Razor::RazorImGui::Text(file.mName.c_str());
+		path = path.RemoveFromPath(Razor::FilePath(_mSearchStack.top()));
+		Razor::RazorImGui::Text(static_cast<std::string>(path).c_str());
 		return false;
 	}
 

@@ -28,7 +28,7 @@ namespace Razor
 		size_t pos = newPath.find(path);
 		if (pos != std::string::npos)
 		{
-			newPath.erase(pos, static_cast<std::string>(path).length());
+			newPath.erase(pos, static_cast<std::string>(path).length() + 1);
 		}
 		return FilePath(newPath);
 	}

@@ -15,6 +15,11 @@ namespace Razor
 
 		FilePath RemoveFromPath(FilePath path);
 
+		FilePath operator+(const FilePath& other) const
+		{
+			return FilePath(_mPath + "/" + other._mPath);
+		}
+
 		operator std::string() const
 		{
 			return _mPath;

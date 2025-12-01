@@ -89,7 +89,9 @@ namespace EdgeEditor
 				_mSearchStack.push(entry.mName);
 			}
 		}
-		Razor::RazorImGui::Text(entry.mName.c_str());
+		Razor::FilePath path(entry.mName);
+		path = path.RemoveFromPath(Razor::FilePath(_mSearchStack.top()));
+		Razor::RazorImGui::Text(static_cast<std::string>(path).c_str());
 	}
 
 	// TODO this is windows only will want a linux version too should probably be hidden behind a platform generic interface

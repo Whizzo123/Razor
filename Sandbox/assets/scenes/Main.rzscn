@@ -22,7 +22,7 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [0, 0, 0]
     Mesh:
-      ModelKey: C:/Sandbox/Razor/Sandbox/assets/models/Cube.model
+      ModelKey: models/Cube.model
     ScriptComponent:
       - Sandbox.Player:
           ScriptFields:
