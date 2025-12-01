@@ -6,11 +6,10 @@ namespace Razor
 
 	void RSDirectionalLightingPass::Render(RenderPipelineEntityProperties& Properties)
 	{
-		auto View = CurrentScene->GetEntitiesWithComponents<DirectionalLight>();
-
-		for (auto RenderingEntity : View)
+		for (auto RenderingEntity : CurrentScene->GetEntitiesWithComponents<DirectionalLight, Transform>())
 		{
 			DirectionalLight& Light = CurrentScene->GetComponent<DirectionalLight>(RenderingEntity);
+			Transform& transform = CurrentScene->GetComponent<Transform>(RenderingEntity);
 			for (auto& Pair : Properties.Properties)
 			{
 				EntityRenderProperty& Property = Pair.second;
@@ -18,7 +17,7 @@ namespace Razor
 				{
 					PropertySlot& Slot = Property.GetPropertySlot(i);
 
-					Slot.AddProperty<glm::vec3>("light.position", Light.Position);
+					Slot.AddProperty<glm::vec3>("light.position", transform.Position);
 					Slot.AddProperty<glm::vec3>("light.ambient", Light.Ambient);
 					Slot.AddProperty<glm::vec3>("light.diffuse", Light.Diffuse);
 					Slot.AddProperty<glm::vec3>("light.specular", Light.Specular);

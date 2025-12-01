@@ -57,13 +57,12 @@ namespace Razor
 
 	struct DirectionalLight
 	{
-		glm::vec3 Position;
 		glm::vec3 Diffuse;
 		glm::vec3 Ambient;
 		glm::vec3 Specular;
 		glm::vec3 Direction;
 
-		DirectionalLight() : Position(glm::vec3(0.0f, 0.0f, 0.0f)), Diffuse(glm::vec3(1.0f, 1.0f, 1.0f)), Ambient(glm::vec3(1.0f, 1.0f, 1.0f)), Specular(glm::vec3(1.0f, 1.0f, 1.0f)), Direction(glm::vec3(1.0f, 0.0f, 0.0f)){}
+		DirectionalLight() : Diffuse(glm::vec3(1.0f, 1.0f, 1.0f)), Ambient(glm::vec3(1.0f, 1.0f, 1.0f)), Specular(glm::vec3(1.0f, 1.0f, 1.0f)), Direction(glm::vec3(1.0f, 0.0f, 0.0f)){}
 	};
 
 	struct PointLight : public Light

@@ -2,30 +2,32 @@ Scene: Untitled
 Entities:
   - Entity: 1
     Transform:
-      Position: [0, 0, -5]
-      Rotation: [0, 0, 0]
-      Scale: [0, 0, 0]
-    ScriptComponent:
-      - Sandbox.Player:
-          ScriptFields:
-            - Name:
-                Type: System.String
-                Data: Joey
-      - Sandbox.Player:
-          ScriptFields:
-            - Name:
-                Type: System.String
-                Data: ""
-  - Entity: 0
-    Transform:
       Position: [0, 0, -10]
       Rotation: [0, 0, 0]
       Scale: [0, 0, 0]
+    DirectionalLight:
+      Diffuse: [1, 1, 1]
+      Ambient: [1, 1, 1]
+      Specular: [1, 1, 1]
+      Direction: [1, 0, 0]
     ScriptComponent:
       - Sandbox.Player:
           ScriptFields:
             - Name:
                 Type: System.String
                 Data: Laurz
+  - Entity: 0
+    Transform:
+      Position: [0, 0, -5]
+      Rotation: [0, 0, 0]
+      Scale: [0, 0, 0]
+    Mesh:
+      ModelKey: C:/Sandbox/Razor/Sandbox/assets/models/Cube.model
+    ScriptComponent:
+      - Sandbox.Player:
+          ScriptFields:
+            - Name:
+                Type: System.String
+                Data: Joey
 Systems:
   - Sandbox.PlayerMovement
