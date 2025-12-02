@@ -32,8 +32,8 @@ namespace EdgeEditor
 			Razor::RazorImGui::End();
 			return;
 		}
-		std::vector<FileEntry> fileNames = GrabFiles(_mSearchStack.top());
-		for (const FileEntry& entry : fileNames)
+		std::vector<Razor::FilePath> fileNames = GrabFiles(_mSearchStack.top());
+		for (const Razor::FilePath& entry : fileNames)
 		{
 			Razor::RazorImGui::TableNextColumn();
 			DrawFileGui(entry);
@@ -53,9 +53,9 @@ namespace EdgeEditor
 		Razor::RazorImGui::End();
 	}
 
-	std::vector<ProjectExplorer::FileEntry> ProjectExplorer::GrabFiles(const std::string & Path)
+	std::vector<Razor::FilePath> ProjectExplorer::GrabFiles(const std::string & Path)
 	{
-		std::vector<FileEntry> fileNames;
+		std::vector<Razor::FilePath> fileNames;
 
 		struct stat sb;
 
@@ -75,22 +75,21 @@ namespace EdgeEditor
 		return fileNames;
 	}
 
-	void ProjectExplorer::DrawFileGui(const FileEntry& entry)
+	void ProjectExplorer::DrawFileGui(const Razor::FilePath& entry)
 	{
 		void* ButtonImage = 0;
 		if (Razor::RazorImGui::ImageButton(ButtonImage, Razor::Vector2(100.0f, 100.0f)))
 		{
-			if (!entry.mbIsDirectory)
+			if (!entry.IsDir())
 			{
 				//_mSelectedAssetPath = entry.mName;
 			}
 			else
 			{
-				_mSearchStack.push(entry.mName);
+				_mSearchStack.push(entry);
 			}
 		}
-		Razor::FilePath path(entry.mName);
-		path = path.RemoveFromPath(Razor::FilePath(_mSearchStack.top()));
+		Razor::FilePath path = entry.RemoveFromPath(Razor::FilePath(_mSearchStack.top()));
 		Razor::RazorImGui::Text(static_cast<std::string>(path).c_str());
 	}
 

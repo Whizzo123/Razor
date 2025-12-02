@@ -4,12 +4,12 @@
 namespace Razor
 {
 	FilePath::FilePath()
-		: _mPath(std::string())
+		: _mPath(std::string()), mbIsDirectory(false)
 	{
 	}
 
-	FilePath::FilePath(const std::string& path)
-		: _mPath(path)
+	FilePath::FilePath(const std::string& path, bool bIsDirectory)
+		: _mPath(path), mbIsDirectory(bIsDirectory)
 	{
 		// Sanitize path to use forward slashes
 		while(_mPath.find('\\') != std::string::npos)
@@ -22,7 +22,7 @@ namespace Razor
 	{
 	}
 
-	FilePath FilePath::RemoveFromPath(FilePath path)
+	FilePath FilePath::RemoveFromPath(FilePath path) const
 	{
 		std::string newPath = _mPath;
 		size_t pos = newPath.find(path);
@@ -33,4 +33,8 @@ namespace Razor
 		return FilePath(newPath);
 	}
 
+	bool FilePath::IsDir() const
+	{
+		return mbIsDirectory;
+	}
 }

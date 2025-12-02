@@ -61,12 +61,12 @@ namespace Razor
 
 		Coordinator = Coordinator::GetInstance();
 		
+		// Platform must be called before RazorGUI so ImGui chains our renderer input callbacks in 
+		PlatformIO = std::make_unique<OpenGLIO>(std::dynamic_pointer_cast<OpenGLWindowProvider>(EngineWindow->GetWindowProvider())->GetPlatformWindowPtr());
+		PlatformIO->RegisterInputCallbacks();
 		RazorGUI = std::make_unique<RazorImGui>();
 		RazorGUI->Setup(EngineWindow->GetWindowProvider());
 		RazorGUI->RegisterImGuiEvents();
-		PlatformIO = std::make_unique<OpenGLIO>(std::dynamic_pointer_cast<OpenGLWindowProvider>(EngineWindow->GetWindowProvider())->GetPlatformWindowPtr());
-		PlatformIO->RegisterInputCallbacks();
-		
 		
 
 		//TODO don't like this being here

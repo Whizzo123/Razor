@@ -19,8 +19,8 @@ namespace EdgeEditor
 		if (Razor::RazorImGui::BeginPopupModal("Asset Picker Window", nullptr))
 		{
 			Razor::RazorImGui::BeginTable("FileTable", 4);
-			std::vector<FileEntry> fileNames = GrabFiles(_mSearchStack.top());
-			for (const FileEntry& file : fileNames)
+			std::vector<Razor::FilePath> fileNames = GrabFiles(_mSearchStack.top());
+			for (const Razor::FilePath& file : fileNames)
 			{
 				Razor::RazorImGui::TableNextColumn();
 				if (DrawFileGui(file))
@@ -53,9 +53,9 @@ namespace EdgeEditor
 		Razor::RazorImGui::CloseCurrentPopup();
 	}
 
-	std::vector<AssetPickerPopupWindow::FileEntry> AssetPickerPopupWindow::GrabFiles(const std::string& Path)
+	std::vector<Razor::FilePath> AssetPickerPopupWindow::GrabFiles(const std::string& Path)
 	{
-		std::vector<FileEntry> fileNames;
+		std::vector<Razor::FilePath> fileNames;
 
 		struct stat sb;
 
@@ -75,28 +75,27 @@ namespace EdgeEditor
 		return fileNames;
 	}
 
-	bool AssetPickerPopupWindow::DrawFileGui(const FileEntry& file)
+	bool AssetPickerPopupWindow::DrawFileGui(const Razor::FilePath& file)
 	{
 		void* ButtonImage = 0;
-		Razor::FilePath path(file.mName);
 		if (Razor::RazorImGui::ImageButton(ButtonImage, Razor::Vector2(100.0f, 100.0f)))
 		{
-			if (!file.mbIsDirectory)
+			if (!file.IsDir())
 			{		
 				while (_mSearchStack.size() > 1)
 				{
 					_mSearchStack.pop();
 				}
-				path = path.RemoveFromPath(Razor::FilePath(_mSearchStack.top()));
+				Razor::FilePath path = file.RemoveFromPath(Razor::FilePath(_mSearchStack.top()));
 				_mSelectedAssetPath = path;
 				return true;
 			}
 			else
 			{
-				_mSearchStack.push(file.mName);
+				_mSearchStack.push(file);
 			}
 		}
-		path = path.RemoveFromPath(Razor::FilePath(_mSearchStack.top()));
+		Razor::FilePath path = file.RemoveFromPath(Razor::FilePath(_mSearchStack.top()));
 		Razor::RazorImGui::Text(static_cast<std::string>(path).c_str());
 		return false;
 	}

@@ -10,11 +10,6 @@ namespace EdgeEditor
 
 	class ProjectExplorer
 	{
-		struct FileEntry
-		{
-			std::string mName;
-			bool mbIsDirectory;
-		};
 	public:
 		ProjectExplorer() 
 		{
@@ -28,8 +23,8 @@ namespace EdgeEditor
 		void Render();
 		void Refresh(const std::string& path);
 	private:
-		std::vector<ProjectExplorer::FileEntry> GrabFiles(const std::string& Path);
-		void DrawFileGui(const FileEntry& FileName);
+		std::vector<Razor::FilePath> GrabFiles(const std::string& Path);
+		void DrawFileGui(const Razor::FilePath& FileName);
 		void OpenFile();
 		bool SaveModelToProject(const std::string& Name);
 	private:

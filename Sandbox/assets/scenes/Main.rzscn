@@ -2,7 +2,20 @@ Scene: Untitled
 Entities:
   - Entity: 1
     Transform:
-      Position: [0, 0, -10]
+      Position: [0, 0, -5]
+      Rotation: [0, 0, 0]
+      Scale: [0, 0, 0]
+    Mesh:
+      ModelKey: models/Cube.model
+    ScriptComponent:
+      - Sandbox.Player:
+          ScriptFields:
+            - Name:
+                Type: System.String
+                Data: Joey
+  - Entity: 0
+    Transform:
+      Position: [1, 0, -10]
       Rotation: [0, 0, 0]
       Scale: [0, 0, 0]
     DirectionalLight:
@@ -16,18 +29,5 @@ Entities:
             - Name:
                 Type: System.String
                 Data: Laurz
-  - Entity: 0
-    Transform:
-      Position: [0, 0, -5]
-      Rotation: [0, 0, 0]
-      Scale: [0, 0, 0]
-    Mesh:
-      ModelKey: models/Cube.model
-    ScriptComponent:
-      - Sandbox.Player:
-          ScriptFields:
-            - Name:
-                Type: System.String
-                Data: Joey
 Systems:
   - Sandbox.PlayerMovement

@@ -10,22 +10,26 @@ namespace Razor
 
 	public:
 		FilePath();
-		FilePath(const std::string& path);
+		FilePath(const std::string& path, bool bIsDirectory = false);
 		~FilePath();
 
-		FilePath RemoveFromPath(FilePath path);
+		FilePath RemoveFromPath(FilePath path) const;
 
 		FilePath operator+(const FilePath& other) const
 		{
-			return FilePath(_mPath + "/" + other._mPath);
+			bool bIsDirectory = IsDir() && other.IsDir();
+			return FilePath(_mPath + "/" + other._mPath, bIsDirectory);
 		}
 
 		operator std::string() const
 		{
 			return _mPath;
 		}
+
+		bool IsDir() const;
 	private:
 		std::string _mPath;
+		bool mbIsDirectory;
 	};
 }
 

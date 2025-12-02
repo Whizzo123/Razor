@@ -3,6 +3,7 @@
 #include <stack>
 #include <string>
 #include <vector>
+#include <Razor.h>
 
 namespace EdgeEditor
 {
@@ -11,12 +12,6 @@ namespace EdgeEditor
 	*/
     class AssetPickerPopupWindow : public PopupWindow
     {
-		struct FileEntry
-		{
-			std::string mName;
-			bool mbIsDirectory;
-		};
-
 	public:
 		AssetPickerPopupWindow(std::string rootFolder);
 		/**
@@ -36,8 +31,8 @@ namespace EdgeEditor
 		*/
 		void Close() override;
 
-		std::vector<FileEntry> GrabFiles(const std::string& Path);
-		bool DrawFileGui(const FileEntry& FileName);
+		std::vector<Razor::FilePath> GrabFiles(const std::string& Path);
+		bool DrawFileGui(const Razor::FilePath& FileName);
 
 	private:
 		std::string _mSelectedAssetPath = ""; /** String to hold selected asset path */

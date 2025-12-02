@@ -69,7 +69,6 @@ namespace Razor
 			ImGui::RenderPlatformWindowsDefault();
 			Renderer->ResetCurrentContext();
 		}
-		//RZ_CORE_INFO("Mouse Pos: {0},{1}", ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y);
 	}
 
 	void RazorImGui::RegisterImGuiEvents()
