@@ -9,24 +9,24 @@ namespace EdgeEditor
 
 	struct EditorStorage
 	{
-		EditorStorage() : SelectedEntity(nullptr) {}
+		EditorStorage() : SelectedEntity(nullptr), _mCurrentProjectPath("") {}
 		Razor::Ref<Razor::Entity> SelectedEntity;
 		Razor::Model DefaultModel;
 	private:
-		std::string CurrentProjectPath;
+		std::string _mCurrentProjectPath;
 		OnProjectSetDelegate ProjectSetDelegate;
 	public:
 		OnProjectSetDelegate& OnProjectSet()
 		{
 			return ProjectSetDelegate;
 		}
-		const std::string& GetProject() const
+		const std::string& GetProjectPath() const
 		{
-			return CurrentProjectPath;
+			return _mCurrentProjectPath;
 		}
-		void SetProject(const std::string& Proj)
+		void SetProjectPath(const std::string& Proj)
 		{
-			CurrentProjectPath = Proj;
+			_mCurrentProjectPath = Proj;
 			ProjectSetDelegate.Broadcast();
 		}
 	};

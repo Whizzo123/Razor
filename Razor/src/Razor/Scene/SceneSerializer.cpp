@@ -44,17 +44,34 @@ namespace Razor
 			yaml_emitter_end_map(Out);
 			
 		}
-		//if (InEntity.HasComponent<Mesh>())
-		//{
-		//	Out << YAML::Key << "Mesh";
-		//	Out << YAML::BeginMap;
+		if (InEntity.HasComponent<Mesh>())
+		{
+			yaml_emitter_key(Out, "Mesh");
+			yaml_emitter_begin_map(Out);
 
-		//	Mesh& EntityMesh = InEntity.GetComponent<Mesh>();
-		//	Out << YAML::Key << "Data" << YAML::Value << YAML::BeginSeq;
-		//	//Out << YAML::Flow << EntityMesh.Data;
-		//	Out << YAML::EndSeq;
-		//	Out << YAML::EndMap;
-		//}
+			Mesh& EntityMesh = InEntity.GetComponent<Mesh>();
+			yaml_emitter_key(Out, "ModelKey");
+			yaml_emitter_value_string(Out, EntityMesh.mKey.GetKey().c_str());
+			
+			yaml_emitter_end_map(Out);
+		}
+		if (InEntity.HasComponent<DirectionalLight>())
+		{
+			yaml_emitter_key(Out, "DirectionalLight");
+			yaml_emitter_begin_map(Out);
+
+			DirectionalLight& DirLight = InEntity.GetComponent<DirectionalLight>();
+			yaml_emitter_key(Out, "Diffuse");
+			yaml_emitter_value_vec3(Out, ToVec3(DirLight.Diffuse));
+			yaml_emitter_key(Out, "Ambient");
+			yaml_emitter_value_vec3(Out, ToVec3(DirLight.Ambient));
+			yaml_emitter_key(Out, "Specular");
+			yaml_emitter_value_vec3(Out, ToVec3(DirLight.Specular));
+			yaml_emitter_key(Out, "Direction");
+			yaml_emitter_value_vec3(Out, ToVec3(DirLight.Direction));
+
+			yaml_emitter_end_map(Out);
+		}
 		if (InEntity.HasComponent<ScriptComponent>())
 		{
 			auto& scriptComponent = InEntity.GetComponent<ScriptComponent>();
@@ -329,12 +346,22 @@ namespace Razor
 				}
 			}
 		}
-		//auto MeshComponent = EntityNode["Mesh"];
-		/*if (MeshComponent)
+		auto MeshComponent = yaml_get_child(EntityNode, "Mesh");
+		if (MeshComponent)
 		{
-			std::vector<MeshData> Data = MeshComponent["Data"].as<std::vector<MeshData>>();
-			Mesh EntityMesh = { Data };
+			AssetKey key(yaml_as_string(yaml_get_child(MeshComponent, "ModelKey")));
+			Mesh EntityMesh = { key };
 			DeserializedEntity->AddComponent<Mesh>(EntityMesh);
-		}*/
+		}
+		auto DirectionalLightComponent = yaml_get_child(EntityNode, "DirectionalLight");
+		if(DirectionalLightComponent)
+		{
+			DirectionalLight dirLight;
+			dirLight.Diffuse = ToGVec3(yaml_as_vec3(yaml_get_child(DirectionalLightComponent, "Diffuse")));
+			dirLight.Ambient = ToGVec3(yaml_as_vec3(yaml_get_child(DirectionalLightComponent, "Ambient")));
+			dirLight.Specular = ToGVec3(yaml_as_vec3(yaml_get_child(DirectionalLightComponent, "Specular")));
+			dirLight.Direction = ToGVec3(yaml_as_vec3(yaml_get_child(DirectionalLightComponent, "Direction")));
+			DeserializedEntity->AddComponent<DirectionalLight>(dirLight);
+		}
 	}
 }

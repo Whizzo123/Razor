@@ -12,7 +12,8 @@ namespace Razor
 		D,
 		S,
 		W,
-		Escape
+		Escape,
+		Backspace
 	};
 
 	enum RazorKeyState

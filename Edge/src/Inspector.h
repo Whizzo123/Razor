@@ -5,6 +5,7 @@
 namespace EdgeEditor
 {
 	struct EditorStorage;
+	class AssetPickerPopupWindow;
 
 	class Inspector
 	{
@@ -19,6 +20,7 @@ namespace EdgeEditor
 
 	private:
 		Razor::Ref<EditorStorage> Storage;
+		Razor::Ref<AssetPickerPopupWindow> _mAssetPickerPopup = nullptr;
 	};
 }
 

@@ -3,7 +3,7 @@
 	url = https://github.com/gabime/spdlog
 [submodule "Razor/vendor/assimp"]
 	path = Razor/vendor/assimp
-	url = https://github.com/AminAliari/assimp
+	url = https://github.com/Whizzo123/assimp
 [submodule "Razor/vendor/glm"]
 	path = Razor/vendor/glm
 	url = https://github.com/g-truc/glm

@@ -7,6 +7,7 @@ namespace Razor
 			{GLFW_KEY_A, RazorKey::A},
 			{GLFW_KEY_S, RazorKey::S},
 			{GLFW_KEY_D, RazorKey::D},
+			{GLFW_KEY_BACKSPACE, RazorKey::Backspace},
 			{GLFW_KEY_ESCAPE, RazorKey::Escape}
 	};
 	std::unordered_map<int, RazorKeyState> OpenGLIO::GLFWToCustomStateMap = {
@@ -57,6 +58,10 @@ namespace Razor
 	void OpenGLIO::KeyCallback(GLFWwindow* window, int button, int action)
 	{
 		RazorIO& EngineIO = RazorIO::Get();
+		if (GLFWToCustomKeyMap.find(button) == GLFWToCustomKeyMap.end())
+		{
+			return;
+		}
 		EngineIO.OnKeyStateChanged().Broadcast(GLFWToCustomKeyMap[button], GLFWToCustomStateMap[action]);
 	}
 

@@ -9,6 +9,7 @@
 #include <memory>
 #include "IO/RazorIO.h"
 #include "Renderer/Model.h"
+#include "Assets/AssetDirectory.h"
 
 namespace Razor
 {
@@ -56,13 +57,12 @@ namespace Razor
 
 	struct DirectionalLight
 	{
-		glm::vec3 Position;
 		glm::vec3 Diffuse;
 		glm::vec3 Ambient;
 		glm::vec3 Specular;
 		glm::vec3 Direction;
 
-		DirectionalLight() : Position(glm::vec3(0.0f, 0.0f, 0.0f)), Diffuse(glm::vec3(1.0f, 1.0f, 1.0f)), Ambient(glm::vec3(1.0f, 1.0f, 1.0f)), Specular(glm::vec3(1.0f, 1.0f, 1.0f)), Direction(glm::vec3(1.0f, 0.0f, 0.0f)){}
+		DirectionalLight() : Diffuse(glm::vec3(1.0f, 1.0f, 1.0f)), Ambient(glm::vec3(1.0f, 1.0f, 1.0f)), Specular(glm::vec3(1.0f, 1.0f, 1.0f)), Direction(glm::vec3(1.0f, 0.0f, 0.0f)){}
 	};
 
 	struct PointLight : public Light
@@ -81,9 +81,9 @@ namespace Razor
 
 	struct Mesh
 	{
-		Mesh() {}
-		Mesh(Ref<Model> Model) : Model(Model) {}
-		Ref<Model> Model;
+		Mesh() : mKey(AssetKey("")) {}
+		Mesh(AssetKey assetKey) : mKey(assetKey) {}
+		AssetKey mKey;
 	};
 
 	struct Collider

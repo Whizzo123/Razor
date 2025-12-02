@@ -1,8 +1,11 @@
 #include "ComponentImGui.h"
+#include "AssetPickerPopupWindow.h"
 
 namespace EdgeEditor
 {
 	std::unordered_map<std::string, ComponentDrawer> ComponentImGui::_ComponentDrawers = RegisterDrawers();
+
+	Razor::Ref<AssetPickerPopupWindow> ComponentImGui::_mAssetPickerPopup = nullptr;
 
 	std::unordered_map<std::string, ComponentDrawer> ComponentImGui::RegisterDrawers()
 	{
@@ -20,6 +23,11 @@ namespace EdgeEditor
 		{
 			drawer(InEntity);
 		}
+	}
+
+	void ComponentImGui::SetAssetPickerPopup(Razor::Ref<AssetPickerPopupWindow> InPopup)
+	{
+		_mAssetPickerPopup = InPopup;
 	}
 
 	void ComponentImGui::DrawTransform(Razor::Ref<Razor::Entity> InEntity)
@@ -46,7 +54,25 @@ namespace EdgeEditor
 			Razor::Mesh& mesh = InEntity->GetComponent<Razor::Mesh>();
 			if (Razor::RazorImGui::CollapsingHeader("Mesh"))
 			{
-				// Nothing really here to show just now maybe in the future but at least we know it's there
+				Razor::RazorImGui::Text(mesh.mKey.GetKey().c_str());
+				if (Razor::RazorImGui::Button("Pick"))
+				{
+					if (_mAssetPickerPopup == nullptr)
+					{
+						_mAssetPickerPopup = Razor::CreateRef<AssetPickerPopupWindow>("C:/Sandbox/Razor/Sandbox/assets");
+					}
+				}
+				if (_mAssetPickerPopup)
+				{
+					if (_mAssetPickerPopup->Draw() == false)
+					{
+						if (_mAssetPickerPopup->GetSelectedAssetPath() != mesh.mKey.GetKey())
+						{
+							mesh.mKey = Razor::AssetKey{ _mAssetPickerPopup->GetSelectedAssetPath()};
+						}
+						_mAssetPickerPopup = nullptr;
+					}
+				}
 			}
 		}
 	}

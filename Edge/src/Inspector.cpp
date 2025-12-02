@@ -12,7 +12,7 @@ namespace EdgeEditor
 
 	Inspector::Inspector(Razor::Ref<EditorStorage> Storage) : Storage(Storage)
 	{
-
+		ComponentImGui::SetAssetPickerPopup(_mAssetPickerPopup);
 	}
 
 	void Inspector::Render()
@@ -46,7 +46,7 @@ namespace EdgeEditor
 		{
 			if (Razor::RazorImGui::Button("Mesh Component"))
 			{
-				Storage->SelectedEntity->AddComponent<Razor::Mesh>(Razor::CreateRef<Razor::Model>(Storage->DefaultModel));
+				Storage->SelectedEntity->AddComponent<Razor::Mesh>();
 			}
 			if (Razor::RazorImGui::Button("Directional Light Component"))
 			{

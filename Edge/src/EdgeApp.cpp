@@ -53,6 +53,7 @@ private:
 	Razor::Vector2 ViewportSize { 0.0f, 0.0f }; /** 2D vector to hold size of viewport window */
 	Razor::Vector2 ViewportPos { 0.0f, 0.0f }; /** 2D vector to hold position of image displaying scene texture for viewport*/
 	Razor::Ref<EdgeEditor::EditorStorage> Storage; /** Container object to hold data to be shared among windows*/
+	EdgeEditor::ProjectExplorer _mProjectExplorerWindow;
 };
 
 Razor::Application* Razor::CreateApplication()
@@ -64,6 +65,8 @@ void Edge::Run()
 {
 	Razor::Engine& Engine = Razor::Engine::Get();
 
+	Engine.GetCoordinator()->RegisterSystem<EdgeEditor::RSEditorCamera>(EdgeEditor::RSEditorCamera(Engine.CurrentScene, Engine.GetRenderer(), EditorCamera.GetCamera()));
+
 	Razor::RenderPipelineConfig PipelineConfig;
 	PipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_MATERIAL_PASS, std::vector<const char*> { typeid(Razor::RSMaterialPass).name() } });
 	PipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_LIGHTING_PASS, std::vector<const char*>
@@ -73,7 +76,7 @@ void Edge::Run()
 		typeid(Razor::RSSpotLightingPass).name()
 	} });
 	PipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_TRANSFORMATION_PASS, std::vector<const char*> { typeid(Razor::RSTransformationsPass).name() } });
-	PipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_CAMERA_PASS, std::vector<const char*> { typeid(Razor::RSCameraPass).name() } });
+	PipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_CAMERA_PASS, std::vector<const char*> { typeid(EdgeEditor::RSEditorCamera).name() } });
 	PipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_RENDER, std::vector<const char*> { typeid(Razor::RSRenderPass).name() } });
 
 	Razor::RenderPipelineConfig EditorPipelineConfig;
@@ -94,7 +97,7 @@ void Edge::Run()
 	PickPipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_CAMERA_PASS, std::vector<const char*> { typeid(EdgeEditor::RSEditorCamera).name() } });
 	PickPipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_RENDER, std::vector<const char*> { typeid(Razor::RSPickBufferRenderPass).name() } });
 
-	Engine.GetCoordinator()->RegisterSystem<EdgeEditor::RSEditorCamera>(EdgeEditor::RSEditorCamera(Engine.CurrentScene, Engine.GetRenderer(), EditorCamera.GetCamera()));
+	
 
 	Engine.InitSystems();
 
@@ -118,7 +121,7 @@ void Edge::Run()
 
 	EdgeEditor::Inspector InspectorWindow(Storage);
 	EdgeEditor::SceneView SceneViewWindow(Storage);
-	EdgeEditor::ProjectExplorer ProjectExplorerWindow(Storage);
+	_mProjectExplorerWindow = EdgeEditor::ProjectExplorer(Storage);
 	EdgeEditor::SystemView SystemViewWindow;
 
 	Razor::SceneSerializer::Deserialize(Engine.CurrentScene);
@@ -145,7 +148,7 @@ void Edge::Run()
 		CreateDockspace("Edge");
 		InspectorWindow.Render();
 		SceneViewWindow.Render();
-		ProjectExplorerWindow.Render();
+		_mProjectExplorerWindow.Render();
 		SystemViewWindow.Render();
 		RenderSceneViewport(SceneBuffer);
 		Razor::RazorImGui::ShowMetricsWindow();
@@ -179,7 +182,7 @@ void Edge::ProcessInput()
 {
 	Razor::Engine::Get().ProcessInput();
 
-	EditorCamera.ProcessInput(Razor::Engine::Get().GetDeltaTime());
+	EditorCamera.ProcessInput(0.01);
 
 	if (Razor::RazorIO::Get().GetStateForMouseButton(Razor::LEFT) == Razor::MOUSE_DOWN)
 	{
@@ -255,6 +258,7 @@ void Edge::CreateDockspace(const std::string& Title)
 void Edge::OnNewProjectSet()
 {
 	Razor::Engine& Engine = Razor::Engine::Get();
-	Engine.LoadProject(Storage->GetProject());
-	// We need to be able to iterate through types avaliable, create instances of a type, invoke methods on this type, load assemblies
+	Engine.LoadProject(Storage->GetProjectPath());
+	_mProjectExplorerWindow.Refresh(Engine.GetAssetDirectory()->GetRootFolder());
+	
 }
