@@ -20,6 +20,19 @@ group "Dependencies"
 	include "Razor/vendor/Coral/Coral.Native"
 	include "Razor/vendor/Coral/Coral.Managed"
 
+-----------------------------------------
+-- External CMake library (managed by CMake, referenced by Premake)
+-----------------------------------------
+externalproject "Jolt"
+    location "Razor/vendor/JoltPhysics/Build/VS2022_CL"   -- where the CMakeLists.txt lives
+    kind "StaticLib"               -- or "SharedLib" if your CMake project outputs a DLL/SO
+    language "C++"
+	staticruntime "off"
+	cppdialect "C++17"
+
+    -- Optional: if you generate Visual Studio files, they appear here.
+    -- Premake will NOT build this project. CMake will.
+
 project "Razor"
 	location "Razor"
 	kind "SharedLib"
@@ -59,7 +72,8 @@ project "Razor"
 		"%{prj.name}/vendor/ImGui",
 		"%{prj.name}/vendor/yaml-cpp/include",
 		"%{prj.name}/vendor/entt/src",
-		"%{prj.name}/vendor/Coral/Coral.Native/Include"
+		"%{prj.name}/vendor/Coral/Coral.Native/Include",
+		"%{prj.name}/vendor/JoltPhysics/Include"
 	}
 
 	links
@@ -69,7 +83,8 @@ project "Razor"
 		"assimp",
 		"ImGui",
 		"yaml-cpp",
-		"Coral.Native"
+		"Coral.Native",
+		"Jolt"
 	}
 
 	rtti("On")
@@ -98,11 +113,19 @@ project "Razor"
 		}
 
 	filter "configurations:Debug"
+		prelinkcommands {
+        	'if not exist "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL\\Debug\\Jolt.lib" call "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\cmake_vs2022_cl.bat" -DUSE_STATIC_MSVC_RUNTIME_LIBRARY=OFF',
+        	'if not exist "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL\\Debug\\Jolt.lib" cmake --build "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL" --config Debug'
+    	}
 		defines "RZ_DEBUG"
 		runtime "Debug"
 		symbols "on"
 
 	filter "configurations:Release"
+		prelinkcommands {
+        	'if not exist "Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL\\Release\\Jolt.lib" call "Razor\\vendor\\JoltPhysics\\Build\\cmake_vs2022_cl.bat"',
+        	'if not exist "Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL\\Release\\Jolt.lib" cmake --build "VS2022_CL" --config Release'
+    	}
 		defines "RZ_RELEASE"
 		runtime "Release"
 		optimize "on"

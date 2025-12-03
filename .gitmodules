@@ -22,3 +22,6 @@
 [submodule "Razor/vendor/Coral"]
 	path = Razor/vendor/Coral
 	url = https://github.com/Whizzo123/Coral.git
+[submodule "Razor/vendor/JoltPhysics"]
+	path = Razor/vendor/JoltPhysics
+	url = https://github.com/Whizzo123/JoltPhysics
