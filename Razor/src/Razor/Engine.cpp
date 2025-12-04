@@ -36,6 +36,7 @@
 #include "Core/Entity.h"
 #include <Coral/ManagedObject.hpp>
 #include "Assets/AssetDirectory.h"
+#include "Physics/JoltPhysics/JoltPhysicsEngine.h"
 
 namespace Razor
 {
@@ -67,6 +68,8 @@ namespace Razor
 		RazorGUI = std::make_unique<RazorImGui>();
 		RazorGUI->Setup(EngineWindow->GetWindowProvider());
 		RazorGUI->RegisterImGuiEvents();
+
+		_mPhysicsEngine = CreateScope<JoltPhysicsEngine>();
 		
 
 		//TODO don't like this being here
@@ -266,6 +269,7 @@ namespace Razor
 		while (bIsRuntimeRunning)
 		{
 			Step();
+			_mPhysicsEngine->Simulate(DeltaTime);
 			//Somehow pick up input and forward?
 			//ProcessInputForGame()
 			RunSystems();

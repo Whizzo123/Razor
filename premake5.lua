@@ -53,7 +53,9 @@ project "Razor"
 		"%{prj.name}/vendor/glm/glm/**.hpp",
 		"%{prj.name}/vendor/glm/glm/**.inl",
 		"%{prj.name}/vendor/entt/src**.hpp",
-		"%{prj.name}/vendor/entt/src**.cpp"
+		"%{prj.name}/vendor/entt/src**.cpp",
+		"%{prj.name}/vendor/JoltPhysics/Jolt/**.hpp",
+		"%{prj.name}/vendor/JoltPhysics/Jolt/**.cpp"
 	}
 
 	defines
@@ -73,7 +75,7 @@ project "Razor"
 		"%{prj.name}/vendor/yaml-cpp/include",
 		"%{prj.name}/vendor/entt/src",
 		"%{prj.name}/vendor/Coral/Coral.Native/Include",
-		"%{prj.name}/vendor/JoltPhysics/Include"
+		"%{prj.name}/vendor/JoltPhysics"
 	}
 
 	links

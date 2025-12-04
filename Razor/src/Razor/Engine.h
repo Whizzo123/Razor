@@ -21,6 +21,7 @@ namespace Razor
 	class Scene;
 	class ScriptInterface;
 	class AssetDirectory;
+	class IPhysicsEngine;
 
 	struct Light;
 	struct RenderStageConfig;
@@ -186,6 +187,7 @@ namespace Razor
 		Scope<ScriptAssembly> BridgeAssembly;
 		Scope<ScriptAssembly> GameAssembly;
 		Ref<AssetDirectory> _mAssetDirectory;
+		Scope<IPhysicsEngine> _mPhysicsEngine;
 
 		std::atomic<bool> bIsRuntimeRunning { false };
 		std::thread RuntimeThread;
