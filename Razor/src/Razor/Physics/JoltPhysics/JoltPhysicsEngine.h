@@ -5,6 +5,8 @@
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <Jolt/Core/TempAllocator.h>
 #include <Jolt/Core/JobSystemThreadPool.h>
+#include <Jolt/Physics/Body/BodyActivationListener.h>
+#include <Jolt/Physics/Collision/ContactListener.h>
 #include "../../Core.h"
 
 
@@ -64,12 +66,39 @@ namespace Razor
 		virtual bool ShouldCollide(JPH::ObjectLayer inLayer1, JPH::BroadPhaseLayer inLayer2) const override;
 	};
 
+	// An example contact listener
+	class MyContactListener : public JPH::ContactListener
+	{
+	public:
+		// See: ContactListener
+		virtual JPH::ValidateResult	OnContactValidate(const JPH::Body& inBody1, const JPH::Body& inBody2, JPH::RVec3Arg inBaseOffset, const JPH::CollideShapeResult& inCollisionResult) override;
+
+		virtual void OnContactAdded(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings) override;
+
+		virtual void OnContactPersisted(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings) override;
+
+		virtual void OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair) override;
+	};
+
+	// An example activation listener
+	class MyBodyActivationListener : public JPH::BodyActivationListener
+	{
+	public:
+		virtual void OnBodyActivated(const JPH::BodyID& inBodyID, uint64_t inBodyUserData) override;
+
+		virtual void OnBodyDeactivated(const JPH::BodyID& inBodyID, uint64_t inBodyUserData) override;
+	};
+
 	class JoltPhysicsEngine : public IPhysicsEngine
 	{
 	public:
 		JoltPhysicsEngine();
 		~JoltPhysicsEngine() override;
 		void Simulate(float deltaTime) override;
+		Vector3 GetPosition(unsigned int bodyId) const override;
+		void ApplyLinearVelocity(unsigned int bodyId, const Vector3& velocity) override;
+		void CreateBoxRigidBody() override;
+		void DestroyBody(unsigned int bodyId) override;
 
 	private:
 		JPH::PhysicsSystem _mPhysicsSystem;
@@ -85,6 +114,9 @@ namespace Razor
 		Scope<ObjectLayerPairFilterImpl> _mObjectVsObjectLayerFilter;
 
 		std::shared_ptr<JPH::BodyInterface> _mBodyInterface;
+
+		MyBodyActivationListener _mBodyActivationListener;
+		MyContactListener _mContactListener;
 	};
 }
 

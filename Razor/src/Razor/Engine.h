@@ -166,6 +166,8 @@ namespace Razor
 
 		Ref<AssetDirectory> GetAssetDirectory();
 
+		Scope<IPhysicsEngine> GetPhysicsEngine();
+
 	private:
 		
 		void RenderImGui(uint64_t SceneTexture);

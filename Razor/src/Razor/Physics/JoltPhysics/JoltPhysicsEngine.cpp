@@ -7,7 +7,7 @@
 #include <Jolt/Physics/Collision/Shape/BoxShape.h>
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
-#include <Jolt/Physics/Body/BodyActivationListener.h>
+
 
 JPH_SUPPRESS_WARNINGS
 
@@ -16,6 +16,8 @@ using namespace JPH::literals;
 #include <thread>
 #include <cstdarg>
 #include <iostream>
+
+#include "../../Utils/Vector.h"
 
 namespace Razor
 {
@@ -109,49 +111,38 @@ namespace Razor
 	}
 	
 
-	// An example contact listener
-	class MyContactListener : public JPH::ContactListener
+	JPH::ValidateResult	MyContactListener::OnContactValidate(const JPH::Body& inBody1, const JPH::Body& inBody2, JPH::RVec3Arg inBaseOffset, const JPH::CollideShapeResult& inCollisionResult)
 	{
-	public:
-		// See: ContactListener
-		virtual JPH::ValidateResult	OnContactValidate(const JPH::Body& inBody1, const JPH::Body& inBody2, JPH::RVec3Arg inBaseOffset, const JPH::CollideShapeResult& inCollisionResult) override
-		{
-			std::cout << "Contact validate callback" << std::endl;
+		std::cout << "Contact validate callback" << std::endl;
 
-			// Allows you to ignore a contact before it is created (using layers to not make objects collide is cheaper!)
-			return JPH::ValidateResult::AcceptAllContactsForThisBodyPair;
-		}
+		// Allows you to ignore a contact before it is created (using layers to not make objects collide is cheaper!)
+		return JPH::ValidateResult::AcceptAllContactsForThisBodyPair;
+	}
 
-		virtual void			OnContactAdded(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings) override
-		{
-			std::cout << "A contact was added" << std::endl;
-		}
-
-		virtual void			OnContactPersisted(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings) override
-		{
-			std::cout << "A contact was persisted" << std::endl;
-		}
-
-		virtual void			OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair) override
-		{
-			std::cout << "A contact was removed" << std::endl;
-		}
-	};
-
-	// An example activation listener
-	class MyBodyActivationListener : public JPH::BodyActivationListener
+	void MyContactListener::OnContactAdded(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings)
 	{
-	public:
-		virtual void		OnBodyActivated(const JPH::BodyID& inBodyID, uint64_t inBodyUserData) override
-		{
-			std::cout << "A body got activated" << std::endl;
-		}
+		std::cout << "A contact was added" << std::endl;
+	}
 
-		virtual void		OnBodyDeactivated(const JPH::BodyID& inBodyID, uint64_t inBodyUserData) override
-		{
-			std::cout << "A body went to sleep" << std::endl;
-		}
-	};
+	void MyContactListener::OnContactPersisted(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings)
+	{
+		std::cout << "A contact was persisted" << std::endl;
+	}
+
+	void MyContactListener::OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair)
+	{
+		std::cout << "A contact was removed" << std::endl;
+	}
+
+	void MyBodyActivationListener::OnBodyActivated(const JPH::BodyID& inBodyID, uint64_t inBodyUserData)
+	{
+		std::cout << "A body got activated" << std::endl;
+	}
+
+	void MyBodyActivationListener::OnBodyDeactivated(const JPH::BodyID& inBodyID, uint64_t inBodyUserData)
+	{
+		std::cout << "A body went to sleep" << std::endl;
+	}
 
 	JoltPhysicsEngine::JoltPhysicsEngine() :  IPhysicsEngine()
 	{
@@ -211,18 +202,56 @@ namespace Razor
 		// A body activation listener gets notified when bodies activate and go to sleep
 		// Note that this is called from a job so whatever you do here needs to be thread safe.
 		// Registering one is entirely optional.
-		MyBodyActivationListener body_activation_listener;
-		_mPhysicsSystem.SetBodyActivationListener(&body_activation_listener);
+		
+		_mPhysicsSystem.SetBodyActivationListener(&_mBodyActivationListener);
 
 		// A contact listener gets notified when bodies (are about to) collide, and when they separate again.
 		// Note that this is called from a job so whatever you do here needs to be thread safe.
 		// Registering one is entirely optional.
-		MyContactListener contact_listener;
-		_mPhysicsSystem.SetContactListener(&contact_listener);
+		_mPhysicsSystem.SetContactListener(&_mContactListener);
 
-		// The main way to interact with the bodies in the physics system is through the body interface. There is a locking and a non-locking
-		// variant of this. We're going to use the locking version (even though we're not planning to access bodies from multiple threads)
-		_mBodyInterface = std::shared_ptr<JPH::BodyInterface>(&_mPhysicsSystem.GetBodyInterface(), [](JPH::BodyInterface*) {});
+		// Optional step: Before starting the physics simulation you can optimize the broad phase. This improves collision detection performance (it's pointless here because we only have 2 bodies).
+		// You should definitely not call this every frame or when e.g. streaming in a new level section as it is an expensive operation.
+		// Instead insert all new objects in batches instead of 1 at a time to keep the broad phase efficient.
+		_mPhysicsSystem.OptimizeBroadPhase(); 
+	}
+
+	JoltPhysicsEngine::~JoltPhysicsEngine()
+	{
+		// Unregisters all types with the factory and cleans up the default material
+		JPH::UnregisterTypes();
+
+		// Destroy the factory
+		delete JPH::Factory::sInstance;
+		JPH::Factory::sInstance = nullptr;
+	}
+
+	void JoltPhysicsEngine::Simulate(float deltatime)
+	{
+		// If you take larger steps than 1 / 60th of a second you need to do multiple collision steps in order to keep the simulation stable. Do 1 collision step per 1 / 60th of a second (round up).
+		const int cCollisionSteps = 1;
+
+		// Step the world
+		_mPhysicsSystem.Update(deltatime, cCollisionSteps, _mTempAllocator.get(), _mJobSystem.get());
+	}
+
+	Vector3 JoltPhysicsEngine::GetPosition(unsigned int bodyId) const
+	{
+		const JPH::BodyInterface& interface = _mPhysicsSystem.GetBodyInterface();
+		JPH::RVec3 position = interface.GetCenterOfMassPosition(JPH::BodyID(bodyId));
+		return Vector3{ position.GetX(), position.GetY(), position.GetZ() };
+	}
+
+	void JoltPhysicsEngine::ApplyLinearVelocity(unsigned int bodyId, const Vector3& velocity)
+	{
+		JPH::BodyInterface& interface = _mPhysicsSystem.GetBodyInterface();
+		JPH::Vec3 jphVelocity{ velocity.X, velocity.Y, velocity.Z };
+		_mBodyInterface->SetLinearVelocity(JPH::BodyID(bodyId), jphVelocity);
+	}
+	
+	void JoltPhysicsEngine::CreateBoxRigidBody()
+	{
+		JPH::BodyInterface& interface = _mPhysicsSystem.GetBodyInterface();
 
 		// Next we can create a rigid body to serve as the floor, we make a large box
 		// Create the settings for the collision volume (the shape).
@@ -238,75 +267,16 @@ namespace Razor
 		JPH::BodyCreationSettings floor_settings(floor_shape, JPH::RVec3(0.0_r, -1.0_r, 0.0_r), JPH::Quat::sIdentity(), JPH::EMotionType::Static, Layers::NON_MOVING);
 
 		// Create the actual rigid body
-		JPH::Body* floor = _mBodyInterface->CreateBody(floor_settings); // Note that if we run out of bodies this can return nullptr
+		JPH::Body* floor = interface.CreateBody(floor_settings); // Note that if we run out of bodies this can return nullptr
 
 		// Add it to the world
-		_mBodyInterface->AddBody(floor->GetID(), JPH::EActivation::DontActivate);
-
-		// Now create a dynamic body to bounce on the floor
-		// Note that this uses the shorthand version of creating and adding a body to the world
-		JPH::BodyCreationSettings sphere_settings(new JPH::SphereShape(0.5f), JPH::RVec3(0.0_r, 2.0_r, 0.0_r), JPH::Quat::sIdentity(), JPH::EMotionType::Dynamic, Layers::MOVING);
-		JPH::BodyID sphere_id = _mBodyInterface->CreateAndAddBody(sphere_settings, JPH::EActivation::Activate);
-
-		// Now you can interact with the dynamic body, in this case we're going to give it a velocity.
-		// (note that if we had used CreateBody then we could have set the velocity straight on the body before adding it to the physics system)
-		_mBodyInterface->SetLinearVelocity(sphere_id, JPH::Vec3(0.0f, -5.0f, 0.0f));
-
-		// We simulate the physics world in discrete time steps. 60 Hz is a good rate to update the physics system.
-		const float cDeltaTime = 1.0f / 60.0f;
-
-		// Optional step: Before starting the physics simulation you can optimize the broad phase. This improves collision detection performance (it's pointless here because we only have 2 bodies).
-		// You should definitely not call this every frame or when e.g. streaming in a new level section as it is an expensive operation.
-		// Instead insert all new objects in batches instead of 1 at a time to keep the broad phase efficient.
-		_mPhysicsSystem.OptimizeBroadPhase(); 
-
-
+		interface.AddBody(floor->GetID(), JPH::EActivation::DontActivate);
 	}
 
-	JoltPhysicsEngine::~JoltPhysicsEngine()
+	void JoltPhysicsEngine::DestroyBody(unsigned int bodyId)
 	{
-		// Remove the sphere from the physics system. Note that the sphere itself keeps all of its state and can be re-added at any time.
-		/*body_interface.RemoveBody(sphere_id);
-
-		// Destroy the sphere. After this the sphere ID is no longer valid.
-		body_interface.DestroyBody(sphere_id);
-
-		// Remove and destroy the floor
-		body_interface.RemoveBody(floor->GetID());
-		body_interface.DestroyBody(floor->GetID());
-
-		// Unregisters all types with the factory and cleans up the default material
-		UnregisterTypes();
-
-		// Destroy the factory
-		delete Factory::sInstance;
-		Factory::sInstance = nullptr;*/
+		JPH::BodyInterface& interface = _mPhysicsSystem.GetBodyInterface();
+		interface.RemoveBody(static_cast<JPH::BodyID>(bodyId));
+		interface.DestroyBody(static_cast<JPH::BodyID>(bodyId));
 	}
-
-	void JoltPhysicsEngine::Simulate(float deltatime)
-	{
-		// If you take larger steps than 1 / 60th of a second you need to do multiple collision steps in order to keep the simulation stable. Do 1 collision step per 1 / 60th of a second (round up).
-		const int cCollisionSteps = 1;
-
-		// Step the world
-		_mPhysicsSystem.Update(deltatime, cCollisionSteps, _mTempAllocator.get(), _mJobSystem.get());
-	}
-
-
-	/*
-	* uint step = 0;
-	* // Now we're ready to simulate the body, keep simulating until it goes to sleep
-		while (body_interface.IsActive(sphere_id))
-		{
-			// Next step
-			++step;
-
-			// Output current position and velocity of the sphere
-			RVec3 position = body_interface.GetCenterOfMassPosition(sphere_id);
-			Vec3 velocity = body_interface.GetLinearVelocity(sphere_id);
-			cout << "Step " << step << ": Position = (" << position.GetX() << ", " << position.GetY() << ", " << position.GetZ() << "), Velocity = (" << velocity.GetX() << ", " << velocity.GetY() << ", " << velocity.GetZ() << ")" << endl;
-
-			
-		}
-	*/
 }

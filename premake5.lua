@@ -54,8 +54,6 @@ project "Razor"
 		"%{prj.name}/vendor/glm/glm/**.inl",
 		"%{prj.name}/vendor/entt/src**.hpp",
 		"%{prj.name}/vendor/entt/src**.cpp",
-		"%{prj.name}/vendor/JoltPhysics/Jolt/**.hpp",
-		"%{prj.name}/vendor/JoltPhysics/Jolt/**.cpp"
 	}
 
 	defines

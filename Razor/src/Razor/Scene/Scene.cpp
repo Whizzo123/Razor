@@ -7,6 +7,8 @@
 #include "../Scripting/ScriptEngine.h"
 #include "../Log.h"
 #include "../Utils/Vector.h"
+#include "../Physics/Components/BoxBody.h"
+#include "../Physics/IPhysicsEngine.h"
 
 namespace Razor
 {
@@ -71,6 +73,13 @@ namespace Razor
 		for (auto entity : GetEntitiesWithComponents<ScriptComponent>())
 		{
 			CreateInstanceObjects(GetEntity(entity)->GetComponent<ScriptComponent>().mScriptInstances);
+		}
+
+		// TODO I feel like here is a good point to add all our physics objects to the engine (remember to batch)
+
+		for (auto entity : GetEntitiesWithComponents<BoxBody>())
+		{
+			Engine::Get().GetPhysicsEngine()->CreateBoxRigidBody();
 		}
 	}
 
@@ -180,6 +189,12 @@ namespace Razor
 		}
 
 		interface.ClearObjectPool();
+
+		for (auto entity : GetEntitiesWithComponents<BoxBody>())
+		{
+			BoxBody body = GetEntity(entity)->GetComponent<BoxBody>();
+			Engine::Get().GetPhysicsEngine()->DestroyBody(body.bodyId);
+		}
 	}
 
 	void Scene::MoveFrom(Scene&& other)

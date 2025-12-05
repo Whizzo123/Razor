@@ -37,6 +37,7 @@
 #include <Coral/ManagedObject.hpp>
 #include "Assets/AssetDirectory.h"
 #include "Physics/JoltPhysics/JoltPhysicsEngine.h"
+#include "Systems/PhysicsSystem.h"
 
 namespace Razor
 {
@@ -90,6 +91,7 @@ namespace Razor
 		Coordinator->RegisterSystem<MeshRenderer>(MeshRenderer(CurrentScene, Renderer, ShaderIDMap, SceneLights));
 		Coordinator->RegisterSystem<CollisionSystem>(CollisionSystem(CurrentScene));
 		Coordinator->RegisterSystem<CameraController>(CameraController(CurrentScene));
+		Coordinator->RegisterSystem<PhysicsSystem>(CurrentScene);
 
 		//Render Systems
 		Coordinator->RegisterSystem<RSMaterialPass>(RSMaterialPass(CurrentScene));
@@ -291,5 +293,10 @@ namespace Razor
 	Ref<AssetDirectory> Engine::GetAssetDirectory()
 	{
 		return _mAssetDirectory;
+	}
+
+	Scope<IPhysicsEngine> Engine::GetPhysicsEngine()
+	{
+		return std::move(_mPhysicsEngine);
 	}
 }
