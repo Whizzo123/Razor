@@ -52,6 +52,10 @@ namespace EdgeEditor
 			{
 				Storage->SelectedEntity->AddComponent<Razor::DirectionalLight>();
 			}
+			if (Razor::RazorImGui::Button("Box Body Component"))
+			{
+				Storage->SelectedEntity->AddComponent<Razor::BoxBody>();
+			}
 			for (const auto& component : Engine.GetScriptInterface().GetComponentTypes())
 			{
 				if (Razor::RazorImGui::Button(component.GetName().c_str()))

@@ -97,7 +97,8 @@ namespace Razor
 		void Simulate(float deltaTime) override;
 		Vector3 GetPosition(unsigned int bodyId) const override;
 		void ApplyLinearVelocity(unsigned int bodyId, const Vector3& velocity) override;
-		void CreateBoxRigidBody() override;
+		unsigned int CreateBoxRigidBody(Vector3 position) override;
+		void SetGravity(unsigned int bodyId, bool useGravity) override;
 		void DestroyBody(unsigned int bodyId) override;
 
 	private:
@@ -117,6 +118,8 @@ namespace Razor
 
 		MyBodyActivationListener _mBodyActivationListener;
 		MyContactListener _mContactListener;
+
+		float accumulator = 0.0f;
 	};
 }
 

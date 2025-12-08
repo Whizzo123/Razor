@@ -198,6 +198,7 @@ namespace Razor
 
 		// Now we can create the actual physics system.
 		_mPhysicsSystem.Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, *_mBroadPhaseLayerInterface, *_mObjectVsBroadphaseLayerFilter, *_mObjectVsObjectLayerFilter);
+		_mPhysicsSystem.SetGravity(JPH::Vec3(0, -1, 0));
 
 		// A body activation listener gets notified when bodies activate and go to sleep
 		// Note that this is called from a job so whatever you do here needs to be thread safe.
@@ -213,7 +214,6 @@ namespace Razor
 		// Optional step: Before starting the physics simulation you can optimize the broad phase. This improves collision detection performance (it's pointless here because we only have 2 bodies).
 		// You should definitely not call this every frame or when e.g. streaming in a new level section as it is an expensive operation.
 		// Instead insert all new objects in batches instead of 1 at a time to keep the broad phase efficient.
-		_mPhysicsSystem.OptimizeBroadPhase(); 
 	}
 
 	JoltPhysicsEngine::~JoltPhysicsEngine()
@@ -231,8 +231,16 @@ namespace Razor
 		// If you take larger steps than 1 / 60th of a second you need to do multiple collision steps in order to keep the simulation stable. Do 1 collision step per 1 / 60th of a second (round up).
 		const int cCollisionSteps = 1;
 
-		// Step the world
-		_mPhysicsSystem.Update(deltatime, cCollisionSteps, _mTempAllocator.get(), _mJobSystem.get());
+		accumulator += deltatime;
+
+		const float fixedStep = 1.0f / 60.0f;
+
+		if (accumulator >= fixedStep)
+		{
+			// Step the world
+			_mPhysicsSystem.Update(fixedStep, cCollisionSteps, _mTempAllocator.get(), _mJobSystem.get());
+			accumulator -= fixedStep;
+		}
 	}
 
 	Vector3 JoltPhysicsEngine::GetPosition(unsigned int bodyId) const
@@ -249,14 +257,14 @@ namespace Razor
 		_mBodyInterface->SetLinearVelocity(JPH::BodyID(bodyId), jphVelocity);
 	}
 	
-	void JoltPhysicsEngine::CreateBoxRigidBody()
+	unsigned int JoltPhysicsEngine::CreateBoxRigidBody(Vector3 position)
 	{
 		JPH::BodyInterface& interface = _mPhysicsSystem.GetBodyInterface();
 
 		// Next we can create a rigid body to serve as the floor, we make a large box
 		// Create the settings for the collision volume (the shape).
 		// Note that for simple shapes (like boxes) you can also directly construct a BoxShape.
-		JPH::BoxShapeSettings floor_shape_settings(JPH::Vec3(100.0f, 1.0f, 100.0f));
+		JPH::BoxShapeSettings floor_shape_settings(JPH::Vec3(1.0f, 1.0f, 1.0f));
 		floor_shape_settings.SetEmbedded(); // A ref counted object on the stack (base class RefTarget) should be marked as such to prevent it from being freed when its reference count goes to 0.
 
 		// Create the shape
@@ -264,13 +272,30 @@ namespace Razor
 		JPH::ShapeRefC floor_shape = floor_shape_result.Get(); // We don't expect an error here, but you can check floor_shape_result for HasError() / GetError()
 
 		// Create the settings for the body itself. Note that here you can also set other properties like the restitution / friction.
-		JPH::BodyCreationSettings floor_settings(floor_shape, JPH::RVec3(0.0_r, -1.0_r, 0.0_r), JPH::Quat::sIdentity(), JPH::EMotionType::Static, Layers::NON_MOVING);
+		JPH::BodyCreationSettings floor_settings(floor_shape, JPH::RVec3(position.X, position.Y, position.Z), JPH::Quat::sIdentity(), JPH::EMotionType::Dynamic, Layers::MOVING);
 
 		// Create the actual rigid body
 		JPH::Body* floor = interface.CreateBody(floor_settings); // Note that if we run out of bodies this can return nullptr
 
 		// Add it to the world
-		interface.AddBody(floor->GetID(), JPH::EActivation::DontActivate);
+		interface.AddBody(floor->GetID(), JPH::EActivation::Activate);
+
+		_mPhysicsSystem.OptimizeBroadPhase();
+
+		return floor->GetID().GetIndexAndSequenceNumber();
+	}
+
+	void JoltPhysicsEngine::SetGravity(unsigned int bodyId, bool useGravity)
+	{
+		JPH::BodyInterface& interface = _mPhysicsSystem.GetBodyInterface();
+		if (useGravity)
+		{
+			interface.SetGravityFactor(static_cast<JPH::BodyID>(bodyId), 1.0f);
+		}
+		else
+		{
+			interface.SetGravityFactor(static_cast<JPH::BodyID>(bodyId), 0.0f);
+		}
 	}
 
 	void JoltPhysicsEngine::DestroyBody(unsigned int bodyId)

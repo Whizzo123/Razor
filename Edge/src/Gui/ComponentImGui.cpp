@@ -14,6 +14,7 @@ namespace EdgeEditor
 		map["Mesh"] = DrawMesh;
 		map["DirectionalLight"] = DrawDirectionalLight;
 		map["ScriptComponent"] = DrawScriptComponent;
+		map["BoxBody"] = DrawBoxBody;
 		return map;
 	}
 
@@ -116,6 +117,21 @@ namespace EdgeEditor
 				}
 			}
 			
+		}
+	}
+
+	void ComponentImGui::DrawBoxBody(Razor::Ref<Razor::Entity> inEntity)
+	{
+		if (inEntity->HasComponent<Razor::BoxBody>())
+		{
+			Razor::BoxBody& body = inEntity->GetComponent<Razor::BoxBody>();
+			if (Razor::RazorImGui::CollapsingHeader("Box Body"))
+			{
+				if (Razor::RazorImGui::CheckBox("Use Gravity", &body.mbUseGravity))
+				{
+
+				}
+			}
 		}
 	}
 }

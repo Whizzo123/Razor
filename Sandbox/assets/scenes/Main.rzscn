@@ -1,19 +1,15 @@
 Scene: Untitled
 Entities:
-  - Entity: 1
+  - Entity: 2
     Transform:
-      Position: [0, 0, -5]
+      Position: [-4.22683188e-05, -98.3572693, -5]
       Rotation: [0, 0, 0]
       Scale: [0, 0, 0]
     Mesh:
       ModelKey: models/Cube.model
     ScriptComponent:
-      - Sandbox.Player:
-          ScriptFields:
-            - Name:
-                Type: System.String
-                Data: Joey
-  - Entity: 0
+      []
+  - Entity: 1
     Transform:
       Position: [1, 0, -10]
       Rotation: [0, 0, 0]
@@ -24,10 +20,15 @@ Entities:
       Specular: [1, 1, 1]
       Direction: [1, 0, 0]
     ScriptComponent:
-      - Sandbox.Player:
-          ScriptFields:
-            - Name:
-                Type: System.String
-                Data: Laurz
+      []
+  - Entity: 0
+    Transform:
+      Position: [4.22683188e-05, -100.357269, -5]
+      Rotation: [0, 0, 0]
+      Scale: [0, 0, 0]
+    Mesh:
+      ModelKey: models/Cube.model
+    ScriptComponent:
+      []
 Systems:
   - Sandbox.PlayerMovement

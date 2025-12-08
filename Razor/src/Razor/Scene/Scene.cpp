@@ -79,7 +79,11 @@ namespace Razor
 
 		for (auto entity : GetEntitiesWithComponents<BoxBody>())
 		{
-			Engine::Get().GetPhysicsEngine()->CreateBoxRigidBody();
+			Transform& transform = GetEntity(entity)->GetComponent<Transform>();
+			Vector3 pos = { transform.Position.x, transform.Position.y, transform.Position.z };
+			BoxBody& body = GetEntity(entity)->GetComponent<BoxBody>();
+			body.bodyId = Engine::Get().GetPhysicsEngine().CreateBoxRigidBody(pos);
+			Engine::Get().GetPhysicsEngine().SetGravity(body.bodyId, body.mbUseGravity);
 		}
 	}
 
@@ -193,7 +197,7 @@ namespace Razor
 		for (auto entity : GetEntitiesWithComponents<BoxBody>())
 		{
 			BoxBody body = GetEntity(entity)->GetComponent<BoxBody>();
-			Engine::Get().GetPhysicsEngine()->DestroyBody(body.bodyId);
+			Engine::Get().GetPhysicsEngine().DestroyBody(body.bodyId);
 		}
 	}
 

@@ -354,4 +354,13 @@ namespace Razor
 		}
 		return false;
 	}
+
+	bool RazorImGui::CheckBox(const char* label, bool* value)
+	{
+		if (ImGui::Checkbox(label, value))
+		{
+			return true;
+		}
+		return false;
+	}
 }

@@ -295,8 +295,8 @@ namespace Razor
 		return _mAssetDirectory;
 	}
 
-	Scope<IPhysicsEngine> Engine::GetPhysicsEngine()
+	IPhysicsEngine& Engine::GetPhysicsEngine()
 	{
-		return std::move(_mPhysicsEngine);
+		return *_mPhysicsEngine;
 	}
 }

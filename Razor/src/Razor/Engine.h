@@ -166,7 +166,7 @@ namespace Razor
 
 		Ref<AssetDirectory> GetAssetDirectory();
 
-		Scope<IPhysicsEngine> GetPhysicsEngine();
+		IPhysicsEngine& GetPhysicsEngine();
 
 	private:
 		
