@@ -257,7 +257,7 @@ namespace Razor
 		_mBodyInterface->SetLinearVelocity(JPH::BodyID(bodyId), jphVelocity);
 	}
 	
-	unsigned int JoltPhysicsEngine::CreateBoxRigidBody(Vector3 position)
+	unsigned int JoltPhysicsEngine::CreateBoxRigidBody(Vector3 position, float mass, EPhysicsMotionType motionType, bool bIsStatic)
 	{
 		JPH::BodyInterface& interface = _mPhysicsSystem.GetBodyInterface();
 
@@ -272,7 +272,27 @@ namespace Razor
 		JPH::ShapeRefC floor_shape = floor_shape_result.Get(); // We don't expect an error here, but you can check floor_shape_result for HasError() / GetError()
 
 		// Create the settings for the body itself. Note that here you can also set other properties like the restitution / friction.
-		JPH::BodyCreationSettings floor_settings(floor_shape, JPH::RVec3(position.X, position.Y, position.Z), JPH::Quat::sIdentity(), JPH::EMotionType::Dynamic, Layers::MOVING);
+		JPH::ObjectLayer layer = Layers::MOVING;
+		if (bIsStatic)
+		{
+			layer = Layers::NON_MOVING;
+		}
+		JPH::EMotionType motion = JPH::EMotionType::Static;
+		switch (motionType)
+		{
+		case (EPhysicsMotionType::Kinematic):
+			motion = JPH::EMotionType::Kinematic;
+			break;
+		case (EPhysicsMotionType::Dynamic):
+			motion = JPH::EMotionType::Dynamic;
+			break;
+		default:
+			motion = JPH::EMotionType::Static;
+		}
+		JPH::BodyCreationSettings floor_settings(floor_shape, JPH::RVec3(position.X, position.Y, position.Z), JPH::Quat::sIdentity(), motion, layer);
+		JPH::MassProperties massOverride;
+		massOverride.ScaleToMass(mass);
+		floor_settings.mMassPropertiesOverride = massOverride;
 
 		// Create the actual rigid body
 		JPH::Body* floor = interface.CreateBody(floor_settings); // Note that if we run out of bodies this can return nullptr

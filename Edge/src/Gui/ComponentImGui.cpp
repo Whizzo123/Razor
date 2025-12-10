@@ -127,9 +127,46 @@ namespace EdgeEditor
 			Razor::BoxBody& body = inEntity->GetComponent<Razor::BoxBody>();
 			if (Razor::RazorImGui::CollapsingHeader("Box Body"))
 			{
-				if (Razor::RazorImGui::CheckBox("Use Gravity", &body.mbUseGravity))
-				{
+				if (Razor::RazorImGui::CheckBox("Use Gravity", &body.mbUseGravity)) {}
 
+				if (Razor::RazorImGui::CheckBox("Is Static", &body.mbIsStatic)) {}
+
+				if (Razor::RazorImGui::InputFloat("Mass", &body.mMass)) {}
+
+				std::vector<const char*> motionTypes =
+				{
+					"Static",
+					"Kinematic",
+					"Dynamic"
+				};
+				int selectedIdx = 0;
+				switch (body.mMotionType) 
+				{
+				case(Razor::EPhysicsMotionType::Kinematic):
+					selectedIdx = 1;
+					break;
+				case(Razor::EPhysicsMotionType::Dynamic):
+					selectedIdx = 2;
+					break;
+				}
+				
+				const char** data = motionTypes.data();
+
+				if (Razor::RazorImGui::Combo("Motion Type", data, motionTypes.size(), &selectedIdx)) 
+				{
+					if (motionTypes[selectedIdx] == "Static")
+					{
+						body.mMotionType = Razor::EPhysicsMotionType::Static;
+					}
+					else if (motionTypes[selectedIdx] == "Kinematic")
+					{
+						body.mMotionType = Razor::EPhysicsMotionType::Kinematic;
+					} 
+					else if (motionTypes[selectedIdx] == "Dynamic")
+					{
+						body.mMotionType = Razor::EPhysicsMotionType::Dynamic;
+					}
+					
 				}
 			}
 		}

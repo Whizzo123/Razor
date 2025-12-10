@@ -75,14 +75,14 @@ namespace Razor
 			CreateInstanceObjects(GetEntity(entity)->GetComponent<ScriptComponent>().mScriptInstances);
 		}
 
-		// TODO I feel like here is a good point to add all our physics objects to the engine (remember to batch)
+		// TODO Add batching to bodies 
 
 		for (auto entity : GetEntitiesWithComponents<BoxBody>())
 		{
 			Transform& transform = GetEntity(entity)->GetComponent<Transform>();
 			Vector3 pos = { transform.Position.x, transform.Position.y, transform.Position.z };
 			BoxBody& body = GetEntity(entity)->GetComponent<BoxBody>();
-			body.bodyId = Engine::Get().GetPhysicsEngine().CreateBoxRigidBody(pos);
+			body.bodyId = Engine::Get().GetPhysicsEngine().CreateBoxRigidBody(pos, body.mMass, body.mMotionType, body.mbIsStatic);
 			Engine::Get().GetPhysicsEngine().SetGravity(body.bodyId, body.mbUseGravity);
 		}
 	}
