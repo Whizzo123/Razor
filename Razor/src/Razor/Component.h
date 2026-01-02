@@ -81,9 +81,9 @@ namespace Razor
 
 	struct Mesh
 	{
-		Mesh() {}
-		Mesh(Ref<Model> model) : mModel(model) {}
-		Ref<Model> mModel;
+		Mesh() : mKey(AssetKey("")) {}
+		Mesh(AssetKey assetKey) : mKey(assetKey) {}
+		AssetKey mKey;
 	};
 
 	struct Collider

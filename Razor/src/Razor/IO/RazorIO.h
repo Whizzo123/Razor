@@ -15,18 +15,6 @@ namespace Razor
 		Escape,
 		Backspace
 	};
-	~RazorIO() {};
-	std::unordered_map<RazorKey, RazorKeyState> Keyboard;
-	std::unordered_map<RazorMouseButton, RazorMouseState> MouseButtons;
-	
-private:
-	static RazorIO* GRazorIO;
-	
-	//DELEGATES
-	OnMouseButtonPressedDelegate _mOnMouseButtonPressedDelegate;
-	OnMouseButtonReleasedDelegate _mOnMouseButtonReleasedDelegate;
-	OnKeyStateChangedDelegate _mOnKeyStateChangedDelegate;
-	OnMousePosChangedDelegate _mOnMousePosChangedDelegate;
 
 	enum RazorKeyState
 	{
@@ -95,15 +83,15 @@ private:
 		~RazorIO() {};
 		std::unordered_map<RazorKey, RazorKeyState> Keyboard;
 		std::unordered_map<RazorMouseButton, RazorMouseState> MouseButtons;
-
-	private:
+	
+private:
 		static RazorIO* GRazorIO;
-
+		
 		//DELEGATES
-		OnMouseButtonPressedDelegate OnMouseButtonPressedDelegate;
-		OnMouseButtonReleasedDelegate OnMouseButtonReleasedDelegate;
-		OnKeyStateChangedDelegate OnKeyStateChangedDelegate;
-		OnMousePosChangedDelegate OnMousePosChangedDelegate;
+		OnMouseButtonPressedDelegate _mOnMouseButtonPressedDelegate;
+		OnMouseButtonReleasedDelegate _mOnMouseButtonReleasedDelegate;
+		OnKeyStateChangedDelegate _mOnKeyStateChangedDelegate;
+		OnMousePosChangedDelegate _mOnMousePosChangedDelegate;
 
 		// May want to move the LastMousePos calculation to inndividual systems as not really an IO thing to do
 		void UpdateMousePositions(double Xpos, double Ypos)
