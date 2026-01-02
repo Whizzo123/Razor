@@ -53,3 +53,5 @@ Binaries/
 *.csproj.Backup.tmp
 *.deps.json
 *.pdb
+
+Makefile

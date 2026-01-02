@@ -15,6 +15,18 @@ namespace Razor
 		Escape,
 		Backspace
 	};
+	~RazorIO() {};
+	std::unordered_map<RazorKey, RazorKeyState> Keyboard;
+	std::unordered_map<RazorMouseButton, RazorMouseState> MouseButtons;
+	
+private:
+	static RazorIO* GRazorIO;
+	
+	//DELEGATES
+	OnMouseButtonPressedDelegate _mOnMouseButtonPressedDelegate;
+	OnMouseButtonReleasedDelegate _mOnMouseButtonReleasedDelegate;
+	OnKeyStateChangedDelegate _mOnKeyStateChangedDelegate;
+	OnMousePosChangedDelegate _mOnMousePosChangedDelegate;
 
 	enum RazorKeyState
 	{

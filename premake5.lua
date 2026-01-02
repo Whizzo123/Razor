@@ -115,6 +115,15 @@ project "Razor"
 			"CORAL_WINDOWS",
 			"RZ_BUILD_DLL"
 		}
+	
+	filter "system:linux"
+		systemversion "latest"
+
+		defines
+		{
+			"RZ_BUILD_DLL",
+			"RZ_PLATFORM_LINUX"
+		}
 
 	filter "configurations:Debug"
 		prebuildcommands {
