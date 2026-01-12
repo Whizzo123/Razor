@@ -22,6 +22,8 @@ namespace Razor
 	class ScriptInterface;
 	class AssetDirectory;
 	class IPhysicsEngine;
+	class IPhysicsDebugRenderer;
+	class PhysicsDebugDrawBuffer;
 
 	struct Light;
 	struct RenderStageConfig;
@@ -168,6 +170,10 @@ namespace Razor
 
 		IPhysicsEngine& GetPhysicsEngine();
 
+		void PopulateRenderPipelineDebugData();
+
+		void ClearDebugDrawBuffer();
+
 	private:
 		
 		void RenderImGui(uint64_t SceneTexture);
@@ -190,6 +196,9 @@ namespace Razor
 		Scope<ScriptAssembly> GameAssembly;
 		Ref<AssetDirectory> _mAssetDirectory;
 		Scope<IPhysicsEngine> _mPhysicsEngine;
+		Ref<IPhysicsDebugRenderer> _mPhysicsDebugRenderer;
+
+		PhysicsDebugDrawBuffer* _mDebugDrawBuffer;
 
 		std::atomic<bool> bIsRuntimeRunning { false };
 		std::thread RuntimeThread;

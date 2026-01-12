@@ -4,7 +4,7 @@
 
 namespace Razor
 {
-	void RSPickBufferRenderPass::Render(RenderPipelineEntityProperties& Properties)
+	void RSPickBufferRenderPass::Render(RenderPipelineData& data)
 	{
 		auto View = CurrentScene->GetEntitiesWithComponents<Mesh>();
 
@@ -19,13 +19,19 @@ namespace Razor
 			for (const MeshData& Child : Model->asset.GetModelMeshData())
 			{
 				Renderer->UseShader(Engine::Get().GetShaderForType(typeid(PickBufferShader).name())->ID);
-				if (Properties.Properties.find(EntityToRender) == Properties.Properties.end())
+				if (data.mEntityRenderProperties.Properties.find(EntityToRender) == data.mEntityRenderProperties.Properties.end())
 				{
 					continue;
 				}
-				PropertySlot& Slot = Properties.Properties[EntityToRender].GetPropertySlot(Child.MaterialId);
+				ShaderPropertySlot& Slot = data.mEntityRenderProperties.Properties[EntityToRender].GetPropertySlot(Child.MaterialId);
 				std::shared_ptr<Shader> MeshShader = ShaderMap[Engine::Get().GetShaderForType(typeid(PickBufferShader).name())->ID];
 				
+				static const std::string floatTypeName = std::string(typeid(float).name());
+				static const std::string vec3TypeName = std::string(typeid(glm::vec3).name());
+				static const std::string mat4TypeName = std::string(typeid(glm::mat4).name());
+				static const std::string boolTypeName = std::string(typeid(bool).name());
+				static const std::string intTypeName = std::string(typeid(int).name());
+
 				for (Scope<IProperty>& Prop : Slot.GetProperties())
 				{
 					if (!Prop)
@@ -33,7 +39,7 @@ namespace Razor
 						continue;
 					}
 					
-					if (Prop->GetType() == typeid(float).name())
+					if (Prop->GetType() == floatTypeName)
 					{
 						if (Property<float>* FloatProperty = dynamic_cast<Property<float>*>(Prop.get()))
 						{
@@ -41,7 +47,7 @@ namespace Razor
 						}
 					}
 
-					if (Prop->GetType() == typeid(glm::vec3).name())
+					if (Prop->GetType() == vec3TypeName)
 					{
 						if (Property<glm::vec3>* Vec3Property = dynamic_cast<Property<glm::vec3>*>(Prop.get()))
 						{
@@ -49,7 +55,7 @@ namespace Razor
 						}
 					}
 
-					if (Prop->GetType() == typeid(glm::mat4).name())
+					if (Prop->GetType() == mat4TypeName)
 					{
 						if (Property<glm::mat4>* Mat4Property = dynamic_cast<Property<glm::mat4>*>(Prop.get()))
 						{
@@ -57,7 +63,7 @@ namespace Razor
 						}
 					}
 
-					if (Prop->GetType() == typeid(bool).name())
+					if (Prop->GetType() == boolTypeName)
 					{
 						if (Property<bool>* BoolProperty = dynamic_cast<Property<bool>*>(Prop.get()))
 						{
@@ -65,7 +71,7 @@ namespace Razor
 						}
 					}
 
-					if (Prop->GetType() == typeid(int).name())
+					if (Prop->GetType() == intTypeName)
 					{
 						if (Property<int>* IntProperty = dynamic_cast<Property<int>*>(Prop.get()))
 						{
@@ -75,7 +81,7 @@ namespace Razor
 				}
 				Renderer->DrawMesh({ Child });
 			}
-			Properties.Properties[EntityToRender].Clear();
+			data.mEntityRenderProperties.Properties[EntityToRender].Clear();
 		}
 	}
 }

@@ -8,6 +8,7 @@
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 
+#include "JoltDebugRenderer.h"
 
 JPH_SUPPRESS_WARNINGS
 
@@ -144,7 +145,7 @@ namespace Razor
 		std::cout << "A body went to sleep" << std::endl;
 	}
 
-	JoltPhysicsEngine::JoltPhysicsEngine() :  IPhysicsEngine()
+	JoltPhysicsEngine::JoltPhysicsEngine(Ref<JoltDebugRenderer> debugRenderer) :  IPhysicsEngine()
 	{
 		// Register allocation hook. Default to malloc / free.
 		JPH::RegisterDefaultAllocator();
@@ -162,6 +163,8 @@ namespace Razor
 		_mTempAllocator = CreateScope<JPH::TempAllocatorImpl>(10 * 1024 * 1024); // 10 MB
 
 		_mJobSystem = CreateScope<JPH::JobSystemThreadPool>(1024, 8, std::thread::hardware_concurrency() - 1);
+
+		JPH::DebugRenderer::sInstance = debugRenderer.get();
 
 		// This is the max amount of rigid bodies that you can add to the physics system. If you try to add more you'll get an error.
 		// Note: This value is low because this is a simple test. For a real project use something in the order of 65536.
@@ -233,7 +236,7 @@ namespace Razor
 
 		accumulator += deltatime;
 
-		const float fixedStep = 1.0f / 60.0f;
+		const float fixedStep = 1.0f / 30.0f;
 
 		if (accumulator >= fixedStep)
 		{
@@ -247,6 +250,17 @@ namespace Razor
 	{
 		const JPH::BodyInterface& interface = _mPhysicsSystem.GetBodyInterface();
 		JPH::RVec3 position = interface.GetCenterOfMassPosition(JPH::BodyID(bodyId));
+
+		JPH::BodyLockRead lock(_mPhysicsSystem.GetBodyLockInterface(), JPH::BodyID(bodyId));
+		if (!lock.Succeeded())
+			return Vector3{ position.GetX(), position.GetY(), position.GetZ() };
+
+		const JPH::Body& body = lock.GetBody();
+
+		JPH::AABox aabb = body.GetWorldSpaceBounds();
+
+		JPH::DebugRenderer::sInstance->DrawWireBox(aabb, JPH::Color::sRed);
+
 		return Vector3{ position.GetX(), position.GetY(), position.GetZ() };
 	}
 

@@ -27,6 +27,7 @@ namespace Razor
 		void RunSystems(float dt);
 		void RunRenderSystems(RenderPipelineConfig PipelineConfig);
 		void InitSystems();
+		void SetRenderPipelineDebugData(std::vector<DebugLine> lineData, std::vector<DebugTriangle> triangleData);
 
 	private:
 		void Init();

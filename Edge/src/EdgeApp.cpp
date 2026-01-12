@@ -11,7 +11,7 @@
 #include "Gui/OpenProjectPopupWindow.h"
 #include "SystemView.h"
 
-
+#define _ITERATOR_DEBUG_LEVEL 2
 
 class Edge : public Razor::Application
 {
@@ -136,11 +136,15 @@ void Edge::Run()
 		SceneBuffer->Refresh(SizeX, SizeY);
 		Renderer->SetViewport(0, 0, SizeX, SizeY);
 
+		Engine.PopulateRenderPipelineDebugData();
+
 		Engine.Render(PickBuffer->GetID(), PickPipelineConfig);
 
 		ProcessInput();
 
 		Engine.Render(SceneBuffer->GetID(), EditorPipelineConfig);
+
+		Engine.ClearDebugDrawBuffer();
 
 		Renderer->PollForEvents();
 

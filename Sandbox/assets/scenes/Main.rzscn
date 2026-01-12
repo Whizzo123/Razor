@@ -2,7 +2,7 @@ Scene: Untitled
 Entities:
   - Entity: 2
     Transform:
-      Position: [4.22683188e-05, 0, -5]
+      Position: [-4.22683188e-05, 5, -5]
       Rotation: [0, 0, 0]
       Scale: [0, 0, 0]
     Mesh:
@@ -11,7 +11,7 @@ Entities:
       []
     BoxBody:
       UseGravity: false
-      IsStatic: true
+      IsStatic: false
       MotionType: Static
       Mass: 1
   - Entity: 1
@@ -28,12 +28,17 @@ Entities:
       []
   - Entity: 0
     Transform:
-      Position: [-4.22683188e-05, 5, -5]
+      Position: [4.22683188e-05, 0, -5]
       Rotation: [0, 0, 0]
       Scale: [0, 0, 0]
     Mesh:
       ModelKey: models/Cube.model
     ScriptComponent:
       []
+    BoxBody:
+      UseGravity: false
+      IsStatic: true
+      MotionType: Static
+      Mass: 1
 Systems:
   - Sandbox.PlayerMovement
