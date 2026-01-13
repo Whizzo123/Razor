@@ -123,16 +123,47 @@ namespace Razor
 	void MyContactListener::OnContactAdded(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings)
 	{
 		std::cout << "A contact was added" << std::endl;
+		_mBodyContactMap[inBody1.GetID()].push_back({ EContactType::Started, inBody2.GetID().GetIndex(), false });
+		_mBodyContactMap[inBody2.GetID()].push_back({ EContactType::Started, inBody1.GetID().GetIndex(), false });
 	}
 
 	void MyContactListener::OnContactPersisted(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings)
 	{
 		std::cout << "A contact was persisted" << std::endl;
+
+		auto processContact = [=](JPH::BodyID first, JPH::BodyID second)
+		{
+			for(ContactInfo& info : _mBodyContactMap[first])
+			{
+				if (info.mOtherBodyId == second.GetIndex() && info.mContactProcessed)
+				{
+					info.mContactType = EContactType::Persisted;
+					info.mContactProcessed = false;
+				}
+			}
+		};
+
+		processContact(inBody1.GetID(), inBody2.GetID());
+		processContact(inBody2.GetID(), inBody1.GetID());
 	}
 
 	void MyContactListener::OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair)
 	{
 		std::cout << "A contact was removed" << std::endl;
+
+		auto processContact = [=](JPH::BodyID first, JPH::BodyID second)
+			{
+				for (ContactInfo& info : _mBodyContactMap[first])
+				{
+					if (info.mOtherBodyId == second.GetIndex() && info.mContactProcessed)
+					{
+						info.mContactType = EContactType::Ended;
+						info.mContactProcessed = false;
+					}
+				}
+			};
+		processContact(inSubShapePair.GetBody1ID(), inSubShapePair.GetBody2ID());
+		processContact(inSubShapePair.GetBody2ID(), inSubShapePair.GetBody1ID());
 	}
 
 	void MyBodyActivationListener::OnBodyActivated(const JPH::BodyID& inBodyID, uint64_t inBodyUserData)
@@ -337,5 +368,31 @@ namespace Razor
 		JPH::BodyInterface& interface = _mPhysicsSystem.GetBodyInterface();
 		interface.RemoveBody(static_cast<JPH::BodyID>(bodyId));
 		interface.DestroyBody(static_cast<JPH::BodyID>(bodyId));
+	}
+
+	std::vector<ContactInfo> JoltPhysicsEngine::GetContactInfo(unsigned int bodyId)
+	{
+		std::vector<ContactInfo> ret;
+		if (_mContactListener._mBodyContactMap.find(JPH::BodyID(bodyId)) != _mContactListener._mBodyContactMap.end())
+		{
+			ret = _mContactListener._mBodyContactMap[static_cast<JPH::BodyID>(bodyId)];
+
+			std::vector<ContactInfo> clearList;
+			for (ContactInfo& info : _mContactListener._mBodyContactMap[static_cast<JPH::BodyID>(bodyId)])
+			{
+				info.mContactProcessed = true;
+				if (info.mContactType == EContactType::Ended)
+				{
+					clearList.push_back(info);
+				}
+			}
+			for (const ContactInfo& info : clearList)
+			{
+				_mContactListener._mBodyContactMap[static_cast<JPH::BodyID>(bodyId)].erase(std::find(_mContactListener._mBodyContactMap[static_cast<JPH::BodyID>(bodyId)].begin(),
+					_mContactListener._mBodyContactMap[static_cast<JPH::BodyID>(bodyId)].end(), info));
+			}
+		}
+		
+		return ret;
 	}
 }

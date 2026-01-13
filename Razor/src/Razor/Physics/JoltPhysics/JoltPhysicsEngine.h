@@ -79,6 +79,10 @@ namespace Razor
 		virtual void OnContactPersisted(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings) override;
 
 		virtual void OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair) override;
+
+		friend class JoltPhysicsEngine;
+	private:
+		std::unordered_map<JPH::BodyID, std::vector<ContactInfo>> _mBodyContactMap;
 	};
 
 	// An example activation listener
@@ -101,6 +105,7 @@ namespace Razor
 		unsigned int CreateBoxRigidBody(Vector3 position, float mass, EPhysicsMotionType motionType, bool bIsStatic) override;
 		void SetGravity(unsigned int bodyId, bool useGravity) override;
 		void DestroyBody(unsigned int bodyId) override;
+		std::vector<ContactInfo> GetContactInfo(unsigned int bodyId) override;
 
 	private:
 		JPH::PhysicsSystem _mPhysicsSystem;
@@ -118,7 +123,7 @@ namespace Razor
 		std::shared_ptr<JPH::BodyInterface> _mBodyInterface;
 
 		MyBodyActivationListener _mBodyActivationListener;
-		MyContactListener _mContactListener;
+		MyContactListener _mContactListener;		
 
 		float accumulator = 0.0f;
 	};

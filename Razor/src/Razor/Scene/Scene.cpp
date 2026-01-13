@@ -82,6 +82,7 @@ namespace Razor
 			Transform& transform = GetEntity(entity)->GetComponent<Transform>();
 			Vector3 pos = { transform.Position.x, transform.Position.y, transform.Position.z };
 			BoxBody& body = GetEntity(entity)->GetComponent<BoxBody>();
+			body.OnCollisionStarted = []() { RZ_CORE_INFO("Collision started"); };
 			body.bodyId = Engine::Get().GetPhysicsEngine().CreateBoxRigidBody(pos, body.mMass, body.mMotionType, body.mbIsStatic);
 			Engine::Get().GetPhysicsEngine().SetGravity(body.bodyId, body.mbUseGravity);
 		}
