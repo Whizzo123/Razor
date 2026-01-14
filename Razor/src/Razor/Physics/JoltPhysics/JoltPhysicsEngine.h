@@ -83,6 +83,7 @@ namespace Razor
 		friend class JoltPhysicsEngine;
 	private:
 		std::unordered_map<JPH::BodyID, std::vector<ContactInfo>> _mBodyContactMap;
+		std::mutex _mContactMapMutex;
 	};
 
 	// An example activation listener

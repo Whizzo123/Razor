@@ -17,6 +17,7 @@ using namespace JPH::literals;
 #include <thread>
 #include <cstdarg>
 #include <iostream>
+#include <mutex>
 
 #include "../../Utils/Vector.h"
 
@@ -123,6 +124,7 @@ namespace Razor
 	void MyContactListener::OnContactAdded(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings)
 	{
 		std::cout << "A contact was added" << std::endl;
+		std::lock_guard<std::mutex> lock(_mContactMapMutex);
 		_mBodyContactMap[inBody1.GetID()].push_back({ EContactType::Started, inBody2.GetID().GetIndex(), false });
 		_mBodyContactMap[inBody2.GetID()].push_back({ EContactType::Started, inBody1.GetID().GetIndex(), false });
 	}
@@ -131,7 +133,8 @@ namespace Razor
 	{
 		std::cout << "A contact was persisted" << std::endl;
 
-		auto processContact = [=](JPH::BodyID first, JPH::BodyID second)
+		std::lock_guard<std::mutex> lock(_mContactMapMutex);
+		auto processContact = [this](JPH::BodyID first, JPH::BodyID second)
 		{
 			for(ContactInfo& info : _mBodyContactMap[first])
 			{
@@ -151,7 +154,8 @@ namespace Razor
 	{
 		std::cout << "A contact was removed" << std::endl;
 
-		auto processContact = [=](JPH::BodyID first, JPH::BodyID second)
+		std::lock_guard<std::mutex> lock(_mContactMapMutex);
+		auto processContact = [this](JPH::BodyID first, JPH::BodyID second)
 			{
 				for (ContactInfo& info : _mBodyContactMap[first])
 				{
@@ -299,7 +303,7 @@ namespace Razor
 	{
 		JPH::BodyInterface& interface = _mPhysicsSystem.GetBodyInterface();
 		JPH::Vec3 jphVelocity{ velocity.X, velocity.Y, velocity.Z };
-		_mBodyInterface->SetLinearVelocity(JPH::BodyID(bodyId), jphVelocity);
+		interface.SetLinearVelocity(JPH::BodyID(bodyId), jphVelocity);
 	}
 	
 	unsigned int JoltPhysicsEngine::CreateBoxRigidBody(Vector3 position, float mass, EPhysicsMotionType motionType, bool bIsStatic)
@@ -341,6 +345,12 @@ namespace Razor
 
 		// Create the actual rigid body
 		JPH::Body* floor = interface.CreateBody(floor_settings); // Note that if we run out of bodies this can return nullptr
+		
+		if (floor == nullptr)
+		{
+			std::cerr << "Failed to create physics body - body limit may have been reached" << std::endl;
+			return JPH::BodyID::cInvalidBodyID;
+		}
 
 		// Add it to the world
 		interface.AddBody(floor->GetID(), JPH::EActivation::Activate);
@@ -372,6 +382,7 @@ namespace Razor
 
 	std::vector<ContactInfo> JoltPhysicsEngine::GetContactInfo(unsigned int bodyId)
 	{
+		std::lock_guard<std::mutex> lock(_mContactListener._mContactMapMutex);
 		std::vector<ContactInfo> ret;
 		if (_mContactListener._mBodyContactMap.find(JPH::BodyID(bodyId)) != _mContactListener._mBodyContactMap.end())
 		{
