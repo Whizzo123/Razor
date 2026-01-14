@@ -7,6 +7,8 @@
 #include "../Scripting/ScriptEngine.h"
 #include "../Log.h"
 #include "../Utils/Vector.h"
+#include "../Physics/Components/BoxBody.h"
+#include "../Physics/IPhysicsEngine.h"
 
 namespace Razor
 {
@@ -71,6 +73,23 @@ namespace Razor
 		for (auto entity : GetEntitiesWithComponents<ScriptComponent>())
 		{
 			CreateInstanceObjects(GetEntity(entity)->GetComponent<ScriptComponent>().mScriptInstances);
+		}
+
+		// TODO Add batching to bodies 
+
+		for (auto entity : GetEntitiesWithComponents<BoxBody>())
+		{
+			Transform& transform = GetEntity(entity)->GetComponent<Transform>();
+			Vector3 pos = { transform.Position.x, transform.Position.y, transform.Position.z };
+			BoxBody& body = GetEntity(entity)->GetComponent<BoxBody>();
+			body.OnCollisionStarted = []() { RZ_CORE_INFO("Collision started"); };
+			body.bodyId = Engine::Get().GetPhysicsEngine().CreateBoxRigidBody(pos, body.mMass, body.mMotionType, body.mbIsStatic);
+			if (body.bodyId == 0xFFFFFFFF)
+			{
+				RZ_CORE_ERROR("Scene(StartScene): -> Failed to create BoxBody physics body for entity");
+				continue;
+			}
+			Engine::Get().GetPhysicsEngine().SetGravity(body.bodyId, body.mbUseGravity);
 		}
 	}
 
@@ -180,6 +199,12 @@ namespace Razor
 		}
 
 		interface.ClearObjectPool();
+
+		for (auto entity : GetEntitiesWithComponents<BoxBody>())
+		{
+			BoxBody body = GetEntity(entity)->GetComponent<BoxBody>();
+			Engine::Get().GetPhysicsEngine().DestroyBody(body.bodyId);
+		}
 	}
 
 	void Scene::MoveFrom(Scene&& other)

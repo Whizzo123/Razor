@@ -1,4 +1,5 @@
 #include "Coordinator.h"
+#include "Core/Entity.h"
 
 namespace Razor
 {
@@ -32,5 +33,10 @@ namespace Razor
 	void Coordinator::InitSystems()
 	{
 		SystemMgr->InitSystems();
+	}
+
+	void Coordinator::SetRenderPipelineDebugData(std::vector<DebugLine> lineData, std::vector<DebugTriangle> triangleData)
+	{
+		SystemMgr->SetPipelineDebugData(lineData, triangleData);
 	}
 }

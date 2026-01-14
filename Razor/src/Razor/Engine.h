@@ -21,6 +21,9 @@ namespace Razor
 	class Scene;
 	class ScriptInterface;
 	class AssetDirectory;
+	class IPhysicsEngine;
+	class IPhysicsDebugRenderer;
+	class PhysicsDebugDrawBuffer;
 
 	struct Light;
 	struct RenderStageConfig;
@@ -165,13 +168,19 @@ namespace Razor
 
 		Ref<AssetDirectory> GetAssetDirectory();
 
+		IPhysicsEngine& GetPhysicsEngine();
+
+		void PopulateRenderPipelineDebugData();
+
+		void ClearDebugDrawBuffer();
+
 	private:
 		
 		void RenderImGui(uint64_t SceneTexture);
 		void RunRuntime();
 
 		std::unique_ptr<Window> EngineWindow;
-		std::shared_ptr<Coordinator> Coordinator;
+		std::shared_ptr<Coordinator> _mCoordinator;
 		std::unordered_map<uint8_t, std::shared_ptr<Shader>> ShaderIDMap;
 		std::unordered_map<std::string, std::shared_ptr<Shader>> ShaderTypeMap;
 		std::shared_ptr<std::vector<Light*>> SceneLights;
@@ -181,11 +190,15 @@ namespace Razor
 		static Engine* GEngine;
 		std::unique_ptr<IPlatformIO> PlatformIO;
 		std::unique_ptr<ITimeProvider> TimeProvider; /** Generic object to provide time functionality */
-		std::unique_ptr<ScriptInterface> ScriptInterface;
+		std::unique_ptr<ScriptInterface> _mScriptInterface;
 		Ref<Project> LoadedProject;
 		Scope<ScriptAssembly> BridgeAssembly;
 		Scope<ScriptAssembly> GameAssembly;
 		Ref<AssetDirectory> _mAssetDirectory;
+		Scope<IPhysicsEngine> _mPhysicsEngine;
+		Ref<IPhysicsDebugRenderer> _mPhysicsDebugRenderer;
+
+		PhysicsDebugDrawBuffer* _mDebugDrawBuffer;
 
 		std::atomic<bool> bIsRuntimeRunning { false };
 		std::thread RuntimeThread;

@@ -17,8 +17,8 @@ namespace Razor
 
 	struct ScriptEngineData
 	{
-		Scope<ScriptAssembly> BridgeAssembly = nullptr;
-		Scope<ScriptAssembly> GameAssembly = nullptr;
+		Scope<ScriptAssembly> BridgeAssembly;
+		Scope<ScriptAssembly> GameAssembly;
 
 		std::filesystem::path CoreAssemblyFilepath;
 		std::filesystem::path AppAssemblyFilepath;

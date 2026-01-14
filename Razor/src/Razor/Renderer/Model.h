@@ -3,6 +3,7 @@
 #include <vector>
 #include <glm/ext/vector_float3.hpp>
 #include <glm/ext/vector_float2.hpp>
+#include <assimp/material.h>
 // TODO replace front glm with Razor Vec2 and Vec3 like ImGui
 
 
@@ -10,7 +11,6 @@ struct aiScene;
 struct aiNode;
 struct aiMesh;
 struct aiMaterial;
-enum aiTextureType;
 
 namespace Razor
 {

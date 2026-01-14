@@ -10,6 +10,7 @@
 #include "../Scripting/ScriptInterface.h"
 #include "../Assert.h"
 #include "../Engine.h"
+#include "../Physics/Components/BoxBody.h"
 
 namespace Razor
 {
@@ -142,6 +143,33 @@ namespace Razor
 			}
 
 			yaml_emitter_end_seq(Out); // ScriptComponent
+		}
+		if (InEntity.HasComponent<BoxBody>())
+		{
+			yaml_emitter_key(Out, "BoxBody");
+			yaml_emitter_begin_map(Out);
+
+			BoxBody& body = InEntity.GetComponent<BoxBody>();
+			yaml_emitter_key(Out, "UseGravity");
+			yaml_emitter_value_bool(Out, body.mbUseGravity);
+			yaml_emitter_key(Out, "IsStatic");
+			yaml_emitter_value_bool(Out, body.mbIsStatic);
+			yaml_emitter_key(Out, "MotionType");
+			switch (body.mMotionType)
+			{
+			case(EPhysicsMotionType::Static):
+				yaml_emitter_value_string(Out, std::string("Static").c_str());
+				break;
+			case(EPhysicsMotionType::Kinematic):
+				yaml_emitter_value_string(Out, std::string("Kinematic").c_str());
+				break;
+			case(EPhysicsMotionType::Dynamic):
+				yaml_emitter_value_string(Out, std::string("Dynamic").c_str());
+				break;
+			}
+			yaml_emitter_key(Out, "Mass");
+			yaml_emitter_value_float(Out, body.mMass);
+			yaml_emitter_end_map(Out);
 		}
 
 		yaml_emitter_end_map(Out);
@@ -362,6 +390,28 @@ namespace Razor
 			dirLight.Specular = ToGVec3(yaml_as_vec3(yaml_get_child(DirectionalLightComponent, "Specular")));
 			dirLight.Direction = ToGVec3(yaml_as_vec3(yaml_get_child(DirectionalLightComponent, "Direction")));
 			DeserializedEntity->AddComponent<DirectionalLight>(dirLight);
+		}
+		auto BoxBodyComponent = yaml_get_child(EntityNode, "BoxBody");
+		if (BoxBodyComponent)
+		{
+			BoxBody body;
+			body.mbUseGravity = yaml_as_bool(yaml_get_child(BoxBodyComponent, "UseGravity"), false);
+			body.mbIsStatic = yaml_as_bool(yaml_get_child(BoxBodyComponent, "IsStatic"), false);
+			std::string motionTypeStr = yaml_as_string(yaml_get_child(BoxBodyComponent, "MotionType"));
+			if (motionTypeStr == "Static")
+			{
+				body.mMotionType = EPhysicsMotionType::Static;
+			}
+			else if (motionTypeStr == "Kinematic")
+			{
+				body.mMotionType = EPhysicsMotionType::Kinematic;
+			}
+			else if (motionTypeStr == "Dynamic")
+			{
+				body.mMotionType = EPhysicsMotionType::Dynamic;
+			}
+			body.mMass = yaml_as_float(yaml_get_child(BoxBodyComponent, "Mass"), 1.0f);
+			DeserializedEntity->AddComponent<BoxBody>(body);
 		}
 	}
 }

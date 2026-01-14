@@ -6,7 +6,6 @@
 #include <imgui.h>
 #include "../../Platform/OpenGL/imgui_impl_opengl3.h"
 #include "../../Platform/OpenGL/imgui_impl_glfw.h"
-#include "../IO/RazorIO.h"
 #include "../../Platform/OpenGL/OpenGLWindowProvider.h"
 #include "../Log.h"
 #include "../Renderer/IRenderer.h"
@@ -349,6 +348,15 @@ namespace Razor
 	bool RazorImGui::InputText(const char* label, char* buf, size_t bufSize)
 	{
 		if (ImGui::InputText(label, buf, bufSize))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	bool RazorImGui::CheckBox(const char* label, bool* value)
+	{
+		if (ImGui::Checkbox(label, value))
 		{
 			return true;
 		}

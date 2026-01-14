@@ -1,10 +1,11 @@
 #include "RSRenderPass.h"
 #include "../Assets/AssetDirectory.h"
 #include "../Engine.h"
+#include "../Renderer/Shaders/DefaultMeshShader.h"
 
 namespace Razor
 {
-	void RSRenderPass::Render(RenderPipelineEntityProperties& Properties)
+	void RSRenderPass::Render(RenderPipelineData& data)
 	{
 		auto View = CurrentScene->GetEntitiesWithComponents<Mesh>();
 
@@ -20,70 +21,100 @@ namespace Razor
 			for (const MeshData& Child : Model->asset.GetModelMeshData())
 			{
 				Renderer->UseShader(EntityMaterial.ShaderID);
-				if (Properties.Properties.find(EntityToRender) == Properties.Properties.end())
+				if (data.mEntityRenderProperties.Properties.find(EntityToRender) == data.mEntityRenderProperties.Properties.end())
 				{
 					continue;
 				}
-				PropertySlot& Slot = Properties.Properties[EntityToRender].GetPropertySlot(Child.MaterialId);
+				ShaderPropertySlot& Slot = data.mEntityRenderProperties.Properties[EntityToRender].GetPropertySlot(Child.MaterialId);
 				std::shared_ptr<Shader> MeshShader = ShaderMap[EntityMaterial.ShaderID];
-				if (!MeshShader)
-				{
-					RZ_CORE_WARN("RSRenderPass(Render) -> Shader for material is null id was {0}", EntityMaterial.ShaderID);
-					continue;
-				}
 				
-				for (Scope<IProperty>& Prop : Slot.GetProperties())
-				{
-					std::string propTypeName(Prop->GetType());
-					if (!Prop)
-					{
-						continue;
-					}
-					
-					if (propTypeName == std::string(typeid(float).name()))
-					{
-						if (Property<float>* FloatProperty = dynamic_cast<Property<float>*>(Prop.get()))
-						{
-							MeshShader->SetFloat(FloatProperty->Name, FloatProperty->Value);
-						}
-					}
-
-					if (propTypeName == std::string(typeid(glm::vec3).name()))
-					{
-						if (Property<glm::vec3>* Vec3Property = dynamic_cast<Property<glm::vec3>*>(Prop.get()))
-						{
-							MeshShader->SetVec3(Vec3Property->Name, Vec3Property->Value);
-						}
-					}
-
-					if (propTypeName == std::string(typeid(glm::mat4).name()))
-					{
-						if (Property<glm::mat4>* Mat4Property = dynamic_cast<Property<glm::mat4>*>(Prop.get()))
-						{
-							MeshShader->SetMat4Float(Mat4Property->Name, Mat4Property->Value);
-						}
-					}
-
-					if (propTypeName == std::string(typeid(bool).name()))
-					{
-						if (Property<bool>* BoolProperty = dynamic_cast<Property<bool>*>(Prop.get()))
-						{
-							MeshShader->SetBool(BoolProperty->Name, BoolProperty->Value);
-						}
-					}
-
-					if (propTypeName == std::string(typeid(int).name()))
-					{
-						if (Property<int>* IntProperty = dynamic_cast<Property<int>*>(Prop.get()))
-						{
-							MeshShader->SetInt(IntProperty->Name, IntProperty->Value);
-						}
-					}
-				}
+				HandleProperties(Slot, MeshShader);
 
 				Renderer->DrawMesh({ Child });
 			}
-			Properties.Properties[EntityToRender].Clear();
+			data.mEntityRenderProperties.Properties[EntityToRender].Clear();
+		}
+
+		Ref<Shader> defaultShader = _mShaderNameMap[std::string(typeid(DefaultMeshShader).name())];
+		if (data.mDebugLineProperties.size() > 0) {
+			Renderer->UseShader(defaultShader->ID);
+			HandleProperties(data.mDebugLineProperties[0].GetPropertySlot(0), defaultShader);
+			for (int i = 0; i < data.mDebugLines.size(); i++)
+			{
+				Renderer->DrawLine(data.mDebugLines[i]);
+			}
+		}
+		data.mDebugLineProperties.clear();
+		
+		for (int i = 0; i < data.mDebugTriangles.size(); i++)
+		{
+			Renderer->UseShader(defaultShader->ID);
+			HandleProperties(data.mDebugTriangleProperties[i].GetPropertySlot(0), defaultShader);
+			Renderer->DrawTriangle(data.mDebugTriangles[i]);
+		}
+		data.mDebugTriangleProperties.clear();
+	}
+
+	void RSRenderPass::HandleProperties(ShaderPropertySlot& slot, Ref<Shader> shader)
+	{
+		if (!shader)
+		{
+			RZ_CORE_WARN("RSRenderPass(Render) -> Shader for material is null id was {0}", shader->ID);
+			return;
+		}
+
+		static const std::string floatTypeName = std::string(typeid(float).name());
+		static const std::string vec3TypeName = std::string(typeid(glm::vec3).name());
+		static const std::string mat4TypeName = std::string(typeid(glm::mat4).name());
+		static const std::string boolTypeName = std::string(typeid(bool).name());
+		static const std::string intTypeName = std::string(typeid(int).name());
+
+		for (Scope<IProperty>& Prop : slot.GetProperties())
+		{
+			if (!Prop)
+			{
+				continue;
+			}
+
+			if (Prop->GetType() == floatTypeName)
+			{
+				if (Property<float>* FloatProperty = dynamic_cast<Property<float>*>(Prop.get()))
+				{
+					shader->SetFloat(FloatProperty->Name, FloatProperty->Value);
+				}
+			}
+
+			if (Prop->GetType() == vec3TypeName)
+			{
+				if (Property<glm::vec3>* Vec3Property = dynamic_cast<Property<glm::vec3>*>(Prop.get()))
+				{
+					shader->SetVec3(Vec3Property->Name, Vec3Property->Value);
+				}
+			}
+
+			if (Prop->GetType() == mat4TypeName)
+			{
+				if (Property<glm::mat4>* Mat4Property = dynamic_cast<Property<glm::mat4>*>(Prop.get()))
+				{
+					shader->SetMat4Float(Mat4Property->Name, Mat4Property->Value);
+				}
+			}
+
+			if (Prop->GetType() == boolTypeName)
+			{
+				if (Property<bool>* BoolProperty = dynamic_cast<Property<bool>*>(Prop.get()))
+				{
+					shader->SetBool(BoolProperty->Name, BoolProperty->Value);
+				}
+			}
+
+			if (Prop->GetType() == intTypeName)
+			{
+				if (Property<int>* IntProperty = dynamic_cast<Property<int>*>(Prop.get()))
+				{
+					shader->SetInt(IntProperty->Name, IntProperty->Value);
+				}
+			}
 		}
 	}
 }

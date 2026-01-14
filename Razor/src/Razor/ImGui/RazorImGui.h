@@ -1,8 +1,9 @@
 #pragma once
 
+#include <memory>
 #include "../Core.h"
 #include "../Utils/Vector.h"
-#include <memory>
+#include "../IO/RazorIO.h"
 
 typedef int ImGuiWindowFlags;
 typedef int ImGuiDockNodeFlags;
@@ -22,8 +23,6 @@ namespace Razor
 	class IRenderer;
 	class Window;
 	class IWindowProvider;
-	enum RazorMouseButton;
-	enum RazorMouseState;
 
 	enum RazorGuiWindowFlags_
 	{
@@ -125,6 +124,7 @@ namespace Razor
 		static void SetWindowSize(const Vector2& Size);
 		static bool Combo(const char* label, const char** data, int dataLength, int* selectedIdx);
 		static bool InputText(const char* label, char* buf, size_t bufSize);
+		static bool CheckBox(const char* label, bool* value);
 	public:
 		// Function to hook our on such and such events to GLFW key events
 		void RegisterImGuiEvents();

@@ -15,7 +15,7 @@ namespace Razor
 			Renderer = EngineRenderer;
 			ShaderMap = IDToShaderMap;
 		}
-		void Render(RenderPipelineEntityProperties& Properties) override;
+		void Render(RenderPipelineData& data) override;
 
 	protected:
 		std::shared_ptr<IRenderer> Renderer;
