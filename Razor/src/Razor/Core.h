@@ -6,6 +6,9 @@
 #ifdef RZ_DEBUG
 	#if defined(RZ_PLATFORM_WINDOWS)
 		#define RZ_DEBUGBREAK() __debugbreak()
+	#elif defined(RZ_PLATFORM_LINUX)
+		#include <signal.h>
+		#define RZ_DEBUGBREAK() raise(SIGTRAP)
 	#else
 		#error "Platform doesn't support debugbreak yet!"
 	#endif

@@ -23,15 +23,8 @@ group "Dependencies"
 -----------------------------------------
 -- External CMake library (managed by CMake, referenced by Premake)
 -----------------------------------------
-externalproject "Jolt"
-    location "Razor/vendor/JoltPhysics/Build/VS2022_CL"   -- where the CMakeLists.txt lives
-    kind "StaticLib"               -- or "SharedLib" if your CMake project outputs a DLL/SO
-    language "C++"
-	staticruntime "off"
-	cppdialect "C++17"
-
-    -- Optional: if you generate Visual Studio files, they appear here.
-    -- Premake will NOT build this project. CMake will.
+project "Jolt"
+	kind "None"
 
 project "Razor"
 	location "Razor"
@@ -80,6 +73,17 @@ project "Razor"
 		"%{prj.name}/vendor/JoltPhysics"
 	}
 
+	filter "system:linux"
+		libdirs
+		{	
+			"%{prj.name}/vendor/JoltPhysics/Build/Linux_Debug"
+		}
+	filter "system:windows"
+		libdirs
+		{	
+			"%{prj.name}/vendor/JoltPhysics/Build/VS_2022_CL"
+		}
+
 	links
 	{
 		"GLFW",
@@ -115,12 +119,32 @@ project "Razor"
 			"CORAL_WINDOWS",
 			"RZ_BUILD_DLL"
 		}
+	
+	filter "system:linux"
+		systemversion "latest"
 
-	filter "configurations:Debug"
+		defines
+		{
+			"RZ_BUILD_DLL",
+			"RZ_PLATFORM_LINUX"
+		}
+
+	filter {"configurations:Debug", "system:windows"}
 		prebuildcommands {
-        	'if not exist "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL\\Debug\\Jolt.lib" call "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\cmake_vs2022_cl.bat" -DUSE_STATIC_MSVC_RUNTIME_LIBRARY=OFF',
-        	'if not exist "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL\\Debug\\Jolt.lib" cmake --build "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL" --config Debug'
+	    	'if not exist "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL\\Debug\\Jolt.lib" call "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\cmake_vs2022_cl.bat" -DUSE_STATIC_MSVC_RUNTIME_LIBRARY=OFF',
+    		'if not exist "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL\\Debug\\Jolt.lib" cmake --build "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL" --config Debug'
     	}
+	filter {"configurations:Debug", "system:linux"}
+		prebuildcommands {
+	    	 -- Configure step (only if build dir does not exist)
+        	'if [ ! -f "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug/Makefile" ]; then ' ..
+			'(cd "%{wks.location}/Razor/vendor/JoltPhysics/Build" && ' ..
+        	'sh ./cmake_linux_clang_gcc.sh Debug g++ -DUSE_STATIC_MSVC_RUNTIME_LIBRARY=OFF); fi',
+        	-- Build step
+			'if [ ! -f "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug/libjolt.a" ]; then ' ..
+        	'cmake --build "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug"; fi'
+    	}
+	filter "configurations:Debug"
 		defines "RZ_DEBUG"
 		runtime "Debug"
 		symbols "on"

@@ -7,21 +7,22 @@ namespace Razor
 
 	OnMouseButtonPressedDelegate& RazorIO::OnMouseButtonPressed()
 	{
-		return OnMouseButtonPressedDelegate;
+		return _mOnMouseButtonPressedDelegate;
 	}
 
 	OnMouseButtonReleasedDelegate& RazorIO::OnMouseButtonReleased()
 	{
-		return OnMouseButtonReleasedDelegate;
+		return _mOnMouseButtonReleasedDelegate;
 	}
 
 	OnKeyStateChangedDelegate& RazorIO::OnKeyStateChanged()
 	{
-		return OnKeyStateChangedDelegate;
+		return _mOnKeyStateChangedDelegate;
 	}
 
 	OnMousePosChangedDelegate& RazorIO::OnMousePosChanged()
 	{
-		return OnMousePosChangedDelegate;
+		return _mOnMousePosChangedDelegate;
 	}
+
 }

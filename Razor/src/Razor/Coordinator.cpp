@@ -1,4 +1,5 @@
 #include "Coordinator.h"
+#include "Core/Entity.h"
 
 namespace Razor
 {

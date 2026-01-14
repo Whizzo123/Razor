@@ -34,12 +34,15 @@ namespace Razor
 		MOUSE_UP,
 		MOUSE_DOWN
 	};
+}
 
-	template class RAZOR_API MulticastDelegate<RazorMouseButton, RazorMouseState>;
-	template class RAZOR_API MulticastDelegate<RazorKey, RazorKeyState>;
-	template class RAZOR_API MulticastDelegate<int>;
-	template class RAZOR_API MulticastDelegate<double, double>;
+template class RAZOR_API MulticastDelegate<Razor::RazorMouseButton, Razor::RazorMouseState>;
+template class RAZOR_API MulticastDelegate<Razor::RazorKey, Razor::RazorKeyState>;
+template class RAZOR_API MulticastDelegate<int>;
+template class RAZOR_API MulticastDelegate<double, double>;
 
+namespace Razor
+{
 	using OnMouseButtonPressedDelegate = MulticastDelegate<RazorMouseButton, RazorMouseState>;
 	using OnMouseButtonReleasedDelegate = MulticastDelegate<int>;
 	using OnKeyStateChangedDelegate = MulticastDelegate<RazorKey, RazorKeyState>;
@@ -83,15 +86,15 @@ namespace Razor
 		~RazorIO() {};
 		std::unordered_map<RazorKey, RazorKeyState> Keyboard;
 		std::unordered_map<RazorMouseButton, RazorMouseState> MouseButtons;
-
-	private:
+	
+private:
 		static RazorIO* GRazorIO;
-
+		
 		//DELEGATES
-		OnMouseButtonPressedDelegate OnMouseButtonPressedDelegate;
-		OnMouseButtonReleasedDelegate OnMouseButtonReleasedDelegate;
-		OnKeyStateChangedDelegate OnKeyStateChangedDelegate;
-		OnMousePosChangedDelegate OnMousePosChangedDelegate;
+		OnMouseButtonPressedDelegate _mOnMouseButtonPressedDelegate;
+		OnMouseButtonReleasedDelegate _mOnMouseButtonReleasedDelegate;
+		OnKeyStateChangedDelegate _mOnKeyStateChangedDelegate;
+		OnMousePosChangedDelegate _mOnMousePosChangedDelegate;
 
 		// May want to move the LastMousePos calculation to inndividual systems as not really an IO thing to do
 		void UpdateMousePositions(double Xpos, double Ypos)
