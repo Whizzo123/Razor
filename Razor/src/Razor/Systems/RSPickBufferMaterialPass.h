@@ -15,7 +15,7 @@ namespace Razor
 		{
 			SystemRenderStage = RenderStage::RENDER_STAGE_MATERIAL_PASS;
 		}
-		void Render(RenderPipelineEntityProperties& Properties) override;
+		void Render(RenderPipelineData& data) override;
 	};
 }
 

@@ -34,4 +34,9 @@ namespace Razor
 	{
 		SystemMgr->InitSystems();
 	}
+
+	void Coordinator::SetRenderPipelineDebugData(std::vector<DebugLine> lineData, std::vector<DebugTriangle> triangleData)
+	{
+		SystemMgr->SetPipelineDebugData(lineData, triangleData);
+	}
 }

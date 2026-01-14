@@ -3,19 +3,19 @@
 
 namespace Razor
 {
-	void RSSpotLightingPass::Render(RenderPipelineEntityProperties& Properties)
+	void RSSpotLightingPass::Render(RenderPipelineData& data)
 	{
 		auto View = CurrentScene->GetEntitiesWithComponents<SpotLight, Transform>();
 		for (auto RenderingEntity : View)
 		{
 			SpotLight& Light = CurrentScene->GetComponent<SpotLight>(RenderingEntity);
 			Transform& transform = CurrentScene->GetComponent<Transform>(RenderingEntity);
-			for (auto& Pair : Properties.Properties)
+			for (auto& Pair : data.mEntityRenderProperties.Properties)
 			{
-				EntityRenderProperty& Property = Pair.second;
+				ShaderProperty& Property = Pair.second;
 				for (int i = 0; i < Property.GetNumberOfSlots(); i++)
 				{
-					PropertySlot& Slot = Property.GetPropertySlot(i);
+					ShaderPropertySlot& Slot = Property.GetPropertySlot(i);
 
 					Slot.AddProperty<glm::vec3>("light.position", transform.Position);
 					Slot.AddProperty<glm::vec3>("light.ambient", Light.Ambient);

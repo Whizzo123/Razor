@@ -23,6 +23,8 @@ namespace Razor
 		void EnableStencilWriting(bool bEnable) override;
 		CameraInfo GetCameraInfo() override;
 		void DrawMesh(RendererInfo Info) override;
+		void DrawLine(const DebugLine& line) override;
+		void DrawTriangle(const DebugTriangle& triangle) override;
 		void ClearBuffer() override;
 		void BindFrameBuffer(uint32_t BufferIndex = 0) override;
 		Ref<Framebuffer> CreateFrameBuffer(uint32_t Width, uint32_t Height) override;

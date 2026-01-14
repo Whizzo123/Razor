@@ -37,6 +37,7 @@
 #include <Coral/ManagedObject.hpp>
 #include "Assets/AssetDirectory.h"
 #include "Physics/JoltPhysics/JoltPhysicsEngine.h"
+#include "Physics/JoltPhysics/JoltDebugRenderer.h"
 #include "Systems/PhysicsSystem.h"
 
 namespace Razor
@@ -70,7 +71,9 @@ namespace Razor
 		RazorGUI->Setup(EngineWindow->GetWindowProvider());
 		RazorGUI->RegisterImGuiEvents();
 
-		_mPhysicsEngine = CreateScope<JoltPhysicsEngine>();
+		_mDebugDrawBuffer = new PhysicsDebugDrawBuffer();
+		_mPhysicsDebugRenderer = CreateRef<JoltDebugRenderer>(_mDebugDrawBuffer);
+		_mPhysicsEngine = CreateScope<JoltPhysicsEngine>(std::dynamic_pointer_cast<JoltDebugRenderer>(_mPhysicsDebugRenderer));
 		
 
 		//TODO don't like this being here
@@ -84,6 +87,7 @@ namespace Razor
 		ShaderIDMap[PickShader->ID] = PickShader;
 		ShaderTypeMap[std::string(typeid(PickBufferShader).name())] = PickShader;
 
+		// TODO this should be nullptr move this logic to the EdgeEditor/Game
 		CurrentScene = CreateRef<Scene>("Untitled.rzscn");
 
 		SceneLights = std::make_shared<std::vector<Light*>>();
@@ -286,8 +290,8 @@ namespace Razor
 		if(RuntimeThread.joinable())
 		{
 			RuntimeThread.join();
+			CurrentScene->StopScene();
 		}
-		CurrentScene->StopScene();
 	}
 
 	Ref<AssetDirectory> Engine::GetAssetDirectory()
@@ -298,5 +302,20 @@ namespace Razor
 	IPhysicsEngine& Engine::GetPhysicsEngine()
 	{
 		return *_mPhysicsEngine;
+	}
+
+	void Engine::PopulateRenderPipelineDebugData()
+	{
+		std::unique_lock lock(_mDebugDrawBuffer->mutex, std::try_to_lock);
+		if (!lock.owns_lock())
+			return;
+		Coordinator->SetRenderPipelineDebugData(_mDebugDrawBuffer->lines, _mDebugDrawBuffer->triangles);
+	}
+
+	void Engine::ClearDebugDrawBuffer()
+	{
+		std::scoped_lock lock(_mDebugDrawBuffer->mutex);
+		_mDebugDrawBuffer->lines.clear();
+		_mDebugDrawBuffer->triangles.clear();
 	}
 }

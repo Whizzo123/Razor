@@ -4,7 +4,7 @@
 
 namespace Razor
 {
-	void RSPickBufferMaterialPass::Render(RenderPipelineEntityProperties& Properties)
+	void RSPickBufferMaterialPass::Render(RenderPipelineData& data)
 	{
 		auto View = CurrentScene->GetEntitiesWithComponents<Mesh>();
 		for (auto RenderingEntity : View)
@@ -18,15 +18,15 @@ namespace Razor
 			Material& EntityMat = Model->asset.GetMaterial();
 			auto View = CurrentScene->GetEntitiesWithComponents<Material>();
 
-			if (Properties.Properties.find(RenderingEntity) == Properties.Properties.end())
+			if (data.mEntityRenderProperties.Properties.find(RenderingEntity) == data.mEntityRenderProperties.Properties.end())
 			{
 				continue;
 			}
-			EntityRenderProperty& Property = Properties.Properties[RenderingEntity];
+			ShaderProperty& Property = data.mEntityRenderProperties.Properties[RenderingEntity];
 			Property.GeneratePropertySlots(EntityMat.Materials.size());
 			for (int i = 0; i < EntityMat.Materials.size(); i++)
 			{
-				PropertySlot& Slot = Property.GetPropertySlot(i);
+				ShaderPropertySlot& Slot = Property.GetPropertySlot(i);
 				//Red, Green, Blue
 				std::uint32_t Id = (std::uint32_t)RenderingEntity;
 				glm::vec3 EntityColor = glm::vec3((Id & 0x000000FF) / 255.0f,

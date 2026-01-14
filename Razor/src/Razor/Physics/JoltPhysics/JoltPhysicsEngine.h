@@ -1,6 +1,8 @@
 #pragma once
 #include "../IPhysicsEngine.h"
 
+#include <mutex>
+
 #include <Jolt/Jolt.h>
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <Jolt/Core/TempAllocator.h>
@@ -12,6 +14,7 @@
 
 namespace Razor
 {
+	class JoltDebugRenderer;
 	// Each broadphase layer results in a separate bounding volume tree in the broad phase. You at least want to have
 	// a layer for non-moving and moving objects to avoid having to update a tree full of static objects every frame.
 	// You can have a 1-on-1 mapping between object layers and broadphase layers (like in this case) but if you have
@@ -78,6 +81,12 @@ namespace Razor
 		virtual void OnContactPersisted(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings) override;
 
 		virtual void OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair) override;
+
+		std::vector<ContactInfo> GetContactInfo(unsigned int bodyId);
+
+	private:
+		std::unordered_map<JPH::BodyID, std::vector<ContactInfo>> _mBodyContactMap;
+		std::mutex _mBodyContactMapMutex {};
 	};
 
 	// An example activation listener
@@ -92,7 +101,7 @@ namespace Razor
 	class JoltPhysicsEngine : public IPhysicsEngine
 	{
 	public:
-		JoltPhysicsEngine();
+		JoltPhysicsEngine(Ref<JoltDebugRenderer> debugRenderer);
 		~JoltPhysicsEngine() override;
 		void Simulate(float deltaTime) override;
 		Vector3 GetPosition(unsigned int bodyId) const override;
@@ -100,6 +109,7 @@ namespace Razor
 		unsigned int CreateBoxRigidBody(Vector3 position, float mass, EPhysicsMotionType motionType, bool bIsStatic) override;
 		void SetGravity(unsigned int bodyId, bool useGravity) override;
 		void DestroyBody(unsigned int bodyId) override;
+		std::vector<ContactInfo> GetContactInfo(unsigned int bodyId) override;
 
 	private:
 		JPH::PhysicsSystem _mPhysicsSystem;
@@ -117,7 +127,7 @@ namespace Razor
 		std::shared_ptr<JPH::BodyInterface> _mBodyInterface;
 
 		MyBodyActivationListener _mBodyActivationListener;
-		MyContactListener _mContactListener;
+		MyContactListener _mContactListener;		
 
 		float accumulator = 0.0f;
 	};

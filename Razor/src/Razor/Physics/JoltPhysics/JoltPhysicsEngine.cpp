@@ -1,5 +1,9 @@
 #include "JoltPhysicsEngine.h"
 
+#include <thread>
+#include <cstdarg>
+#include <iostream>
+
 #include <Jolt/Core/Memory.h>
 #include <Jolt/Core/Factory.h>
 #include <Jolt/RegisterTypes.h>
@@ -8,14 +12,12 @@
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 
+#include "JoltDebugRenderer.h"
+#include "../../Log.h"
 
 JPH_SUPPRESS_WARNINGS
 
 using namespace JPH::literals;
-
-#include <thread>
-#include <cstdarg>
-#include <iostream>
 
 #include "../../Utils/Vector.h"
 
@@ -121,17 +123,46 @@ namespace Razor
 
 	void MyContactListener::OnContactAdded(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings)
 	{
-		std::cout << "A contact was added" << std::endl;
+		std::scoped_lock lock(_mBodyContactMapMutex);
+		_mBodyContactMap[inBody1.GetID()].push_back({ EContactType::Started, inBody2.GetID().GetIndex(), false });
+		_mBodyContactMap[inBody2.GetID()].push_back({ EContactType::Started, inBody1.GetID().GetIndex(), false });
 	}
 
 	void MyContactListener::OnContactPersisted(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings)
 	{
-		std::cout << "A contact was persisted" << std::endl;
+		std::scoped_lock lock(_mBodyContactMapMutex);
+		auto processContact = [=](JPH::BodyID first, JPH::BodyID second)
+		{
+			for(ContactInfo& info : _mBodyContactMap[first])
+			{
+				if (info.mOtherBodyId == second.GetIndex() && info.mContactProcessed)
+				{
+					info.mContactType = EContactType::Persisted;
+					info.mContactProcessed = false;
+				}
+			}
+		};
+
+		processContact(inBody1.GetID(), inBody2.GetID());
+		processContact(inBody2.GetID(), inBody1.GetID());
 	}
 
 	void MyContactListener::OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair)
 	{
-		std::cout << "A contact was removed" << std::endl;
+		std::scoped_lock lock(_mBodyContactMapMutex);
+		auto processContact = [=](JPH::BodyID first, JPH::BodyID second)
+			{
+				for (ContactInfo& info : _mBodyContactMap[first])
+				{
+					if (info.mOtherBodyId == second.GetIndex() && info.mContactProcessed)
+					{
+						info.mContactType = EContactType::Ended;
+						info.mContactProcessed = false;
+					}
+				}
+			};
+		processContact(inSubShapePair.GetBody1ID(), inSubShapePair.GetBody2ID());
+		processContact(inSubShapePair.GetBody2ID(), inSubShapePair.GetBody1ID());
 	}
 
 	void MyBodyActivationListener::OnBodyActivated(const JPH::BodyID& inBodyID, uint64_t inBodyUserData)
@@ -144,7 +175,7 @@ namespace Razor
 		std::cout << "A body went to sleep" << std::endl;
 	}
 
-	JoltPhysicsEngine::JoltPhysicsEngine() :  IPhysicsEngine()
+	JoltPhysicsEngine::JoltPhysicsEngine(Ref<JoltDebugRenderer> debugRenderer) :  IPhysicsEngine()
 	{
 		// Register allocation hook. Default to malloc / free.
 		JPH::RegisterDefaultAllocator();
@@ -162,6 +193,8 @@ namespace Razor
 		_mTempAllocator = CreateScope<JPH::TempAllocatorImpl>(10 * 1024 * 1024); // 10 MB
 
 		_mJobSystem = CreateScope<JPH::JobSystemThreadPool>(1024, 8, std::thread::hardware_concurrency() - 1);
+
+		JPH::DebugRenderer::sInstance = debugRenderer.get();
 
 		// This is the max amount of rigid bodies that you can add to the physics system. If you try to add more you'll get an error.
 		// Note: This value is low because this is a simple test. For a real project use something in the order of 65536.
@@ -247,12 +280,27 @@ namespace Razor
 	{
 		const JPH::BodyInterface& interface = _mPhysicsSystem.GetBodyInterface();
 		JPH::RVec3 position = interface.GetCenterOfMassPosition(JPH::BodyID(bodyId));
+
+		JPH::BodyLockRead lock(_mPhysicsSystem.GetBodyLockInterface(), JPH::BodyID(bodyId));
+		if (!lock.Succeeded())
+			return Vector3{ position.GetX(), position.GetY(), position.GetZ() };
+
+		const JPH::Body& body = lock.GetBody();
+
+		JPH::AABox aabb = body.GetWorldSpaceBounds();
+
+		JPH::DebugRenderer::sInstance->DrawWireBox(aabb, JPH::Color::sRed);
+
 		return Vector3{ position.GetX(), position.GetY(), position.GetZ() };
 	}
 
 	void JoltPhysicsEngine::ApplyLinearVelocity(unsigned int bodyId, const Vector3& velocity)
 	{
-		JPH::BodyInterface& interface = _mPhysicsSystem.GetBodyInterface();
+		if (!_mBodyInterface)
+		{
+			RZ_CORE_WARN("JoltPhysicsEngine::ApplyLinearVelocity: Body interface not initialized");
+			return;
+		}
 		JPH::Vec3 jphVelocity{ velocity.X, velocity.Y, velocity.Z };
 		_mBodyInterface->SetLinearVelocity(JPH::BodyID(bodyId), jphVelocity);
 	}
@@ -295,14 +343,20 @@ namespace Razor
 		floor_settings.mMassPropertiesOverride = massOverride;
 
 		// Create the actual rigid body
-		JPH::Body* floor = interface.CreateBody(floor_settings); // Note that if we run out of bodies this can return nullptr
+		JPH::Body* boxBody = interface.CreateBody(floor_settings); // Note that if we run out of bodies this can return nullptr
+
+		if (boxBody == nullptr)
+		{
+			RZ_CORE_ERROR("JoltPhysicsEngine::CreateBoxRigidBody -> Failed to create body, out of bodies?");
+			return JPH::BodyID::cInvalidBodyID;
+		}
 
 		// Add it to the world
-		interface.AddBody(floor->GetID(), JPH::EActivation::Activate);
+		interface.AddBody(boxBody->GetID(), JPH::EActivation::Activate);
 
 		_mPhysicsSystem.OptimizeBroadPhase();
 
-		return floor->GetID().GetIndexAndSequenceNumber();
+		return boxBody->GetID().GetIndexAndSequenceNumber();
 	}
 
 	void JoltPhysicsEngine::SetGravity(unsigned int bodyId, bool useGravity)
@@ -323,5 +377,37 @@ namespace Razor
 		JPH::BodyInterface& interface = _mPhysicsSystem.GetBodyInterface();
 		interface.RemoveBody(static_cast<JPH::BodyID>(bodyId));
 		interface.DestroyBody(static_cast<JPH::BodyID>(bodyId));
+	}
+
+	std::vector<ContactInfo> MyContactListener::GetContactInfo(unsigned int bodyId)
+	{
+		std::vector<ContactInfo> ret;
+		std::scoped_lock lock(_mBodyContactMapMutex);
+		if (_mBodyContactMap.find(JPH::BodyID(bodyId)) != _mBodyContactMap.end())
+		{
+			ret = _mBodyContactMap[static_cast<JPH::BodyID>(bodyId)];
+
+			std::vector<ContactInfo> clearList;
+			for (ContactInfo& info : _mBodyContactMap[static_cast<JPH::BodyID>(bodyId)])
+			{
+				info.mContactProcessed = true;
+				if (info.mContactType == EContactType::Ended)
+				{
+					clearList.push_back(info);
+				}
+			}
+			for (const ContactInfo& info : clearList)
+			{
+				_mBodyContactMap[static_cast<JPH::BodyID>(bodyId)].erase(std::find(_mBodyContactMap[static_cast<JPH::BodyID>(bodyId)].begin(),
+					_mBodyContactMap[static_cast<JPH::BodyID>(bodyId)].end(), info));
+			}
+		}
+		
+		return ret;
+	}
+
+	std::vector<ContactInfo> JoltPhysicsEngine::GetContactInfo(unsigned int bodyId)
+	{
+		return _mContactListener.GetContactInfo(bodyId);
 	}
 }

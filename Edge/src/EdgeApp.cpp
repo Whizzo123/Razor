@@ -136,11 +136,15 @@ void Edge::Run()
 		SceneBuffer->Refresh(SizeX, SizeY);
 		Renderer->SetViewport(0, 0, SizeX, SizeY);
 
+		Engine.PopulateRenderPipelineDebugData();
+
 		Engine.Render(PickBuffer->GetID(), PickPipelineConfig);
 
 		ProcessInput();
 
 		Engine.Render(SceneBuffer->GetID(), EditorPipelineConfig);
+
+		Engine.ClearDebugDrawBuffer();
 
 		Renderer->PollForEvents();
 

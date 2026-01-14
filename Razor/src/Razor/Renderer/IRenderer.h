@@ -8,6 +8,8 @@ namespace Razor
 {
 	class Framebuffer;
 	class Window;
+	struct DebugLine;
+	struct DebugTriangle;
 
 	struct RendererInfo
 	{
@@ -68,6 +70,8 @@ namespace Razor
 		virtual void SetStencilFunction(EStencilFunc Function, unsigned int Ref, unsigned int Mask) = 0;
 		virtual void EnableStencilWriting(bool bEnable) = 0;
 		virtual void DrawMesh(RendererInfo Info) = 0;
+		virtual void DrawLine(const DebugLine& line) = 0;
+		virtual void DrawTriangle(const DebugTriangle& triangle) = 0;
 		virtual void SwapBuffer(Window& RenderWindow) = 0;
 		virtual void ClearBuffer() = 0;
 		virtual void BindFrameBuffer(uint32_t = 0) = 0;

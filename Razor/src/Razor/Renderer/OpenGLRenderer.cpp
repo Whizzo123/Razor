@@ -6,6 +6,8 @@
 #include "../Assert.h"
 #include "OpenGL/GLFramebuffer.h"
 #include "../Window.h"
+#include "Debug/DebugLine.h"
+#include "Debug/DebugTriangle.h"
 
 namespace Razor
 {
@@ -139,6 +141,40 @@ namespace Razor
         glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(Info.ObjMesh.Indices.size()), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
+
+    void OpenGLRenderer::DrawLine(const DebugLine& line)
+    {
+        unsigned int VBO, VAO;
+        glGenBuffers(1, &VBO);
+        glGenVertexArrays(1, &VAO);
+        glBindVertexArray(VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        Vector3 vertices[] = {line.a, line.b};
+        glBufferData(GL_ARRAY_BUFFER, 2 * sizeof(Vector3), &vertices, GL_STATIC_DRAW);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+        glDrawArrays(GL_LINES, 0, 2);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+		glDeleteVertexArrays(1, &VAO);
+		glDeleteBuffers(1, &VBO);
+	}
+
+    void OpenGLRenderer::DrawTriangle(const DebugTriangle& triangle)
+    {
+        unsigned int VBO, VAO;
+        glGenBuffers(1, &VBO);
+        glGenVertexArrays(1, &VAO);
+        glBindVertexArray(VAO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        Vector3 vertices[] = { triangle.v1, triangle.v2, triangle.v3 };
+        glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(Vector3), &vertices, GL_STATIC_DRAW);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+	}
 
     void OpenGLRenderer::ClearBuffer()
     {
