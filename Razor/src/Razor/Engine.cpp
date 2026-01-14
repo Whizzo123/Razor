@@ -49,7 +49,7 @@ namespace Razor
 
 	void Engine::Init()
 	{
-		ScriptInterface = std::make_unique<Razor::ScriptInterface>();
+		_mScriptInterface = std::make_unique<Razor::ScriptInterface>();
 
 		Renderer = std::make_shared<OpenGLRenderer>();
 		Renderer->InitRendererAPI();
@@ -61,7 +61,7 @@ namespace Razor
 		
 		Renderer->EnableDepthTesting(/*bEnable*/true);
 
-		Coordinator = Coordinator::GetInstance();
+		_mCoordinator = Coordinator::GetInstance();
 		
 		// Platform must be called before RazorGUI so ImGui chains our renderer input callbacks in 
 		PlatformIO = std::make_unique<OpenGLIO>(std::dynamic_pointer_cast<OpenGLWindowProvider>(EngineWindow->GetWindowProvider())->GetPlatformWindowPtr());
@@ -88,21 +88,21 @@ namespace Razor
 
 		SceneLights = std::make_shared<std::vector<Light*>>();
 		// TODO rename mesh renderer doesn't do rendering just sets up the mesh for renderering
-		Coordinator->RegisterSystem<MeshRenderer>(MeshRenderer(CurrentScene, Renderer, ShaderIDMap, SceneLights));
-		Coordinator->RegisterSystem<CollisionSystem>(CollisionSystem(CurrentScene));
-		Coordinator->RegisterSystem<CameraController>(CameraController(CurrentScene));
-		Coordinator->RegisterSystem<PhysicsSystem>(CurrentScene);
+		_mCoordinator->RegisterSystem<MeshRenderer>(MeshRenderer(CurrentScene, Renderer, ShaderIDMap, SceneLights));
+		_mCoordinator->RegisterSystem<CollisionSystem>(CollisionSystem(CurrentScene));
+		_mCoordinator->RegisterSystem<CameraController>(CameraController(CurrentScene));
+		_mCoordinator->RegisterSystem<PhysicsSystem>(CurrentScene);
 
 		//Render Systems
-		Coordinator->RegisterSystem<RSMaterialPass>(RSMaterialPass(CurrentScene));
-		Coordinator->RegisterSystem<RSTransformationsPass>(RSTransformationsPass(CurrentScene));
-		Coordinator->RegisterSystem<RSDirectionalLightingPass>(RSDirectionalLightingPass(CurrentScene));
-		Coordinator->RegisterSystem<RSCameraPass>(RSCameraPass(CurrentScene, Renderer));
-		Coordinator->RegisterSystem<RSRenderPass>(RSRenderPass(CurrentScene, Renderer, ShaderIDMap));
-		Coordinator->RegisterSystem<RSPickBufferMaterialPass>(RSPickBufferMaterialPass(CurrentScene));
-		Coordinator->RegisterSystem<RSPickBufferRenderPass>(RSPickBufferRenderPass(CurrentScene, Renderer, ShaderIDMap));
-		Coordinator->RegisterSystem<RSPointLightingPass>(RSPointLightingPass(CurrentScene));
-		Coordinator->RegisterSystem<RSSpotLightingPass>(RSSpotLightingPass(CurrentScene));
+		_mCoordinator->RegisterSystem<RSMaterialPass>(RSMaterialPass(CurrentScene));
+		_mCoordinator->RegisterSystem<RSTransformationsPass>(RSTransformationsPass(CurrentScene));
+		_mCoordinator->RegisterSystem<RSDirectionalLightingPass>(RSDirectionalLightingPass(CurrentScene));
+		_mCoordinator->RegisterSystem<RSCameraPass>(RSCameraPass(CurrentScene, Renderer));
+		_mCoordinator->RegisterSystem<RSRenderPass>(RSRenderPass(CurrentScene, Renderer, ShaderIDMap));
+		_mCoordinator->RegisterSystem<RSPickBufferMaterialPass>(RSPickBufferMaterialPass(CurrentScene));
+		_mCoordinator->RegisterSystem<RSPickBufferRenderPass>(RSPickBufferRenderPass(CurrentScene, Renderer, ShaderIDMap));
+		_mCoordinator->RegisterSystem<RSPointLightingPass>(RSPointLightingPass(CurrentScene));
+		_mCoordinator->RegisterSystem<RSSpotLightingPass>(RSSpotLightingPass(CurrentScene));
 		
 	}
 
@@ -126,7 +126,7 @@ namespace Razor
 
 	void Engine::InitSystems()
 	{
-		Coordinator->InitSystems();
+		_mCoordinator->InitSystems();
 	}
 
 	void Engine::Step()
@@ -172,20 +172,20 @@ namespace Razor
 	{
 		Renderer->BindFrameBuffer(targetId);
 		Renderer->ClearBuffer();
-		Coordinator->RunRenderSystems(Config); 
+		_mCoordinator->RunRenderSystems(Config); 
 		Renderer->BindFrameBuffer();
 		Renderer->ClearBuffer();
 	}
 
 	void Engine::RunSystems() 
 	{ 
-		Coordinator->RunSystems(DeltaTime);
+		_mCoordinator->RunSystems(DeltaTime);
 		CurrentScene->RunSystems(DeltaTime);
 	}
 
 	std::shared_ptr<Coordinator> Engine::GetCoordinator()
 	{
-		return Coordinator;
+		return _mCoordinator;
 	}
 
 	bool Engine::ShouldEngineClose() 
@@ -205,7 +205,7 @@ namespace Razor
 
 	ScriptInterface& Engine::GetScriptInterface()
 	{
-		return *ScriptInterface;
+		return *_mScriptInterface;
 	}
 
 	void Engine::SaveProject()
@@ -237,8 +237,8 @@ namespace Razor
 		ProjectSerializer::Deserialize(ProjectPath, LoadedProject);
 		RZ_CORE_INFO("Loading up project: {0}", LoadedProject->m_ProjectName);
 		// TODO move assembly holding into ScriptEngine
-		BridgeAssembly = CreateScope<ScriptAssembly>(ScriptInterface->LoadAssembly(Path + "/" + LoadedProject->m_DllDirectory + "/" + "Razor-ScriptBridge.dll", true));
-		GameAssembly = CreateScope<ScriptAssembly>(ScriptInterface->LoadAssembly(Path + "/" + LoadedProject->m_DllDirectory + "/" + LoadedProject->m_ProjectName + ".dll", false));
+		BridgeAssembly = CreateScope<ScriptAssembly>(_mScriptInterface->LoadAssembly(Path + "/" + LoadedProject->m_DllDirectory + "/" + "Razor-ScriptBridge.dll", true));
+		GameAssembly = CreateScope<ScriptAssembly>(_mScriptInterface->LoadAssembly(Path + "/" + LoadedProject->m_DllDirectory + "/" + LoadedProject->m_ProjectName + ".dll", false));
 
 		// Load main scene
 		Ref<Scene> MainScene = CreateRef<Scene>(Path + LoadedProject->m_MainScenePath);

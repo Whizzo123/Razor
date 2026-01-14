@@ -34,12 +34,15 @@ namespace Razor
 		MOUSE_UP,
 		MOUSE_DOWN
 	};
+}
 
-	template class RAZOR_API MulticastDelegate<RazorMouseButton, RazorMouseState>;
-	template class RAZOR_API MulticastDelegate<RazorKey, RazorKeyState>;
-	template class RAZOR_API MulticastDelegate<int>;
-	template class RAZOR_API MulticastDelegate<double, double>;
+template class RAZOR_API MulticastDelegate<Razor::RazorMouseButton, Razor::RazorMouseState>;
+template class RAZOR_API MulticastDelegate<Razor::RazorKey, Razor::RazorKeyState>;
+template class RAZOR_API MulticastDelegate<int>;
+template class RAZOR_API MulticastDelegate<double, double>;
 
+namespace Razor
+{
 	using OnMouseButtonPressedDelegate = MulticastDelegate<RazorMouseButton, RazorMouseState>;
 	using OnMouseButtonReleasedDelegate = MulticastDelegate<int>;
 	using OnKeyStateChangedDelegate = MulticastDelegate<RazorKey, RazorKeyState>;

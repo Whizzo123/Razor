@@ -26,12 +26,12 @@ namespace Razor
 	class ShaderParameterArray : public IShaderParameterArray
 	{
 	public:
-		template<typename T>
+
 		void AddParameter(ShaderParameter<T> Parameter)
 		{
 			ParameterArray.push_back(Parameter);
 		}
-		template<typename T>
+
 		std::vector<ShaderParameter<T>> GetParameters()
 		{
 			return ParameterArray;
@@ -62,7 +62,7 @@ namespace Razor
 		void SetBool(std::string Name, bool Value);
 
 	public:
-		template<typename T>
+		/*template<typename T>
 		void AddParameter(ShaderParameter<T> Parameter)
 		{
 			const char* TypeName = typeid(T).name();
@@ -76,7 +76,7 @@ namespace Razor
 				ParameterArray = CreateNewParameterArray<T>();
 			}
 			ParameterArray->AddParameter<T>(Parameter);
-		}
+		}*/
 		
 		uint8_t NextShaderParameterType = 0;
 
