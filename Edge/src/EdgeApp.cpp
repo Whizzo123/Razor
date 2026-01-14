@@ -11,7 +11,7 @@
 #include "Gui/OpenProjectPopupWindow.h"
 #include "SystemView.h"
 
-#define _ITERATOR_DEBUG_LEVEL 2
+
 
 class Edge : public Razor::Application
 {

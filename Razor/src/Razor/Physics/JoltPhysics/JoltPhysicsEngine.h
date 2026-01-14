@@ -1,6 +1,8 @@
 #pragma once
 #include "../IPhysicsEngine.h"
 
+#include <mutex>
+
 #include <Jolt/Jolt.h>
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <Jolt/Core/TempAllocator.h>
@@ -80,9 +82,11 @@ namespace Razor
 
 		virtual void OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair) override;
 
-		friend class JoltPhysicsEngine;
+		std::vector<ContactInfo> GetContactInfo(unsigned int bodyId);
+
 	private:
 		std::unordered_map<JPH::BodyID, std::vector<ContactInfo>> _mBodyContactMap;
+		std::mutex _mBodyContactMapMutex {};
 	};
 
 	// An example activation listener

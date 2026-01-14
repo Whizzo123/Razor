@@ -75,7 +75,7 @@ namespace Razor
 			slot.AddProperty<glm::vec3>("material.specular", zero);
 			slot.AddProperty<float>("material.shininess", 0.0f);
 			slot.AddProperty<int>("material.bUseTextures", 0);
-			data.mDebugLineProperties.push_back(std::move(property));
+			data.mDebugTriangleProperties.push_back(std::move(property));
 		}
 	}
 
