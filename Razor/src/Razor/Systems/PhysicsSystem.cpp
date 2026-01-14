@@ -13,6 +13,12 @@ namespace Razor
 			BoxBody& body = CurrentScene->GetComponent<BoxBody>(entity);
 			Transform& transform = CurrentScene->GetComponent<Transform>(entity);
 
+			// Skip invalid bodies
+			if (body.bodyId == 0xFFFFFFFF) // JPH::BodyID::cInvalidBodyID
+			{
+				continue;
+			}
+
 			IPhysicsEngine& physicsEngine = Engine::Get().GetPhysicsEngine();
 
 			Vector3 physicsPos = physicsEngine.GetPosition(body.bodyId);

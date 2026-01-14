@@ -84,7 +84,14 @@ namespace Razor
 			BoxBody& body = GetEntity(entity)->GetComponent<BoxBody>();
 			body.OnCollisionStarted = []() { RZ_CORE_INFO("Collision started"); };
 			body.bodyId = Engine::Get().GetPhysicsEngine().CreateBoxRigidBody(pos, body.mMass, body.mMotionType, body.mbIsStatic);
-			Engine::Get().GetPhysicsEngine().SetGravity(body.bodyId, body.mbUseGravity);
+			if (body.bodyId != 0xFFFFFFFF) // JPH::BodyID::cInvalidBodyID
+			{
+				Engine::Get().GetPhysicsEngine().SetGravity(body.bodyId, body.mbUseGravity);
+			}
+			else
+			{
+				RZ_CORE_ERROR("Failed to create physics body for entity");
+			}
 		}
 	}
 
