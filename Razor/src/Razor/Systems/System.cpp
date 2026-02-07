@@ -1,9 +1,12 @@
 #include "System.h"
+#include <glm/glm.hpp>
 
 namespace Razor
 {
 
 	RenderStage RenderSystem::SystemRenderStage = RenderStage::RENDER_STAGE_MATERIAL_PASS;
+
+	// Bare in mind that RunSystems and RunRenderSystems run on two different threads
 
 	void SystemManager::RunSystems(float dt)
 	{
@@ -24,7 +27,7 @@ namespace Razor
 		{
 			for (const char* SystemType : StageConfig.StageSystemsToRun)
 			{
-				RenderPipeline.PipelineSystems[StageConfig.Stage][SystemType]->Render(RenderPipeline.EntityRenderProperties);
+				_mRenderPipeline.mPipelineSystems[StageConfig.Stage][std::string(SystemType)]->Render(_mRenderPipeline.mPipelineData);
 			}
 		}
 	}
@@ -37,6 +40,14 @@ namespace Razor
 
 			System->Init();
 		}
+	}
+
+	void SystemManager::SetPipelineDebugData(std::vector<DebugLine> lineData, std::vector<DebugTriangle> triangleData)
+	{			
+		_mRenderPipeline.mPipelineData.mDebugLineProperties.clear();
+		_mRenderPipeline.mPipelineData.mDebugTriangleProperties.clear();
+		_mRenderPipeline.mPipelineData.mDebugLines = lineData;
+		_mRenderPipeline.mPipelineData.mDebugTriangles = triangleData;
 	}
 
 }

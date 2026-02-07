@@ -1,9 +1,16 @@
 #pragma once
 #include "../Core.h"
-#include <assimp/mesh.h>
-#include <assimp/scene.h>
+#include <vector>
 #include <glm/ext/vector_float3.hpp>
 #include <glm/ext/vector_float2.hpp>
+#include <assimp/material.h>
+// TODO replace front glm with Razor Vec2 and Vec3 like ImGui
+
+
+struct aiScene;
+struct aiNode;
+struct aiMesh;
+struct aiMaterial;
 
 namespace Razor
 {
@@ -31,11 +38,11 @@ namespace Razor
 		}
 
 		MeshData(std::vector<Vertex> Vertices, std::vector<unsigned int> Indices, std::vector<Texture> Textures, unsigned int MaterialID)
+			: Vertices(Vertices),
+			  Indices(Indices), 
+			  Textures(Textures), 
+			  MaterialId(MaterialID)
 		{
-			this->Vertices = Vertices;
-			this->Indices = Indices;
-			this->Textures = Textures;
-			MaterialId = MaterialID;
 		}
 
 		std::vector<Vertex> Vertices;
@@ -70,7 +77,7 @@ namespace Razor
 		Material ModelMaterial;
 	};
 
-	class Model
+	class RAZOR_API Model
 	{
 	public:
 		void LoadMesh(std::string Path);

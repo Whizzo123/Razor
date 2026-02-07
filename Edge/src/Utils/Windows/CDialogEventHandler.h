@@ -87,4 +87,5 @@ private:
     long _cRef;
 };
 
+
 #endif // RZ_PLATFORM_WINDOWS

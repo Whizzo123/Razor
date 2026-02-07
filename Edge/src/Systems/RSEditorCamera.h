@@ -27,7 +27,7 @@ namespace EdgeEditor
 		* 
 		* @param EntityProperties - Shader properties for all the entities in the scene
 		*/
-		void Render(Razor::RenderPipelineEntityProperties& EntityProperties) override;
+		void Render(Razor::RenderPipelineData& data) override;
 
 	protected:
 		std::shared_ptr<Razor::IRenderer> Renderer; /** Shared Ptr to current IRenderer object */

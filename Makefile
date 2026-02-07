@@ -14,6 +14,7 @@ ifeq ($(config),debug)
   ImGui_config = debug
   yaml_cpp_config = debug
   EnTT_config = debug
+  Coral.Native_config = debug
   Razor_config = debug
   Edge_config = debug
   Sandbox_config = debug
@@ -24,6 +25,7 @@ else ifeq ($(config),release)
   ImGui_config = release
   yaml_cpp_config = release
   EnTT_config = release
+  Coral.Native_config = release
   Razor_config = release
   Edge_config = release
   Sandbox_config = release
@@ -34,6 +36,7 @@ else ifeq ($(config),dist)
   ImGui_config = dist
   yaml_cpp_config = dist
   EnTT_config = dist
+  Coral.Native_config = dist
   Razor_config = dist
   Edge_config = dist
   Sandbox_config = dist
@@ -42,13 +45,13 @@ else
   $(error "invalid configuration $(config)")
 endif
 
-PROJECTS := GLFW assimp ImGui yaml-cpp EnTT Razor Edge Sandbox
+PROJECTS := GLFW assimp ImGui yaml-cpp EnTT Coral.Native Razor Edge Sandbox
 
 .PHONY: all clean help $(PROJECTS) Dependencies
 
 all: $(PROJECTS)
 
-Dependencies: Edge EnTT GLFW ImGui Razor Sandbox assimp yaml-cpp
+Dependencies: Coral.Native Edge EnTT GLFW ImGui Razor Sandbox assimp yaml-cpp
 
 GLFW:
 ifneq (,$(GLFW_config))
@@ -80,19 +83,25 @@ ifneq (,$(EnTT_config))
 	@${MAKE} --no-print-directory -C Razor/vendor/entt -f Makefile config=$(EnTT_config)
 endif
 
-Razor: GLFW assimp ImGui yaml-cpp
+Coral.Native:
+ifneq (,$(Coral.Native_config))
+	@echo "==== Building Coral.Native ($(Coral.Native_config)) ===="
+	@${MAKE} --no-print-directory -C Razor/vendor/Coral/Coral.Native -f Makefile config=$(Coral.Native_config)
+endif
+
+Razor: GLFW assimp ImGui yaml-cpp Coral.Native
 ifneq (,$(Razor_config))
 	@echo "==== Building Razor ($(Razor_config)) ===="
 	@${MAKE} --no-print-directory -C Razor -f Makefile config=$(Razor_config)
 endif
 
-Edge: Razor
+Edge: Razor GLFW assimp ImGui yaml-cpp
 ifneq (,$(Edge_config))
 	@echo "==== Building Edge ($(Edge_config)) ===="
 	@${MAKE} --no-print-directory -C Edge -f Makefile config=$(Edge_config)
 endif
 
-Sandbox: Razor
+Sandbox: Razor GLFW assimp ImGui yaml-cpp
 ifneq (,$(Sandbox_config))
 	@echo "==== Building Sandbox ($(Sandbox_config)) ===="
 	@${MAKE} --no-print-directory -C Sandbox -f Makefile config=$(Sandbox_config)
@@ -104,6 +113,7 @@ clean:
 	@${MAKE} --no-print-directory -C Razor/vendor/ImGui -f Makefile clean
 	@${MAKE} --no-print-directory -C Razor/vendor/yaml-cpp -f Makefile clean
 	@${MAKE} --no-print-directory -C Razor/vendor/entt -f Makefile clean
+	@${MAKE} --no-print-directory -C Razor/vendor/Coral/Coral.Native -f Makefile clean
 	@${MAKE} --no-print-directory -C Razor -f Makefile clean
 	@${MAKE} --no-print-directory -C Edge -f Makefile clean
 	@${MAKE} --no-print-directory -C Sandbox -f Makefile clean
@@ -124,6 +134,7 @@ help:
 	@echo "   ImGui"
 	@echo "   yaml-cpp"
 	@echo "   EnTT"
+	@echo "   Coral.Native"
 	@echo "   Razor"
 	@echo "   Edge"
 	@echo "   Sandbox"

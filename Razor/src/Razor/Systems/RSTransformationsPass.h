@@ -13,7 +13,7 @@ namespace Razor
 		{
 			SystemRenderStage = RenderStage::RENDER_STAGE_TRANSFORMATION_PASS;
 		}
-		void Render(RenderPipelineEntityProperties& EntityProperties) override;
+		void Render(RenderPipelineData& data) override;
 	};
 }
 

@@ -1,10 +1,11 @@
 #pragma once
 
 #include <Razor.h>
-#include "../EditorStorage.h"
 
 namespace EdgeEditor
 {
+	struct EditorStorage;
+
 	class SceneView
 	{
 	public:

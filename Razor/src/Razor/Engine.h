@@ -1,27 +1,43 @@
 #pragma once
 
 #include <vector>
-#include "Window.h"
-#include "Coordinator.h"
+#include <unordered_map>
 #include "Core.h"
-#include "Renderer/IRenderer.h"
-#include "Renderer/Model.h"
-#include "Renderer/Shaders/Shader.h"
-#include "ImGui/RazorImGui.h"
 #include "../Platform/Generic/IPlatformIO.h"
-#include "imgui.h"
-#include "Scene/Scene.h"
-#include "entt/entt.hpp"
+#include "Scene/Project.h"
+#include <thread>
+#include <atomic>
 
 namespace Razor
 {
-	using Vec2 = ImVec2;
+	// Forward Declarations
+	class RazorImGui;
+	class Window;
+	class Coordinator;
+	class IRenderer;
+	class Model;
+	class Shader;
+	class ITimeProvider;
+	class Scene;
+	class ScriptInterface;
+	class AssetDirectory;
+	class IPhysicsEngine;
+	class IPhysicsDebugRenderer;
+	class PhysicsDebugDrawBuffer;
+
+	struct Light;
+	struct RenderStageConfig;
+
+	struct ScriptAssembly;
+
+	using RenderPipelineConfig = std::vector<RenderStageConfig>;
+
 	/**
 	* Class that is responsible for loading up all the different pieces of the engine
 	* 
 	* Exists as a singleton instance can only be accessed through Get() function
 	*/
-	class   Engine
+	class RAZOR_API Engine
 	{
 	
 	public:
@@ -30,39 +46,23 @@ namespace Razor
 		* 
 		* @return Shared Ptr to IRenderer object
 		*/
-		std::shared_ptr<IRenderer> GetRenderer()
-		{
-			return Renderer;
-		}
+		std::shared_ptr<IRenderer> GetRenderer();
+
 		/**
 		* Deconstructor for the Engine object
 		*/
-		~Engine()
-		{
-			RZ_CORE_INFO("Destroying razor");
-			delete GEngine;
-		}
+		~Engine();
 		/**
 		* Function to return the singleton instance of the Engine
 		* 
 		* @return Reference to the Engine
 		*/
-		static Engine& Get()
-		{
-			if (GEngine == nullptr)
-			{
-				GEngine = new Engine();
-			}
-			return *GEngine;
-		}
+		static Engine& Get();
 	protected:
 		/**
 		* Default Engine Constructor
 		*/
-		Engine()
-		{
-
-		}
+		Engine();
 		
 	public:
 		/**
@@ -84,17 +84,17 @@ namespace Razor
 		* 
 		* @return A boolean representing if we should close the engine
 		*/
-		bool ShouldEngineClose() { return EngineWindow->ShouldWindowClose(); }
+		bool ShouldEngineClose();
 		/**
 		* Function to run the systems registered to the Coordinator
 		*/
-		void RunSystems() { Coordinator->RunSystems(DeltaTime); }
+		void RunSystems();
 		/**
 		* Function to run the render systems registered to the Coordinator 
 		* 
 		* @param Config - The pipeline configuration we want to run with this render
 		*/
-		void RunRenderSystems(const RenderPipelineConfig& Config) { Coordinator->RunRenderSystems(Config); }
+		void Render(int32_t targetId, const RenderPipelineConfig& Config);
 		/**
 		* Getter function for the RazorImGui object
 		* 
@@ -102,7 +102,7 @@ namespace Razor
 		* 
 		* @return A reference to the RazorImGui object
 		*/
-		RazorImGui& GetGUI() { return std::move(*RazorGUI); }
+		RazorImGui& GetGUI() { return *RazorGUI; }
 		/**
 		* Getter function for the Window object
 		* 
@@ -110,16 +110,13 @@ namespace Razor
 		* 
 		* @return A reference to the Window object
 		*/
-		Window& GetWindow() { return std::move(*EngineWindow); }
+		Window& GetWindow();
 		/**
 		* Getter function for the Coordinator object
 		* 
 		* @return A shared ptr to the Coordinator object
 		*/
-		std::shared_ptr<Coordinator> GetCoordinator()
-		{
-			return Coordinator;
-		}
+		std::shared_ptr<Coordinator> GetCoordinator();
 
 		/**
 		* Function to Process Input via the RazorIO class
@@ -127,13 +124,6 @@ namespace Razor
 		* This just checks for the close event on the window
 		*/
 		void ProcessInput();
-		/**
-		* Function to pick and object via the PickBuffer
-		* Needs it's functionality properly implemented
-		* 
-		* @param PickBuffer - An unsigned int pointing to the FrameBuffer used as the PickBuffer
-		*/
-		void PickObject(unsigned int PickBuffer);
 		// TODO move this
 		/**
 		* Function to process Model from .obj file to Model object
@@ -160,28 +150,57 @@ namespace Razor
 		/**
 		* Getter function for a Shader from Type
 		*
-		* @param Type - A const char* representing the type of the object
+		* @param Type - A std::string representing the type of the object
 		* 
 		* @return A shared ptr to the Shader object
 		*/
 		std::shared_ptr<Shader> GetShaderForType(const char* Type);
 
+		ScriptInterface& GetScriptInterface();
+
+		void SaveProject();
+		void LoadProject(const std::string& ProjectPath);
+
+		void RuntimeStart();
+		void RuntimeStop();
+
 		Ref<Scene> CurrentScene; /** Ref to the current scene we have*/
+
+		Ref<AssetDirectory> GetAssetDirectory();
+
+		IPhysicsEngine& GetPhysicsEngine();
+
+		void PopulateRenderPipelineDebugData();
+
+		void ClearDebugDrawBuffer();
 
 	private:
 		
 		void RenderImGui(uint64_t SceneTexture);
+		void RunRuntime();
 
 		std::unique_ptr<Window> EngineWindow;
-		std::shared_ptr<Coordinator> Coordinator;
+		std::shared_ptr<Coordinator> _mCoordinator;
 		std::unordered_map<uint8_t, std::shared_ptr<Shader>> ShaderIDMap;
-		std::unordered_map<const char*, std::shared_ptr<Shader>> ShaderTypeMap;
+		std::unordered_map<std::string, std::shared_ptr<Shader>> ShaderTypeMap;
 		std::shared_ptr<std::vector<Light*>> SceneLights;
 		std::unique_ptr<RazorImGui> RazorGUI;
 		float DeltaTime = 0.0f;
 		float LastFrame = 0.0f;
 		static Engine* GEngine;
 		std::unique_ptr<IPlatformIO> PlatformIO;
-		
+		std::unique_ptr<ITimeProvider> TimeProvider; /** Generic object to provide time functionality */
+		std::unique_ptr<ScriptInterface> _mScriptInterface;
+		Ref<Project> LoadedProject;
+		Scope<ScriptAssembly> BridgeAssembly;
+		Scope<ScriptAssembly> GameAssembly;
+		Ref<AssetDirectory> _mAssetDirectory;
+		Scope<IPhysicsEngine> _mPhysicsEngine;
+		Ref<IPhysicsDebugRenderer> _mPhysicsDebugRenderer;
+
+		PhysicsDebugDrawBuffer* _mDebugDrawBuffer;
+
+		std::atomic<bool> bIsRuntimeRunning { false };
+		std::thread RuntimeThread;
 	};
 }

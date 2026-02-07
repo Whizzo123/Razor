@@ -1,5 +1,6 @@
 #include "Inspector.h"
 #include "Gui/ComponentImGui.h"
+#include "EditorStorage.h"
 
 namespace EdgeEditor
 {
@@ -11,7 +12,7 @@ namespace EdgeEditor
 
 	Inspector::Inspector(Razor::Ref<EditorStorage> Storage) : Storage(Storage)
 	{
-
+		ComponentImGui::SetAssetPickerPopup(_mAssetPickerPopup);
 	}
 
 	void Inspector::Render()
@@ -19,41 +20,52 @@ namespace EdgeEditor
 		Razor::Engine& Engine = Razor::Engine::Get();
 
 		bool bIsOpen;
-		ImGui::Begin("Inspector", &bIsOpen, ImGuiWindowFlags_MenuBar);
-		ImGui::SetWindowSize(ImVec2(200.0f, 200.0f));
-		ImGui::Text("Hello Inspector, %d", 123);
+		Razor::RazorImGui::Begin("Inspector", &bIsOpen, Razor::RazorGuiWindowFlags_MenuBar);
+		Razor::RazorImGui::SetWindowSize(Razor::Vector2(200.0f, 200.0f));
+		Razor::RazorImGui::Text("Hello Inspector, %d", 123);
 
 		if (!Storage->SelectedEntity)
 		{
-			ImGui::End();
+			Razor::RazorImGui::End();
 			return;
 		}
 
 		Razor::Ref<Razor::Scene> CurrentScene = Engine.CurrentScene;
 		
-		if (ImGui::TreeNode(std::to_string((uint32_t)Storage->SelectedEntity->EntityHandle).c_str()))
+		if (Razor::RazorImGui::TreeNode(std::to_string((uint32_t)Storage->SelectedEntity->EntityHandle).c_str()))
 		{
 			ComponentImGui::DrawComponents(Storage->SelectedEntity);
-			ImGui::TreePop();
+			Razor::RazorImGui::TreePop();
 		}
 		const char* PopupId = "Add Component Popup";
-		if (ImGui::Button("Add Component"))
+		if (Razor::RazorImGui::Button("Add Component"))
 		{
-			ImGui::OpenPopup(PopupId);	
+			Razor::RazorImGui::OpenPopup(PopupId);	
 		}
-		if (ImGui::BeginPopup(PopupId))
+		if (Razor::RazorImGui::BeginPopup(PopupId))
 		{
-			if (ImGui::Button("Mesh Component"))
+			if (Razor::RazorImGui::Button("Mesh Component"))
 			{
-				Storage->SelectedEntity->AddComponent<Razor::Mesh>(Razor::CreateRef<Razor::Model>(Storage->DefaultModel));
+				Storage->SelectedEntity->AddComponent<Razor::Mesh>();
 			}
-			if (ImGui::Button("Directional Light Component"))
+			if (Razor::RazorImGui::Button("Directional Light Component"))
 			{
 				Storage->SelectedEntity->AddComponent<Razor::DirectionalLight>();
 			}
-			ImGui::EndPopup();
+			if (Razor::RazorImGui::Button("Box Body Component"))
+			{
+				Storage->SelectedEntity->AddComponent<Razor::BoxBody>();
+			}
+			for (const auto& component : Engine.GetScriptInterface().GetComponentTypes())
+			{
+				if (Razor::RazorImGui::Button(component.GetName().c_str()))
+				{
+					Storage->SelectedEntity->AddScriptComponent(component.GetName());
+				}
+			}
+			Razor::RazorImGui::EndPopup();
 		}
-		ImGui::End();
+		Razor::RazorImGui::End();
 	}
 
 	void Inspector::CreateEntity()

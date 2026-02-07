@@ -1,4 +1,5 @@
 #include "Coordinator.h"
+#include "Core/Entity.h"
 
 namespace Razor
 {
@@ -34,8 +35,8 @@ namespace Razor
 		SystemMgr->InitSystems();
 	}
 
-	std::vector<const char*> Coordinator::GetComponentsForEntity(Entity InEntity)
+	void Coordinator::SetRenderPipelineDebugData(std::vector<DebugLine> lineData, std::vector<DebugTriangle> triangleData)
 	{
-		return ComponentMgr->GetComponentsForEntity(InEntity);
+		SystemMgr->SetPipelineDebugData(lineData, triangleData);
 	}
 }

@@ -1,11 +1,14 @@
 #pragma once
 
+#include "../Core.h"
+
 #ifndef CPP_DELEGATES
 #define CPP_DELEGATES
 
 #include <vector>
 #include <memory>
 #include <tuple>
+#include <cstring>
 
 ///////////////////////////////////////////////////////////////
 //////////////////// DEFINES SECTION //////////////////////////
@@ -292,7 +295,7 @@ private:
 
 //A handle to a delegate used for a multicast delegate
 //Static ID so that every handle is unique
-class DelegateHandle
+class RAZOR_API DelegateHandle
 {
 public:
 	constexpr DelegateHandle() noexcept

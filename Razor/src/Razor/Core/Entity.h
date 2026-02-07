@@ -4,7 +4,7 @@
 
 namespace Razor
 {
-	class Entity
+	class RAZOR_API Entity
 	{
 	public:
 		Entity() {}
@@ -16,6 +16,8 @@ namespace Razor
 			T& component = _Scene->registry.emplace<T>(EntityHandle, std::forward<Args>(args)...);
 			return component;
 		}
+
+		void AddScriptComponent(std::string className);
 
 		template<typename T>
 		bool HasComponent()

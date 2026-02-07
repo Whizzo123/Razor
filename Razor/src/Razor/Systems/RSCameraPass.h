@@ -13,7 +13,7 @@ namespace Razor
 		{
 			SystemRenderStage = RenderStage::RENDER_STAGE_CAMERA_PASS;
 		}
-		void Render(RenderPipelineEntityProperties& EntityProperties) override;
+		void Render(RenderPipelineData& data) override;
 
 	protected:
 		std::shared_ptr<IRenderer> Renderer;

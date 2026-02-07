@@ -1,9 +1,11 @@
 #pragma once
 
+#include "../Core.h"
+
 namespace Razor
 {
 
-	struct Framebuffer
+	struct RAZOR_API Framebuffer
 	{
 		virtual void CreateFramebuffer() = 0;
 		virtual void Invalidate() = 0;

@@ -19,50 +19,71 @@ endif
 # #############################################
 
 RESCOMP = windres
-INCLUDES += -Ivendor/spdlog/include -Ivendor/GLFW/include -Ivendor/assimp/include -Ivendor/Glad/include -Ivendor/stb_image/include -Ivendor/glm -Ivendor/ImGui -Ivendor/yaml-cpp/include -Ivendor/entt/src
+INCLUDES += -Ivendor/spdlog/include -Ivendor/GLFW/include -Ivendor/assimp/include -Ivendor/Glad/include -Ivendor/stb_image/include -Ivendor/glm -Ivendor/ImGui -Ivendor/yaml-cpp/include -Ivendor/entt/src -Ivendor/Coral/Coral.Native/Include -Ivendor/JoltPhysics
 FORCE_INCLUDE +=
 ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
 ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
-define PREBUILDCMDS
-endef
+LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
 define PRELINKCMDS
-endef
-define POSTBUILDCMDS
 endef
 
 ifeq ($(config),debug)
 TARGETDIR = ../bin/Debug-linux-x86_64/Razor
-TARGET = $(TARGETDIR)/libRazor.a
+TARGET = $(TARGETDIR)/libRazor.so
 OBJDIR = ../intermediate/Debug-linux-x86_64/Razor
-DEFINES += -D_CRT_SECURE_NO_WARNINGS -DYAML_CPP_STATIC_DEFINE -DRZ_DEBUG
-ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -g
-ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -g -std=c++17
-LIBS += vendor/GLFW/bin/Debug-linux-x86_64/GLFW/libGLFW.a vendor/assimp/bin/Debug-linux-x86_64/assimp/libassimp.a vendor/ImGui/bin/Debug-linux-x86_64/ImGui/libImGui.a vendor/yaml-cpp/bin/Debug-linux-x86_64/yaml-cpp/libyaml-cpp.a -lopengl32.lib
-LDDEPS += vendor/GLFW/bin/Debug-linux-x86_64/GLFW/libGLFW.a vendor/assimp/bin/Debug-linux-x86_64/assimp/libassimp.a vendor/ImGui/bin/Debug-linux-x86_64/ImGui/libImGui.a vendor/yaml-cpp/bin/Debug-linux-x86_64/yaml-cpp/libyaml-cpp.a
-ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64
+DEFINES += -D_CRT_SECURE_NO_WARNINGS -DJPH_FLOATING_POINT_EXCEPTIONS_ENABLED -DJPH_PROFILE_ENABLED -DJPH_DEBUG_RENDERER -DJPH_OBJECT_STREAM -DYAML_CPP_STATIC_DEFINE -DCORAL_LINUX -DRZ_BUILD_DLL -DRZ_PLATFORM_LINUX -DRZ_DEBUG
+ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -fPIC -g
+ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -fPIC -g -std=c++20
+LIBS += vendor/GLFW/bin/Debug-linux-x86_64/GLFW/libGLFW.a vendor/assimp/bin/Debug-linux-x86_64/assimp/libassimp.a vendor/ImGui/bin/Debug-linux-x86_64/ImGui/libImGui.a vendor/yaml-cpp/bin/Debug-linux-x86_64/yaml-cpp/libyaml-cpp.a vendor/Coral/Build/Debug/libCoral.Native.a -lGL -lJolt -ldl -lpthread -lX11
+LDDEPS += vendor/GLFW/bin/Debug-linux-x86_64/GLFW/libGLFW.a vendor/assimp/bin/Debug-linux-x86_64/assimp/libassimp.a vendor/ImGui/bin/Debug-linux-x86_64/ImGui/libImGui.a vendor/yaml-cpp/bin/Debug-linux-x86_64/yaml-cpp/libyaml-cpp.a vendor/Coral/Build/Debug/libCoral.Native.a
+ALL_LDFLAGS += $(LDFLAGS) -Lvendor/JoltPhysics/Build/Linux_Debug -L/usr/lib64 -m64 -shared -Wl,-soname=libRazor.so
+define PREBUILDCMDS
+	@echo Running prebuild commands
+	if [ ! -f "../Razor/vendor/JoltPhysics/Build/Linux_Debug/Makefile" ]; then (cd "../Razor/vendor/JoltPhysics/Build" && sh ./cmake_linux_clang_gcc.sh Debug g++ -DUSE_STATIC_MSVC_RUNTIME_LIBRARY=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON); fi
+	if [ ! -f "../Razor/vendor/JoltPhysics/Build/Linux_Debug/libjolt.a" ]; then cmake --build "../Razor/vendor/JoltPhysics/Build/Linux_Debug"; fi
+	dotnet build "../Razor/vendor/Coral/Coral.Managed/Coral.Managed-Static.csproj" -c Debug -o "../Razor/vendor/Coral/Coral.Managed/bin/Debug/net9.0"
+endef
+define POSTBUILDCMDS
+	@echo Running postbuild commands
+	mkdir -p "../bin/Debug-linux-x86_64/Edge" && cp -rf "../Razor/vendor/Coral/Coral.Managed/bin/Debug/net9.0/Coral.Managed.dll" "../bin/Debug-linux-x86_64/Edge/"
+endef
 
 else ifeq ($(config),release)
 TARGETDIR = ../bin/Release-linux-x86_64/Razor
-TARGET = $(TARGETDIR)/libRazor.a
+TARGET = $(TARGETDIR)/libRazor.so
 OBJDIR = ../intermediate/Release-linux-x86_64/Razor
-DEFINES += -D_CRT_SECURE_NO_WARNINGS -DYAML_CPP_STATIC_DEFINE -DRZ_RELEASE
-ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -O2
-ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -std=c++17
-LIBS += vendor/GLFW/bin/Release-linux-x86_64/GLFW/libGLFW.a vendor/assimp/bin/Release-linux-x86_64/assimp/libassimp.a vendor/ImGui/bin/Release-linux-x86_64/ImGui/libImGui.a vendor/yaml-cpp/bin/Release-linux-x86_64/yaml-cpp/libyaml-cpp.a -lopengl32.lib
-LDDEPS += vendor/GLFW/bin/Release-linux-x86_64/GLFW/libGLFW.a vendor/assimp/bin/Release-linux-x86_64/assimp/libassimp.a vendor/ImGui/bin/Release-linux-x86_64/ImGui/libImGui.a vendor/yaml-cpp/bin/Release-linux-x86_64/yaml-cpp/libyaml-cpp.a
-ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64 -s
+DEFINES += -D_CRT_SECURE_NO_WARNINGS -DJPH_FLOATING_POINT_EXCEPTIONS_ENABLED -DJPH_PROFILE_ENABLED -DJPH_DEBUG_RENDERER -DJPH_OBJECT_STREAM -DYAML_CPP_STATIC_DEFINE -DCORAL_LINUX -DRZ_BUILD_DLL -DRZ_PLATFORM_LINUX -DRZ_RELEASE
+ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -fPIC
+ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -fPIC -std=c++20
+LIBS += vendor/GLFW/bin/Release-linux-x86_64/GLFW/libGLFW.a vendor/assimp/bin/Release-linux-x86_64/assimp/libassimp.a vendor/ImGui/bin/Release-linux-x86_64/ImGui/libImGui.a vendor/yaml-cpp/bin/Release-linux-x86_64/yaml-cpp/libyaml-cpp.a vendor/Coral/Build/Release/libCoral.Native.a -lGL -lJolt -ldl -lpthread -lX11
+LDDEPS += vendor/GLFW/bin/Release-linux-x86_64/GLFW/libGLFW.a vendor/assimp/bin/Release-linux-x86_64/assimp/libassimp.a vendor/ImGui/bin/Release-linux-x86_64/ImGui/libImGui.a vendor/yaml-cpp/bin/Release-linux-x86_64/yaml-cpp/libyaml-cpp.a vendor/Coral/Build/Release/libCoral.Native.a
+ALL_LDFLAGS += $(LDFLAGS) -Lvendor/JoltPhysics/Build/Linux_Debug -L/usr/lib64 -m64 -shared -Wl,-soname=libRazor.so -s
+define PREBUILDCMDS
+	@echo Running prebuild commands
+	if not exist "Razor\vendor\JoltPhysics\Build\VS2022_CL\Release\Jolt.lib" call "Razor\vendor\JoltPhysics\Build\cmake_vs2022_cl.bat"
+	if not exist "Razor\vendor\JoltPhysics\Build\VS2022_CL\Release\Jolt.lib" cmake --build "VS2022_CL" --config Release
+endef
+define POSTBUILDCMDS
+	@echo Running postbuild commands
+	mkdir -p "../bin/Release-linux-x86_64/Edge" && cp -rf "../Razor/vendor/Coral/Coral.Managed/bin/Release/net9.0/Coral.Managed.dll" "../bin/Release-linux-x86_64/Edge/"
+endef
 
 else ifeq ($(config),dist)
 TARGETDIR = ../bin/Dist-linux-x86_64/Razor
-TARGET = $(TARGETDIR)/libRazor.a
+TARGET = $(TARGETDIR)/libRazor.so
 OBJDIR = ../intermediate/Dist-linux-x86_64/Razor
-DEFINES += -D_CRT_SECURE_NO_WARNINGS -DYAML_CPP_STATIC_DEFINE -DRZ_DIST
-ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -O2
-ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -std=c++17
-LIBS += vendor/GLFW/bin/Dist-linux-x86_64/GLFW/libGLFW.a vendor/assimp/bin/Dist-linux-x86_64/assimp/libassimp.a vendor/ImGui/bin/Dist-linux-x86_64/ImGui/libImGui.a vendor/yaml-cpp/bin/Dist-linux-x86_64/yaml-cpp/libyaml-cpp.a -lopengl32.lib
-LDDEPS += vendor/GLFW/bin/Dist-linux-x86_64/GLFW/libGLFW.a vendor/assimp/bin/Dist-linux-x86_64/assimp/libassimp.a vendor/ImGui/bin/Dist-linux-x86_64/ImGui/libImGui.a vendor/yaml-cpp/bin/Dist-linux-x86_64/yaml-cpp/libyaml-cpp.a
-ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64 -s
+DEFINES += -D_CRT_SECURE_NO_WARNINGS -DJPH_FLOATING_POINT_EXCEPTIONS_ENABLED -DJPH_PROFILE_ENABLED -DJPH_DEBUG_RENDERER -DJPH_OBJECT_STREAM -DYAML_CPP_STATIC_DEFINE -DCORAL_LINUX -DRZ_BUILD_DLL -DRZ_PLATFORM_LINUX -DRZ_DIST
+ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -fPIC
+ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -fPIC -std=c++20
+LIBS += vendor/GLFW/bin/Dist-linux-x86_64/GLFW/libGLFW.a vendor/assimp/bin/Dist-linux-x86_64/assimp/libassimp.a vendor/ImGui/bin/Dist-linux-x86_64/ImGui/libImGui.a vendor/yaml-cpp/bin/Dist-linux-x86_64/yaml-cpp/libyaml-cpp.a vendor/Coral/Build/Dist/libCoral.Native.a -lGL -lJolt -ldl -lpthread -lX11
+LDDEPS += vendor/GLFW/bin/Dist-linux-x86_64/GLFW/libGLFW.a vendor/assimp/bin/Dist-linux-x86_64/assimp/libassimp.a vendor/ImGui/bin/Dist-linux-x86_64/ImGui/libImGui.a vendor/yaml-cpp/bin/Dist-linux-x86_64/yaml-cpp/libyaml-cpp.a vendor/Coral/Build/Dist/libCoral.Native.a
+ALL_LDFLAGS += $(LDFLAGS) -Lvendor/JoltPhysics/Build/Linux_Debug -L/usr/lib64 -m64 -shared -Wl,-soname=libRazor.so -s
+define PREBUILDCMDS
+endef
+define POSTBUILDCMDS
+	@echo Running postbuild commands
+	mkdir -p "../bin/Dist-linux-x86_64/Edge" && cp -rf "../Razor/vendor/Coral/Coral.Managed/bin/Dist/net9.0/Coral.Managed.dll" "../bin/Dist-linux-x86_64/Edge/"
+endef
 
 endif
 
@@ -77,6 +98,7 @@ GENERATED :=
 OBJECTS :=
 
 GENERATED += $(OBJDIR)/Application.o
+GENERATED += $(OBJDIR)/AssetDirectory.o
 GENERATED += $(OBJDIR)/CameraController.o
 GENERATED += $(OBJDIR)/CollisionSystem.o
 GENERATED += $(OBJDIR)/Coordinator.o
@@ -85,15 +107,22 @@ GENERATED += $(OBJDIR)/DefaultMeshShader.o
 GENERATED += $(OBJDIR)/Delegates.o
 GENERATED += $(OBJDIR)/Engine.o
 GENERATED += $(OBJDIR)/Entity.o
+GENERATED += $(OBJDIR)/FilePath.o
+GENERATED += $(OBJDIR)/GLFWTimeProvider.o
 GENERATED += $(OBJDIR)/GLFramebuffer.o
+GENERATED += $(OBJDIR)/JoltDebugRenderer.o
+GENERATED += $(OBJDIR)/JoltPhysicsEngine.o
 GENERATED += $(OBJDIR)/LightRenderer.o
 GENERATED += $(OBJDIR)/Log.o
 GENERATED += $(OBJDIR)/MeshRenderer.o
 GENERATED += $(OBJDIR)/Model.o
+GENERATED += $(OBJDIR)/ModelSerializer.o
 GENERATED += $(OBJDIR)/OpenGLIO.o
 GENERATED += $(OBJDIR)/OpenGLRenderer.o
 GENERATED += $(OBJDIR)/OpenGLWindowProvider.o
+GENERATED += $(OBJDIR)/PhysicsSystem.o
 GENERATED += $(OBJDIR)/PickBufferShader.o
+GENERATED += $(OBJDIR)/ProjectSerializer.o
 GENERATED += $(OBJDIR)/RSCameraPass.o
 GENERATED += $(OBJDIR)/RSDirectionalLightingPass.o
 GENERATED += $(OBJDIR)/RSMaterialPass.o
@@ -108,16 +137,22 @@ GENERATED += $(OBJDIR)/RazorImGui.o
 GENERATED += $(OBJDIR)/RazorMaths.o
 GENERATED += $(OBJDIR)/Scene.o
 GENERATED += $(OBJDIR)/SceneSerializer.o
+GENERATED += $(OBJDIR)/ScriptClass.o
+GENERATED += $(OBJDIR)/ScriptEngine.o
+GENERATED += $(OBJDIR)/ScriptGlue.o
+GENERATED += $(OBJDIR)/ScriptInterface.o
 GENERATED += $(OBJDIR)/Shader.o
 GENERATED += $(OBJDIR)/ShaderReader.o
 GENERATED += $(OBJDIR)/SpinSystem.o
 GENERATED += $(OBJDIR)/System.o
 GENERATED += $(OBJDIR)/TextureReader.o
 GENERATED += $(OBJDIR)/Window.o
+GENERATED += $(OBJDIR)/YamlWrapper.o
 GENERATED += $(OBJDIR)/glad.o
 GENERATED += $(OBJDIR)/imgui_impl_glfw.o
 GENERATED += $(OBJDIR)/imgui_impl_opengl3.o
 OBJECTS += $(OBJDIR)/Application.o
+OBJECTS += $(OBJDIR)/AssetDirectory.o
 OBJECTS += $(OBJDIR)/CameraController.o
 OBJECTS += $(OBJDIR)/CollisionSystem.o
 OBJECTS += $(OBJDIR)/Coordinator.o
@@ -126,15 +161,22 @@ OBJECTS += $(OBJDIR)/DefaultMeshShader.o
 OBJECTS += $(OBJDIR)/Delegates.o
 OBJECTS += $(OBJDIR)/Engine.o
 OBJECTS += $(OBJDIR)/Entity.o
+OBJECTS += $(OBJDIR)/FilePath.o
+OBJECTS += $(OBJDIR)/GLFWTimeProvider.o
 OBJECTS += $(OBJDIR)/GLFramebuffer.o
+OBJECTS += $(OBJDIR)/JoltDebugRenderer.o
+OBJECTS += $(OBJDIR)/JoltPhysicsEngine.o
 OBJECTS += $(OBJDIR)/LightRenderer.o
 OBJECTS += $(OBJDIR)/Log.o
 OBJECTS += $(OBJDIR)/MeshRenderer.o
 OBJECTS += $(OBJDIR)/Model.o
+OBJECTS += $(OBJDIR)/ModelSerializer.o
 OBJECTS += $(OBJDIR)/OpenGLIO.o
 OBJECTS += $(OBJDIR)/OpenGLRenderer.o
 OBJECTS += $(OBJDIR)/OpenGLWindowProvider.o
+OBJECTS += $(OBJDIR)/PhysicsSystem.o
 OBJECTS += $(OBJDIR)/PickBufferShader.o
+OBJECTS += $(OBJDIR)/ProjectSerializer.o
 OBJECTS += $(OBJDIR)/RSCameraPass.o
 OBJECTS += $(OBJDIR)/RSDirectionalLightingPass.o
 OBJECTS += $(OBJDIR)/RSMaterialPass.o
@@ -149,12 +191,17 @@ OBJECTS += $(OBJDIR)/RazorImGui.o
 OBJECTS += $(OBJDIR)/RazorMaths.o
 OBJECTS += $(OBJDIR)/Scene.o
 OBJECTS += $(OBJDIR)/SceneSerializer.o
+OBJECTS += $(OBJDIR)/ScriptClass.o
+OBJECTS += $(OBJDIR)/ScriptEngine.o
+OBJECTS += $(OBJDIR)/ScriptGlue.o
+OBJECTS += $(OBJDIR)/ScriptInterface.o
 OBJECTS += $(OBJDIR)/Shader.o
 OBJECTS += $(OBJDIR)/ShaderReader.o
 OBJECTS += $(OBJDIR)/SpinSystem.o
 OBJECTS += $(OBJDIR)/System.o
 OBJECTS += $(OBJDIR)/TextureReader.o
 OBJECTS += $(OBJDIR)/Window.o
+OBJECTS += $(OBJDIR)/YamlWrapper.o
 OBJECTS += $(OBJDIR)/glad.o
 OBJECTS += $(OBJDIR)/imgui_impl_glfw.o
 OBJECTS += $(OBJDIR)/imgui_impl_opengl3.o
@@ -221,6 +268,9 @@ endif
 # File Rules
 # #############################################
 
+$(OBJDIR)/GLFWTimeProvider.o: src/Platform/OpenGL/GLFWTimeProvider.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/OpenGLIO.o: src/Platform/OpenGL/OpenGLIO.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
@@ -236,6 +286,15 @@ $(OBJDIR)/imgui_impl_opengl3.o: src/Platform/OpenGL/imgui_impl_opengl3.cpp
 $(OBJDIR)/Application.o: src/Razor/Application.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/AssetDirectory.o: src/Razor/Assets/AssetDirectory.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/FilePath.o: src/Razor/Assets/FilePath.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/ModelSerializer.o: src/Razor/Assets/ModelSerializer.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Coordinator.o: src/Razor/Coordinator.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
@@ -245,7 +304,13 @@ $(OBJDIR)/Entity.o: src/Razor/Core/Entity.cpp
 $(OBJDIR)/Engine.o: src/Razor/Engine.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/ProjectSerializer.o: src/Razor/IO/File/ProjectSerializer.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/RazorIO.o: src/Razor/IO/RazorIO.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/YamlWrapper.o: src/Razor/IO/YamlWrapper.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/RazorImGui.o: src/Razor/ImGui/RazorImGui.cpp
@@ -255,6 +320,12 @@ $(OBJDIR)/Log.o: src/Razor/Log.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/MeshRenderer.o: src/Razor/MeshRenderer.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/JoltDebugRenderer.o: src/Razor/Physics/JoltPhysics/JoltDebugRenderer.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/JoltPhysicsEngine.o: src/Razor/Physics/JoltPhysics/JoltPhysicsEngine.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Model.o: src/Razor/Renderer/Model.cpp
@@ -284,6 +355,18 @@ $(OBJDIR)/Scene.o: src/Razor/Scene/Scene.cpp
 $(OBJDIR)/SceneSerializer.o: src/Razor/Scene/SceneSerializer.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/ScriptClass.o: src/Razor/Scripting/ScriptClass.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/ScriptEngine.o: src/Razor/Scripting/ScriptEngine.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/ScriptGlue.o: src/Razor/Scripting/ScriptGlue.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/ScriptInterface.o: src/Razor/Scripting/ScriptInterface.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/ShaderReader.o: src/Razor/ShaderReader.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
@@ -294,6 +377,9 @@ $(OBJDIR)/CollisionSystem.o: src/Razor/Systems/CollisionSystem.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/LightRenderer.o: src/Razor/Systems/LightRenderer.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/PhysicsSystem.o: src/Razor/Systems/PhysicsSystem.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/RSCameraPass.o: src/Razor/Systems/RSCameraPass.cpp

@@ -1,5 +1,7 @@
 #include "OpenGLWindowProvider.h"
 #include <iostream>
+#include "../../Razor/Engine.h"
+#include "../../Razor/Window.h"
 
 
 namespace Razor
@@ -7,6 +9,8 @@ namespace Razor
     void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     {
         glViewport(0, 0, width, height);
+        Engine::Get().GetWindow().SetWidth(width);
+        Engine::Get().GetWindow().SetHeight(height);
         // Think what we want is to re-create our framebuffers to be of this width and height rather than try resizing them
         ///Renderer->ResizeFramebuffers(width, height);
     }

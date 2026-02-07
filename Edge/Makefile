@@ -35,34 +35,34 @@ ifeq ($(config),debug)
 TARGETDIR = ../bin/Debug-linux-x86_64/Edge
 TARGET = $(TARGETDIR)/Edge
 OBJDIR = ../intermediate/Debug-linux-x86_64/Edge
-DEFINES += -DYAML_CPP_STATIC_DEFINE -DRZ_DEBUG
+DEFINES += -DYAML_CPP_STATIC_DEFINE -DRZ_PLATFORM_LINUX -DRZ_DEBUG
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -g
-ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -g -std=c++17
-LIBS += ../bin/Debug-linux-x86_64/Razor/libRazor.a -lShlwapi.lib -lPropsys.lib
-LDDEPS += ../bin/Debug-linux-x86_64/Razor/libRazor.a
-ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64
+ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -g -std=c++20
+LIBS += ../bin/Debug-linux-x86_64/Razor/libRazor.so ../Razor/vendor/GLFW/bin/Debug-linux-x86_64/GLFW/libGLFW.a ../Razor/vendor/assimp/bin/Debug-linux-x86_64/assimp/libassimp.a ../Razor/vendor/ImGui/bin/Debug-linux-x86_64/ImGui/libImGui.a ../Razor/vendor/yaml-cpp/bin/Debug-linux-x86_64/yaml-cpp/libyaml-cpp.a -lGL -ldl -lpthread -lX11
+LDDEPS += ../bin/Debug-linux-x86_64/Razor/libRazor.so ../Razor/vendor/GLFW/bin/Debug-linux-x86_64/GLFW/libGLFW.a ../Razor/vendor/assimp/bin/Debug-linux-x86_64/assimp/libassimp.a ../Razor/vendor/ImGui/bin/Debug-linux-x86_64/ImGui/libImGui.a ../Razor/vendor/yaml-cpp/bin/Debug-linux-x86_64/yaml-cpp/libyaml-cpp.a
+ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -Wl,-rpath,'$$ORIGIN/../Razor' -m64
 
 else ifeq ($(config),release)
 TARGETDIR = ../bin/Release-linux-x86_64/Edge
 TARGET = $(TARGETDIR)/Edge
 OBJDIR = ../intermediate/Release-linux-x86_64/Edge
-DEFINES += -DYAML_CPP_STATIC_DEFINE -DRZ_RELEASE
+DEFINES += -DYAML_CPP_STATIC_DEFINE -DRZ_PLATFORM_LINUX -DRZ_RELEASE
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -O2
-ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -std=c++17
-LIBS += ../bin/Release-linux-x86_64/Razor/libRazor.a -lShlwapi.lib -lPropsys.lib
-LDDEPS += ../bin/Release-linux-x86_64/Razor/libRazor.a
-ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64 -s
+ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -std=c++20
+LIBS += ../bin/Release-linux-x86_64/Razor/libRazor.so ../Razor/vendor/GLFW/bin/Release-linux-x86_64/GLFW/libGLFW.a ../Razor/vendor/assimp/bin/Release-linux-x86_64/assimp/libassimp.a ../Razor/vendor/ImGui/bin/Release-linux-x86_64/ImGui/libImGui.a ../Razor/vendor/yaml-cpp/bin/Release-linux-x86_64/yaml-cpp/libyaml-cpp.a -lGL -ldl -lpthread -lX11
+LDDEPS += ../bin/Release-linux-x86_64/Razor/libRazor.so ../Razor/vendor/GLFW/bin/Release-linux-x86_64/GLFW/libGLFW.a ../Razor/vendor/assimp/bin/Release-linux-x86_64/assimp/libassimp.a ../Razor/vendor/ImGui/bin/Release-linux-x86_64/ImGui/libImGui.a ../Razor/vendor/yaml-cpp/bin/Release-linux-x86_64/yaml-cpp/libyaml-cpp.a
+ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -Wl,-rpath,'$$ORIGIN/../Razor' -m64 -s
 
 else ifeq ($(config),dist)
 TARGETDIR = ../bin/Dist-linux-x86_64/Edge
 TARGET = $(TARGETDIR)/Edge
 OBJDIR = ../intermediate/Dist-linux-x86_64/Edge
-DEFINES += -DYAML_CPP_STATIC_DEFINE -DRZ_DIST
+DEFINES += -DYAML_CPP_STATIC_DEFINE -DRZ_PLATFORM_LINUX -DRZ_DIST
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -O2
-ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -std=c++17
-LIBS += ../bin/Dist-linux-x86_64/Razor/libRazor.a -lShlwapi.lib -lPropsys.lib
-LDDEPS += ../bin/Dist-linux-x86_64/Razor/libRazor.a
-ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64 -s
+ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -std=c++20
+LIBS += ../bin/Dist-linux-x86_64/Razor/libRazor.so ../Razor/vendor/GLFW/bin/Dist-linux-x86_64/GLFW/libGLFW.a ../Razor/vendor/assimp/bin/Dist-linux-x86_64/assimp/libassimp.a ../Razor/vendor/ImGui/bin/Dist-linux-x86_64/ImGui/libImGui.a ../Razor/vendor/yaml-cpp/bin/Dist-linux-x86_64/yaml-cpp/libyaml-cpp.a -lGL -ldl -lpthread -lX11
+LDDEPS += ../bin/Dist-linux-x86_64/Razor/libRazor.so ../Razor/vendor/GLFW/bin/Dist-linux-x86_64/GLFW/libGLFW.a ../Razor/vendor/assimp/bin/Dist-linux-x86_64/assimp/libassimp.a ../Razor/vendor/ImGui/bin/Dist-linux-x86_64/ImGui/libImGui.a ../Razor/vendor/yaml-cpp/bin/Dist-linux-x86_64/yaml-cpp/libyaml-cpp.a
+ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -Wl,-rpath,'$$ORIGIN/../Razor' -m64 -s
 
 endif
 
@@ -76,24 +76,34 @@ endif
 GENERATED :=
 OBJECTS :=
 
+GENERATED += $(OBJDIR)/AssetPickerPopupWindow.o
 GENERATED += $(OBJDIR)/CDialogEventHandler.o
 GENERATED += $(OBJDIR)/ComponentImGui.o
 GENERATED += $(OBJDIR)/EdgeApp.o
 GENERATED += $(OBJDIR)/EditorCamera.o
 GENERATED += $(OBJDIR)/Inspector.o
 GENERATED += $(OBJDIR)/ModelSerializer.o
+GENERATED += $(OBJDIR)/NewProjectPopupWindow.o
+GENERATED += $(OBJDIR)/OpenProjectPopupWindow.o
+GENERATED += $(OBJDIR)/PopupWindow.o
 GENERATED += $(OBJDIR)/ProjectExplorer.o
 GENERATED += $(OBJDIR)/RSEditorCamera.o
 GENERATED += $(OBJDIR)/SceneView.o
+GENERATED += $(OBJDIR)/SystemView.o
+OBJECTS += $(OBJDIR)/AssetPickerPopupWindow.o
 OBJECTS += $(OBJDIR)/CDialogEventHandler.o
 OBJECTS += $(OBJDIR)/ComponentImGui.o
 OBJECTS += $(OBJDIR)/EdgeApp.o
 OBJECTS += $(OBJDIR)/EditorCamera.o
 OBJECTS += $(OBJDIR)/Inspector.o
 OBJECTS += $(OBJDIR)/ModelSerializer.o
+OBJECTS += $(OBJDIR)/NewProjectPopupWindow.o
+OBJECTS += $(OBJDIR)/OpenProjectPopupWindow.o
+OBJECTS += $(OBJDIR)/PopupWindow.o
 OBJECTS += $(OBJDIR)/ProjectExplorer.o
 OBJECTS += $(OBJDIR)/RSEditorCamera.o
 OBJECTS += $(OBJDIR)/SceneView.o
+OBJECTS += $(OBJDIR)/SystemView.o
 
 # Rules
 # #############################################
@@ -166,7 +176,19 @@ $(OBJDIR)/EditorCamera.o: src/EditorCamera.cpp
 $(OBJDIR)/ModelSerializer.o: src/FileIO/ModelSerializer.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/AssetPickerPopupWindow.o: src/Gui/AssetPickerPopupWindow.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/ComponentImGui.o: src/Gui/ComponentImGui.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/NewProjectPopupWindow.o: src/Gui/NewProjectPopupWindow.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/OpenProjectPopupWindow.o: src/Gui/OpenProjectPopupWindow.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/PopupWindow.o: src/Gui/PopupWindow.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Inspector.o: src/Inspector.cpp
@@ -176,6 +198,9 @@ $(OBJDIR)/ProjectExplorer.o: src/ProjectExplorer.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/SceneView.o: src/SceneView.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/SystemView.o: src/SystemView.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/RSEditorCamera.o: src/Systems/RSEditorCamera.cpp

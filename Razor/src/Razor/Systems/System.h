@@ -1,12 +1,15 @@
 #pragma once
 #include <set>
 #include "../Core.h"
-#include <glm/glm.hpp>
 #include "../Utils/RazorMacros.h"
 #include "../Scene/Scene.h"
+#include "../Log.h"
+#include "../Renderer/Debug/DebugLine.h"
+#include "../Renderer/Debug/DebugTriangle.h"
 
 namespace Razor
 {
+
 	#ifndef ENUM_RENDERSTAGE
 	#define ENUM_RENDERSTAGE
 	enum class RenderStage { RENDER_STAGE_MATERIAL_PASS, RENDER_STAGE_LIGHTING_PASS, RENDER_STAGE_TRANSFORMATION_PASS, RENDER_STAGE_CAMERA_PASS, RENDER_STAGE_RENDER };
@@ -33,7 +36,7 @@ namespace Razor
 	public:
 		Property() {}
 		~Property() {}
-		Property(std::string Name, T Value)
+		Property(const std::string& Name, T Value)
 		{
 			this->Name = Name;
 			this->Value = Value;
@@ -47,10 +50,10 @@ namespace Razor
 		T Value;
 	};
 
-	struct PropertySlot
+	struct ShaderPropertySlot
 	{
 		template<typename T>
-		void AddProperty(std::string Name, T Value)
+		void AddProperty(const std::string& Name, T Value)
 		{
 			Properties.emplace_back(new Property<T>(Name, Value));
 		}
@@ -63,14 +66,14 @@ namespace Razor
 	private:
 		std::vector<Scope<IProperty>> Properties;
 	};
-	struct EntityRenderProperty
+	struct ShaderProperty
 	{
 		void GeneratePropertySlots(size_t NumberOfSlots)
 		{
 			Slots.reserve(NumberOfSlots);
 			for (int i = 0; i < NumberOfSlots; i++)
 			{
-				Slots.push_back(PropertySlot());
+				Slots.push_back(ShaderPropertySlot());
 			}
 		}
 		int32_t GetNumberOfSlots()
@@ -82,11 +85,11 @@ namespace Razor
 			Slots.clear();
 		}
 	private:
-		std::vector<PropertySlot> Slots;
+		std::vector<ShaderPropertySlot> Slots;
 
 
 	public:
-		PropertySlot& GetPropertySlot(int32_t SlotIndex)
+		ShaderPropertySlot& GetPropertySlot(int32_t SlotIndex)
 		{
 			if (SlotIndex >= 0 && SlotIndex < Slots.size())
 			{
@@ -96,13 +99,24 @@ namespace Razor
 			return Slots[0];
 		}
 	};
+	
 	struct RenderPipelineEntityProperties
 	{
-		std::unordered_map<entt::entity, EntityRenderProperty> Properties;
+		std::unordered_map<entt::entity, ShaderProperty> Properties;
+	};
+
+	struct RenderPipelineData
+	{
+		RenderPipelineEntityProperties mEntityRenderProperties;
+		std::vector<DebugLine> mDebugLines;
+		std::vector<ShaderProperty> mDebugLineProperties;
+		std::vector<DebugTriangle> mDebugTriangles;
+		std::vector<ShaderProperty> mDebugTriangleProperties;
+		std::mutex mDataMutex {};
 	};
 	
 
-	class System
+	class RAZOR_API System
 	{
 	public:
 		System(Ref<Scene> Scene) : CurrentScene(Scene) {}
@@ -113,28 +127,21 @@ namespace Razor
 		Ref<Scene> CurrentScene;
 	};
 
-	class RenderSystem : public System
+	class RAZOR_API RenderSystem : public System
 	{
 	public:
 		RenderSystem(Ref<Scene> Scene) : System(Scene) {}
-		virtual void Render(RenderPipelineEntityProperties& Properties) {}
+		virtual void Render(RenderPipelineData& data) {}
 		static RenderStage SystemRenderStage;
 	};
 
 	struct RenderSystemPipeline
 	{
-		std::unordered_map <RenderStage, std::unordered_map<const char*, std::shared_ptr<RenderSystem>>> PipelineSystems{};
-		RenderPipelineEntityProperties EntityRenderProperties;
-		void RunSystemsFor(RenderStage Stage)
-		{
-			for (std::pair<const char*, std::shared_ptr<RenderSystem>> System : PipelineSystems[Stage])
-			{
-				System.second->Render(EntityRenderProperties);
-			}
-		}
+		std::unordered_map <RenderStage, std::unordered_map<std::string, std::shared_ptr<RenderSystem>>> mPipelineSystems{};
+		RenderPipelineData mPipelineData;
 	};
 
-	class   SystemManager
+	class SystemManager
 	{
 	public:
 
@@ -149,24 +156,18 @@ namespace Razor
 			Systems.insert({ typeName, SystemInstPtr });
 			if (std::shared_ptr<RenderSystem> RndrSystem = std::dynamic_pointer_cast<RenderSystem>(SystemInstPtr))
 			{
-				RenderPipeline.PipelineSystems[RndrSystem->SystemRenderStage].insert({ typeName, RndrSystem });
+				_mRenderPipeline.mPipelineSystems[RndrSystem->SystemRenderStage].insert({ typeName, RndrSystem });
 			}
-			//// Setup Signature
-			//Signature SystemSignature;
-			//for (const ComponentType& Type : SystemInstPtr->Signature)
-			//{
-			//	SystemSignature.set(Type);
-			//}
-			//SetSignature<T>(SystemSignature);
 			return SystemInstPtr;
 		}
 
 		void RunSystems(float dt);
 		void RunRenderSystems(RenderPipelineConfig& PipelineConfig);
+		void SetPipelineDebugData(std::vector<DebugLine> lineData, std::vector<DebugTriangle> triangleData);
 		void InitSystems();
 	private:
 		std::unordered_map<const char*, std::shared_ptr<System>> Systems{};
-		RenderSystemPipeline RenderPipeline;
+		RenderSystemPipeline _mRenderPipeline;
 		
 	};
 

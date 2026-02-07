@@ -1,5 +1,7 @@
 #pragma once
 
+#include <limits>
+
 inline int32_t Size_tToInt(size_t Variable)
 {
 	const int VariableSize = sizeof(Variable);

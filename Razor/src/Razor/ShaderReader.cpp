@@ -1,87 +1,94 @@
 ﻿#include "ShaderReader.h"
 #include "Log.h"
+#include "Engine.h"
+#include "Renderer/Shaders/Shader.h"
 
-
-
-ShaderReader::ShaderReader() = default;
-ShaderReader::~ShaderReader() = default;
-
-std::string ShaderReader::ReadInShader(std::string shaderName)
+namespace Razor
 {
-    std::ifstream t("resources/shaders/" + shaderName);
-    std::stringstream buffer;
-    buffer << t.rdbuf();
-    return buffer.str();
-}
 
+    ShaderReader::ShaderReader() = default;
+    ShaderReader::~ShaderReader() = default;
 
-unsigned int ShaderReader::CreateShader(std::string shaderName, ShaderType type)
-{
-    std::string temp = ReadInShader(shaderName);
-
-    unsigned int shader = -1;
-
-    if (temp.empty())
+    std::string ShaderReader::ReadInShader(std::string shaderName)
     {
-        RZ_CORE_ERROR("ERROR::SHADER:: {0} ::COMPILATION::FAILED no file found or empty file at {1}", type, shaderName );
+        std::ifstream t("resources/shaders/" + shaderName);
+        std::stringstream buffer;
+        buffer << t.rdbuf();
+        return buffer.str();
+    }
+
+
+    unsigned int ShaderReader::CreateShader(std::string shaderName, ShaderType type)
+    {
+        std::string temp = ReadInShader(shaderName);
+
+        unsigned int shader = -1;
+
+        if (temp.empty())
+        {
+            RZ_CORE_ERROR("ERROR::SHADER:: {0} ::COMPILATION::FAILED no file found or empty file at {1}", type, shaderName);
+            return shader;
+        }
+
+        const char* source = temp.c_str();
+
+        Ref<IRenderer> Renderer = Engine::Get().GetRenderer();
+
+        switch (type)
+        {
+        case VERTEX:
+        {
+            shader = Renderer->CreateShader(EShader::VERTEX);
+            break;
+        }
+        case FRAGMENT:
+        {
+            shader = Renderer->CreateShader(EShader::FRAGMENT);
+            break;
+        }
+        }
+        Renderer->SetShaderSource(shader, 1, &source, nullptr);
+        Renderer->CompileShader(shader);
+
+        int success;
+        char infoLog[512];
+        Renderer->GetShaderStatusParam(shader, EStatusParam::COMPILE, &success);
+        if (!success)
+        {
+            Renderer->GetShaderLog(shader, 512, nullptr, infoLog);
+            RZ_CORE_ERROR("ERROR::SHADER::{0}::COMPILATION::FAILED\n{1}", type, infoLog);
+        }
+
         return shader;
     }
-	
-    const char* source = temp.c_str();
-	
-    switch(type)
+
+    unsigned ShaderReader::CreateShaderProgram(std::string vertexShaderFile, std::string fragmentShaderFile)
     {
-        case VERTEX:
-            {
-                shader = glCreateShader(GL_VERTEX_SHADER);
-                break;
-            }
-        case FRAGMENT:
-            {
-                shader = glCreateShader(GL_FRAGMENT_SHADER);
-                break;
-            }
-    }
-    glShaderSource(shader, 1, &source, nullptr);
-    glCompileShader(shader);
-	
-    int success;
-    char infoLog[512];
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-    if(!success)
-    {
-        glGetShaderInfoLog(shader, 512, nullptr, infoLog);
-        RZ_CORE_ERROR("ERROR::SHADER::{0}::COMPILATION::FAILED\n{1}", type, infoLog);
+        Ref<IRenderer> Renderer = Engine::Get().GetRenderer();
+
+        unsigned int vertexShader = CreateShader(vertexShaderFile, VERTEX);
+        unsigned int fragmentShader = CreateShader(fragmentShaderFile, FRAGMENT);
+
+        unsigned int shaderProgram;
+        shaderProgram = Renderer->CreateShaderProgram();
+
+        Renderer->AttachShader(shaderProgram, vertexShader);
+        Renderer->AttachShader(shaderProgram, fragmentShader);
+        Renderer->LinkShaderProgram(shaderProgram);
+
+        int success;
+        Renderer->GetShaderProgramStatusParam(shaderProgram, EProgramStatusParam::LINK, &success);
+        if (!success)
+        {
+            char infoLog[512];
+            Renderer->GetShaderProgramLog(shaderProgram, 512, nullptr, infoLog);
+            RZ_CORE_ERROR("ERROR::PROGRAM::LINKING::FAILED\n{0}", infoLog);
+        }
+
+        Renderer->DeleteShader(vertexShader);
+        Renderer->DeleteShader(fragmentShader);
+
+        return shaderProgram;
     }
 
-    return shader;
 }
-
-unsigned ShaderReader::CreateShaderProgram(std::string vertexShaderFile, std::string fragmentShaderFile)
-{
-    unsigned int vertexShader = CreateShader(vertexShaderFile, VERTEX);
-    unsigned int fragmentShader = CreateShader(fragmentShaderFile, FRAGMENT);
-
-    unsigned int shaderProgram;
-    shaderProgram = glCreateProgram();
-
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    int success;
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if(!success)
-    {
-        char infoLog[512];
-        glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
-        RZ_CORE_ERROR("ERROR::PROGRAM::LINKING::FAILED\n{0}", infoLog);
-    }
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
-    return shaderProgram;
-}
-
-

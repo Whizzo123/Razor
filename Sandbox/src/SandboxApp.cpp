@@ -50,7 +50,7 @@ public:
 		LightComp.Linear = 0.0014f;
 		LightComp.Quadratic = 0.000007f;*/
 		Razor::SpotLight LightComp = Razor::SpotLight();
-		LightComp.Position = LightTransform.Position;
+		// SpotLight inherits from DirectionalLight which doesn't have Position
 		LightComp.Diffuse = glm::vec3(0.0f, 0.0f, 1.0f);
 		LightComp.Ambient = glm::vec3(0.1f, 0.1f, 0.1f);
 		LightComp.Specular = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -77,5 +77,5 @@ Razor::Application* Razor::CreateApplication()
 
 void Sandbox::Run()
 {
-	Razor::Engine::Get().Run();
+	Razor::Engine::Get().RunRuntime();
 }
