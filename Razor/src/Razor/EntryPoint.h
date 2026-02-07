@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 
-#ifdef RZ_PLATFORM_WINDOWS
+#if defined(RZ_PLATFORM_WINDOWS) || defined(RZ_PLATFORM_LINUX)
 
 extern Razor::Application* Razor::CreateApplication();
 
@@ -18,5 +18,5 @@ int main(int argc, char** argv)
 	delete App;
 }
 #else
-	#error Razor only supports Windows!
+	#error Razor only supports Windows and Linux!
 #endif

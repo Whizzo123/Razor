@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef RZ_PLATFORM_WINDOWS
+
 #include <ShObjIdl_core.h>
 #include <ShObjIdl.h>
 #include <shlwapi.h>
@@ -85,4 +87,4 @@ private:
     long _cRef;
 };
 
-
+#endif // RZ_PLATFORM_WINDOWS

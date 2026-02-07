@@ -1,5 +1,7 @@
 #include "ProjectExplorer.h"
 #include <filesystem>
+
+#ifdef RZ_PLATFORM_WINDOWS
 #include "Utils/Windows/CDialogEventHandler.h"
 #include "FileIO/ModelSerializer.h"
 
@@ -15,6 +17,7 @@ HRESULT CDialogEventHandler_CreateInstance(REFIID riid, void** ppv)
 	}
 	return hr;
 }
+#endif // RZ_PLATFORM_WINDOWS
 
 namespace EdgeEditor
 {
@@ -71,8 +74,7 @@ namespace EdgeEditor
 	// TODO this is windows only will want a linux version too should probably be hidden behind a platform generic interface
 	void ProjectExplorer::OpenFile()
 	{
-	
-
+#ifdef RZ_PLATFORM_WINDOWS
 		IFileDialog* FileDialogPtr = nullptr;
 		HRESULT Result = CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&FileDialogPtr));
 
@@ -139,6 +141,10 @@ namespace EdgeEditor
 				}
 			}
 		}
+#else
+		// TODO: Implement Linux file dialog
+		RZ_CORE_WARN("File dialog not implemented for this platform");
+#endif
 	}
 
 	bool ProjectExplorer::SaveModelToProject(const std::string& Name)

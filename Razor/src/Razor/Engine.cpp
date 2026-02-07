@@ -20,7 +20,25 @@
 #include "Systems/RSSpotLightingPass.h"
 #include "../Platform/OpenGL/OpenGLWindowProvider.h"
 #include "Scene/SceneSerializer.h"
-#include <imgui.h>
+#include "ImGui/RazorImGui.h"
+#include "../Platform/OpenGL/GLFWTimeProvider.h"
+#include "Window.h"
+#include "Coordinator.h"
+#include "Renderer/IRenderer.h"
+#include "Renderer/Shaders/Shader.h"
+#include "Scene/Scene.h"
+#include "entt/entt.hpp"
+#include "../Platform/Generic/ITimeProvider.h"
+#include "Log.h"
+#include "Scripting/ScriptInterface.h"
+#include "Scene/Project.h"
+#include "IO/File/ProjectSerializer.h"
+#include "Core/Entity.h"
+#include <Coral/ManagedObject.hpp>
+#include "Assets/AssetDirectory.h"
+#include "Physics/JoltPhysics/JoltPhysicsEngine.h"
+#include "Physics/JoltPhysics/JoltDebugRenderer.h"
+#include "Systems/PhysicsSystem.h"
 
 namespace Razor
 {
@@ -32,64 +50,92 @@ namespace Razor
 
 	void Engine::Init()
 	{
+		_mScriptInterface = std::make_unique<Razor::ScriptInterface>();
+
 		Renderer = std::make_shared<OpenGLRenderer>();
 		Renderer->InitRendererAPI();
 
 		std::shared_ptr<IWindowProvider> Provider = std::make_shared<OpenGLWindowProvider>();
 		EngineWindow = std::make_unique<Window>(800, 600, Provider);
+
+		TimeProvider = std::make_unique<GLFWTimeProvider>();
 		
 		Renderer->EnableDepthTesting(/*bEnable*/true);
 
-		Coordinator = Coordinator::GetInstance();
+		_mCoordinator = Coordinator::GetInstance();
 		
+		// Platform must be called before RazorGUI so ImGui chains our renderer input callbacks in 
+		PlatformIO = std::make_unique<OpenGLIO>(std::dynamic_pointer_cast<OpenGLWindowProvider>(EngineWindow->GetWindowProvider())->GetPlatformWindowPtr());
+		PlatformIO->RegisterInputCallbacks();
 		RazorGUI = std::make_unique<RazorImGui>();
 		RazorGUI->Setup(EngineWindow->GetWindowProvider());
 		RazorGUI->RegisterImGuiEvents();
-		PlatformIO = std::make_unique<OpenGLIO>(std::dynamic_pointer_cast<OpenGLWindowProvider>(EngineWindow->GetWindowProvider())->GetPlatformWindowPtr());
-		PlatformIO->RegisterInputCallbacks();
-		
+
+		_mDebugDrawBuffer = new PhysicsDebugDrawBuffer();
+		_mPhysicsDebugRenderer = CreateRef<JoltDebugRenderer>(_mDebugDrawBuffer);
+		_mPhysicsEngine = CreateScope<JoltPhysicsEngine>(std::dynamic_pointer_cast<JoltDebugRenderer>(_mPhysicsDebugRenderer));
 		
 
 		//TODO don't like this being here
 		std::shared_ptr<Shader> D_MeshShader = std::make_shared<DefaultMeshShader>();
 		ShaderIDMap[D_MeshShader->ID] = D_MeshShader;
-		ShaderTypeMap[typeid(DefaultMeshShader).name()] = D_MeshShader;
+		ShaderTypeMap[std::string(typeid(DefaultMeshShader).name())] = D_MeshShader;
 		std::shared_ptr<Shader> D_DebugShader = std::make_shared<DebugLightShader>();
 		ShaderIDMap[D_DebugShader->ID] = D_DebugShader;
-		ShaderTypeMap[typeid(DebugLightShader).name()] = D_DebugShader;
+		ShaderTypeMap[std::string(typeid(DebugLightShader).name())] = D_DebugShader;
 		std::shared_ptr<Shader> PickShader = std::make_shared<PickBufferShader>();
 		ShaderIDMap[PickShader->ID] = PickShader;
-		ShaderTypeMap[typeid(PickBufferShader).name()] = PickShader;
+		ShaderTypeMap[std::string(typeid(PickBufferShader).name())] = PickShader;
 
+		// TODO this should be nullptr move this logic to the EdgeEditor/Game
 		CurrentScene = CreateRef<Scene>("Untitled.rzscn");
 
 		SceneLights = std::make_shared<std::vector<Light*>>();
 		// TODO rename mesh renderer doesn't do rendering just sets up the mesh for renderering
-		Coordinator->RegisterSystem<MeshRenderer>(MeshRenderer(CurrentScene, Renderer, ShaderIDMap, SceneLights));
-		Coordinator->RegisterSystem<CollisionSystem>(CollisionSystem(CurrentScene));
-		Coordinator->RegisterSystem<CameraController>(CameraController(CurrentScene));
+		_mCoordinator->RegisterSystem<MeshRenderer>(MeshRenderer(CurrentScene, Renderer, ShaderIDMap, SceneLights));
+		_mCoordinator->RegisterSystem<CollisionSystem>(CollisionSystem(CurrentScene));
+		_mCoordinator->RegisterSystem<CameraController>(CameraController(CurrentScene));
+		_mCoordinator->RegisterSystem<PhysicsSystem>(CurrentScene);
 
 		//Render Systems
-		Coordinator->RegisterSystem<RSMaterialPass>(RSMaterialPass(CurrentScene));
-		Coordinator->RegisterSystem<RSTransformationsPass>(RSTransformationsPass(CurrentScene));
-		Coordinator->RegisterSystem<RSDirectionalLightingPass>(RSDirectionalLightingPass(CurrentScene));
-		Coordinator->RegisterSystem<RSCameraPass>(RSCameraPass(CurrentScene, Renderer));
-		Coordinator->RegisterSystem<RSRenderPass>(RSRenderPass(CurrentScene, Renderer, ShaderIDMap));
-		Coordinator->RegisterSystem<RSPickBufferMaterialPass>(RSPickBufferMaterialPass(CurrentScene));
-		Coordinator->RegisterSystem<RSPickBufferRenderPass>(RSPickBufferRenderPass(CurrentScene, Renderer, ShaderIDMap));
-		Coordinator->RegisterSystem<RSPointLightingPass>(RSPointLightingPass(CurrentScene));
-		Coordinator->RegisterSystem<RSSpotLightingPass>(RSSpotLightingPass(CurrentScene));
+		_mCoordinator->RegisterSystem<RSMaterialPass>(RSMaterialPass(CurrentScene));
+		_mCoordinator->RegisterSystem<RSTransformationsPass>(RSTransformationsPass(CurrentScene));
+		_mCoordinator->RegisterSystem<RSDirectionalLightingPass>(RSDirectionalLightingPass(CurrentScene));
+		_mCoordinator->RegisterSystem<RSCameraPass>(RSCameraPass(CurrentScene, Renderer));
+		_mCoordinator->RegisterSystem<RSRenderPass>(RSRenderPass(CurrentScene, Renderer, ShaderIDMap, ShaderTypeMap));
+		_mCoordinator->RegisterSystem<RSPickBufferMaterialPass>(RSPickBufferMaterialPass(CurrentScene));
+		_mCoordinator->RegisterSystem<RSPickBufferRenderPass>(RSPickBufferRenderPass(CurrentScene, Renderer, ShaderIDMap));
+		_mCoordinator->RegisterSystem<RSPointLightingPass>(RSPointLightingPass(CurrentScene));
+		_mCoordinator->RegisterSystem<RSSpotLightingPass>(RSSpotLightingPass(CurrentScene));
 		
+	}
+
+	Engine::Engine()
+	{}
+
+	Engine::~Engine()
+	{
+		RZ_CORE_INFO("Destroying razor");
+		delete GEngine;
+	}
+
+	Engine& Engine::Get()
+	{
+		if (GEngine == nullptr)
+		{
+			GEngine = new Engine();
+		}
+		return *GEngine;
 	}
 
 	void Engine::InitSystems()
 	{
-		Coordinator->InitSystems();
+		_mCoordinator->InitSystems();
 	}
 
 	void Engine::Step()
 	{
-		float CurrentFrame = glfwGetTime();
+		float CurrentFrame = TimeProvider->GetTime();
 		DeltaTime = CurrentFrame - LastFrame;
 		LastFrame = CurrentFrame;
 	}
@@ -110,19 +156,6 @@ namespace Razor
 		}
 	}
 
-	void Engine::PickObject(unsigned int PickBuffer)
-	{
-		if (RazorIO::Get().GetStateForMouseButton(LEFT) == MOUSE_DOWN)
-		{
-			Vector2D MousePos = RazorIO::Get().CurrentMousePos;
-			unsigned char Pixel[4];
-			Renderer->ReadPixels(MousePos.X, 600 - MousePos.Y, 1, 1, Pixel, PickBuffer);
-			int PickedEntity = 0;
-			PickedEntity = static_cast<int>(Pixel[0]) << 16 | static_cast<int>(Pixel[1]) << 8 | static_cast<int>(Pixel[2]);
-			//RZ_CORE_INFO("Picked {0}", PickedEntity);
-		}
-	}
-
 	void Engine::RenderImGui(uint64_t SceneTexture)
 	{
 		
@@ -136,6 +169,153 @@ namespace Razor
 
 	std::shared_ptr<Shader> Engine::GetShaderForType(const char* Type)
 	{
-		return ShaderTypeMap[Type];
+		return ShaderTypeMap[std::string(Type)];
+	}
+
+	void Engine::Render(int32_t targetId, const RenderPipelineConfig& Config) 
+	{
+		Renderer->BindFrameBuffer(targetId);
+		Renderer->ClearBuffer();
+		_mCoordinator->RunRenderSystems(Config); 
+		Renderer->BindFrameBuffer();
+		Renderer->ClearBuffer();
+	}
+
+	void Engine::RunSystems() 
+	{ 
+		_mCoordinator->RunSystems(DeltaTime);
+		CurrentScene->RunSystems(DeltaTime);
+	}
+
+	std::shared_ptr<Coordinator> Engine::GetCoordinator()
+	{
+		return _mCoordinator;
+	}
+
+	bool Engine::ShouldEngineClose() 
+	{ 
+		return EngineWindow->ShouldWindowClose(); 
+	}
+
+	Window& Engine::GetWindow() 
+	{ 
+		return *EngineWindow; 
+	}
+
+	std::shared_ptr<IRenderer> Engine::GetRenderer()
+	{
+		return Renderer;
+	}
+
+	ScriptInterface& Engine::GetScriptInterface()
+	{
+		return *_mScriptInterface;
+	}
+
+	void Engine::SaveProject()
+	{
+		if (LoadedProject == nullptr)
+		{
+			RZ_CORE_ERROR("Attempting to save project when no project is loaded");
+			return;
+		}
+
+		ProjectSerializer::Serialize(LoadedProject->m_ProjectPath, LoadedProject);
+	}
+
+	void Engine::LoadProject(const std::string& ProjectPath)
+	{
+		if (ProjectPath.empty())
+		{
+			RZ_CORE_ERROR("Project path is empty");
+			return;
+		}
+
+		if (LoadedProject == nullptr)
+		{
+			LoadedProject = CreateRef<Project>();
+		}
+
+		const std::string Path = "../Sandbox";
+
+		ProjectSerializer::Deserialize(ProjectPath, LoadedProject);
+		RZ_CORE_INFO("Loading up project: {0}", LoadedProject->m_ProjectName);
+		// TODO move assembly holding into ScriptEngine
+		BridgeAssembly = CreateScope<ScriptAssembly>(_mScriptInterface->LoadAssembly(Path + "/" + LoadedProject->m_DllDirectory + "/" + "Razor-ScriptBridge.dll", true));
+		GameAssembly = CreateScope<ScriptAssembly>(_mScriptInterface->LoadAssembly(Path + "/" + LoadedProject->m_DllDirectory + "/" + LoadedProject->m_ProjectName + ".dll", false));
+
+		// Load main scene
+		Ref<Scene> MainScene = CreateRef<Scene>(Path + LoadedProject->m_MainScenePath);
+		if (SceneSerializer::Deserialize(MainScene) == false)
+		{
+			LoadedProject->m_MainScenePath = "/assets/scenes/Main.rzscn";
+			MainScene = CreateRef<Scene>(LoadedProject->m_MainScenePath);
+			SceneSerializer::Serialize(MainScene);
+			ProjectSerializer::Serialize("../", LoadedProject);
+		}
+		*CurrentScene = std::move(*MainScene);
+		_mAssetDirectory = CreateRef<AssetDirectory>(Path + "/" + LoadedProject->m_AssetDirectory);
+	}
+
+	void Engine::RuntimeStart()
+	{
+		if(bIsRuntimeRunning.load())
+		{
+			RZ_CORE_WARN("Runtime is already running");
+			return;
+		}
+		RZ_CORE_INFO("Starting Runtime");
+		bIsRuntimeRunning.store(true);
+		CurrentScene->StartScene();
+		RuntimeThread = std::thread(&Engine::RunRuntime, this);
+	}
+
+	void Engine::RunRuntime()
+	{
+		while (bIsRuntimeRunning)
+		{
+			Step();
+			_mPhysicsEngine->Simulate(DeltaTime);
+			//Somehow pick up input and forward?
+			//ProcessInputForGame()
+			RunSystems();
+		}
+		RZ_CORE_INFO("Exiting Runtime Thread");
+	}
+
+	void Engine::RuntimeStop()
+	{
+		RZ_CORE_INFO("Stopping Runtime");
+		bIsRuntimeRunning.store(false);
+		if(RuntimeThread.joinable())
+		{
+			RuntimeThread.join();
+			CurrentScene->StopScene();
+		}
+	}
+
+	Ref<AssetDirectory> Engine::GetAssetDirectory()
+	{
+		return _mAssetDirectory;
+	}
+
+	IPhysicsEngine& Engine::GetPhysicsEngine()
+	{
+		return *_mPhysicsEngine;
+	}
+
+	void Engine::PopulateRenderPipelineDebugData()
+	{
+		std::unique_lock lock(_mDebugDrawBuffer->mutex, std::try_to_lock);
+		if (!lock.owns_lock())
+			return;
+		_mCoordinator->SetRenderPipelineDebugData(_mDebugDrawBuffer->lines, _mDebugDrawBuffer->triangles);
+	}
+
+	void Engine::ClearDebugDrawBuffer()
+	{
+		std::scoped_lock lock(_mDebugDrawBuffer->mutex);
+		_mDebugDrawBuffer->lines.clear();
+		_mDebugDrawBuffer->triangles.clear();
 	}
 }

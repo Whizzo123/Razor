@@ -1,3 +1,5 @@
+#ifdef RZ_PLATFORM_WINDOWS
+
 #include "CDialogEventHandler.h"
 
 // IFileDialogEvents methods
@@ -82,3 +84,5 @@ HRESULT CDialogEventHandler::OnItemSelected(IFileDialogCustomize* pfdc, DWORD dw
     }
     return hr;
 }
+
+#endif // RZ_PLATFORM_WINDOWS
