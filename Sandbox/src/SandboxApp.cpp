@@ -1,5 +1,6 @@
 
 #include "Razor.h"
+#include "Razor/EntryPoint.h"
 #include <memory>
 
 class Sandbox : public Razor::Application
@@ -77,5 +78,13 @@ Razor::Application* Razor::CreateApplication()
 
 void Sandbox::Run()
 {
-	Razor::Engine::Get().RunRuntime();
+	Razor::Engine& Engine = Razor::Engine::Get();
+	while (!Engine.ShouldEngineClose())
+	{
+		Engine.Step();
+		Engine.RunSystems();
+		Engine.Renderer->PollForEvents();
+		Engine.Renderer->SwapBuffer(Engine.GetWindow());
+	}
+	Engine.Renderer->TerminateRendererAPI();
 }
