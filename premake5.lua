@@ -155,26 +155,21 @@ project "Razor"
 			"RZ_PLATFORM_LINUX",
 			"CORAL_LINUX"
 		}
+
+	filter {"configurations:Debug", "system:linux"}
 		linkoptions {
         	"-Wl,--whole-archive",
         	"vendor/assimp/bin/" .. outputdir .. "/assimp/libassimp.a",
 			"vendor/JoltPhysics/Build/Linux_Debug/libJolt.a",
         	"-Wl,--no-whole-archive"
     	}
-
-	filter {"configurations:Debug", "system:windows"}
-		prebuildcommands {
-	    	'if not exist "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL\\Debug\\Jolt.lib" call "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\cmake_vs2022_cl.bat" -DUSE_STATIC_MSVC_RUNTIME_LIBRARY=OFF',
-    		'if not exist "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL\\Debug\\Jolt.lib" cmake --build "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL" --config Debug'
-    	}
-	filter {"configurations:Debug", "system:linux"}
 		prebuildcommands {
 	    	 -- Configure step (only if build dir does not exist)
         	'if [ ! -f "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug/Makefile" ]; then ' ..
 			'(cd "%{wks.location}/Razor/vendor/JoltPhysics/Build" && ' ..
         	'sh ./cmake_linux_clang_gcc.sh Debug g++ -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCPP_RTTI_ENABLED=ON); fi',
         	-- Build step
-			'if [ ! -f "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug/libjolt.a" ]; then ' ..
+			'if [ ! -f "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug/libJolt.a" ]; then ' ..
         	'cmake --build "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug"; fi',
 			-- Assimp configure step (only if build dir does not exist)
 			'if [ ! -d "%{wks.location}/Razor/vendor/assimp/build" ]; then ' ..
@@ -186,6 +181,12 @@ project "Razor"
         	'cmake --build "%{wks.location}/Razor/vendor/assimp/build" && ' ..
 			'mkdir -p "%{wks.location}/Razor/vendor/assimp/bin/' .. outputdir .. '/assimp" && ' ..
 			'cp "%{wks.location}/Razor/vendor/assimp/build/lib/libassimp.a" "%{wks.location}/Razor/vendor/assimp/bin/' .. outputdir .. '/assimp/libassimp.a"; fi'
+    	}
+
+	filter {"configurations:Debug", "system:windows"}
+		prebuildcommands {
+	    	'if not exist "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL\\Debug\\Jolt.lib" call "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\cmake_vs2022_cl.bat" -DUSE_STATIC_MSVC_RUNTIME_LIBRARY=OFF',
+    		'if not exist "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL\\Debug\\Jolt.lib" cmake --build "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL" --config Debug'
     	}
 		
 	filter "configurations:Debug"
