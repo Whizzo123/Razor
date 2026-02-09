@@ -8,6 +8,13 @@
 #include "ScriptClass.h"
 #include "ScriptInterface.h"
 
+#if defined(_MSC_VER)
+    #define RAZOR_CALL __cdecl
+#else
+    #define RAZOR_CALL
+#endif
+
+
 namespace Razor
 {
 
@@ -15,12 +22,13 @@ namespace Razor
 	{
 		return true;
 	}
-
-	static void __cdecl Print_Message(const char* message)
+extern "C"
+{
+	static void RAZOR_CALL Print_Message(const char* message)
 	{
 		RZ_INFO(message);
 	}
-
+}
 	static void* Scene_GetEntitiesWithTransforms(int* count)
 	{
 		static std::vector<uint32_t> ids;

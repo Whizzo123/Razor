@@ -1,7 +1,9 @@
 #include "ProjectExplorer.h"
 #include <filesystem>
-#include "Utils/Windows/CDialogEventHandler.h"
 
+
+#ifdef RZ_PLATFORM_WINDOWS
+#include "Utils/Windows/CDialogEventHandler.h"
 HRESULT CDialogEventHandler_CreateInstance(REFIID riid, void** ppv)
 {
 	*ppv = NULL;
@@ -14,6 +16,7 @@ HRESULT CDialogEventHandler_CreateInstance(REFIID riid, void** ppv)
 	}
 	return hr;
 }
+#endif
 
 namespace EdgeEditor
 {
@@ -97,7 +100,7 @@ namespace EdgeEditor
 	void ProjectExplorer::OpenFile()
 	{
 	
-
+		#ifdef RZ_PLATFORM_WINDOWS
 		IFileDialog* FileDialogPtr = nullptr;
 		HRESULT Result = CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&FileDialogPtr));
 
@@ -164,6 +167,10 @@ namespace EdgeEditor
 				}
 			}
 		}
+		#endif
+		#ifdef RZ_PLATFORM_LINUX
+
+		#endif
 	}
 
 	bool ProjectExplorer::SaveModelToProject(const std::string& Name)

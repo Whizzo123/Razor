@@ -21,9 +21,6 @@ namespace Razor
 
 	void ScriptEngine::Init()
 	{
-		std::wstring ws(std::filesystem::current_path().c_str());
-		std::string s(ws.begin(), ws.end());
-		RZ_CORE_INFO(s);
 		Coral::HostSettings HostSettings;
 		HostSettings.CoralDirectory = "bin";
 		HostSettings.MessageCallback = CoralMessageCallback;

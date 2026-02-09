@@ -12,7 +12,7 @@
 #include "Razor/Systems/RSCameraPass.h"
 #include "Razor/Systems/RSMaterialPass.h"
 #include "Razor/Systems/RSDirectionalLightingPass.h"
-#include "Razor/Systems/RSSpotlightingPass.h"
+#include "Razor/Systems/RSSpotLightingPass.h"
 #include "Razor/Systems/RSPointLightingPass.h"
 #include "Razor/Systems/RSRenderPass.h"
 #include "Razor/Systems/RSTransformationsPass.h"

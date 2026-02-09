@@ -26,6 +26,9 @@ group "Dependencies"
 project "Jolt"
 	kind "None"
 
+project "assimp"
+	kind "None"
+
 project "Razor"
 	location "Razor"
 	kind "SharedLib"
@@ -84,31 +87,54 @@ project "Razor"
 			"%{prj.name}/vendor/JoltPhysics/Build/VS_2022_CL"
 		}
 
-	links
-	{
-		"GLFW",
-		"opengl32.lib",
-		"assimp",
-		"ImGui",
-		"yaml-cpp",
-		"Coral.Native",
-		"Jolt"
-	}
+	filter "system:windows"
+    links
+    {
+        "GLFW",
+        "opengl32.lib",
+        "assimp",
+        "ImGui",
+        "yaml-cpp",
+        "Coral.Native",
+        "Jolt"
+    }
+
+	filter "system:linux"
+	    links
+	    {
+			"z",
+			"GL",
+	        "dl",
+	        "pthread",
+			"assimp",
+	        "GLFW",
+	        "ImGui",
+	        "yaml-cpp",
+	        "Coral.Native",
+	        "Jolt"
+	    }
 
 	rtti("On")
 
 	defines
 	{
-		"YAML_CPP_STATIC_DEFINE",
-		"CORAL_WINDOWS"
+		"YAML_CPP_STATIC_DEFINE"
 	}
 
 	 -- Automatically copy DLL from C# project after build
-    postbuildcommands {
-        '{COPY} "%{wks.location}Razor/vendor/Coral/Coral.Managed/bin/%{cfg.buildcfg}/Coral.Managed.dll" "%{wks.location}Edge/bin"',
-		'{COPY} "%{wks.location}Razor/vendor/Coral/Coral.Managed/Coral.Managed.runtimeconfig.json" "%{wks.location}Edge/bin"',
-		'{COPY} "%{cfg.buildtarget.relpath}" "%{wks.location}bin/' .. outputdir .. '/Edge"'
-    }
+    filter "system:windows"
+    	postbuildcommands {
+    	    '{COPY} "%{wks.location}Razor/vendor/Coral/Coral.Managed/bin/%{cfg.buildcfg}/Coral.Managed.dll" "%{wks.location}Edge/bin"',
+    	    '{COPY} "%{wks.location}Razor/vendor/Coral/Coral.Managed/Coral.Managed.runtimeconfig.json" "%{wks.location}Edge/bin"',
+    	    '{COPY} "%{cfg.buildtarget.relpath}" "%{wks.location}bin/' .. outputdir .. '/Edge"'
+    	}
+
+	filter "system:linux"
+    	postbuildcommands {
+    	    '{COPY} "Razor/vendor/Coral/Coral.Managed/bin/%{cfg.buildcfg}/libCoral.Managed.a" "%{wks.location}Edge/bin"',
+    	    '{COPY} "Razor/vendor/Coral/Coral.Managed/Coral.Managed.runtimeconfig.json" "%{wks.location}Edge/bin"',
+    	    '{COPY} "%{cfg.buildtarget.relpath}" "%{wks.location}bin/' .. outputdir .. '/Edge"'
+    	}
 
 	filter "system:windows"
 		systemversion "latest"
@@ -122,12 +148,18 @@ project "Razor"
 	
 	filter "system:linux"
 		systemversion "latest"
-
+		pic "On"
 		defines
 		{
 			"RZ_BUILD_DLL",
-			"RZ_PLATFORM_LINUX"
+			"RZ_PLATFORM_LINUX",
+			"CORAL_LINUX"
 		}
+		linkoptions {
+        	"-Wl,--whole-archive",
+        	"vendor/assimp/bin/" .. outputdir .. "/assimp/libassimp.a",
+        	"-Wl,--no-whole-archive"
+    	}
 
 	filter {"configurations:Debug", "system:windows"}
 		prebuildcommands {
@@ -139,11 +171,14 @@ project "Razor"
 	    	 -- Configure step (only if build dir does not exist)
         	'if [ ! -f "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug/Makefile" ]; then ' ..
 			'(cd "%{wks.location}/Razor/vendor/JoltPhysics/Build" && ' ..
-        	'sh ./cmake_linux_clang_gcc.sh Debug g++ -DUSE_STATIC_MSVC_RUNTIME_LIBRARY=OFF); fi',
+        	'sh ./cmake_linux_clang_gcc.sh Debug g++ -DCMAKE_POSITION_INDEPENDENT_CODE=ON); fi',
         	-- Build step
 			'if [ ! -f "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug/libjolt.a" ]; then ' ..
-        	'cmake --build "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug"; fi'
+        	'cmake --build "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug"; fi',
+			'if [ ! -f "%{wks.location}/Razor/vendor/assimp/bin/"' .. outputdir .. '"/libassimp.a" ]; then ' ..
+        	'cmake --build "%{wks.location}/Razor/vendor/assimp"; fi'
     	}
+		
 	filter "configurations:Debug"
 		defines "RZ_DEBUG"
 		runtime "Debug"
@@ -193,12 +228,19 @@ project "Edge"
 		"Razor/vendor/entt/src"
 	}
 	
-	links 
-	{
-		"Razor",
-		"Shlwapi.lib",
-		"Propsys.lib"
-	}
+	filter "system:windows"
+		links 
+		{
+			"Razor",
+			"Shlwapi.lib",
+			"Propsys.lib"
+		}
+
+	filter "system:linux"
+		links
+		{
+			"Razor"
+		}
 	
 	defines
 	{
@@ -213,6 +255,16 @@ project "Edge"
 			"RZ_PLATFORM_WINDOWS"
 		}
 	
+	filter "system:linux"
+		removefiles {
+    		"%{prj.name}/src/Utils/Windows**.h",
+			"%{prj.name}/src/Utils/Windows**.cpp"
+		}
+		defines
+		{
+			"RZ_PLATFORM_LINUX"
+		}
+
 	filter "configurations:Debug"
 		defines "RZ_DEBUG"
 		runtime "Debug"
