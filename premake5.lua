@@ -13,7 +13,6 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 group "Dependencies"
 	include "Razor/vendor/GLFW"
-	include "Razor/vendor/assimp"
 	include "Razor/vendor/ImGui"
 	include "Razor/vendor/yaml-cpp"
 	include "Razor/vendor/entt"
@@ -66,6 +65,7 @@ project "Razor"
 		"%{prj.name}/vendor/spdlog/include",
 		"%{prj.name}/vendor/GLFW/include",
 		"%{prj.name}/vendor/assimp/include",
+		"%{prj.name}/vendor/assimp/build/include",
 		"%{prj.name}/vendor/Glad/include",
 		"%{prj.name}/vendor/stb_image/include",
 		"%{prj.name}/vendor/glm",
@@ -79,12 +79,14 @@ project "Razor"
 	filter "system:linux"
 		libdirs
 		{	
-			"%{prj.name}/vendor/JoltPhysics/Build/Linux_Debug"
+			"%{prj.name}/vendor/JoltPhysics/Build/Linux_Debug",
+			"%{prj.name}/vendor/assimp/bin/" .. outputdir .. "/assimp"
 		}
 	filter "system:windows"
 		libdirs
 		{	
-			"%{prj.name}/vendor/JoltPhysics/Build/VS_2022_CL"
+			"%{prj.name}/vendor/JoltPhysics/Build/VS_2022_CL",
+			"%{prj.name}/vendor/assimp/bin/" .. outputdir .. "/assimp"
 		}
 
 	filter "system:windows"
@@ -102,7 +104,6 @@ project "Razor"
 	filter "system:linux"
 	    links
 	    {
-			"z",
 			"GL",
 	        "dl",
 	        "pthread",
@@ -111,8 +112,15 @@ project "Razor"
 	        "ImGui",
 	        "yaml-cpp",
 	        "Coral.Native",
-	        "Jolt"
+	        "Jolt",
+			"z"
 	    }
+	 	linkoptions
+    	{
+        	"-Wl,--whole-archive",
+        	"-lJolt",
+        	"-Wl,--no-whole-archive"
+    	}
 
 	rtti("On")
 
@@ -155,11 +163,7 @@ project "Razor"
 			"RZ_PLATFORM_LINUX",
 			"CORAL_LINUX"
 		}
-		linkoptions {
-        	"-Wl,--whole-archive",
-        	"vendor/assimp/bin/" .. outputdir .. "/assimp/libassimp.a",
-        	"-Wl,--no-whole-archive"
-    	}
+		
 
 	filter {"configurations:Debug", "system:windows"}
 		prebuildcommands {
@@ -169,14 +173,22 @@ project "Razor"
 	filter {"configurations:Debug", "system:linux"}
 		prebuildcommands {
 	    	 -- Configure step (only if build dir does not exist)
-        	'if [ ! -f "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug/Makefile" ]; then ' ..
+        	'if [ ! -f "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug" ]; then ' ..
 			'(cd "%{wks.location}/Razor/vendor/JoltPhysics/Build" && ' ..
-        	'sh ./cmake_linux_clang_gcc.sh Debug g++ -DCMAKE_POSITION_INDEPENDENT_CODE=ON); fi',
+        	'sh ./cmake_linux_clang_gcc.sh Debug g++ -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCPP_RTTI_ENABLED=ON -DJPH_DEBUG_RENDERER=ON); fi',
         	-- Build step
 			'if [ ! -f "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug/libjolt.a" ]; then ' ..
         	'cmake --build "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug"; fi',
-			'if [ ! -f "%{wks.location}/Razor/vendor/assimp/bin/"' .. outputdir .. '"/libassimp.a" ]; then ' ..
-        	'cmake --build "%{wks.location}/Razor/vendor/assimp"; fi'
+			-- Assimp configure step (only if build dir does not exist)
+			'if [ ! -d "%{wks.location}/Razor/vendor/assimp/build" ]; then ' ..
+			'cmake -S "%{wks.location}/Razor/vendor/assimp" -B "%{wks.location}/Razor/vendor/assimp/build" ' ..
+			'-DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_SHARED_LIBS=OFF -DASSIMP_BUILD_TESTS=OFF ' ..
+			'-DASSIMP_BUILD_ASSIMP_TOOLS=OFF; fi',
+			-- Assimp build step
+			'if [ ! -f "%{wks.location}/Razor/vendor/assimp/bin/' .. outputdir .. '/assimp/libassimp.a" ]; then ' ..
+        	'cmake --build "%{wks.location}/Razor/vendor/assimp/build" && ' ..
+			'mkdir -p "%{wks.location}/Razor/vendor/assimp/bin/' .. outputdir .. '/assimp" && ' ..
+			'cp "%{wks.location}/Razor/vendor/assimp/build/lib/libassimp.a" "%{wks.location}/Razor/vendor/assimp/bin/' .. outputdir .. '/assimp/libassimp.a"; fi'
     	}
 		
 	filter "configurations:Debug"
@@ -219,6 +231,7 @@ project "Edge"
 		"Razor/vendor/spdlog/include",
 		"Razor/vendor/GLFW/include",
 		"Razor/vendor/assimp/include",
+		"Razor/vendor/assimp/build/include",
 		"Razor/vendor/Glad/include",
 		"Razor/vendor/stb_image/include",
 		"Razor/vendor/glm",
