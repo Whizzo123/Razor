@@ -54,7 +54,6 @@ project "Razor"
 	defines
 	{
 		"_CRT_SECURE_NO_WARNINGS",
-		"JPH_FLOATING_POINT_EXCEPTIONS_ENABLED",
 		"JPH_PROFILE_ENABLED",
 		"JPH_DEBUG_RENDERER",
 		"JPH_OBJECT_STREAM"
@@ -90,6 +89,12 @@ project "Razor"
 		}
 
 	filter "system:windows"
+
+	defines
+	{
+		"JPH_FLOATING_POINT_EXCEPTIONS_ENABLED"
+	}
+
     links
     {
         "GLFW",
@@ -109,6 +114,10 @@ project "Razor"
 	        "pthread",
 			"assimp",
 	        "GLFW",
+			"EGL",
+			"wayland-client",
+			"wayland-egl",
+        	"wayland-cursor",
 	        "ImGui",
 	        "yaml-cpp",
 	        "Coral.Native",
