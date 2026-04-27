@@ -22,11 +22,6 @@ group "Dependencies"
 -----------------------------------------
 -- External CMake library (managed by CMake, referenced by Premake)
 -----------------------------------------
-project "Jolt"
-	kind "None"
-
-project "assimp"
-	kind "None"
 
 project "Razor"
 	location "Razor"
@@ -81,14 +76,15 @@ project "Razor"
 			"%{prj.name}/vendor/JoltPhysics/Build/Linux_Debug",
 			"%{prj.name}/vendor/assimp/bin/" .. outputdir .. "/assimp"
 		}
-	filter "system:windows"
-		libdirs
-		{	
-			"%{prj.name}/vendor/JoltPhysics/Build/VS_2022_CL",
-			"%{prj.name}/vendor/assimp/bin/" .. outputdir .. "/assimp"
-		}
+		
 
 	filter "system:windows"
+
+	libdirs
+	{	
+		"%{prj.name}/vendor/JoltPhysics/Build/VS2022_CL/Debug",
+		"%{prj.name}/vendor/assimp/bin/" .. outputdir .. "/assimp"
+	}
 
 	defines
 	{
@@ -130,7 +126,7 @@ project "Razor"
         	"-lJolt",
         	"-Wl,--no-whole-archive"
     	}
-
+	filter {}
 	rtti("On")
 
 	defines

@@ -14,8 +14,9 @@ namespace Razor
 
     void OpenGLRenderer::InitRendererAPI()
     {   
+#ifdef RZ_PLATFORM_LINUX
         glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_WAYLAND);
-
+#endif
         if(!glfwInit()) {
             std::string buffer(512, '*');
             const char* buffer_ptr = buffer.c_str();
