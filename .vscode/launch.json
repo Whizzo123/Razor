@@ -1,0 +1,12 @@
+{
+  "configurations": [
+    {
+      "name": "Run Edge",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/Debug-windows-x86_64/Edge/Edge.exe",
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "Build Debug"
+    }
+  ]
+}

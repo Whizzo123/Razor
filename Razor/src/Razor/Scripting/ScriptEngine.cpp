@@ -2,6 +2,10 @@
 #include "ScriptInterface.h"
 #include "../Core/Entity.h"
 
+#if defined(RZ_PLATFORM_WINDOWS)
+#include <windows.h>
+#endif
+
 namespace Razor
 {
 	Coral::HostInstance ScriptEngine::CoralInstance = Coral::HostInstance();
@@ -22,7 +26,15 @@ namespace Razor
 	void ScriptEngine::Init()
 	{
 		Coral::HostSettings HostSettings;
-		HostSettings.CoralDirectory = "bin";
+
+#if defined(RZ_PLATFORM_WINDOWS)
+		char exePath[MAX_PATH];
+		GetModuleFileNameA(NULL, exePath, MAX_PATH);
+		std::string coralDir = std::filesystem::path(exePath).parent_path().string();
+#elif defined(RZ_PLATFORM_LINUX)
+		std::string coralDir = std::filesystem::canonical("/proc/self/exe").parent_path().string();
+#endif
+		HostSettings.CoralDirectory = coralDir;
 		HostSettings.MessageCallback = CoralMessageCallback;
 		HostSettings.ExceptionCallback = ExceptionCallback;
 
