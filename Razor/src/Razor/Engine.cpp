@@ -102,7 +102,7 @@ namespace Razor
 		_mCoordinator->RegisterSystem<RSTransformationsPass>(RSTransformationsPass(CurrentScene));
 		_mCoordinator->RegisterSystem<RSDirectionalLightingPass>(RSDirectionalLightingPass(CurrentScene));
 		_mCoordinator->RegisterSystem<RSCameraPass>(RSCameraPass(CurrentScene, Renderer));
-		_mCoordinator->RegisterSystem<RSRenderPass>(RSRenderPass(CurrentScene, Renderer, ShaderIDMap));
+		_mCoordinator->RegisterSystem<RSRenderPass>(RSRenderPass(CurrentScene, Renderer, ShaderIDMap, ShaderTypeMap));
 		_mCoordinator->RegisterSystem<RSPickBufferMaterialPass>(RSPickBufferMaterialPass(CurrentScene));
 		_mCoordinator->RegisterSystem<RSPickBufferRenderPass>(RSPickBufferRenderPass(CurrentScene, Renderer, ShaderIDMap));
 		_mCoordinator->RegisterSystem<RSPointLightingPass>(RSPointLightingPass(CurrentScene));
@@ -309,7 +309,7 @@ namespace Razor
 		std::unique_lock lock(_mDebugDrawBuffer->mutex, std::try_to_lock);
 		if (!lock.owns_lock())
 			return;
-		Coordinator->SetRenderPipelineDebugData(_mDebugDrawBuffer->lines, _mDebugDrawBuffer->triangles);
+		_mCoordinator->SetRenderPipelineDebugData(_mDebugDrawBuffer->lines, _mDebugDrawBuffer->triangles);
 	}
 
 	void Engine::ClearDebugDrawBuffer()

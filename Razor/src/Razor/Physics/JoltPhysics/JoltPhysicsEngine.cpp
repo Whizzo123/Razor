@@ -131,7 +131,7 @@ namespace Razor
 	void MyContactListener::OnContactPersisted(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings)
 	{
 		std::scoped_lock lock(_mBodyContactMapMutex);
-		auto processContact = [=](JPH::BodyID first, JPH::BodyID second)
+		auto processContact = [this](JPH::BodyID first, JPH::BodyID second)
 		{
 			for(ContactInfo& info : _mBodyContactMap[first])
 			{
@@ -150,7 +150,7 @@ namespace Razor
 	void MyContactListener::OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair)
 	{
 		std::scoped_lock lock(_mBodyContactMapMutex);
-		auto processContact = [=](JPH::BodyID first, JPH::BodyID second)
+		auto processContact = [this](JPH::BodyID first, JPH::BodyID second)
 			{
 				for (ContactInfo& info : _mBodyContactMap[first])
 				{

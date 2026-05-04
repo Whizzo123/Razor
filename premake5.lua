@@ -13,7 +13,6 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 group "Dependencies"
 	include "Razor/vendor/GLFW"
-	include "Razor/vendor/assimp"
 	include "Razor/vendor/ImGui"
 	include "Razor/vendor/yaml-cpp"
 	include "Razor/vendor/entt"
@@ -23,8 +22,6 @@ group "Dependencies"
 -----------------------------------------
 -- External CMake library (managed by CMake, referenced by Premake)
 -----------------------------------------
-project "Jolt"
-	kind "None"
 
 project "Razor"
 	location "Razor"
@@ -52,7 +49,6 @@ project "Razor"
 	defines
 	{
 		"_CRT_SECURE_NO_WARNINGS",
-		"JPH_FLOATING_POINT_EXCEPTIONS_ENABLED",
 		"JPH_PROFILE_ENABLED",
 		"JPH_DEBUG_RENDERER",
 		"JPH_OBJECT_STREAM"
@@ -63,6 +59,7 @@ project "Razor"
 		"%{prj.name}/vendor/spdlog/include",
 		"%{prj.name}/vendor/GLFW/include",
 		"%{prj.name}/vendor/assimp/include",
+		"%{prj.name}/vendor/assimp/build/include",
 		"%{prj.name}/vendor/Glad/include",
 		"%{prj.name}/vendor/stb_image/include",
 		"%{prj.name}/vendor/glm",
@@ -76,39 +73,81 @@ project "Razor"
 	filter "system:linux"
 		libdirs
 		{	
-			"%{prj.name}/vendor/JoltPhysics/Build/Linux_Debug"
+			"%{prj.name}/vendor/JoltPhysics/Build/Linux_Debug",
+			"%{prj.name}/vendor/assimp/bin/" .. outputdir .. "/assimp"
 		}
-	filter "system:windows"
-		libdirs
-		{	
-			"%{prj.name}/vendor/JoltPhysics/Build/VS_2022_CL"
-		}
+		
 
-	links
-	{
-		"GLFW",
-		"opengl32.lib",
-		"assimp",
-		"ImGui",
-		"yaml-cpp",
-		"Coral.Native",
-		"Jolt"
+	filter "system:windows"
+
+	libdirs
+	{	
+		"%{prj.name}/vendor/JoltPhysics/Build/VS2022_CL/Debug",
+		"%{prj.name}/vendor/assimp/bin/" .. outputdir .. "/assimp"
 	}
 
+	defines
+	{
+		"JPH_FLOATING_POINT_EXCEPTIONS_ENABLED"
+	}
+
+    links
+    {
+        "GLFW",
+        "opengl32.lib",
+        "assimp",
+        "ImGui",
+        "yaml-cpp",
+        "Coral.Native",
+        "Jolt"
+    }
+
+	filter "system:linux"
+	    links
+	    {
+			"GL",
+	        "dl",
+	        "pthread",
+			"assimp",
+	        "GLFW",
+			"EGL",
+			"wayland-client",
+			"wayland-egl",
+        	"wayland-cursor",
+	        "ImGui",
+	        "yaml-cpp",
+	        "Coral.Native",
+	        "Jolt",
+			"z"
+	    }
+	 	linkoptions
+    	{
+        	"-Wl,--whole-archive",
+        	"-lJolt",
+        	"-Wl,--no-whole-archive"
+    	}
+	filter {}
 	rtti("On")
 
 	defines
 	{
-		"YAML_CPP_STATIC_DEFINE",
-		"CORAL_WINDOWS"
+		"YAML_CPP_STATIC_DEFINE"
 	}
 
 	 -- Automatically copy DLL from C# project after build
-    postbuildcommands {
-        '{COPY} "%{wks.location}Razor/vendor/Coral/Coral.Managed/bin/%{cfg.buildcfg}/Coral.Managed.dll" "%{wks.location}Edge/bin"',
-		'{COPY} "%{wks.location}Razor/vendor/Coral/Coral.Managed/Coral.Managed.runtimeconfig.json" "%{wks.location}Edge/bin"',
-		'{COPY} "%{cfg.buildtarget.relpath}" "%{wks.location}bin/' .. outputdir .. '/Edge"'
-    }
+    filter "system:windows"
+    	postbuildcommands {
+    	    '{COPY} "%{cfg.buildtarget.relpath}" "%{wks.location}bin/' .. outputdir .. '/Edge"',
+    	    '{COPY} "%{wks.location}Razor/vendor/Coral/Build/%{cfg.buildcfg}/Coral.Managed.dll" "%{wks.location}bin/' .. outputdir .. '/Edge"',
+    	    '{COPY} "%{wks.location}Razor/vendor/Coral/Build/%{cfg.buildcfg}/Coral.Managed.runtimeconfig.json" "%{wks.location}bin/' .. outputdir .. '/Edge"'
+    	}
+
+	filter "system:linux"
+    	postbuildcommands {
+    	    '{COPY} "Razor/vendor/Coral/Coral.Managed/bin/%{cfg.buildcfg}/libCoral.Managed.a" "%{wks.location}Edge/bin"',
+    	    '{COPY} "%{cfg.buildtarget.relpath}" "%{wks.location}bin/' .. outputdir .. '/Edge"',
+    	    '{COPY} "%{wks.location}/Razor/vendor/Coral/Coral.Managed/Coral.Managed.runtimeconfig.json" "%{wks.location}bin/' .. outputdir .. '/Edge"'
+    	}
 
 	filter "system:windows"
 		systemversion "latest"
@@ -122,12 +161,14 @@ project "Razor"
 	
 	filter "system:linux"
 		systemversion "latest"
-
+		pic "On"
 		defines
 		{
 			"RZ_BUILD_DLL",
-			"RZ_PLATFORM_LINUX"
+			"RZ_PLATFORM_LINUX",
+			"CORAL_LINUX"
 		}
+		
 
 	filter {"configurations:Debug", "system:windows"}
 		prebuildcommands {
@@ -137,13 +178,24 @@ project "Razor"
 	filter {"configurations:Debug", "system:linux"}
 		prebuildcommands {
 	    	 -- Configure step (only if build dir does not exist)
-        	'if [ ! -f "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug/Makefile" ]; then ' ..
+        	'if [ ! -f "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug" ]; then ' ..
 			'(cd "%{wks.location}/Razor/vendor/JoltPhysics/Build" && ' ..
-        	'sh ./cmake_linux_clang_gcc.sh Debug g++ -DUSE_STATIC_MSVC_RUNTIME_LIBRARY=OFF); fi',
+        	'sh ./cmake_linux_clang_gcc.sh Debug g++ -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCPP_RTTI_ENABLED=ON -DJPH_DEBUG_RENDERER=ON); fi',
         	-- Build step
 			'if [ ! -f "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug/libjolt.a" ]; then ' ..
-        	'cmake --build "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug"; fi'
+        	'cmake --build "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug"; fi',
+			-- Assimp configure step (only if build dir does not exist)
+			'if [ ! -d "%{wks.location}/Razor/vendor/assimp/build" ]; then ' ..
+			'cmake -S "%{wks.location}/Razor/vendor/assimp" -B "%{wks.location}/Razor/vendor/assimp/build" ' ..
+			'-DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_SHARED_LIBS=OFF -DASSIMP_BUILD_TESTS=OFF ' ..
+			'-DASSIMP_BUILD_ASSIMP_TOOLS=OFF; fi',
+			-- Assimp build step
+			'if [ ! -f "%{wks.location}/Razor/vendor/assimp/bin/' .. outputdir .. '/assimp/libassimp.a" ]; then ' ..
+        	'cmake --build "%{wks.location}/Razor/vendor/assimp/build" && ' ..
+			'mkdir -p "%{wks.location}/Razor/vendor/assimp/bin/' .. outputdir .. '/assimp" && ' ..
+			'cp "%{wks.location}/Razor/vendor/assimp/build/lib/libassimp.a" "%{wks.location}/Razor/vendor/assimp/bin/' .. outputdir .. '/assimp/libassimp.a"; fi'
     	}
+		
 	filter "configurations:Debug"
 		defines "RZ_DEBUG"
 		runtime "Debug"
@@ -184,6 +236,7 @@ project "Edge"
 		"Razor/vendor/spdlog/include",
 		"Razor/vendor/GLFW/include",
 		"Razor/vendor/assimp/include",
+		"Razor/vendor/assimp/build/include",
 		"Razor/vendor/Glad/include",
 		"Razor/vendor/stb_image/include",
 		"Razor/vendor/glm",
@@ -193,12 +246,19 @@ project "Edge"
 		"Razor/vendor/entt/src"
 	}
 	
-	links 
-	{
-		"Razor",
-		"Shlwapi.lib",
-		"Propsys.lib"
-	}
+	filter "system:windows"
+		links 
+		{
+			"Razor",
+			"Shlwapi.lib",
+			"Propsys.lib"
+		}
+
+	filter "system:linux"
+		links
+		{
+			"Razor"
+		}
 	
 	defines
 	{
@@ -213,6 +273,16 @@ project "Edge"
 			"RZ_PLATFORM_WINDOWS"
 		}
 	
+	filter "system:linux"
+		removefiles {
+    		"%{prj.name}/src/Utils/Windows**.h",
+			"%{prj.name}/src/Utils/Windows**.cpp"
+		}
+		defines
+		{
+			"RZ_PLATFORM_LINUX"
+		}
+
 	filter "configurations:Debug"
 		defines "RZ_DEBUG"
 		runtime "Debug"

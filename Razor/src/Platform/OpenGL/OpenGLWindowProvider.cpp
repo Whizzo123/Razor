@@ -2,6 +2,7 @@
 #include <iostream>
 #include "../../Razor/Engine.h"
 #include "../../Razor/Window.h"
+#include "../../Razor/Log.h"
 
 
 namespace Razor
@@ -20,10 +21,15 @@ namespace Razor
         std::cout << "Creating window" << std::endl;
         Window = glfwCreateWindow(Width, Height, Title.c_str(), nullptr, nullptr);
 
-        if (Window == nullptr)
-        {
-            std::cout << "Failed to create window" << std::endl;
+        if (Window == nullptr) {
+            const char* buffer_ptr = new char[512];
+            int ret = glfwGetError(&buffer_ptr);
+            std::string buffer_str = buffer_ptr;
+            RZ_CORE_ERROR("Failed to create window GLFW {0}", buffer_str);
             glfwTerminate();
+            return;
+        } else {
+            RZ_CORE_INFO("OpenGLWindowProvider::CreateProviderWindow -> Successfully Created Window");
         }
 
         glfwMakeContextCurrent(Window);
