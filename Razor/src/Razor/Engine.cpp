@@ -236,7 +236,7 @@ namespace Razor
 			LoadedProject = CreateRef<Project>();
 		}
 
-		const std::string Path = "../Sandbox";
+		const std::string Path = "Sandbox";
 
 		ProjectSerializer::Deserialize(ProjectPath, LoadedProject);
 		RZ_CORE_INFO("Loading up project: {0}", LoadedProject->m_ProjectName);
