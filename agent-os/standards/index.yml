@@ -1,0 +1,35 @@
+# Agent OS Standards Index
+
+ecs:
+  entity-wrapper:
+    description: Entity is a disposable proxy; systems use entt::entity handles directly, not the wrapper
+  mandatory-components:
+    description: Scene::CreateEntity always adds Transform and ScriptComponent; do not add them manually
+  smart-pointer-aliases:
+    description: Use Ref<T>/CreateRef<T> and Scope<T>/CreateScope<T> — never make_shared, make_unique, or new
+
+editor:
+  component-drawers:
+    description: How to add new component UI drawers to the ComponentImGui registry
+  editor-storage:
+    description: Shared editor state bus and cross-view event pattern using MulticastDelegates
+  imgui-view-lifecycle:
+    description: Required Begin/End structure for all editor views using RazorImGui wrapper
+
+rendering:
+  render-system-structure:
+    description: How to create and register a new RS* render system with SystemRenderStage
+  runtime-pipeline-config:
+    description: Render execution order defined by RenderPipelineConfig in EdgeApp.cpp
+  shader-class-pattern:
+    description: Shader classes are thin wrappers calling ShaderReader::CreateShaderProgram
+  shader-property-distribution:
+    description: How RS* passes add typed shader properties consumed and cleared by RSRenderPass each frame
+
+serialization:
+  asset-key:
+    description: AssetKey wraps a project-relative file path; only created by AssetDirectory or scene deserialization
+  scene-serializer-components:
+    description: Adding a component requires updating Component.h, SceneSerializer, ComponentImGui, and Inspector
+  yaml-pattern:
+    description: YAML emit and decode patterns using YamlWrapper — never use yaml-cpp directly
