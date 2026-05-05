@@ -15,7 +15,7 @@ namespace EdgeEditor
 			// TODO will create big old file explorer for now we just wanna have a button we click which directs us to the current Sandbox
 			if (Razor::RazorImGui::Button("Create"))
 			{
-				Storage->SetProjectPath("../Sandbox/Sandbox");
+				Storage->SetProjectPath("/Sandbox/Sandbox");
 				Razor::RazorImGui::CloseCurrentPopup();
 			}
 			Razor::RazorImGui::SameLine();

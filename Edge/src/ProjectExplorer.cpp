@@ -1,8 +1,8 @@
 #include "ProjectExplorer.h"
 #include <filesystem>
 
-
 #ifdef RZ_PLATFORM_WINDOWS
+#include <direct.h>
 #include "Utils/Windows/CDialogEventHandler.h"
 HRESULT CDialogEventHandler_CreateInstance(REFIID riid, void** ppv)
 {
@@ -61,7 +61,9 @@ namespace EdgeEditor
 		std::vector<Razor::FilePath> fileNames;
 
 		struct stat sb;
-
+		// TODO verify that Path is actually a path to a file otherwise we will throw here 
+		try 
+		{
 		for (const std::filesystem::directory_entry& DirectoryEntry : std::filesystem::directory_iterator(Path))
 		{
 			std::filesystem::path filePath = DirectoryEntry.path();
@@ -73,6 +75,13 @@ namespace EdgeEditor
 				bIsDirectory = true;
 			}
 			fileNames.push_back({ path, bIsDirectory });
+		}
+		} catch (std::filesystem::filesystem_error err) {
+			char buffer[512];
+			#ifdef RZ_PLATFORM_WINDOWS
+			char* ptr = getcwd(&buffer[0], 512);
+			#endif
+			RZ_ERROR("ProjectExplorer::GrabFiles -> Threw file system error path was {0}, current working directory is {1}", Path, buffer);
 		}
 
 		return fileNames;
