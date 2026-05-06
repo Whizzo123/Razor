@@ -11,7 +11,7 @@ namespace Razor
 
     std::string ShaderReader::ReadInShader(std::string shaderName)
     {
-        std::ifstream t("resources/shaders/" + shaderName);
+        std::ifstream t("Edge/resources/shaders/" + shaderName);
         std::stringstream buffer;
         buffer << t.rdbuf();
         return buffer.str();
