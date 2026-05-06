@@ -1,7 +1,9 @@
 #pragma once
 
 #include "PopupWindow.h"
+#include <stack>
 #include <string>
+#include <vector>
 #include "Razor.h"
 
 
@@ -12,8 +14,8 @@ namespace EdgeEditor
 	class OpenProjectPopupWindow : public PopupWindow
 	{
 	public:
-		OpenProjectPopupWindow() : bIsOpen(false), WindowName("Open Project Window"), Storage(nullptr) {}
-		OpenProjectPopupWindow(Razor::Ref<EditorStorage> Storage) : bIsOpen(false), WindowName("Open Project Window"), Storage(Storage) {}
+		OpenProjectPopupWindow();
+		OpenProjectPopupWindow(Razor::Ref<EditorStorage> Storage);
 		/**
 		* Function to draw popup window function to be called when wishing to draw popup
 		*/
@@ -29,10 +31,11 @@ namespace EdgeEditor
 		*/
 		void Close() override;
 
+		std::vector<Razor::FilePath> GrabFiles(const std::string& Path);
+		bool DrawFileGui(const Razor::FilePath& file);
+
 		bool bIsOpen;
-		//TODO push this up to parent class
-		std::string WindowName;
 		Razor::Ref<EditorStorage> Storage;
+		std::stack<std::string> _mSearchStack;
 	};
 }
-

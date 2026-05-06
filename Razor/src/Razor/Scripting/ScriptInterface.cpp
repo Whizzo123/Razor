@@ -3,6 +3,7 @@
 #include "ScriptGlue.h"
 #include "../Log.h"
 #include <Coral/HostInstance.hpp>
+#include <filesystem>
 
 namespace Razor
 {
@@ -13,12 +14,15 @@ namespace Razor
 
 	ScriptAssembly ScriptInterface::LoadAssembly(std::string assemblyPath, bool isBridgeAssembly)
 	{
-		AssemblyPool.push_back(CreateRef<Coral::ManagedAssembly>(ScriptEngine::LoadAssembly(assemblyPath)));
+		// Coral requires absolute paths; resolve relative paths against cwd
+		std::string absolutePath = std::filesystem::absolute(assemblyPath).string();
+		AssemblyPool.push_back(CreateRef<Coral::ManagedAssembly>(ScriptEngine::LoadAssembly(absolutePath)));
 
 		Ref<Coral::ManagedAssembly> Assembly = AssemblyPool.back();
-		if (Assembly->GetLoadStatus() == Coral::AssemblyLoadStatus::UnknownError)
+		if (Assembly->GetLoadStatus() != Coral::AssemblyLoadStatus::Success)
 		{
-			RZ_CORE_ERROR("ScriptInterface: -> Failed to load assembly at path: {0}", assemblyPath);
+			RZ_CORE_ERROR("ScriptInterface: -> Failed to load assembly at path: {0}", absolutePath);
+			AssemblyPool.pop_back();
 			return ScriptAssembly{ -1 };
 		}
 

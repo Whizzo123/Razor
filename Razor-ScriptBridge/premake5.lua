@@ -2,7 +2,7 @@
 project "Razor-ScriptBridge"
         kind "SharedLib"
         language "C#"
-        dotnetframework "net8.0"
+        dotnetframework "net9.0"
         clr "UnSafe"
         
         targetdir("../Edge/Resources/Scripts")

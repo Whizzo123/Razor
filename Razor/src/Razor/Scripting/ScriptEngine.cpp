@@ -64,20 +64,22 @@ namespace Razor
 			const char* splitter = ".";
 			bool bIsSystem = false;
 			bool bIsComponent = false;
-			Coral::Type& baseType = Type->GetBaseType();
-			while (baseType) 
+			// Traverse base type chain via pointer — never assign through the reference,
+			// which would overwrite TypeCache entries and corrupt m_Id for later types.
+			Coral::Type* baseTypePtr = &Type->GetBaseType();
+			while (*baseTypePtr)
 			{
-				if (baseType.GetFullName() == "Razor.System") {
+				if (baseTypePtr->GetFullName() == "Razor.System") {
 					RZ_CORE_INFO("Found System Class: {0}",  std::string(Type->GetFullName()));
 					bIsSystem = true;
 					break;
 				}
-				if (baseType.GetFullName() == "Razor.Component") {
+				if (baseTypePtr->GetFullName() == "Razor.Component") {
 					RZ_CORE_INFO("Found Component Class: {0}", std::string(Type->GetFullName()));
 					bIsComponent = true;
 					break;
 				}
-				baseType = baseType.GetBaseType();
+				baseTypePtr = &baseTypePtr->GetBaseType();
 			}
 
 			Ref<ScriptClass> Class = CreateRef<ScriptClass>(std::strtok(&Name[0], splitter), Type->GetFullName(), bIsSystem, bIsComponent);
