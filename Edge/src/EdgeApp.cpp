@@ -248,11 +248,18 @@ void Edge::CreateDockspace(const std::string& Title)
 			if (Razor::RazorImGui::MenuItem("Play"))
 			{
 				if (!_mPlaybackSceneBackup)
-					_mPlaybackSceneBackup = Razor::Engine::Get().RuntimeStart();
+				{
+					Razor::Engine& engine = Razor::Engine::Get();
+					_mPlaybackSceneBackup = engine.CurrentScene->Clone();
+					engine.RuntimeStart();
+				}
 			}
 			if (Razor::RazorImGui::MenuItem("Stop"))
 			{
-				Razor::Engine::Get().RuntimeStop(_mPlaybackSceneBackup);
+				Razor::Engine& engine = Razor::Engine::Get();
+				engine.RuntimeStop();
+				if (_mPlaybackSceneBackup)
+					*engine.CurrentScene = std::move(*_mPlaybackSceneBackup);
 				_mPlaybackSceneBackup = nullptr;
 			}
 			Razor::RazorImGui::EndMenu();
