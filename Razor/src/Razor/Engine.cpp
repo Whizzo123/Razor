@@ -265,7 +265,6 @@ namespace Razor
 			return;
 		}
 		RZ_CORE_INFO("Starting Runtime");
-
 		bIsRuntimeRunning.store(true);
 		CurrentScene->StartScene();
 		RuntimeThread = std::thread(&Engine::RunRuntime, this);
