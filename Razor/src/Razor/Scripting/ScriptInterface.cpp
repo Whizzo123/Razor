@@ -141,8 +141,9 @@ namespace Razor
 	void ScriptInterface::DestroyInstanceObject(int handle)
 	{
 		ScriptInstance& instance = GetScriptInstance(handle);
-		Ref<Coral::ManagedObject> object = GetManagedObject(handle);
-		object->Destroy();
+		Ref<Coral::ManagedObject> object = GetManagedObject(instance.handle);
+		if (object)
+			object->Destroy();
 		instance.handle = 0;
 	}
 

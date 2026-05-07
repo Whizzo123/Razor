@@ -163,6 +163,7 @@ namespace Razor
 
 		void RuntimeStart();
 		void RuntimeStop();
+		bool IsRuntimeRunning() const { return bIsRuntimeRunning.load(); }
 
 		Ref<Scene> CurrentScene; /** Ref to the current scene we have*/
 
