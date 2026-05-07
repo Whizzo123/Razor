@@ -161,8 +161,8 @@ namespace Razor
 		void SaveProject();
 		void LoadProject(const std::string& ProjectPath);
 
-		void RuntimeStart();
-		void RuntimeStop();
+		Ref<Scene> RuntimeStart();
+		void RuntimeStop(Ref<Scene> backup);
 
 		Ref<Scene> CurrentScene; /** Ref to the current scene we have*/
 

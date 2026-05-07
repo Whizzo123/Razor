@@ -257,17 +257,22 @@ namespace Razor
 		_mAssetDirectory = CreateRef<AssetDirectory>(Path + "/" + LoadedProject->m_AssetDirectory);
 	}
 
-	void Engine::RuntimeStart()
+	Ref<Scene> Engine::RuntimeStart()
 	{
 		if(bIsRuntimeRunning.load())
 		{
 			RZ_CORE_WARN("Runtime is already running");
-			return;
+			return nullptr;
 		}
 		RZ_CORE_INFO("Starting Runtime");
+
+		Ref<Scene> backup = CurrentScene->Clone();
+
 		bIsRuntimeRunning.store(true);
 		CurrentScene->StartScene();
 		RuntimeThread = std::thread(&Engine::RunRuntime, this);
+
+		return backup;
 	}
 
 	void Engine::RunRuntime()
@@ -283,7 +288,7 @@ namespace Razor
 		RZ_CORE_INFO("Exiting Runtime Thread");
 	}
 
-	void Engine::RuntimeStop()
+	void Engine::RuntimeStop(Ref<Scene> backup)
 	{
 		RZ_CORE_INFO("Stopping Runtime");
 		bIsRuntimeRunning.store(false);
@@ -292,6 +297,8 @@ namespace Razor
 			RuntimeThread.join();
 			CurrentScene->StopScene();
 		}
+		if (backup)
+			*CurrentScene = std::move(*backup);
 	}
 
 	Ref<AssetDirectory> Engine::GetAssetDirectory()

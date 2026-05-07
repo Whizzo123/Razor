@@ -54,6 +54,7 @@ private:
 	Razor::Vector2 ViewportPos { 0.0f, 0.0f }; /** 2D vector to hold position of image displaying scene texture for viewport*/
 	Razor::Ref<EdgeEditor::EditorStorage> Storage; /** Container object to hold data to be shared among windows*/
 	EdgeEditor::ProjectExplorer _mProjectExplorerWindow;
+	Razor::Ref<Razor::Scene> _mPlaybackSceneBackup;
 };
 
 Razor::Application* Razor::CreateApplication()
@@ -246,11 +247,13 @@ void Edge::CreateDockspace(const std::string& Title)
 		{
 			if (Razor::RazorImGui::MenuItem("Play"))
 			{
-				Razor::Engine::Get().RuntimeStart();
+				if (!_mPlaybackSceneBackup)
+					_mPlaybackSceneBackup = Razor::Engine::Get().RuntimeStart();
 			}
 			if (Razor::RazorImGui::MenuItem("Stop"))
 			{
-				Razor::Engine::Get().RuntimeStop();
+				Razor::Engine::Get().RuntimeStop(_mPlaybackSceneBackup);
+				_mPlaybackSceneBackup = nullptr;
 			}
 			Razor::RazorImGui::EndMenu();
 		}

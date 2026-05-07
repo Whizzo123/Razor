@@ -1,7 +1,9 @@
 #pragma once
 #include <entt/entt.hpp>
 #include "../Core.h"
+#include "../Component.h"
 #include <vector>
+#include <unordered_map>
 
 namespace Razor
 {
@@ -31,6 +33,8 @@ namespace Razor
 
 		std::string& GetPath() { return FilePath; }
 
+		Ref<Scene> Clone() const;
+
 		Ref<Entity> CreateEntity();
 
 		Ref<Entity> GetEntity(entt::entity EntityHandle);
@@ -55,8 +59,6 @@ namespace Razor
 		void CreateInstanceObjects(std::vector<uint64_t> handles);
 		void PopulateObjectFields(ScriptInstance& instance, uint64_t objId);
 		void StopScene();
-
-		
 
 		entt::registry registry;
 	private:

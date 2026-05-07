@@ -10,6 +10,17 @@
 #include "../Physics/Components/BoxBody.h"
 #include "../Physics/IPhysicsEngine.h"
 
+namespace
+{
+	template<typename T>
+	void CopyComponent(const entt::registry& src, entt::registry& dst,
+		const std::unordered_map<entt::entity, entt::entity>& map)
+	{
+		for (auto [entity, component] : src.view<const T>().each())
+			dst.emplace<T>(map.at(entity), component);
+	}
+}
+
 namespace Razor
 {
 	Scene::Scene(const std::string& Path)
@@ -19,6 +30,30 @@ namespace Razor
 	Scene::~Scene()
 	{
 
+	}
+
+	Ref<Scene> Scene::Clone() const
+	{
+		auto copy = CreateRef<Scene>(FilePath);
+		copy->mSystemInstanceHandles = mSystemInstanceHandles;
+
+		std::unordered_map<entt::entity, entt::entity> entityMap;
+		for (auto e : registry.view<Transform>())
+			entityMap[e] = copy->registry.create();
+
+		CopyComponent<Transform>       (registry, copy->registry, entityMap);
+		CopyComponent<ScriptComponent> (registry, copy->registry, entityMap);
+		CopyComponent<Mesh>            (registry, copy->registry, entityMap);
+		CopyComponent<Camera>          (registry, copy->registry, entityMap);
+		CopyComponent<CameraInfo>      (registry, copy->registry, entityMap);
+		CopyComponent<DirectionalLight>(registry, copy->registry, entityMap);
+		CopyComponent<PointLight>      (registry, copy->registry, entityMap);
+		CopyComponent<SpotLight>       (registry, copy->registry, entityMap);
+		CopyComponent<Collider>        (registry, copy->registry, entityMap);
+		CopyComponent<BoxBody>         (registry, copy->registry, entityMap);
+		CopyComponent<Input>           (registry, copy->registry, entityMap);
+
+		return copy;
 	}
 
 	Ref<Entity> Scene::CreateEntity()
