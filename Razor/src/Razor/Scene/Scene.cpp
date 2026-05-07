@@ -238,7 +238,8 @@ namespace Razor
 		for (auto entity : GetEntitiesWithComponents<BoxBody>())
 		{
 			BoxBody body = GetEntity(entity)->GetComponent<BoxBody>();
-			Engine::Get().GetPhysicsEngine().DestroyBody(body.bodyId);
+			if (body.bodyId != 0xFFFFFFFF)
+				Engine::Get().GetPhysicsEngine().DestroyBody(body.bodyId);
 		}
 	}
 

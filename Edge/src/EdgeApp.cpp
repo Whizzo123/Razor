@@ -247,7 +247,7 @@ void Edge::CreateDockspace(const std::string& Title)
 		{
 			if (Razor::RazorImGui::MenuItem("Play"))
 			{
-				if (!_mPlaybackSceneBackup)
+				if (!Razor::Engine::Get().IsRuntimeRunning())
 				{
 					Razor::Engine& engine = Razor::Engine::Get();
 					_mPlaybackSceneBackup = engine.CurrentScene->Clone();
