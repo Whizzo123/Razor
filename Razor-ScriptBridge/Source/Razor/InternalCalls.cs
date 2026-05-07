@@ -15,6 +15,9 @@ namespace Razor
         internal static delegate* unmanaged[Cdecl]<int, uint*, int*, int> Scene_GetEntitiesWithScriptComponent;
         internal static delegate* unmanaged[Cdecl]<sbyte*, int> Util_GetTypeIdForManagedType;
         internal static delegate* unmanaged[Cdecl]<int, uint, IntPtr> Scene_GetComponentOnEntity;
+        internal static delegate* unmanaged[Cdecl]<int, int>                           Input_GetKey;
+        internal static delegate* unmanaged[Cdecl]<uint, float*, float*, float*, void> Transform_GetPosition;
+        internal static delegate* unmanaged[Cdecl]<uint, float, float, float, void>    Transform_SetPosition;
 
         public static void LogMsg(string msg)
         {
@@ -76,6 +79,23 @@ namespace Razor
 
                 return result;
             }
+        }
+
+        public static RazorKeyState GetInputKey(RazorKey key)
+        {
+            return (RazorKeyState)Input_GetKey((int)key);
+        }
+
+        public static (float X, float Y, float Z) GetTransformPosition(uint entityId)
+        {
+            float x, y, z;
+            Transform_GetPosition(entityId, &x, &y, &z);
+            return (x, y, z);
+        }
+
+        public static void SetTransformPosition(uint entityId, float x, float y, float z)
+        {
+            Transform_SetPosition(entityId, x, y, z);
         }
 
         public static T GetComponent<T>(uint entityId) where T : Component
