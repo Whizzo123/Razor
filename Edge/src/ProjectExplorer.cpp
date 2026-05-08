@@ -28,20 +28,22 @@ namespace EdgeEditor
 		bool bIsOpen;
 		Razor::RazorImGui::Begin("Project Explorer", &bIsOpen, Razor::RazorGuiWindowFlags_MenuBar);
 		Razor::RazorImGui::SetWindowSize(Razor::Vector2(200.0f, 200.0f));
-		Razor::RazorImGui::BeginTable("FileTable", 4);
-		if (_mSearchStack.empty())
+		if (Razor::RazorImGui::BeginTable("FileTable", 4))
 		{
+			if (_mSearchStack.empty())
+			{
+				Razor::RazorImGui::EndTable();
+				Razor::RazorImGui::End();
+				return;
+			}
+			std::vector<Razor::FilePath> fileNames = GrabFiles(_mSearchStack.top());
+			for (const Razor::FilePath& entry : fileNames)
+			{
+				Razor::RazorImGui::TableNextColumn();
+				DrawFileGui(entry);
+			}
 			Razor::RazorImGui::EndTable();
-			Razor::RazorImGui::End();
-			return;
 		}
-		std::vector<Razor::FilePath> fileNames = GrabFiles(_mSearchStack.top());
-		for (const Razor::FilePath& entry : fileNames)
-		{
-			Razor::RazorImGui::TableNextColumn();
-			DrawFileGui(entry);
-		}
-		Razor::RazorImGui::EndTable();
 		if (Razor::RazorImGui::Button("Import", Razor::Vector2(100.0f, 50.0f)))
 		{
 			OpenFile();

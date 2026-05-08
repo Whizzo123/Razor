@@ -29,7 +29,7 @@ Then open `Razor.sln` in Visual Studio and build.
 **Linux (Makefiles):**
 ```sh
 ./GenerateProjects.sh         # generates Makefiles via gmake
-make config=debug_x64
+make config=debug
 ```
 
 **Build configurations:** `Debug`, `Release`, `Dist`
@@ -62,6 +62,31 @@ Start-Process "C:\Sandbox\Razor\bin\Debug-windows-x86_64\Edge\Edge.exe" -Working
 - Build output is at `bin/Debug-windows-x86_64/` (Premake uses `x86_64`, not `x64`).
 - Coral.Managed builds to `Razor/vendor/Coral/Build/Debug/` — this is already referenced correctly in `premake5.lua` after the fix on 2026-05-04.
 - Sandbox has a pre-existing linker error (no object files in its .vcxproj); this does not affect Edge or Razor.
+
+## Testing Workflow (Linux)
+
+After writing any feature or fix, always build and run Edge to verify:
+
+**1. Build** (run from workspace root):
+```sh
+make config=debug
+```
+
+**2. Run** (from workspace root so asset paths resolve):
+```sh
+./bin/Debug-linux-x86_64/Edge/Edge
+```
+
+**3. Verify:**
+- A non-zero make exit code means a build regression — fix before reporting done.
+- Edge opens a window on the desktop. Confirm it reaches the editor UI without crashing.
+- Console/spdlog output streams to stdout and can be captured if needed.
+
+**Notes:**
+- If new files were added to the project, run `./GenerateProjects.sh` first to regenerate Makefiles via Premake.
+- Build output is at `bin/Debug-linux-x86_64/`.
+- GLFW is configured for Wayland by default; ensure a Wayland compositor is running or set `WAYLAND_DISPLAY` appropriately.
+- Sandbox has a pre-existing linker error (undefined reference to `main`); this does not affect Edge or Razor.
 
 ## Architecture
 

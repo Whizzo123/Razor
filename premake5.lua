@@ -144,9 +144,11 @@ project "Razor"
 
 	filter "system:linux"
     	postbuildcommands {
-    	    '{COPY} "Razor/vendor/Coral/Coral.Managed/bin/%{cfg.buildcfg}/libCoral.Managed.a" "%{wks.location}Edge/bin"',
-    	    '{COPY} "%{cfg.buildtarget.relpath}" "%{wks.location}bin/' .. outputdir .. '/Edge"',
-    	    '{COPY} "%{wks.location}/Razor/vendor/Coral/Coral.Managed/Coral.Managed.runtimeconfig.json" "%{wks.location}bin/' .. outputdir .. '/Edge"'
+    	    '{COPY} "%{wks.location}/Razor/vendor/Coral/Coral.Managed/bin/%{cfg.buildcfg}/libCoral.Managed.a" "%{wks.location}/Edge/bin"',
+    	    'mkdir -p "%{wks.location}/bin/' .. outputdir .. '/Edge"',
+    	    '{COPY} "%{cfg.buildtarget.relpath}" "%{wks.location}/bin/' .. outputdir .. '/Edge"',
+    	    '{COPY} "%{wks.location}/Razor/vendor/Coral/Build/%{cfg.buildcfg}/Coral.Managed.dll" "%{wks.location}/bin/' .. outputdir .. '/Edge"',
+    	    '{COPY} "%{wks.location}/Razor/vendor/Coral/Build/%{cfg.buildcfg}/Coral.Managed.runtimeconfig.json" "%{wks.location}/bin/' .. outputdir .. '/Edge"'
     	}
 
 	filter "system:windows"

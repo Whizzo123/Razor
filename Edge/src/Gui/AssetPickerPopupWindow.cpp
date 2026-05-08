@@ -18,18 +18,20 @@ namespace EdgeEditor
 
 		if (Razor::RazorImGui::BeginPopupModal("Asset Picker Window", nullptr))
 		{
-			Razor::RazorImGui::BeginTable("FileTable", 4);
-			std::vector<Razor::FilePath> fileNames = GrabFiles(_mSearchStack.top());
-			for (const Razor::FilePath& file : fileNames)
+			if (Razor::RazorImGui::BeginTable("FileTable", 4))
 			{
-				Razor::RazorImGui::TableNextColumn();
-				if (DrawFileGui(file))
+				std::vector<Razor::FilePath> fileNames = GrabFiles(_mSearchStack.top());
+				for (const Razor::FilePath& file : fileNames)
 				{
-					Close();
-					bIsOpen = false;
+					Razor::RazorImGui::TableNextColumn();
+					if (DrawFileGui(file))
+					{
+						Close();
+						bIsOpen = false;
+					}
 				}
+				Razor::RazorImGui::EndTable();
 			}
-			Razor::RazorImGui::EndTable();
 			Razor::RazorImGui::SameLine();
 			if (Razor::RazorImGui::Button("Back"))
 			{

@@ -50,6 +50,7 @@ Binaries/
 *.sln
 *.ini
 *.csproj
+!Razor/vendor/Coral/Coral.Managed/Coral.Managed.csproj
 *.csproj.Backup.tmp
 *.deps.json
 *.pdb
