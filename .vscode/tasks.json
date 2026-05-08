@@ -33,6 +33,19 @@
             ],
             "group": "build",
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build Sandbox Scripts (Debug)",
+            "type": "process",
+            "command": "dotnet",
+            "args": [
+                "build",
+                "${workspaceFolder}\\Sandbox\\Scripts\\Sandbox.csproj",
+                "-c", "Debug",
+                "-p:Platform=x64"
+            ],
+            "group": "build",
+            "problemMatcher": "$msCompile"
         }
     ],
     "version": "2.0.0"
