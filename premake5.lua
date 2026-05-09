@@ -1,3 +1,14 @@
+newoption {
+	trigger     = "display-backend",
+	value       = "BACKEND",
+	description = "Linux display backend for GLFW (x11 or wayland)",
+	allowed = {
+		{ "x11",     "X11/GLX — works on Nvidia via XWayland (default)" },
+		{ "wayland", "Wayland/EGL — requires Mesa or Nvidia EGL Wayland support" },
+	},
+	default = "x11"
+}
+
 workspace "Razor"
 	architecture "x64"
 	startproject "Sandbox"
@@ -164,13 +175,14 @@ project "Razor"
 	filter "system:linux"
 		systemversion "latest"
 		pic "On"
-		defines
-		{
-			"RZ_BUILD_DLL",
-			"RZ_PLATFORM_LINUX",
-			"CORAL_LINUX"
-		}
-		
+		defines { "RZ_BUILD_DLL", "RZ_PLATFORM_LINUX", "CORAL_LINUX" }
+
+	filter { "system:linux" }
+		if _OPTIONS["display-backend"] == "wayland" then
+			defines { "RZ_GLFW_WAYLAND" }
+		else
+			defines { "RZ_GLFW_X11" }
+		end
 
 	filter {"configurations:Debug", "system:windows"}
 		prebuildcommands {
@@ -182,7 +194,7 @@ project "Razor"
 	    	 -- Configure step (only if build dir does not exist)
         	'if [ ! -f "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug" ]; then ' ..
 			'(cd "%{wks.location}/Razor/vendor/JoltPhysics/Build" && ' ..
-        	'sh ./cmake_linux_clang_gcc.sh Debug g++ -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCPP_RTTI_ENABLED=ON -DJPH_DEBUG_RENDERER=ON); fi',
+        	'sh ./cmake_linux_clang_gcc.sh Debug g++ -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCPP_RTTI_ENABLED=ON -DJPH_DEBUG_RENDERER=ON -DCMAKE_MAKE_PROGRAM=make -DTARGET_UNIT_TESTS=OFF -DTARGET_PERFORMANCE_TEST=OFF); fi',
         	-- Build step
 			'if [ ! -f "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug/libjolt.a" ]; then ' ..
         	'cmake --build "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug"; fi',

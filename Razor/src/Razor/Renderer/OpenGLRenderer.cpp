@@ -14,14 +14,15 @@ namespace Razor
 
     void OpenGLRenderer::InitRendererAPI()
     {   
-#ifdef RZ_PLATFORM_LINUX
+#ifdef RZ_GLFW_WAYLAND
         glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_WAYLAND);
+#elif defined(RZ_GLFW_X11)
+        glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
 #endif
         if(!glfwInit()) {
-            std::string buffer(512, '*');
-            const char* buffer_ptr = buffer.c_str();
-            int ret = glfwGetError(&buffer_ptr);
-            RZ_CORE_ERROR("Failed to init GLFW {0}", buffer);
+            const char* err = nullptr;
+            glfwGetError(&err);
+            RZ_CORE_ERROR("Failed to init GLFW: {0}", err ? err : "unknown error");
         }
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
