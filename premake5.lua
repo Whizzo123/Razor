@@ -1,3 +1,14 @@
+newoption {
+	trigger     = "display-backend",
+	value       = "BACKEND",
+	description = "Linux display backend for GLFW (x11 or wayland)",
+	allowed = {
+		{ "x11",     "X11/GLX — works on Nvidia via XWayland (default)" },
+		{ "wayland", "Wayland/EGL — requires Mesa or Nvidia EGL Wayland support" },
+	},
+	default = "x11"
+}
+
 workspace "Razor"
 	architecture "x64"
 	startproject "Sandbox"
@@ -70,10 +81,24 @@ project "Razor"
 		"%{prj.name}/vendor/JoltPhysics"
 	}
 
-	filter "system:linux"
+	filter {"configurations:Debug", "system:linux"}
 		libdirs
-		{	
+		{
 			"%{prj.name}/vendor/JoltPhysics/Build/Linux_Debug",
+			"%{prj.name}/vendor/assimp/bin/" .. outputdir .. "/assimp"
+		}
+
+	filter {"configurations:Release", "system:linux"}
+		libdirs
+		{
+			"%{prj.name}/vendor/JoltPhysics/Build/Linux_Release",
+			"%{prj.name}/vendor/assimp/bin/" .. outputdir .. "/assimp"
+		}
+
+	filter {"configurations:Dist", "system:linux"}
+		libdirs
+		{
+			"%{prj.name}/vendor/JoltPhysics/Build/Linux_Distribution",
 			"%{prj.name}/vendor/assimp/bin/" .. outputdir .. "/assimp"
 		}
 		
@@ -110,10 +135,6 @@ project "Razor"
 	        "pthread",
 			"assimp",
 	        "GLFW",
-			"EGL",
-			"wayland-client",
-			"wayland-egl",
-        	"wayland-cursor",
 	        "ImGui",
 	        "yaml-cpp",
 	        "Coral.Native",
@@ -126,6 +147,13 @@ project "Razor"
         	"-lJolt",
         	"-Wl,--no-whole-archive"
     	}
+
+	filter { "system:linux" }
+		if _OPTIONS["display-backend"] == "wayland" then
+			links { "EGL", "wayland-client", "wayland-egl", "wayland-cursor" }
+		else
+			links { "X11", "Xrandr", "Xi", "Xcursor" }
+		end
 	filter {}
 	rtti("On")
 
@@ -144,9 +172,11 @@ project "Razor"
 
 	filter "system:linux"
     	postbuildcommands {
-    	    '{COPY} "Razor/vendor/Coral/Coral.Managed/bin/%{cfg.buildcfg}/libCoral.Managed.a" "%{wks.location}Edge/bin"',
-    	    '{COPY} "%{cfg.buildtarget.relpath}" "%{wks.location}bin/' .. outputdir .. '/Edge"',
-    	    '{COPY} "%{wks.location}/Razor/vendor/Coral/Coral.Managed/Coral.Managed.runtimeconfig.json" "%{wks.location}bin/' .. outputdir .. '/Edge"'
+    	    '{COPY} "%{wks.location}/Razor/vendor/Coral/Coral.Managed/bin/%{cfg.buildcfg}/libCoral.Managed.a" "%{wks.location}/Edge/bin"',
+    	    'mkdir -p "%{wks.location}/bin/' .. outputdir .. '/Edge"',
+    	    '{COPY} "%{cfg.buildtarget.relpath}" "%{wks.location}/bin/' .. outputdir .. '/Edge"',
+    	    '{COPY} "%{wks.location}/Razor/vendor/Coral/Build/%{cfg.buildcfg}/Coral.Managed.dll" "%{wks.location}/bin/' .. outputdir .. '/Edge"',
+    	    '{COPY} "%{wks.location}/Razor/vendor/Coral/Build/%{cfg.buildcfg}/Coral.Managed.runtimeconfig.json" "%{wks.location}/bin/' .. outputdir .. '/Edge"'
     	}
 
 	filter "system:windows"
@@ -162,13 +192,14 @@ project "Razor"
 	filter "system:linux"
 		systemversion "latest"
 		pic "On"
-		defines
-		{
-			"RZ_BUILD_DLL",
-			"RZ_PLATFORM_LINUX",
-			"CORAL_LINUX"
-		}
-		
+		defines { "RZ_BUILD_DLL", "RZ_PLATFORM_LINUX", "CORAL_LINUX" }
+
+	filter { "system:linux" }
+		if _OPTIONS["display-backend"] == "wayland" then
+			defines { "RZ_GLFW_WAYLAND" }
+		else
+			defines { "RZ_GLFW_X11" }
+		end
 
 	filter {"configurations:Debug", "system:windows"}
 		prebuildcommands {
@@ -178,9 +209,9 @@ project "Razor"
 	filter {"configurations:Debug", "system:linux"}
 		prebuildcommands {
 	    	 -- Configure step (only if build dir does not exist)
-        	'if [ ! -f "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug" ]; then ' ..
+        	'if [ ! -d "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug" ]; then ' ..
 			'(cd "%{wks.location}/Razor/vendor/JoltPhysics/Build" && ' ..
-        	'sh ./cmake_linux_clang_gcc.sh Debug g++ -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCPP_RTTI_ENABLED=ON -DJPH_DEBUG_RENDERER=ON); fi',
+        	'sh ./cmake_linux_clang_gcc.sh Debug g++ -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCPP_RTTI_ENABLED=ON -DJPH_DEBUG_RENDERER=ON -DCMAKE_MAKE_PROGRAM=make -DTARGET_UNIT_TESTS=OFF -DTARGET_PERFORMANCE_TEST=OFF); fi',
         	-- Build step
 			'if [ ! -f "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug/libjolt.a" ]; then ' ..
         	'cmake --build "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Debug"; fi',
@@ -201,11 +232,47 @@ project "Razor"
 		runtime "Debug"
 		symbols "on"
 
-	filter "configurations:Release"
+	filter {"configurations:Release", "system:windows"}
 		prebuildcommands {
         	'if not exist "Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL\\Release\\Jolt.lib" call "Razor\\vendor\\JoltPhysics\\Build\\cmake_vs2022_cl.bat"',
         	'if not exist "Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL\\Release\\Jolt.lib" cmake --build "VS2022_CL" --config Release'
     	}
+
+	filter {"configurations:Release", "system:linux"}
+		prebuildcommands {
+			'if [ ! -d "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Release" ]; then ' ..
+			'(cd "%{wks.location}/Razor/vendor/JoltPhysics/Build" && ' ..
+			'sh ./cmake_linux_clang_gcc.sh Release g++ -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCPP_RTTI_ENABLED=ON -DCMAKE_MAKE_PROGRAM=make -DTARGET_UNIT_TESTS=OFF -DTARGET_PERFORMANCE_TEST=OFF); fi',
+			'if [ ! -f "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Release/libjolt.a" ]; then ' ..
+			'cmake --build "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Release"; fi',
+			'if [ ! -d "%{wks.location}/Razor/vendor/assimp/build" ]; then ' ..
+			'cmake -S "%{wks.location}/Razor/vendor/assimp" -B "%{wks.location}/Razor/vendor/assimp/build" ' ..
+			'-DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_SHARED_LIBS=OFF -DASSIMP_BUILD_TESTS=OFF ' ..
+			'-DASSIMP_BUILD_ASSIMP_TOOLS=OFF; fi',
+			'if [ ! -f "%{wks.location}/Razor/vendor/assimp/bin/' .. outputdir .. '/assimp/libassimp.a" ]; then ' ..
+			'cmake --build "%{wks.location}/Razor/vendor/assimp/build" && ' ..
+			'mkdir -p "%{wks.location}/Razor/vendor/assimp/bin/' .. outputdir .. '/assimp" && ' ..
+			'cp "%{wks.location}/Razor/vendor/assimp/build/lib/libassimp.a" "%{wks.location}/Razor/vendor/assimp/bin/' .. outputdir .. '/assimp/libassimp.a"; fi'
+		}
+
+	filter {"configurations:Dist", "system:linux"}
+		prebuildcommands {
+			'if [ ! -d "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Distribution" ]; then ' ..
+			'(cd "%{wks.location}/Razor/vendor/JoltPhysics/Build" && ' ..
+			'sh ./cmake_linux_clang_gcc.sh Distribution g++ -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCPP_RTTI_ENABLED=ON -DCMAKE_MAKE_PROGRAM=make -DTARGET_UNIT_TESTS=OFF -DTARGET_PERFORMANCE_TEST=OFF); fi',
+			'if [ ! -f "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Distribution/libjolt.a" ]; then ' ..
+			'cmake --build "%{wks.location}/Razor/vendor/JoltPhysics/Build/Linux_Distribution"; fi',
+			'if [ ! -d "%{wks.location}/Razor/vendor/assimp/build" ]; then ' ..
+			'cmake -S "%{wks.location}/Razor/vendor/assimp" -B "%{wks.location}/Razor/vendor/assimp/build" ' ..
+			'-DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_SHARED_LIBS=OFF -DASSIMP_BUILD_TESTS=OFF ' ..
+			'-DASSIMP_BUILD_ASSIMP_TOOLS=OFF; fi',
+			'if [ ! -f "%{wks.location}/Razor/vendor/assimp/bin/' .. outputdir .. '/assimp/libassimp.a" ]; then ' ..
+			'cmake --build "%{wks.location}/Razor/vendor/assimp/build" && ' ..
+			'mkdir -p "%{wks.location}/Razor/vendor/assimp/bin/' .. outputdir .. '/assimp" && ' ..
+			'cp "%{wks.location}/Razor/vendor/assimp/build/lib/libassimp.a" "%{wks.location}/Razor/vendor/assimp/bin/' .. outputdir .. '/assimp/libassimp.a"; fi'
+		}
+
+	filter "configurations:Release"
 		defines "RZ_RELEASE"
 		runtime "Release"
 		optimize "on"

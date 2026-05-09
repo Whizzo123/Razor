@@ -1,12 +1,33 @@
 {
+  "version": "0.2.0",
   "configurations": [
     {
-      "name": "Run Edge",
+      "name": "Run Edge (Linux)",
+      "type": "cppdbg",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "Build Debug",
+      "program": "${workspaceFolder}/bin/Debug-linux-x86_64/Edge/Edge",
+      "MIMode": "gdb",
+      "environment": [
+        { "name": "DISPLAY", "value": "${env:DISPLAY}" },
+        { "name": "WAYLAND_DISPLAY", "value": "${env:WAYLAND_DISPLAY}" }
+      ],
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    },
+    {
+      "name": "Run Edge (Windows)",
       "type": "cppvsdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/bin/Debug-windows-x86_64/Edge/Edge.exe",
       "cwd": "${workspaceFolder}",
-      "preLaunchTask": "Build Debug"
+      "preLaunchTask": "Build Debug",
+      "program": "${workspaceFolder}/bin/Debug-windows-x86_64/Edge/Edge.exe"
     }
   ]
 }

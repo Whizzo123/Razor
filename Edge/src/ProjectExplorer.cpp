@@ -3,6 +3,11 @@
 
 #ifdef RZ_PLATFORM_WINDOWS
 #include <direct.h>
+#define getcwd _getcwd
+#elif defined(RZ_PLATFORM_LINUX)
+#include <unistd.h>
+#endif
+#ifdef RZ_PLATFORM_WINDOWS
 #include "Utils/Windows/CDialogEventHandler.h"
 HRESULT CDialogEventHandler_CreateInstance(REFIID riid, void** ppv)
 {
@@ -28,20 +33,22 @@ namespace EdgeEditor
 		bool bIsOpen;
 		Razor::RazorImGui::Begin("Project Explorer", &bIsOpen, Razor::RazorGuiWindowFlags_MenuBar);
 		Razor::RazorImGui::SetWindowSize(Razor::Vector2(200.0f, 200.0f));
-		Razor::RazorImGui::BeginTable("FileTable", 4);
-		if (_mSearchStack.empty())
+		if (Razor::RazorImGui::BeginTable("FileTable", 4))
 		{
+			if (_mSearchStack.empty())
+			{
+				Razor::RazorImGui::EndTable();
+				Razor::RazorImGui::End();
+				return;
+			}
+			std::vector<Razor::FilePath> fileNames = GrabFiles(_mSearchStack.top());
+			for (const Razor::FilePath& entry : fileNames)
+			{
+				Razor::RazorImGui::TableNextColumn();
+				DrawFileGui(entry);
+			}
 			Razor::RazorImGui::EndTable();
-			Razor::RazorImGui::End();
-			return;
 		}
-		std::vector<Razor::FilePath> fileNames = GrabFiles(_mSearchStack.top());
-		for (const Razor::FilePath& entry : fileNames)
-		{
-			Razor::RazorImGui::TableNextColumn();
-			DrawFileGui(entry);
-		}
-		Razor::RazorImGui::EndTable();
 		if (Razor::RazorImGui::Button("Import", Razor::Vector2(100.0f, 50.0f)))
 		{
 			OpenFile();
@@ -78,9 +85,8 @@ namespace EdgeEditor
 		}
 		} catch (std::filesystem::filesystem_error err) {
 			char buffer[512];
-			#ifdef RZ_PLATFORM_WINDOWS
-			char* ptr = getcwd(&buffer[0], 512);
-			#endif
+			buffer[0] = '\0';
+			getcwd(&buffer[0], 512);
 			RZ_ERROR("ProjectExplorer::GrabFiles -> Threw file system error path was {0}, current working directory is {1}", Path, buffer);
 		}
 
