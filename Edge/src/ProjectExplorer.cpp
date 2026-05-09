@@ -3,6 +3,7 @@
 
 #ifdef RZ_PLATFORM_WINDOWS
 #include <direct.h>
+#define getcwd _getcwd
 #elif defined(RZ_PLATFORM_LINUX)
 #include <unistd.h>
 #endif
