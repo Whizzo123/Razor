@@ -69,7 +69,7 @@ After writing any feature or fix, always build and run Edge to verify:
 
 **1. Build** (run from workspace root):
 ```sh
-make config=debug
+make -j$(nproc) config=debug
 ```
 
 **2. Run** (from workspace root so asset paths resolve):

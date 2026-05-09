@@ -3,6 +3,10 @@
 
 #ifdef RZ_PLATFORM_WINDOWS
 #include <direct.h>
+#elif defined(RZ_PLATFORM_LINUX)
+#include <unistd.h>
+#endif
+#ifdef RZ_PLATFORM_WINDOWS
 #include "Utils/Windows/CDialogEventHandler.h"
 HRESULT CDialogEventHandler_CreateInstance(REFIID riid, void** ppv)
 {
@@ -80,9 +84,8 @@ namespace EdgeEditor
 		}
 		} catch (std::filesystem::filesystem_error err) {
 			char buffer[512];
-			#ifdef RZ_PLATFORM_WINDOWS
-			char* ptr = getcwd(&buffer[0], 512);
-			#endif
+			buffer[0] = '\0';
+			getcwd(&buffer[0], 512);
 			RZ_ERROR("ProjectExplorer::GrabFiles -> Threw file system error path was {0}, current working directory is {1}", Path, buffer);
 		}
 
