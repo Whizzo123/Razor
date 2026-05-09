@@ -61,7 +61,6 @@ Start-Process "C:\Sandbox\Razor\bin\Debug-windows-x86_64\Edge\Edge.exe" -Working
 - If new files were added to the project, run `GenerateProjects.bat` first to regenerate `Razor.sln` via Premake.
 - Build output is at `bin/Debug-windows-x86_64/` (Premake uses `x86_64`, not `x64`).
 - Coral.Managed builds to `Razor/vendor/Coral/Build/Debug/` — this is already referenced correctly in `premake5.lua` after the fix on 2026-05-04.
-- Sandbox has a pre-existing linker error (no object files in its .vcxproj); this does not affect Edge or Razor.
 
 ## Testing Workflow (Linux)
 
@@ -86,7 +85,6 @@ make -j$(nproc) config=debug
 - If new files were added to the project, run `./GenerateProjects.sh` first to regenerate Makefiles via Premake.
 - Build output is at `bin/Debug-linux-x86_64/`.
 - GLFW is configured for Wayland by default; ensure a Wayland compositor is running or set `WAYLAND_DISPLAY` appropriately.
-- Sandbox has a pre-existing linker error (undefined reference to `main`); this does not affect Edge or Razor.
 
 ## Architecture
 

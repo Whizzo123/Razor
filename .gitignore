@@ -51,6 +51,8 @@ Binaries/
 *.ini
 *.csproj
 !Razor/vendor/Coral/Coral.Managed/Coral.Managed.csproj
+!Razor-ScriptBridge/Razor-ScriptBridge.csproj
+!Sandbox/Scripts/Sandbox.csproj
 *.csproj.Backup.tmp
 *.deps.json
 *.pdb
