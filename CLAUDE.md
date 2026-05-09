@@ -156,7 +156,7 @@ Commit message format: `type [Category]: Description` — e.g. `fix [Linux]: Fix
 
 Files to always exclude from commits:
 - `Edge/bin/` — binary output
-- `Razor/vendor/*` — submodule generated content
+- `Razor/vendor/*` — only exclude if the change is untracked build-generated content inside the submodule (shown as `modified (untracked content)` in `git status`); include it if the submodule has been intentionally updated to a new commit
 - `*.make` — Premake-generated Makefiles
 - Unrelated scene files (`*.rzscn`)
 
