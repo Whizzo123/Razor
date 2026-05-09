@@ -136,6 +136,49 @@ Thin application that loads a scene and runs it through the engine. C# game scri
 | `RZ_DEBUG` / `RZ_RELEASE` / `RZ_DIST` | Active build configuration |
 | `JPH_DEBUG_RENDERER` | Enables Jolt physics debug draw |
 
+## Creating a Pull Request
+
+Follow this workflow when committing changes and opening a PR.
+
+**1. Create a branch from `stable`:**
+```sh
+git checkout stable
+git checkout -b <type>-<short-description>   # e.g. fix-linux-csharp-build
+```
+
+**2. Stage and commit — use separate commits for distinct concerns:**
+```sh
+git add <specific files only — never git add -A>
+git commit -m "type [Category]: Short description"
+```
+
+Commit message format: `type [Category]: Description` — e.g. `fix [Linux]: Fix ImGui editor window docking on Wayland`. Types: `fix`, `feature`, `add`. Category is optional but preferred for scoped changes (e.g. `[Build]`, `[Editor]`, `[Linux]`).
+
+Files to always exclude from commits:
+- `Edge/bin/` — binary output
+- `Razor/vendor/*` — submodule generated content
+- `*.make` — Premake-generated Makefiles
+- Unrelated scene files (`*.rzscn`)
+
+**3. Push and open a PR targeting `stable`:**
+```sh
+git push -u origin <branch-name>
+gh pr create --base stable --head <branch-name> --title "..." --body "..."
+```
+
+**PR description format:**
+```
+## Description ##
+One or two sentences summarising what the PR fixes or adds and why.
+
+## Changes ##
+**Category (if grouping makes sense)**
+- Specific change with enough detail to understand what and why
+- Another change
+```
+
+See PRs #86, #81, #79 on GitHub for examples.
+
 ## Linux Notes
 
 The current branch (`linux-support`) is actively adding Linux support. GLFW is configured for Wayland by default on Linux. Assimp and JoltPhysics are built from source via CMake pre-build commands. Some Windows-only utilities are excluded via `removefiles` in `premake5.lua`.
