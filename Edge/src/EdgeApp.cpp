@@ -72,7 +72,6 @@ void Edge::Run()
 	Razor::Engine& Engine = Razor::Engine::Get();
 
 	Engine.GetCoordinator()->RegisterSystem<EdgeEditor::RSEditorCamera>(EdgeEditor::RSEditorCamera(Engine.CurrentScene, Engine.GetRenderer(), EditorCamera.GetCamera()));
-	Engine.GetCoordinator()->RegisterSystem<Razor::RSCameraPass>(Razor::RSCameraPass(Engine.CurrentScene, Engine.GetRenderer()));
 
 	Razor::RenderPipelineConfig GamePipelineConfig;
 	GamePipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_MATERIAL_PASS, std::vector<const char*> { typeid(Razor::RSMaterialPass).name() } });
