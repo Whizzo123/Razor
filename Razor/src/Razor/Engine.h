@@ -165,6 +165,9 @@ namespace Razor
 		void RuntimeStop();
 		bool IsRuntimeRunning() const { return bIsRuntimeRunning.load(); }
 
+		void SetGameInputEnabled(bool bEnabled) { bIsGameInputEnabled.store(bEnabled); }
+		bool IsGameInputEnabled() const { return bIsGameInputEnabled.load(); }
+
 		Ref<Scene> CurrentScene; /** Ref to the current scene we have*/
 
 		Ref<AssetDirectory> GetAssetDirectory();
@@ -202,6 +205,7 @@ namespace Razor
 		PhysicsDebugDrawBuffer* _mDebugDrawBuffer;
 
 		std::atomic<bool> bIsRuntimeRunning { false };
+		std::atomic<bool> bIsGameInputEnabled { true };
 		std::thread RuntimeThread;
 	};
 }

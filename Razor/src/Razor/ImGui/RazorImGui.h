@@ -125,6 +125,7 @@ namespace Razor
 		static bool Combo(const char* label, const char** data, int dataLength, int* selectedIdx);
 		static bool InputText(const char* label, char* buf, size_t bufSize);
 		static bool CheckBox(const char* label, bool* value);
+		static bool IsWindowHovered();
 		
 	private:
 		static ImGuiViewport& GetViewport(unsigned int ID);

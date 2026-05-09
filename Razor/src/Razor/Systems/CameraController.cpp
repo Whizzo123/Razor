@@ -1,10 +1,14 @@
 #include "CameraController.h"
 #include "../Component.h"
+#include "../Engine.h"
 
 namespace Razor
 {
 	void CameraController::Run(float dt)
 	{
+		if (!Engine::Get().IsGameInputEnabled())
+			return;
+
 		auto View = CurrentScene->GetEntitiesWithComponents<Camera>();
 
 		for (auto Entity : View)
