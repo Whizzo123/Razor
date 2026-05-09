@@ -32,7 +32,7 @@ project "Sandbox"
         kind "SharedLib"
         language "C#"
         dotnetframework "net9.0"
-        targetdir ("Binaries")
+        targetdir ("Binaries/net9.0")
         objdir ("Intermediates")
         architecture "x86_64"
         files { "Source/**.cs", "Properties/**.cs" }

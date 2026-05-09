@@ -1,7 +1,6 @@
 #pragma once
 
 #include "RazorImGui.h"
-#include <cstdlib>
 #include "../Utils/Delegates.h"
 
 #include <imgui.h>
@@ -80,11 +79,7 @@ namespace Razor
 		}
 	}
 
-	void RazorImGui::RegisterImGuiEvents()
-	{
-	}
-
-	ImGuiViewport& RazorImGui::GetViewport(unsigned int ID)
+ImGuiViewport& RazorImGui::GetViewport(unsigned int ID)
 	{
 		if (ID < 0)
 		{

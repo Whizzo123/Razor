@@ -49,6 +49,7 @@ Binaries/
 *.vcxproj.filters
 *.sln
 *.ini
+Edge/resources/imgui.ini
 *.csproj
 !Razor/vendor/Coral/Coral.Managed/Coral.Managed.csproj
 !Razor-ScriptBridge/Razor-ScriptBridge.csproj

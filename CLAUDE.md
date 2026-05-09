@@ -181,4 +181,4 @@ See PRs #86, #81, #79 on GitHub for examples.
 
 ## Linux Notes
 
-The current branch (`linux-support`) is actively adding Linux support. GLFW is configured for Wayland by default on Linux. Assimp and JoltPhysics are built from source via CMake pre-build commands. Some Windows-only utilities are excluded via `removefiles` in `premake5.lua`.
+Linux support is established on this repo. GLFW defaults to the X11 backend (pass `--display-backend=wayland` to `GenerateProjects.sh` to switch). Assimp and JoltPhysics are built from source via CMake pre-build commands. Some Windows-only utilities are excluded via `removefiles` in `premake5.lua`.
