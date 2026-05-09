@@ -52,7 +52,21 @@ namespace Razor
 		}
 	private:
 		uint8_t m_Buffer[64];
+		std::string m_StringValue;
 	};
+
+	// std::string is not trivially copyable — specialise to use a dedicated member
+	template<>
+	inline std::string ScriptFieldInstance::GetValue<std::string>()
+	{
+		return m_StringValue;
+	}
+
+	template<>
+	inline void ScriptFieldInstance::SetValue<std::string>(std::string value)
+	{
+		m_StringValue = std::move(value);
+	}
 
 
 	struct RAZOR_API ScriptInstance {
