@@ -11,7 +11,7 @@ newoption {
 
 workspace "Razor"
 	architecture "x64"
-	startproject "Sandbox"
+	startproject "Edge"
 
 	configurations
 	{
@@ -29,6 +29,9 @@ group "Dependencies"
 	include "Razor/vendor/entt"
 	include "Razor/vendor/Coral/Coral.Native"
 	include "Razor/vendor/Coral/Coral.Managed"
+
+group "Scripting"
+	include "Razor-ScriptBridge"
 
 -----------------------------------------
 -- External CMake library (managed by CMake, referenced by Premake)
@@ -366,65 +369,6 @@ project "Edge"
 		optimize "on"
 	
 
-project "Sandbox"
-	location "Sandbox"
-	kind "ConsoleApp"
-	language "C++"
-	cppdialect "C++20"
-	staticruntime "off"
-
-	targetdir("bin/" .. outputdir .. "/%{prj.name}")
-	objdir("intermediate/" .. outputdir .. "/%{prj.name}")
-
-	files
-	{
-		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
-	}
-
-	includedirs 
-	{
-		"Razor/vendor/spdlog/include",
-		"Razor/vendor/GLFW/include",
-		"Razor/vendor/assimp/include",
-		"Razor/vendor/Glad/include",
-		"Razor/vendor/stb_image/include",
-		"Razor/vendor/glm",
-		"Razor/vendor/ImGui",
-		"Razor/vendor/yaml-cpp/include",
-		"Razor/src",
-		"Razor/vendor/entt/src"
-	}
-
-	links 
-	{
-		"Razor"
-	}
-
-	filter "system:windows"
-		staticruntime "On"
-		systemversion "10.0.22621.0"
-
-		defines
-		{
-			"RZ_PLATFORM_WINDOWS",
-			"YAML_CPP_STATIC_DEFINE"
-		}
-
-	filter "configurations:Debug"
-		defines "RZ_DEBUG"
-		runtime "Debug"
-		symbols "on"
-
-	filter "configurations:Release"
-		defines "RZ_RELEASE"
-		runtime "Release"
-		optimize "on"
-
-	filter "configurations:Dist"
-		defines "RZ_DIST"
-		runtime "Release"
-		optimize "on"
 
 
 	

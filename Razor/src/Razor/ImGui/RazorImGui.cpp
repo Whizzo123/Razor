@@ -30,7 +30,16 @@ namespace Razor
 		ImGuiIO& IO = ImGui::GetIO();
 		IO.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 		IO.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+#if defined(RZ_PLATFORM_LINUX)
+		// glfwGetWindowPos emits GLFW_FEATURE_UNAVAILABLE on Wayland (glfw3.h:3461) and
+		// always returns (0,0). Multi-viewport requires global monitor coordinates to
+		// position floating OS windows and compute drag hit-tests — disable it on Wayland.
+		// Docking within the main window still works normally.
+		if (getenv("WAYLAND_DISPLAY") == nullptr)
+			IO.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+#else
 		IO.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+#endif
 
 		ImGui::StyleColorsDark();
 		ImGuiStyle& style = ImGui::GetStyle();
@@ -70,34 +79,7 @@ namespace Razor
 		}
 	}
 
-	void RazorImGui::RegisterImGuiEvents()
-	{
-		RazorIO& EngineIO = RazorIO::Get();
-		EngineIO.OnMouseButtonPressed().AddRaw(this, &RazorImGui::OnMouseButtonPressedEvent);
-		EngineIO.OnMousePosChanged().AddRaw(this, &RazorImGui::OnMouseMovedEvent);
-	}
-	void RazorImGui::OnMouseButtonPressedEvent(RazorMouseButton Button, RazorMouseState State)
-	{
-		if (ImGui::GetIO().WantCaptureMouse)
-		{
-			if (State == RazorMouseState::MOUSE_DOWN)
-			{
-
-				ImGui::GetIO().MouseDown[(int)Button] = true;
-			}
-			else
-			{
-				ImGui::GetIO().MouseDown[(int)Button] = false;
-			}
-		}
-	}
-	void RazorImGui::OnMouseMovedEvent(double XPos, double YPos)
-	{
-		//ImGui requires full monitor space for coords when using docking branch
-		ImGui::GetIO().MousePos = ImVec2(XPos, YPos);
-	}
-
-	ImGuiViewport& RazorImGui::GetViewport(unsigned int ID)
+ImGuiViewport& RazorImGui::GetViewport(unsigned int ID)
 	{
 		if (ID < 0)
 		{
