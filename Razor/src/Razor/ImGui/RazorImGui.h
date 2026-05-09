@@ -126,12 +126,7 @@ namespace Razor
 		static bool InputText(const char* label, char* buf, size_t bufSize);
 		static bool CheckBox(const char* label, bool* value);
 	public:
-		// Function to hook our on such and such events to GLFW key events
 		void RegisterImGuiEvents();
-		void OnMouseButtonPressedEvent(RazorMouseButton Button, RazorMouseState State);
-		bool OnMouseButtonReleasedEvent(RazorMouseButton Button, RazorMouseState State);
-		void OnMouseMovedEvent(double XPos, double YPos);
-		bool OnMouseScrolledEvent();
 		
 	private:
 		static ImGuiViewport& GetViewport(unsigned int ID);
