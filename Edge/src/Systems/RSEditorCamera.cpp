@@ -5,10 +5,8 @@ namespace EdgeEditor
 
 	void RSEditorCamera::Render(Razor::RenderPipelineData& data)
 	{
-		const int SCREEN_WIDTH = 800;
-		const int SCREEN_HEIGHT = 600;
-
-		glm::mat4 CameraProjection = glm::perspective(glm::radians(45.0f), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
+		const float AspectRatio = ViewportHeight > 0 ? (float)ViewportWidth / (float)ViewportHeight : 1.0f;
+		glm::mat4 CameraProjection = glm::perspective(glm::radians(45.0f), AspectRatio, 0.1f, 100.0f);
 		glm::mat4 CameraView = glm::lookAt(EditorCamera.CameraPos, EditorCamera.CameraPos + EditorCamera.CameraFront, EditorCamera.CameraUp);
 		for (auto& Pair : data.mEntityRenderProperties.Properties)
 		{

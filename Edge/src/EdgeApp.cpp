@@ -1,5 +1,6 @@
 #include <Razor.h>
 #include <Razor/EntryPoint.h>
+#include <algorithm>
 
 #include "Inspector.h"
 #include "SceneView.h"
@@ -56,10 +57,12 @@ private:
 	bool bSceneViewHovered = false; /** True when cursor hovers the Scene viewport panel */
 	bool bGameViewHovered  = false; /** True when cursor hovers the Game viewport panel */
 	Razor::Vector2 ViewportSize { 0.0f, 0.0f }; /** 2D vector to hold size of viewport window */
+	Razor::Vector2 GameViewportSize { 0.0f, 0.0f }; /** 2D vector to hold size of Game viewport panel */
 	Razor::Vector2 ViewportPos { 0.0f, 0.0f }; /** 2D vector to hold position of image displaying scene texture for viewport*/
 	Razor::Ref<EdgeEditor::EditorStorage> Storage; /** Container object to hold data to be shared among windows*/
 	EdgeEditor::ProjectExplorer _mProjectExplorerWindow;
 	Razor::Ref<Razor::Scene> _mPlaybackSceneBackup;
+	Razor::Ref<EdgeEditor::RSEditorCamera> _mEditorCameraSystem;
 };
 
 Razor::Application* Razor::CreateApplication()
@@ -71,7 +74,7 @@ void Edge::Run()
 {
 	Razor::Engine& Engine = Razor::Engine::Get();
 
-	Engine.GetCoordinator()->RegisterSystem<EdgeEditor::RSEditorCamera>(EdgeEditor::RSEditorCamera(Engine.CurrentScene, Engine.GetRenderer(), EditorCamera.GetCamera()));
+	_mEditorCameraSystem = Engine.GetCoordinator()->RegisterSystem<EdgeEditor::RSEditorCamera>(EdgeEditor::RSEditorCamera(Engine.CurrentScene, Engine.GetRenderer(), EditorCamera.GetCamera()));
 
 	Razor::RenderPipelineConfig GamePipelineConfig;
 	GamePipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_MATERIAL_PASS, std::vector<const char*> { typeid(Razor::RSMaterialPass).name() } });
@@ -136,13 +139,18 @@ void Edge::Run()
 	{
 		std::shared_ptr<Razor::IRenderer> Renderer = Engine.Renderer;
 
-		const uint32_t SizeX = (uint32_t)ViewportSize.X;
-		const uint32_t SizeY = (uint32_t)ViewportSize.Y;
+		const uint32_t SizeX     = static_cast<uint32_t>(std::max(0.0f, ViewportSize.X));
+		const uint32_t SizeY     = static_cast<uint32_t>(std::max(0.0f, ViewportSize.Y));
+		const uint32_t GameSizeX = static_cast<uint32_t>(std::max(0.0f, GameViewportSize.X));
+		const uint32_t GameSizeY = static_cast<uint32_t>(std::max(0.0f, GameViewportSize.Y));
 
 		PickBuffer->Refresh(SizeX, SizeY);
 		SceneBuffer->Refresh(SizeX, SizeY);
-		GameBuffer->Refresh(SizeX, SizeY);
+		GameBuffer->Refresh(GameSizeX, GameSizeY);
 		Renderer->SetViewport(0, 0, SizeX, SizeY);
+
+		_mEditorCameraSystem->SetViewportSize(SizeX, SizeY);
+		Engine.SetGameCameraViewportSize(GameSizeX, GameSizeY);
 
 		Engine.PopulateRenderPipelineDebugData();
 
@@ -198,7 +206,7 @@ void Edge::RenderGameViewport(Razor::Ref<Razor::Framebuffer> GameBuffer)
 	bool bIsOpen;
 	Razor::RazorImGui::Begin("Game", &bIsOpen, Razor::RazorGuiWindowFlags_NoScrollbar);
 	bGameViewHovered = Razor::RazorImGui::IsWindowHovered();
-	Razor::Vector2 GameViewportSize = Razor::Vector2(Razor::RazorImGui::GetContentRegionAvail().X, Razor::RazorImGui::GetContentRegionAvail().Y);
+	GameViewportSize = Razor::Vector2(Razor::RazorImGui::GetContentRegionAvail().X, Razor::RazorImGui::GetContentRegionAvail().Y);
 	Razor::RazorImGui::Image(reinterpret_cast<void*>(GameBuffer->GetTexture()), Razor::Vector2(GameViewportSize.X, GameViewportSize.Y), Razor::Vector2(0, 1), Razor::Vector2(1, 0));
 	Razor::RazorImGui::End();
 }

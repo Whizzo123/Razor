@@ -103,6 +103,8 @@ extern "C"
 	
 	static int RAZOR_CALL Input_GetKey(int keyCode)
 	{
+		if (!Engine::Get().IsGameInputEnabled())
+			return 0;
 		return (int)RazorIO::Get().GetStateForKey(static_cast<RazorKey>(keyCode));
 	}
 
