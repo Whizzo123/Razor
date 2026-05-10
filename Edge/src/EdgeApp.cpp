@@ -76,6 +76,7 @@ void Edge::Run()
 
 	_mEditorCameraSystem = Engine.GetCoordinator()->RegisterSystem<EdgeEditor::RSEditorCamera>(EdgeEditor::RSEditorCamera(Engine.CurrentScene, Engine.GetRenderer(), EditorCamera.GetCamera()));
 
+	// RSCameraPass is registered by Engine::InitSystems() — no explicit RegisterSystem call needed here
 	Razor::RenderPipelineConfig GamePipelineConfig;
 	GamePipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_MATERIAL_PASS, std::vector<const char*> { typeid(Razor::RSMaterialPass).name() } });
 	GamePipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_LIGHTING_PASS, std::vector<const char*>
@@ -193,7 +194,7 @@ void Edge::Run()
 void Edge::RenderSceneViewport(Razor::Ref<Razor::Framebuffer> SceneBuffer)
 {
 	bool bIsOpen;
-	Razor::RazorImGui::Begin("Scene", &bIsOpen, Razor::RazorGuiWindowFlags_MenuBar && Razor::RazorGuiWindowFlags_NoScrollbar);
+	Razor::RazorImGui::Begin("Scene", &bIsOpen, Razor::RazorGuiWindowFlags_MenuBar | Razor::RazorGuiWindowFlags_NoScrollbar);
 	bSceneViewHovered = Razor::RazorImGui::IsWindowHovered();
 	ViewportSize = Razor::Vector2(Razor::RazorImGui::GetContentRegionAvail().X, Razor::RazorImGui::GetContentRegionAvail().Y);
 	Razor::RazorImGui::Image(reinterpret_cast<void*>(SceneBuffer->GetTexture()), Razor::Vector2(ViewportSize.X, ViewportSize.Y), Razor::Vector2(0, 1), Razor::Vector2(1, 0));
