@@ -1,6 +1,6 @@
 # C# Input & Transform — Plan
 
-See full plan in `C:\Users\josep\.claude\plans\write-up-a-plan-jazzy-prism.md` (active plan file).
+> Implementation was tracked in a local Claude Code plan file.
 
 ## Summary
 

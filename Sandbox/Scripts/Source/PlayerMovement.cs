@@ -11,18 +11,19 @@ namespace Sandbox
     {
         public override void Run(float deltaTime)
         {
-          var entities = Scene.GetEntitiesWithScriptComponent<Player>();
-          Log logger = new Log();
-          foreach (uint id in entities)
-          {
-              Player player = Scene.GetComponent<Player>(id);
-              logger.Print("Player Name is: " + player.Name);
-              var pos = Transform.GetPosition(id);
-              if (Input.IsKeyPressed(RazorKey.W))
-                  Transform.SetPosition(id, pos.X, pos.Y, pos.Z + 5.0f * deltaTime);
-              if (Input.IsKeyPressed(RazorKey.S))
-                  Transform.SetPosition(id, pos.X, pos.Y, pos.Z - 5.0f * deltaTime);
-          }
+            var entities = Scene.GetEntitiesWithScriptComponent<Player>();
+            Log logger = new Log();
+            foreach (uint id in entities)
+            {
+                Player player = Scene.GetComponent<Player>(id);
+                if (player == null) continue;
+                logger.Print("Player Name is: " + player.Name);
+                var pos = Transform.GetPosition(id);
+                if (Input.IsKeyPressed(RazorKey.W))
+                    Transform.SetPosition(id, pos.X, pos.Y, pos.Z + 5.0f * deltaTime);
+                if (Input.IsKeyPressed(RazorKey.S))
+                    Transform.SetPosition(id, pos.X, pos.Y, pos.Z - 5.0f * deltaTime);
+            }
         }
     }
 }

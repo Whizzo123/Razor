@@ -101,12 +101,12 @@ extern "C"
 		return nullptr;
 	}
 	
-	static int Input_GetKey(int keyCode)
+	static int RAZOR_CALL Input_GetKey(int keyCode)
 	{
 		return (int)RazorIO::Get().GetStateForKey(static_cast<RazorKey>(keyCode));
 	}
 
-	static void Transform_GetPosition(uint32_t entityId, float* x, float* y, float* z)
+	static void RAZOR_CALL Transform_GetPosition(uint32_t entityId, float* x, float* y, float* z)
 	{
 		Ref<Entity> entity = Engine::Get().CurrentScene->GetEntity(static_cast<entt::entity>(entityId));
 		if (!entity) return;
@@ -114,7 +114,7 @@ extern "C"
 		*x = t.Position.x; *y = t.Position.y; *z = t.Position.z;
 	}
 
-	static void Transform_SetPosition(uint32_t entityId, float x, float y, float z)
+	static void RAZOR_CALL Transform_SetPosition(uint32_t entityId, float x, float y, float z)
 	{
 		Ref<Entity> entity = Engine::Get().CurrentScene->GetEntity(static_cast<entt::entity>(entityId));
 		if (!entity) return;
