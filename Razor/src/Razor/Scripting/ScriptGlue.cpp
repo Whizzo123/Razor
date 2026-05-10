@@ -7,6 +7,7 @@
 #include "../Core/Entity.h"
 #include "ScriptClass.h"
 #include "ScriptInterface.h"
+#include "../IO/RazorIO.h"
 
 #if defined(_MSC_VER)
     #define RAZOR_CALL __cdecl
@@ -100,6 +101,26 @@ extern "C"
 		return nullptr;
 	}
 	
+	static int RAZOR_CALL Input_GetKey(int keyCode)
+	{
+		return (int)RazorIO::Get().GetStateForKey(static_cast<RazorKey>(keyCode));
+	}
+
+	static void RAZOR_CALL Transform_GetPosition(uint32_t entityId, float* x, float* y, float* z)
+	{
+		Ref<Entity> entity = Engine::Get().CurrentScene->GetEntity(static_cast<entt::entity>(entityId));
+		if (!entity) return;
+		Transform& t = entity->GetComponent<Transform>();
+		*x = t.Position.x; *y = t.Position.y; *z = t.Position.z;
+	}
+
+	static void RAZOR_CALL Transform_SetPosition(uint32_t entityId, float x, float y, float z)
+	{
+		Ref<Entity> entity = Engine::Get().CurrentScene->GetEntity(static_cast<entt::entity>(entityId));
+		if (!entity) return;
+		entity->GetComponent<Transform>().Position = glm::vec3(x, y, z);
+	}
+
 	void ScriptGlue::RegisterFunctions(Ref<Coral::ManagedAssembly> Assembly)
 	{
 		Assembly->AddInternalCall("Razor.InternalCalls", "Entity_HasComponent", (void*)Entity_HasComponent);
@@ -108,6 +129,9 @@ extern "C"
 		Assembly->AddInternalCall("Razor.InternalCalls", "Scene_GetEntitiesWithScriptComponent", (void*)Scene_GetEntitiesWithScriptComponent);
 		Assembly->AddInternalCall("Razor.InternalCalls", "Util_GetTypeIdForManagedType", (void*)Util_GetTypeIdForManagedType);
 		Assembly->AddInternalCall("Razor.InternalCalls", "Scene_GetComponentOnEntity", (void*)Scene_GetComponentOnEntity);
+		Assembly->AddInternalCall("Razor.InternalCalls", "Input_GetKey",           (void*)Input_GetKey);
+		Assembly->AddInternalCall("Razor.InternalCalls", "Transform_GetPosition",  (void*)Transform_GetPosition);
+		Assembly->AddInternalCall("Razor.InternalCalls", "Transform_SetPosition",  (void*)Transform_SetPosition);
 
 		Assembly->UploadInternalCalls();
 	}
