@@ -1,12 +1,62 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
     <OutputType>Library</OutputType>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <PlatformTarget>x64</PlatformTarget>
-    <OutputPath>Binaries</OutputPath>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <TargetFramework>net9.0</TargetFramework>
+    <Configurations>Debug;Release;Dist</Configurations>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <Platforms>AnyCpu;arm64;x64</Platforms>
+    <Configurations>debug;distribution;release</Configurations>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>false</Optimize>
+    <OutputPath>Binaries\net9.0\</OutputPath>
+    <IntermediateOutputPath>Intermediates\Debug\</IntermediateOutputPath>
+    <DefineConstants></DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>true</Optimize>
+    <OutputPath>Binaries\net9.0\</OutputPath>
+    <IntermediateOutputPath>Intermediates\Release\</IntermediateOutputPath>
+    <DefineConstants></DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Dist|x64' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <Optimize>true</Optimize>
+    <OutputPath>Binaries\net9.0\</OutputPath>
+    <IntermediateOutputPath>Intermediates\Dist\</IntermediateOutputPath>
+    <DefineConstants></DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+  </ItemGroup>
+  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+  </ItemGroup>
+  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Dist|x64' ">
+  </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="../../Razor-ScriptBridge/Razor-ScriptBridge.csproj" />
+    <Compile Include="Source\Player.cs" />
+    <Compile Include="Source\PlayerMovement.cs" />
+    <Compile Include="Source\TestBox.cs" />
+    <Compile Include="Source\TestBoxBodySystem.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Razor-ScriptBridge\Razor-ScriptBridge.csproj">
+      <Project>{E28ED71F-CE72-9875-37D3-92C823D682F7}</Project>
+      <Name>Razor-ScriptBridge</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>
