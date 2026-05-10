@@ -123,6 +123,23 @@ extern "C"
 		entity->GetComponent<Transform>().Position = glm::vec3(x, y, z);
 	}
 
+	static int RAZOR_CALL Collision_GetEventCount(uint32_t entityId)
+	{
+		Ref<Entity> entity = Engine::Get().CurrentScene->GetEntity(static_cast<entt::entity>(entityId));
+		if (!entity || !entity->HasComponent<CollisionComponent>()) return 0;
+		return static_cast<int>(entity->GetComponent<CollisionComponent>().Events.size());
+	}
+
+	static void RAZOR_CALL Collision_GetEvent(uint32_t entityId, int index, int* outType, uint32_t* outOtherId)
+	{
+		Ref<Entity> entity = Engine::Get().CurrentScene->GetEntity(static_cast<entt::entity>(entityId));
+		if (!entity || !entity->HasComponent<CollisionComponent>()) return;
+		const auto& events = entity->GetComponent<CollisionComponent>().Events;
+		if (index < 0 || index >= static_cast<int>(events.size())) return;
+		*outType    = static_cast<int>(events[index].Type);
+		*outOtherId = events[index].OtherEntityId;
+	}
+
 	void ScriptGlue::RegisterFunctions(Ref<Coral::ManagedAssembly> Assembly)
 	{
 		Assembly->AddInternalCall("Razor.InternalCalls", "Entity_HasComponent", (void*)Entity_HasComponent);
@@ -132,8 +149,10 @@ extern "C"
 		Assembly->AddInternalCall("Razor.InternalCalls", "Util_GetTypeIdForManagedType", (void*)Util_GetTypeIdForManagedType);
 		Assembly->AddInternalCall("Razor.InternalCalls", "Scene_GetComponentOnEntity", (void*)Scene_GetComponentOnEntity);
 		Assembly->AddInternalCall("Razor.InternalCalls", "Input_GetKey",           (void*)Input_GetKey);
-		Assembly->AddInternalCall("Razor.InternalCalls", "Transform_GetPosition",  (void*)Transform_GetPosition);
-		Assembly->AddInternalCall("Razor.InternalCalls", "Transform_SetPosition",  (void*)Transform_SetPosition);
+		Assembly->AddInternalCall("Razor.InternalCalls", "Transform_GetPosition",    (void*)Transform_GetPosition);
+		Assembly->AddInternalCall("Razor.InternalCalls", "Transform_SetPosition",    (void*)Transform_SetPosition);
+		Assembly->AddInternalCall("Razor.InternalCalls", "Collision_GetEventCount", (void*)Collision_GetEventCount);
+		Assembly->AddInternalCall("Razor.InternalCalls", "Collision_GetEvent",      (void*)Collision_GetEvent);
 
 		Assembly->UploadInternalCalls();
 	}

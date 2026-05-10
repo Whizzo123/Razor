@@ -4,17 +4,10 @@
 
 namespace Razor
 {
-	struct Transform;
-	struct Collider;
-
 	class CollisionSystem : public System
 	{
 	public:
-
-		CollisionSystem(Ref<Razor::Scene> Scene) : System(Scene)
-		{
-		}
+		CollisionSystem(Ref<Razor::Scene> Scene) : System(Scene) {}
 		void Run(float dt) override;
 	};
 }
-

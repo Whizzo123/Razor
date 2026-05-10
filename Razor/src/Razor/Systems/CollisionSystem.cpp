@@ -1,27 +1,54 @@
 #include "CollisionSystem.h"
 #include "../Component.h"
+#include "../Physics/Components/BoxBody.h"
+#include "../Physics/IPhysicsEngine.h"
+#include "../Engine.h"
+#include <unordered_map>
 
 namespace Razor
 {
-	void CollisionSystem::Run(float DeltaTime)
+	void CollisionSystem::Run(float dt)
 	{
-		auto View = CurrentScene->GetEntitiesWithComponents<Transform, Collider>();
-		for (auto OurEntity : View)
+		// Build reverse lookup: Jolt bodyId -> entt entity id
+		std::unordered_map<unsigned int, uint32_t> bodyToEntity;
+		for (auto entity : CurrentScene->GetEntitiesWithComponents<BoxBody>())
 		{
-			Transform& EntityTransform = CurrentScene->GetComponent<Transform>(OurEntity);
-			Collider& EntityCollider = CurrentScene->GetComponent<Collider>(OurEntity);
-			// Compare this entity with every other entity
-			for (auto ComparisonEntity : View)
+			BoxBody& body = CurrentScene->GetComponent<BoxBody>(entity);
+			bodyToEntity[body.bodyId] = static_cast<uint32_t>(entity);
+		}
+
+		IPhysicsEngine& physics = Engine::Get().GetPhysicsEngine();
+
+		for (auto entity : CurrentScene->GetEntitiesWithComponents<BoxBody>())
+		{
+			BoxBody& body = CurrentScene->GetComponent<BoxBody>(entity);
+			CollisionComponent* collComp = CurrentScene->TryGetComponent<CollisionComponent>(entity);
+
+			if (collComp)
+				collComp->Events.clear();
+
+			std::vector<ContactInfo> contacts = physics.GetContactInfo(body.bodyId);
+			for (const ContactInfo& contact : contacts)
 			{
-				Transform& ComparisonTransform = CurrentScene->GetComponent<Transform>(ComparisonEntity);
-				if (OurEntity != ComparisonEntity)
+				if (contact.mContactType == EContactType::Started)
 				{
-					float Distance = glm::distance(EntityTransform.Position, ComparisonTransform.Position);
-					if (Distance < EntityCollider.Radius)
+					if (body.OnCollisionStarted)
+						body.OnCollisionStarted();
+
+					if (collComp)
 					{
-						// COLLISION
-						RZ_CORE_INFO("COLLISION ALERT");
+						uint32_t otherId = UINT32_MAX;
+						auto it = bodyToEntity.find(contact.mOtherBodyId);
+						if (it != bodyToEntity.end()) otherId = it->second;
+						collComp->Events.push_back({ CollisionEventType::Started, otherId });
 					}
+				}
+				else if (contact.mContactType == EContactType::Ended && collComp)
+				{
+					uint32_t otherId = UINT32_MAX;
+					auto it = bodyToEntity.find(contact.mOtherBodyId);
+					if (it != bodyToEntity.end()) otherId = it->second;
+					collComp->Events.push_back({ CollisionEventType::Ended, otherId });
 				}
 			}
 		}

@@ -51,6 +51,12 @@ namespace Razor
 			return registry.get<T>(Entity);
 		}
 
+		template<typename T>
+		T* TryGetComponent(entt::entity Entity)
+		{
+			return registry.try_get<T>(Entity);
+		}
+
 		void RunSystems(float DeltaTime);
 		void CreateSystemInstance(const Razor::ScriptClass& Type);
 		std::vector<std::string> GetSystemNames() const;

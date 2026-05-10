@@ -177,6 +177,12 @@ namespace Razor
 			yaml_emitter_begin_map(Out);
 			yaml_emitter_end_map(Out);
 		}
+		if (InEntity.HasComponent<CollisionComponent>())
+		{
+			yaml_emitter_key(Out, "CollisionComponent");
+			yaml_emitter_begin_map(Out);
+			yaml_emitter_end_map(Out);
+		}
 
 		yaml_emitter_end_map(Out);
 	}
@@ -425,5 +431,7 @@ namespace Razor
 			Camera camera;
 			DeserializedEntity->AddComponent<Camera>(camera);
 		}
+		if (yaml_get_child(EntityNode, "CollisionComponent"))
+			DeserializedEntity->AddComponent<CollisionComponent>();
 	}
 }

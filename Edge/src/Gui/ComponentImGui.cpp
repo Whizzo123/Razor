@@ -16,6 +16,7 @@ namespace EdgeEditor
 		map["ScriptComponent"] = DrawScriptComponent;
 		map["BoxBody"] = DrawBoxBody;
 		map["Camera"] = DrawCamera;
+		map["CollisionComponent"] = DrawCollisionComponent;
 		return map;
 	}
 
@@ -180,8 +181,14 @@ namespace EdgeEditor
 			Razor::Camera& camera = InEntity->GetComponent<Razor::Camera>();
 			if (Razor::RazorImGui::CollapsingHeader("Camera"))
 			{
-				
+
 			}
 		}
+	}
+
+	void ComponentImGui::DrawCollisionComponent(Razor::Ref<Razor::Entity> InEntity)
+	{
+		if (InEntity->HasComponent<Razor::CollisionComponent>())
+			Razor::RazorImGui::CollapsingHeader("Collision Component");
 	}
 }
