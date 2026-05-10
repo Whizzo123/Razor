@@ -344,4 +344,9 @@ ImGuiViewport& RazorImGui::GetViewport(unsigned int ID)
 		}
 		return false;
 	}
+
+	bool RazorImGui::IsWindowHovered()
+	{
+		return ImGui::IsWindowHovered();
+	}
 }

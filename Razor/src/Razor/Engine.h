@@ -24,6 +24,7 @@ namespace Razor
 	class IPhysicsEngine;
 	class IPhysicsDebugRenderer;
 	class PhysicsDebugDrawBuffer;
+	class RSCameraPass;
 
 	struct Light;
 	struct RenderStageConfig;
@@ -165,6 +166,11 @@ namespace Razor
 		void RuntimeStop();
 		bool IsRuntimeRunning() const { return bIsRuntimeRunning.load(); }
 
+		void SetGameInputEnabled(bool bEnabled) { bIsGameInputEnabled.store(bEnabled); }
+		bool IsGameInputEnabled() const { return bIsGameInputEnabled.load(); }
+
+		void SetGameCameraViewportSize(uint32_t w, uint32_t h);
+
 		Ref<Scene> CurrentScene; /** Ref to the current scene we have*/
 
 		Ref<AssetDirectory> GetAssetDirectory();
@@ -202,6 +208,8 @@ namespace Razor
 		PhysicsDebugDrawBuffer* _mDebugDrawBuffer;
 
 		std::atomic<bool> bIsRuntimeRunning { false };
+		std::atomic<bool> bIsGameInputEnabled { true };
 		std::thread RuntimeThread;
+		std::shared_ptr<RSCameraPass> _mCameraPass;
 	};
 }

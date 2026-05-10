@@ -15,6 +15,7 @@ namespace EdgeEditor
 		map["DirectionalLight"] = DrawDirectionalLight;
 		map["ScriptComponent"] = DrawScriptComponent;
 		map["BoxBody"] = DrawBoxBody;
+		map["Camera"] = DrawCamera;
 		return map;
 	}
 
@@ -168,6 +169,18 @@ namespace EdgeEditor
 					}
 					
 				}
+			}
+		}
+	}
+
+	void ComponentImGui::DrawCamera(Razor::Ref<Razor::Entity> InEntity)
+	{
+		if (InEntity->HasComponent<Razor::Camera>())
+		{
+			Razor::Camera& camera = InEntity->GetComponent<Razor::Camera>();
+			if (Razor::RazorImGui::CollapsingHeader("Camera"))
+			{
+				
 			}
 		}
 	}

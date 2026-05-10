@@ -100,7 +100,7 @@ namespace Razor
 		_mCoordinator->RegisterSystem<RSMaterialPass>(RSMaterialPass(CurrentScene));
 		_mCoordinator->RegisterSystem<RSTransformationsPass>(RSTransformationsPass(CurrentScene));
 		_mCoordinator->RegisterSystem<RSDirectionalLightingPass>(RSDirectionalLightingPass(CurrentScene));
-		_mCoordinator->RegisterSystem<RSCameraPass>(RSCameraPass(CurrentScene, Renderer));
+		_mCameraPass = _mCoordinator->RegisterSystem<RSCameraPass>(RSCameraPass(CurrentScene, Renderer));
 		_mCoordinator->RegisterSystem<RSRenderPass>(RSRenderPass(CurrentScene, Renderer, ShaderIDMap, ShaderTypeMap));
 		_mCoordinator->RegisterSystem<RSPickBufferMaterialPass>(RSPickBufferMaterialPass(CurrentScene));
 		_mCoordinator->RegisterSystem<RSPickBufferRenderPass>(RSPickBufferRenderPass(CurrentScene, Renderer, ShaderIDMap));
@@ -254,6 +254,12 @@ namespace Razor
 		}
 		*CurrentScene = std::move(*MainScene);
 		_mAssetDirectory = CreateRef<AssetDirectory>(Path + "/" + LoadedProject->m_AssetDirectory);
+	}
+
+	void Engine::SetGameCameraViewportSize(uint32_t w, uint32_t h)
+	{
+		if (_mCameraPass)
+			_mCameraPass->SetViewportSize(w, h);
 	}
 
 	void Engine::RuntimeStart()

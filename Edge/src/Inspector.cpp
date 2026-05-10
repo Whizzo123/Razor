@@ -56,6 +56,10 @@ namespace EdgeEditor
 			{
 				Storage->SelectedEntity->AddComponent<Razor::BoxBody>();
 			}
+			if (Razor::RazorImGui::Button("Camera Component"))
+			{
+				Storage->SelectedEntity->AddComponent<Razor::Camera>();
+			}
 			for (const auto& component : Engine.GetScriptInterface().GetComponentTypes())
 			{
 				if (Razor::RazorImGui::Button(component.GetName().c_str()))
