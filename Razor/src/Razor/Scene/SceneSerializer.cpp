@@ -171,6 +171,12 @@ namespace Razor
 			yaml_emitter_value_float(Out, body.mMass);
 			yaml_emitter_end_map(Out);
 		}
+		if (InEntity.HasComponent<Camera>())
+		{
+			yaml_emitter_key(Out, "Camera");
+			yaml_emitter_begin_map(Out);
+			yaml_emitter_end_map(Out);
+		}
 
 		yaml_emitter_end_map(Out);
 	}
@@ -412,6 +418,12 @@ namespace Razor
 			}
 			body.mMass = yaml_as_float(yaml_get_child(BoxBodyComponent, "Mass"), 1.0f);
 			DeserializedEntity->AddComponent<BoxBody>(body);
+		}
+		auto CameraComponent = yaml_get_child(EntityNode, "Camera");
+		if (CameraComponent)
+		{
+			Camera camera;
+			DeserializedEntity->AddComponent<Camera>(camera);
 		}
 	}
 }

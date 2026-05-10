@@ -17,9 +17,10 @@ namespace Razor
 		for(auto CameraEntity : View)
 		{
 			Camera& GameCamera = CurrentScene->GetComponent<Camera>(CameraEntity);
+			Transform& CameraTransform = CurrentScene->GetComponent<Transform>(CameraEntity);
 			CameraProjection = glm::perspective(glm::radians(45.0f), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
-			CameraView = glm::lookAt(GameCamera.CameraPos, GameCamera.CameraPos + GameCamera.CameraFront, GameCamera.CameraUp);
-			CameraPos = GameCamera.CameraPos;
+			CameraView = glm::lookAt(CameraTransform.Position, CameraTransform.Position + GameCamera.CameraFront, GameCamera.CameraUp);
+			CameraPos = CameraTransform.Position;
 
 			for (auto& Pair : data.mEntityRenderProperties.Properties)
 			{
@@ -30,7 +31,7 @@ namespace Razor
 
 					Slot.AddProperty<glm::mat4>("projection", CameraProjection);
 					Slot.AddProperty<glm::mat4>("view", CameraView);
-					Slot.AddProperty<glm::vec3>("viewPos", GameCamera.CameraPos);
+					Slot.AddProperty<glm::vec3>("viewPos", CameraTransform.Position);
 				}
 			}
 		}
