@@ -32,19 +32,21 @@ namespace EdgeEditor
 		}
 		if (Razor::RazorImGui::BeginPopupModal(POPUP_NAME, nullptr))
 		{
-			Razor::RazorImGui::BeginTable("FileTable", 4);
-			std::vector<Razor::FilePath> files = GrabFiles(_mSearchStack.top());
 			bool bSelected = false;
-			for (const Razor::FilePath& file : files)
+			if (Razor::RazorImGui::BeginTable("FileTable", 4))
 			{
-				Razor::RazorImGui::TableNextColumn();
-				if (DrawFileGui(file))
+				std::vector<Razor::FilePath> files = GrabFiles(_mSearchStack.top());
+				for (const Razor::FilePath& file : files)
 				{
-					bSelected = true;
-					break;
+					Razor::RazorImGui::TableNextColumn();
+					if (DrawFileGui(file))
+					{
+						bSelected = true;
+						break;
+					}
 				}
+				Razor::RazorImGui::EndTable();
 			}
-			Razor::RazorImGui::EndTable();
 
 			if (bSelected)
 			{

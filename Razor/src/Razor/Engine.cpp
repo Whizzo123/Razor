@@ -69,7 +69,6 @@ namespace Razor
 		PlatformIO->RegisterInputCallbacks();
 		RazorGUI = std::make_unique<RazorImGui>();
 		RazorGUI->Setup(EngineWindow->GetWindowProvider());
-		RazorGUI->RegisterImGuiEvents();
 
 		_mDebugDrawBuffer = new PhysicsDebugDrawBuffer();
 		_mPhysicsDebugRenderer = CreateRef<JoltDebugRenderer>(_mDebugDrawBuffer);
