@@ -9,7 +9,7 @@ namespace Razor
 {
 	void CollisionSystem::Run(float dt)
 	{
-		// Build reverse lookup: Jolt bodyId -> entt entity id
+		// Built each frame — acceptable for current entity counts; cache if this becomes a hotspot
 		std::unordered_map<unsigned int, uint32_t> bodyToEntity;
 		for (auto entity : CurrentScene->GetEntitiesWithComponents<BoxBody>())
 		{

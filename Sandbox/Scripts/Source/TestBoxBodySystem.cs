@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Razor;
 
 namespace Sandbox
@@ -15,9 +10,9 @@ namespace Sandbox
             Log logger = new Log();
             foreach (uint id in entities)
             {
-                for(int i = 0; i < Collision.GetEventCount(id); i++) {
-                    CollisionEvent colEvent = Collision.GetEvent(id, i);
-                    logger.Print("Collided with entity:" + id);
+                foreach (CollisionEvent colEvent in Collision.GetEvents(id))
+                {
+                    logger.Print("Collided with entity: " + colEvent.OtherEntityId);
                 }
             }
         }
