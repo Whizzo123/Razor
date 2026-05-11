@@ -88,21 +88,24 @@ project "Razor"
 		libdirs
 		{
 			"%{prj.name}/vendor/JoltPhysics/Build/Linux_Debug",
-			"%{prj.name}/vendor/assimp/bin/" .. outputdir .. "/assimp"
+			"%{prj.name}/vendor/assimp/bin/" .. outputdir .. "/assimp",
+			"%{prj.name}/vendor/freetype/build/Debug"
 		}
 
 	filter {"configurations:Release", "system:linux"}
 		libdirs
 		{
 			"%{prj.name}/vendor/JoltPhysics/Build/Linux_Release",
-			"%{prj.name}/vendor/assimp/bin/" .. outputdir .. "/assimp"
+			"%{prj.name}/vendor/assimp/bin/" .. outputdir .. "/assimp",
+			"%{prj.name}/vendor/freetype/build/Release"
 		}
 
 	filter {"configurations:Dist", "system:linux"}
 		libdirs
 		{
 			"%{prj.name}/vendor/JoltPhysics/Build/Linux_Distribution",
-			"%{prj.name}/vendor/assimp/bin/" .. outputdir .. "/assimp"
+			"%{prj.name}/vendor/assimp/bin/" .. outputdir .. "/assimp",
+			"%{prj.name}/vendor/freetype/build/Dist"
 		}
 		
 
@@ -111,7 +114,8 @@ project "Razor"
 	libdirs
 	{	
 		"%{prj.name}/vendor/JoltPhysics/Build/VS2022_CL/Debug",
-		"%{prj.name}/vendor/assimp/bin/" .. outputdir .. "/assimp"
+		"%{prj.name}/vendor/assimp/bin/" .. outputdir .. "/assimp",
+		"%{prj.name}/vendor/freetype/build/Debug"
 	}
 
 	defines
@@ -119,37 +123,39 @@ project "Razor"
 		"JPH_FLOATING_POINT_EXCEPTIONS_ENABLED"
 	}
 
-    links
-    {
-        "GLFW",
-        "opengl32.lib",
-        "assimp",
-        "ImGui",
-        "yaml-cpp",
-        "Coral.Native",
-        "Jolt"
-    }
+	links
+	{
+		"GLFW",
+		"opengl32.lib",
+		"assimp",
+		"ImGui",
+		"yaml-cpp",
+		"Coral.Native",
+		"Jolt",
+		"freetyped"
+	}
 
 	filter "system:linux"
-	    links
-	    {
+		links
+		{
 			"GL",
-	        "dl",
-	        "pthread",
+			"dl",
+			"pthread",
 			"assimp",
-	        "GLFW",
-	        "ImGui",
-	        "yaml-cpp",
-	        "Coral.Native",
-	        "Jolt",
-			"z"
-	    }
-	 	linkoptions
-    	{
-        	"-Wl,--whole-archive",
-        	"-lJolt",
-        	"-Wl,--no-whole-archive"
-    	}
+			"GLFW",
+			"ImGui",
+			"yaml-cpp",
+			"Coral.Native",
+			"Jolt",
+			"z",
+			"freetyped"
+		}
+		linkoptions
+		{
+			"-Wl,--whole-archive",
+			"-lJolt",
+			"-Wl,--no-whole-archive"
+		}
 
 	filter { "system:linux" }
 		if _OPTIONS["display-backend"] == "wayland" then
@@ -206,9 +212,11 @@ project "Razor"
 
 	filter {"configurations:Debug", "system:windows"}
 		prebuildcommands {
-	    	'if not exist "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL\\Debug\\Jolt.lib" call "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\cmake_vs2022_cl.bat" -DUSE_STATIC_MSVC_RUNTIME_LIBRARY=OFF',
-    		'if not exist "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL\\Debug\\Jolt.lib" cmake --build "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL" --config Debug'
-    	}
+			'if not exist "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL\\Debug\\Jolt.lib" call "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\cmake_vs2022_cl.bat" -DUSE_STATIC_MSVC_RUNTIME_LIBRARY=OFF',
+			'if not exist "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL\\Debug\\Jolt.lib" cmake --build "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL" --config Debug',
+			'if not exist "%{wks.location}\\Razor\\vendor\\freetype\\build" cmake -S "%{wks.location}\\Razor\\vendor\\freetype" -B "%{wks.location}\\Razor\\vendor\\freetype\\build"',
+			'if not exist "%{wks.location}\\Razor\\vendor\\freetype\\build\\freetyped.lib" cmake --build "%{wks.location}\\Razor\\vendor\\freetype\\build"'
+		}
 	filter {"configurations:Debug", "system:linux"}
 		prebuildcommands {
 	    	 -- Configure step (only if build dir does not exist)
@@ -225,9 +233,15 @@ project "Razor"
 			'-DASSIMP_BUILD_ASSIMP_TOOLS=OFF; fi',
 			-- Assimp build step
 			'if [ ! -f "%{wks.location}/Razor/vendor/assimp/bin/' .. outputdir .. '/assimp/libassimp.a" ]; then ' ..
-        	'cmake --build "%{wks.location}/Razor/vendor/assimp/build" && ' ..
+			'cmake --build "%{wks.location}/Razor/vendor/assimp/build" && ' ..
 			'mkdir -p "%{wks.location}/Razor/vendor/assimp/bin/' .. outputdir .. '/assimp" && ' ..
-			'cp "%{wks.location}/Razor/vendor/assimp/build/lib/libassimp.a" "%{wks.location}/Razor/vendor/assimp/bin/' .. outputdir .. '/assimp/libassimp.a"; fi'
+			'cp "%{wks.location}/Razor/vendor/assimp/build/lib/libassimp.a" "%{wks.location}/Razor/vendor/assimp/bin/' .. outputdir .. '/assimp/libassimp.a"; fi',
+			-- freetype configure step
+			'if [! -d "%{wks.location}/Razor/vendor/freetype/build"]; then' ..
+			'cmake -S "%{wks.location}/Razor/vendor/freetype" -B "%{wks.location}/Razor/vendor/freetype/build"',
+			-- freetype build step
+			'if [! -f "%{wks.location}/Razor/vendor/freetype/build/freetyped.a"]; then' ..
+			'cmake --build "%{wks.location}/Razor/vendor/freetype/build"'
     	}
 		
 	filter "configurations:Debug"

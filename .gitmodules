@@ -25,3 +25,6 @@
 [submodule "Razor/vendor/JoltPhysics"]
 	path = Razor/vendor/JoltPhysics
 	url = https://github.com/Whizzo123/JoltPhysics
+[submodule "Razor/vendor/freetype"]
+	path = Razor/vendor/freetype
+	url = git@github.com:Whizzo123/freetype.git
