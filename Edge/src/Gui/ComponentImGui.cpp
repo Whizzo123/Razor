@@ -189,6 +189,6 @@ namespace EdgeEditor
 	void ComponentImGui::DrawCollisionComponent(Razor::Ref<Razor::Entity> InEntity)
 	{
 		if (InEntity->HasComponent<Razor::CollisionComponent>())
-			Razor::RazorImGui::CollapsingHeader("Collision Component");
+			Razor::RazorImGui::CollapsingHeader("Collision");
 	}
 }
