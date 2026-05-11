@@ -2,54 +2,6 @@ Scene: Untitled
 Entities:
   - Entity: 4
     Transform:
-      Position: [0, 0, 35]
-      Rotation: [0, 0, 0]
-      Scale: [0, 0, 0]
-    ScriptComponent:
-      []
-    Camera:
-      {}
-  - Entity: 3
-    Transform:
-      Position: [5, 0, 5.28765678]
-      Rotation: [0, 0, 0]
-      Scale: [0, 0, 0]
-    Mesh:
-      ModelKey: models/Cube.model
-    ScriptComponent:
-      - Sandbox.Player:
-          ScriptFields:
-            - Name:
-                Type: System.String
-                Data: Joe
-  - Entity: 2
-    Transform:
-      Position: [4.32268507e-06, 10, 0]
-      Rotation: [0, 0, 0]
-      Scale: [0, 0, 0]
-    Mesh:
-      ModelKey: models/Cube.model
-    ScriptComponent:
-      []
-    BoxBody:
-      UseGravity: true
-      IsStatic: false
-      MotionType: Dynamic
-      Mass: 1
-  - Entity: 1
-    Transform:
-      Position: [1, 0, -10]
-      Rotation: [0, 0, 0]
-      Scale: [0, 0, 0]
-    DirectionalLight:
-      Diffuse: [1, 1, 1]
-      Ambient: [1, 1, 1]
-      Specular: [1, 1, 1]
-      Direction: [1, 0, 0]
-    ScriptComponent:
-      []
-  - Entity: 0
-    Transform:
       Position: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [0, 0, 0]
@@ -62,5 +14,60 @@ Entities:
       IsStatic: true
       MotionType: Static
       Mass: 1
+  - Entity: 3
+    Transform:
+      Position: [1, 0, -10]
+      Rotation: [0, 0, 0]
+      Scale: [0, 0, 0]
+    DirectionalLight:
+      Diffuse: [1, 1, 1]
+      Ambient: [1, 1, 1]
+      Specular: [1, 1, 1]
+      Direction: [1, 0, 0]
+    ScriptComponent:
+      []
+  - Entity: 2
+    Transform:
+      Position: [4.32268507e-06, 10, 0]
+      Rotation: [0, 0, 0]
+      Scale: [0, 0, 0]
+    Mesh:
+      ModelKey: models/Cube.model
+    ScriptComponent:
+      - Sandbox.TestBox:
+          ScriptFields:
+            - Name:
+                Type: System.String
+                Data: ""
+    BoxBody:
+      UseGravity: true
+      IsStatic: false
+      MotionType: Dynamic
+      Mass: 1
+    CollisionComponent:
+      {}
+  - Entity: 1
+    Transform:
+      Position: [5, 0, 5.28765678]
+      Rotation: [0, 0, 0]
+      Scale: [0, 0, 0]
+    Mesh:
+      ModelKey: models/Cube.model
+    ScriptComponent:
+      - Sandbox.Player:
+          ScriptFields:
+            - Name:
+                Type: System.String
+                Data: Joe
+  - Entity: 0
+    Transform:
+      Position: [0, 0, 35]
+      Rotation: [0, 0, 0]
+      Scale: [0, 0, 0]
+    ScriptComponent:
+      []
+    Camera:
+      {}
 Systems:
   - Sandbox.PlayerMovement
+  - Sandbox.TestBoxBodySystem

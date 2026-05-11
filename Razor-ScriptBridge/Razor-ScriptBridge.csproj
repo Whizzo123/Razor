@@ -47,6 +47,7 @@
   <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Dist|x64' ">
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Source\Razor\Collision.cs" />
     <Compile Include="Source\Razor\Component.cs" />
     <Compile Include="Source\Razor\Entity.cs" />
     <Compile Include="Source\Razor\Input.cs" />

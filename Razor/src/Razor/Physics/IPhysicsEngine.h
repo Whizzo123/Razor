@@ -25,6 +25,7 @@ namespace Razor
 		EContactType mContactType;
 		unsigned int mOtherBodyId;
 		bool mContactProcessed;
+		// TODO: extend with normal and penetration depth from JPH::ContactManifold when needed
 
 		bool operator==(const ContactInfo& other) const
 		{

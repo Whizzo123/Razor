@@ -27,6 +27,7 @@ namespace EdgeEditor
 		static void DrawScriptComponent(Razor::Ref<Razor::Entity> InEntity);
 		static void DrawBoxBody(Razor::Ref<Razor::Entity> inEntity);
 		static void DrawCamera(Razor::Ref<Razor::Entity> InEntity);
+		static void DrawCollisionComponent(Razor::Ref<Razor::Entity> InEntity);
 	private:
 		static std::unordered_map<std::string, ComponentDrawer> _ComponentDrawers;
 		static Razor::Ref<AssetPickerPopupWindow> _mAssetPickerPopup;

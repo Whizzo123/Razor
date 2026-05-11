@@ -137,4 +137,17 @@ namespace Razor
 		ScriptComponent() = default;
 		ScriptComponent(const ScriptComponent&) = default;
 	};
+
+	enum class CollisionEventType { Started, Ended };
+
+	struct CollisionEvent
+	{
+		CollisionEventType Type;
+		uint32_t OtherEntityId;
+	};
+
+	struct CollisionComponent
+	{
+		std::vector<CollisionEvent> Events;
+	};
 }
