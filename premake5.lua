@@ -112,9 +112,10 @@ project "Razor"
 	filter "system:windows"
 
 	libdirs
-	{	
+	{
 		"%{prj.name}/vendor/JoltPhysics/Build/VS2022_CL/Debug",
-		"%{prj.name}/vendor/assimp/bin/" .. outputdir .. "/assimp",
+		"%{prj.name}/vendor/assimp/bin/lib/Debug",
+		"%{prj.name}/vendor/assimp/bin/contrib/zlib/Debug",
 		"%{prj.name}/vendor/freetype/build/Debug"
 	}
 
@@ -127,7 +128,8 @@ project "Razor"
 	{
 		"GLFW",
 		"opengl32.lib",
-		"assimp",
+		"assimp-vc143-mtd",
+		"zlibstaticd",
 		"ImGui",
 		"yaml-cpp",
 		"Coral.Native",
@@ -212,10 +214,12 @@ project "Razor"
 
 	filter {"configurations:Debug", "system:windows"}
 		prebuildcommands {
-			'if not exist "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL\\Debug\\Jolt.lib" call "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\cmake_vs2022_cl.bat" -DUSE_STATIC_MSVC_RUNTIME_LIBRARY=OFF',
-			'if not exist "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL\\Debug\\Jolt.lib" cmake --build "%{wks.location}\\Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL" --config Debug',
-			'if not exist "%{wks.location}\\Razor\\vendor\\freetype\\build" cmake -S "%{wks.location}\\Razor\\vendor\\freetype" -B "%{wks.location}\\Razor\\vendor\\freetype\\build"',
-			'if not exist "%{wks.location}\\Razor\\vendor\\freetype\\build\\freetyped.lib" cmake --build "%{wks.location}\\Razor\\vendor\\freetype\\build"'
+			'if not exist "%{wks.location}Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL\\Debug\\Jolt.lib" call "%{wks.location}Razor\\vendor\\JoltPhysics\\Build\\cmake_vs2022_cl.bat" -DUSE_STATIC_MSVC_RUNTIME_LIBRARY=OFF',
+			'if not exist "%{wks.location}Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL\\Debug\\Jolt.lib" cmake --build "%{wks.location}Razor\\vendor\\JoltPhysics\\Build\\VS2022_CL" --config Debug',
+			'if not exist "%{wks.location}Razor\\vendor\\assimp\\bin" cmake -S "%{wks.location}Razor\\vendor\\assimp" -B "%{wks.location}Razor\\vendor\\assimp\\bin" -T v143 -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_SHARED_LIBS=OFF -DASSIMP_BUILD_TESTS=OFF -DASSIMP_BUILD_ASSIMP_TOOLS=OFF',
+			'if not exist "%{wks.location}Razor\\vendor\\assimp\\bin\\lib\\Debug\\assimp-vc143-mtd.lib" cmake --build "%{wks.location}Razor\\vendor\\assimp\\bin"',
+			'if not exist "%{wks.location}Razor\\vendor\\freetype\\build" cmake -S "%{wks.location}Razor\\vendor\\freetype" -B "%{wks.location}Razor\\vendor\\freetype\\build"',
+			'if not exist "%{wks.location}Razor\\vendor\\freetype\\build\\freetyped.lib" cmake --build "%{wks.location}Razor\\vendor\\freetype\\build"'
 		}
 	filter {"configurations:Debug", "system:linux"}
 		prebuildcommands {

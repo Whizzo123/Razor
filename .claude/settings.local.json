@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/c/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/MSBuild.exe *)",
+      "PowerShell(Start-Process \"C:\\\\Sandbox\\\\Razor\\\\bin\\\\Debug-windows-x86_64\\\\Edge\\\\Edge.exe\" -WorkingDirectory \"C:\\\\Sandbox\\\\Razor\")",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:buildermethods.com)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Sandbox\\\\Razor\" -Directory)",
+      "Bash(Select-Object Name)",
+      "Bash(Format-Table -HideTableHeaders)",
+      "Bash(xargs -I {} basename {})",
+      "Bash(Get-ChildItem *)",
+      "PowerShell(ls *)",
+      "Bash(grep -v \"//\")",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(dir RazorsrcRazorAssets *)",
+      "Bash(xargs grep *)",
+      "PowerShell(Get-Item \"C:\\\\Sandbox\\\\Razor\\\\bin\\\\Debug-windows-x86_64\\\\Edge\\\\Edge.exe\" | ForEach-Object { \"LastWriteTime: $\\($_.LastWriteTime\\)\" })",
+      "PowerShell(Get-ChildItem \"C:\\\\Sandbox\\\\Razor\\\\Sandbox\\\\Scripts\\\\Binaries\\\\\" -Recurse | Select-Object FullName, LastWriteTime | Where-Object { $_.FullName -match \"\\\\.dll$\" })",
+      "PowerShell(Get-ChildItem \"C:\\\\Sandbox\\\\Razor\\\\Sandbox\\\\Scripts\\\\\" -Recurse | Where-Object { $_.Name -match \"\\\\.dll$\" } | Select-Object FullName, LastWriteTime)",
+      "PowerShell(& \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"C:\\\\Sandbox\\\\Razor\\\\Razor.sln\" /p:Configuration=Debug /m /nologo /t:Edge 2>&1 | Select-Object -Last 30)",
+      "PowerShell(& \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"C:\\\\Sandbox\\\\Razor\\\\Razor.sln\" /p:Configuration=Debug /m /nologo 2>&1 | Select-Object -Last 20)",
+      "PowerShell(& \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"C:\\\\Sandbox\\\\Razor\\\\Edge\\\\Edge.vcxproj\" /p:Configuration=Debug /m /nologo /p:BuildProjectReferences=false 2>&1 | Select-Object -Last 25)",
+      "PowerShell(& \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"C:\\\\Sandbox\\\\Razor\\\\Edge\\\\Edge.vcxproj\" /p:Configuration=Debug /p:Platform=x64 /m /nologo /p:BuildProjectReferences=false 2>&1 | Select-Object -Last 25)",
+      "PowerShell(& \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"C:\\\\Sandbox\\\\Razor\\\\Edge\\\\Edge.vcxproj\" /p:Configuration=Debug /p:Platform=x64 /m /nologo /p:BuildProjectReferences=false 2>&1 | Select-Object -Last 10)",
+      "PowerShell(& \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"C:\\\\Sandbox\\\\Razor\\\\Razor.sln\" /p:Configuration=Debug /m /nologo 2>&1 | Select-Object -Last 15)",
+      "Bash(grep -E \"\\\\.\\(h|cpp\\)$\")",
+      "PowerShell(& \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"C:\\\\Sandbox\\\\Razor\\\\Razor.sln\" /p:Configuration=Debug /m /nologo 2>&1 | Select-Object -Last 12)",
+      "Bash(gh pr *)",
+      "Bash(gh issue *)",
+      "Bash(Select-Object FullName)"
+    ]
+  }
+}
