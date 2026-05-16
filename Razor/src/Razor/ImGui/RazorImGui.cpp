@@ -349,4 +349,9 @@ ImGuiViewport& RazorImGui::GetViewport(unsigned int ID)
 	{
 		return ImGui::IsWindowHovered();
 	}
+
+	bool RazorImGui::ColorPicker(const std::string& label, Ref<float[]> color)
+	{
+		return ImGui::ColorEdit3(label.c_str(), color.get(), 0);
+	}
 }

@@ -27,6 +27,11 @@ namespace Razor
 		{
 			for (const char* SystemType : StageConfig.StageSystemsToRun)
 			{
+				if(!_mRenderPipeline.mPipelineSystems[StageConfig.Stage][std::string(SystemType)])
+				{
+					RZ_CORE_ERROR("Render System {0} is null in pipeline systems has it not been registered", SystemType);
+					continue;
+				}
 				_mRenderPipeline.mPipelineSystems[StageConfig.Stage][std::string(SystemType)]->Render(_mRenderPipeline.mPipelineData);
 			}
 		}

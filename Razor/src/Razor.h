@@ -18,6 +18,7 @@
 #include "Razor/Systems/RSTransformationsPass.h"
 #include "Razor/Systems/RSPickBufferRenderPass.h"
 #include "Razor/Systems/RSPickBufferMaterialPass.h"
+#include "Razor/Systems/RSTextPass.h"
 #include "Razor/Renderer/Framebuffer.h"
 #include "Razor/Scene/SceneSerializer.h"
 #include "Razor/Scripting/ScriptInterface.h"
@@ -27,3 +28,5 @@
 #include "Razor/Assets/FilePath.h"
 #include "Razor/Assets/ModelSerializer.h"
 #include "Razor/Physics/Components/BoxBody.h"
+#include "Razor/Renderer/Font/Text.h"
+#include "Razor/Renderer/Shaders/DefaultTextShader.h"

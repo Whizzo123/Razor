@@ -3,13 +3,15 @@
 #include "../Core.h"
 #include "../Component.h"
 
-
 namespace Razor
 {
 	class Framebuffer;
 	class Window;
 	struct DebugLine;
 	struct DebugTriangle;
+	struct Bitmap;
+	class Text;
+	class Font;
 
 	struct RendererInfo
 	{
@@ -56,6 +58,20 @@ namespace Razor
 	enum class EPixelDataType
 	{
 		UNSIGNED_BYTE
+	};
+
+	enum class ETextureOption
+	{
+		WRAP_S,
+		WRAP_T,
+		MIN_FILTER,
+		MAG_FILTER
+	};
+
+	enum class ETextureValue
+	{
+		CLAMP_TO_EDGE,
+		LINEAR
 	};
 
 	class RAZOR_API IRenderer
@@ -222,6 +238,18 @@ namespace Razor
 		* @param TextureType - type of texture
 		*/
 		virtual void GenerateMipmap(ETextureType TextureType) = 0;
+
+		virtual void WriteTextureBitmapData(Bitmap& bitmap) = 0;
+
+		virtual void DisableByteAlignment() = 0;
+
+		virtual void SetByteAlignment(unsigned int alignment) = 0;
+
+		virtual void CreateText(Text& text) = 0;
+
+		virtual void RenderText(Text& text, Font& font) = 0;
+
+		virtual void SetTextureParameterInt(ETextureType TextureType, ETextureOption TextureOption, ETextureValue TextureValue) = 0;
 		//TODO remove this
 		Camera RendererCamera;
 	};

@@ -81,7 +81,8 @@ project "Razor"
 		"%{prj.name}/vendor/yaml-cpp/include",
 		"%{prj.name}/vendor/entt/src",
 		"%{prj.name}/vendor/Coral/Coral.Native/Include",
-		"%{prj.name}/vendor/JoltPhysics"
+		"%{prj.name}/vendor/JoltPhysics",
+		"%{prj.name}/vendor/freetype/include"
 	}
 
 	filter {"configurations:Debug", "system:linux"}

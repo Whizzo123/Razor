@@ -8,6 +8,18 @@ namespace Razor
 		float Y;
 	};
 
+	struct Vector2u
+	{
+		unsigned int X;
+		unsigned int Y;
+	};
+
+	struct Vector2i
+	{
+		int X;
+		int Y;
+	};
+
 	struct Vector3
 	{
 		float X;

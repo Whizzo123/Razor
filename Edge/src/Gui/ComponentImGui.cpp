@@ -17,6 +17,7 @@ namespace EdgeEditor
 		map["BoxBody"] = DrawBoxBody;
 		map["Camera"] = DrawCamera;
 		map["CollisionComponent"] = DrawCollisionComponent;
+		map["Text"] = DrawTextComponent;
 		return map;
 	}
 
@@ -190,5 +191,53 @@ namespace EdgeEditor
 	{
 		if (InEntity->HasComponent<Razor::CollisionComponent>())
 			Razor::RazorImGui::CollapsingHeader("Collision");
+	}
+
+
+	void ComponentImGui::DrawTextComponent(Razor::Ref<Razor::Entity> InEntity)
+	{
+		if (InEntity->HasComponent<Razor::Text>())
+		{
+			Razor::Text& text = InEntity->GetComponent<Razor::Text>();
+			if (Razor::RazorImGui::CollapsingHeader("Text"))
+			{
+				char buffer[256];
+				strncpy(buffer, text.GetText().c_str(), sizeof(buffer));
+				if (Razor::RazorImGui::InputText("Content", buffer, sizeof(buffer)))
+				{
+					text.SetText(buffer);
+				}
+			}
+			Razor::RazorImGui::Text(text.mFontKey.GetKey().c_str());
+
+			if (Razor::RazorImGui::Button("Pick"))
+			{
+				if (_mAssetPickerPopup == nullptr)
+				{
+					//TODO fix this hardcoded path please
+					_mAssetPickerPopup = Razor::CreateRef<AssetPickerPopupWindow>("C:/Sandbox/Razor/Sandbox/assets");
+				}
+			}
+			if (_mAssetPickerPopup)
+			{
+				if (_mAssetPickerPopup->Draw() == false)
+				{
+					if (_mAssetPickerPopup->GetSelectedAssetPath() != text.mFontKey.GetKey())
+					{
+						text.mFontKey = Razor::AssetKey{ _mAssetPickerPopup->GetSelectedAssetPath()};
+					}
+					_mAssetPickerPopup = nullptr;
+				}
+			}
+
+			Razor::Ref<float[]> color = Razor::CreateRef<float[]>(3);
+			color[0] = 1.0f;
+			color[1] = 1.0f;
+			color[2] = 1.0f;
+			if (Razor::RazorImGui::ColorPicker("Text Color", color))
+			{
+				text.mColor = Razor::Vector3{color[0], color[1], color[2]};
+			}
+		}
 	}
 }

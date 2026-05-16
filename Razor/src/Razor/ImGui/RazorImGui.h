@@ -126,6 +126,7 @@ namespace Razor
 		static bool InputText(const char* label, char* buf, size_t bufSize);
 		static bool CheckBox(const char* label, bool* value);
 		static bool IsWindowHovered();
+		static bool ColorPicker(const std::string& label, Ref<float[]> color);
 		
 	private:
 		static ImGuiViewport& GetViewport(unsigned int ID);

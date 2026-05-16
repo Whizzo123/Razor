@@ -8,6 +8,9 @@
 #include "../Window.h"
 #include "Debug/DebugLine.h"
 #include "Debug/DebugTriangle.h"
+#include "Textures/Bitmap.h"
+#include "Font/Text.h"
+#include "Font/Font.h"
 
 namespace Razor
 {
@@ -58,6 +61,20 @@ namespace Razor
         TextureTypeTranslation = std::unordered_map<ETextureType, GLenum>
         {
             {ETextureType::TEXTURE_2D, GL_TEXTURE_2D}
+        };
+
+        TextureOptionTranslation = std::unordered_map<ETextureOption, GLenum>
+        {
+            {ETextureOption::WRAP_S, GL_TEXTURE_WRAP_S},
+            {ETextureOption::WRAP_T, GL_TEXTURE_WRAP_T},
+            {ETextureOption::MIN_FILTER, GL_TEXTURE_MIN_FILTER},
+            {ETextureOption::MAG_FILTER, GL_TEXTURE_MAG_FILTER}
+        };
+
+        TextureValueTranslation = std::unordered_map<ETextureValue, GLenum>
+        {
+            {ETextureValue::CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE},
+            {ETextureValue::LINEAR, GL_LINEAR}
         };
 
         PixelDataFormatTranslation = std::unordered_map<EPixelDataFormat, GLenum>
@@ -318,5 +335,86 @@ namespace Razor
     void OpenGLRenderer::GenerateMipmap(ETextureType TextureType)
     {
         glGenerateMipmap(TextureTypeTranslation[TextureType]);
+    }
+    //TODO: We are gonna replace this type with our own type just copy what we need from FT_Bitmap into our own bitmap type
+    void OpenGLRenderer::WriteTextureBitmapData(Bitmap& bitmap)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, bitmap.width, bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE, bitmap.buffer.get());
+    }
+
+    void OpenGLRenderer::DisableByteAlignment()
+    {
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    }
+
+    void OpenGLRenderer::SetByteAlignment(unsigned int alignment)
+    {
+        glPixelStorei(GL_UNPACK_ALIGNMENT, alignment);
+    }
+
+    void OpenGLRenderer::CreateText(Text& text)
+    {
+        glGenVertexArrays(1, &text.mVao);
+        glGenBuffers(1, &text.mVbo);
+        glBindVertexArray(text.mVao);
+        glBindBuffer(GL_ARRAY_BUFFER, text.mVbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0); 
+    }
+
+    void OpenGLRenderer::RenderText(Text& text, Font& font)
+    {
+        // activate corresponding render state	
+        UseShader(text.mShader.ID);
+        text.mShader.SetVec3("textColor", glm::vec3 {text.mColor.X, text.mColor.Y, text.mColor.Z});
+        glActiveTexture(GL_TEXTURE0);
+        glBindVertexArray(text.mVao);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+        // iterate through all characters
+        const std::string message = text.GetText();
+        std::string::const_iterator c;
+        float x = text.mPosition.X;
+        for (c = message.begin(); c != message.end(); c++)
+        {
+            Character ch = font.getCharacter(*c);
+
+            float xpos = x + ch.mBearing.X * text.mScale;
+            float ypos = text.mPosition.Y - (ch.mSize.Y - ch.mBearing.Y) * text.mScale;
+
+            float w = ch.mSize.X * text.mScale;
+            float h = ch.mSize.Y * text.mScale;
+            // update VBO for each character
+            float vertices[6][4] = {
+                { xpos,     ypos + h,   0.0f, 0.0f },            
+                { xpos,     ypos,       0.0f, 1.0f },
+                { xpos + w, ypos,       1.0f, 1.0f },
+
+                { xpos,     ypos + h,   0.0f, 0.0f },
+                { xpos + w, ypos,       1.0f, 1.0f },
+                { xpos + w, ypos + h,   1.0f, 0.0f }           
+            };
+            // render glyph texture over quad
+            glBindTexture(GL_TEXTURE_2D, ch.mTextureID);
+            // update content of VBO memory
+            glBindBuffer(GL_ARRAY_BUFFER, text.mVbo);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices); 
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            // render quad
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+            // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
+            x += (ch.mAdvance >> 6) * text.mScale; // bitshift by 6 to get value in pixels (2^6 = 64)
+        }
+        glBindVertexArray(0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glDisable(GL_BLEND);
+    }
+
+    void OpenGLRenderer::SetTextureParameterInt(ETextureType TextureType, ETextureOption TextureOption, ETextureValue TextureValue)
+    {
+        glTexParameteri(TextureTypeTranslation[TextureType], TextureOptionTranslation[TextureOption], TextureValueTranslation[TextureValue]);
     }
 }

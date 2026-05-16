@@ -11,6 +11,8 @@
 #include "../Assert.h"
 #include "../Engine.h"
 #include "../Physics/Components/BoxBody.h"
+#include "../Renderer/Font/Text.h"
+#include "../Renderer/Shaders/DefaultTextShader.h"
 
 namespace Razor
 {
@@ -181,6 +183,20 @@ namespace Razor
 		{
 			yaml_emitter_key(Out, "CollisionComponent");
 			yaml_emitter_begin_map(Out);
+			yaml_emitter_end_map(Out);
+		}
+		if (InEntity.HasComponent<Text>())
+		{
+			yaml_emitter_key(Out, "Text");
+			yaml_emitter_begin_map(Out);
+
+			Text& text = InEntity.GetComponent<Text>();
+			yaml_emitter_key(Out, "Text");
+			yaml_emitter_value_string(Out, text.GetText().c_str());
+			yaml_emitter_key(Out, "Font");
+			yaml_emitter_value_string(Out, text.mFontKey.GetKey().c_str());
+			yaml_emitter_key(Out, "Color");
+			yaml_emitter_value_vec3(Out, text.mColor);
 			yaml_emitter_end_map(Out);
 		}
 
@@ -433,5 +449,16 @@ namespace Razor
 		}
 		if (yaml_get_child(EntityNode, "CollisionComponent"))
 			DeserializedEntity->AddComponent<CollisionComponent>();
+		auto TextComponent = yaml_get_child(EntityNode, "Text");
+		if (TextComponent)
+		{
+			std::string textContents = yaml_as_string(yaml_get_child(TextComponent, "Text"));
+			Vector3 color = yaml_as_vec3(yaml_get_child(TextComponent, "Color"));
+			AssetKey key(yaml_as_string(yaml_get_child(TextComponent, "Font")));
+			Text textComp(*Engine::Get().GetShaderForType(typeid(DefaultTextShader).name()), textContents);
+			textComp.mFontKey = key;
+			textComp.mColor = color;
+			DeserializedEntity->AddComponent<Text>(textComp);
+		}
 	}
 }

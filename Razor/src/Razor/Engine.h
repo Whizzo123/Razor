@@ -33,6 +33,8 @@ namespace Razor
 
 	using RenderPipelineConfig = std::vector<RenderStageConfig>;
 
+	class FontLoader;
+
 	/**
 	* Class that is responsible for loading up all the different pieces of the engine
 	* 
@@ -177,6 +179,8 @@ namespace Razor
 
 		IPhysicsEngine& GetPhysicsEngine();
 
+		FontLoader& GetFontLoader();
+
 		void PopulateRenderPipelineDebugData();
 
 		void ClearDebugDrawBuffer();
@@ -211,5 +215,6 @@ namespace Razor
 		std::atomic<bool> bIsGameInputEnabled { true };
 		std::thread RuntimeThread;
 		std::shared_ptr<RSCameraPass> _mCameraPass;
+		Scope<FontLoader> _mFontLoader;
 	};
 }

@@ -79,6 +79,7 @@ void Edge::Run()
 	// RSCameraPass is registered by Engine::InitSystems() — no explicit RegisterSystem call needed here
 	Razor::RenderPipelineConfig GamePipelineConfig;
 	GamePipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_MATERIAL_PASS, std::vector<const char*> { typeid(Razor::RSMaterialPass).name() } });
+	GamePipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_TEXT_PASS, std::vector<const char*> { typeid(Razor::RSTextPass).name() } });
 	GamePipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_LIGHTING_PASS, std::vector<const char*>
 	{
 		typeid(Razor::RSDirectionalLightingPass).name(),

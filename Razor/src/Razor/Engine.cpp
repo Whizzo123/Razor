@@ -5,6 +5,7 @@
 #include "Renderer/Model.h"
 #include "Renderer/Shaders/DefaultMeshShader.h"
 #include "Renderer/Shaders/DebugLightShader.h"
+#include "Renderer/Shaders/DefaultTextShader.h"
 #include "Systems/RSMaterialPass.h"
 #include "Systems/RSTransformationsPass.h"
 #include "Systems/RSDirectionalLightingPass.h"
@@ -18,6 +19,7 @@
 #include "Systems/RSPickBufferRenderPass.h"
 #include "Systems/RSPointLightingPass.h"
 #include "Systems/RSSpotLightingPass.h"
+#include "Systems/RSTextPass.h"
 #include "../Platform/OpenGL/OpenGLWindowProvider.h"
 #include "Scene/SceneSerializer.h"
 #include "ImGui/RazorImGui.h"
@@ -39,6 +41,7 @@
 #include "Physics/JoltPhysics/JoltPhysicsEngine.h"
 #include "Physics/JoltPhysics/JoltDebugRenderer.h"
 #include "Systems/PhysicsSystem.h"
+#include "Renderer/Font/FontLoader.h"
 
 namespace Razor
 {
@@ -85,6 +88,9 @@ namespace Razor
 		std::shared_ptr<Shader> PickShader = std::make_shared<PickBufferShader>();
 		ShaderIDMap[PickShader->ID] = PickShader;
 		ShaderTypeMap[std::string(typeid(PickBufferShader).name())] = PickShader;
+		std::shared_ptr<Shader> TextShader = std::make_shared<DefaultTextShader>();
+		ShaderIDMap[TextShader->ID] = TextShader;
+		ShaderTypeMap[std::string(typeid(DefaultTextShader).name())] = TextShader;
 
 		// TODO this should be nullptr move this logic to the EdgeEditor/Game
 		CurrentScene = CreateRef<Scene>("Untitled.rzscn");
@@ -95,7 +101,7 @@ namespace Razor
 		_mCoordinator->RegisterSystem<CollisionSystem>(CollisionSystem(CurrentScene));
 		_mCoordinator->RegisterSystem<CameraController>(CameraController(CurrentScene));
 		_mCoordinator->RegisterSystem<PhysicsSystem>(CurrentScene);
-
+		
 		//Render Systems
 		_mCoordinator->RegisterSystem<RSMaterialPass>(RSMaterialPass(CurrentScene));
 		_mCoordinator->RegisterSystem<RSTransformationsPass>(RSTransformationsPass(CurrentScene));
@@ -106,7 +112,9 @@ namespace Razor
 		_mCoordinator->RegisterSystem<RSPickBufferRenderPass>(RSPickBufferRenderPass(CurrentScene, Renderer, ShaderIDMap));
 		_mCoordinator->RegisterSystem<RSPointLightingPass>(RSPointLightingPass(CurrentScene));
 		_mCoordinator->RegisterSystem<RSSpotLightingPass>(RSSpotLightingPass(CurrentScene));
+		_mCoordinator->RegisterSystem<RSTextPass>(RSTextPass(CurrentScene));
 		
+		_mFontLoader = CreateScope<FontLoader>();
 	}
 
 	Engine::Engine()
@@ -322,5 +330,10 @@ namespace Razor
 		std::scoped_lock lock(_mDebugDrawBuffer->mutex);
 		_mDebugDrawBuffer->lines.clear();
 		_mDebugDrawBuffer->triangles.clear();
+	}
+
+	FontLoader& Engine::GetFontLoader()
+	{
+		return *_mFontLoader;
 	}
 }

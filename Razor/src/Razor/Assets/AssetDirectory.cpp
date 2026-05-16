@@ -3,6 +3,7 @@
 #include "ModelSerializer.h"
 #include "../Engine.h"
 #include "../Renderer/Shaders/DefaultMeshShader.h"
+#include "../Renderer/Font/FontLoader.h"
 #include "FilePath.h"
 
 namespace Razor
@@ -34,5 +35,13 @@ namespace Razor
 		MeshRenderer::InitMesh(model->GetModelMeshData());
 		model->SetModelShader(Engine::Get().GetShaderForType(typeid(DefaultMeshShader).name())->ID);
 		_mModelCache[assetPath] = AssetWrapper<Model>({ *model });
+	}
+
+	void AssetDirectory::LoadFont(const std::string& assetPath)
+	{
+		FilePath path = FilePath(_mRootFolder) + FilePath(assetPath);
+		std::string pathStr = static_cast<std::string>(path);
+		Font font(Engine::Get().GetFontLoader().LoadFontMap(pathStr));
+		_mFontCache[assetPath] = AssetWrapper<Font>({font});
 	}
 }
