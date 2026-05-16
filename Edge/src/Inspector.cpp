@@ -32,7 +32,7 @@ namespace EdgeEditor
 
 		Razor::Ref<Razor::Scene> CurrentScene = Engine.CurrentScene;
 		
-		if (Razor::RazorImGui::TreeNode(std::to_string((uint32_t)Storage->SelectedEntity->EntityHandle).c_str()))
+		if (Razor::RazorImGui::TreeNode(std::to_string((uint32_t)Storage->SelectedEntity->EntityHandle).c_str(), {0.0f, 0.0f}, true))
 		{
 			ComponentImGui::DrawComponents(Storage->SelectedEntity);
 			Razor::RazorImGui::TreePop();

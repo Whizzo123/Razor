@@ -207,36 +207,37 @@ namespace EdgeEditor
 				{
 					text.SetText(buffer);
 				}
-			}
-			Razor::RazorImGui::Text(text.mFontKey.GetKey().c_str());
+			
+				Razor::RazorImGui::Text(text.mFontKey.GetKey().c_str());
 
-			if (Razor::RazorImGui::Button("Pick"))
-			{
-				if (_mAssetPickerPopup == nullptr)
+				if (Razor::RazorImGui::Button("Pick"))
 				{
-					//TODO fix this hardcoded path please
-					_mAssetPickerPopup = Razor::CreateRef<AssetPickerPopupWindow>("C:/Sandbox/Razor/Sandbox/assets");
-				}
-			}
-			if (_mAssetPickerPopup)
-			{
-				if (_mAssetPickerPopup->Draw() == false)
-				{
-					if (_mAssetPickerPopup->GetSelectedAssetPath() != text.mFontKey.GetKey())
+					if (_mAssetPickerPopup == nullptr)
 					{
-						text.mFontKey = Razor::AssetKey{ _mAssetPickerPopup->GetSelectedAssetPath()};
+						//TODO fix this hardcoded path please
+						_mAssetPickerPopup = Razor::CreateRef<AssetPickerPopupWindow>("C:/Sandbox/Razor/Sandbox/assets");
 					}
-					_mAssetPickerPopup = nullptr;
 				}
-			}
+				if (_mAssetPickerPopup)
+				{
+					if (_mAssetPickerPopup->Draw() == false)
+					{
+						if (_mAssetPickerPopup->GetSelectedAssetPath() != text.mFontKey.GetKey())
+						{
+							text.mFontKey = Razor::AssetKey{ _mAssetPickerPopup->GetSelectedAssetPath()};
+						}
+						_mAssetPickerPopup = nullptr;
+					}
+				}
 
-			Razor::Ref<float[]> color = Razor::CreateRef<float[]>(3);
-			color[0] = 1.0f;
-			color[1] = 1.0f;
-			color[2] = 1.0f;
-			if (Razor::RazorImGui::ColorPicker("Text Color", color))
-			{
-				text.mColor = Razor::Vector3{color[0], color[1], color[2]};
+				Razor::Ref<float[]> color = Razor::CreateRef<float[]>(3);
+				color[0] = text.mColor.X;
+				color[1] = text.mColor.Y;
+				color[2] = text.mColor.Z;
+				if (Razor::RazorImGui::ColorPicker("Text Color", color))
+				{
+					text.mColor = Razor::Vector3{color[0], color[1], color[2]};
+				}
 			}
 		}
 	}

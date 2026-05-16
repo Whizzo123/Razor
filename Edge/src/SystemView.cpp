@@ -33,7 +33,7 @@ namespace EdgeEditor
 			CurrentScene->CreateSystemInstance(Engine.GetScriptInterface().GetType(SystemClassNames[selectedIdx]));
 		}
 
-		if (Razor::RazorImGui::TreeNode("Systems"))
+		if (Razor::RazorImGui::TreeNode("Systems", {0.0f, 0.0f}, true))
 		{
 			for (const auto& name : CurrentScene->GetSystemNames())
 			{
