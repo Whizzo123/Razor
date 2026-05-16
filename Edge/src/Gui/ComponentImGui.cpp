@@ -214,8 +214,7 @@ namespace EdgeEditor
 				{
 					if (_mAssetPickerPopup == nullptr)
 					{
-						//TODO fix this hardcoded path please
-						_mAssetPickerPopup = Razor::CreateRef<AssetPickerPopupWindow>("C:/Sandbox/Razor/Sandbox/assets");
+						_mAssetPickerPopup = Razor::CreateRef<AssetPickerPopupWindow>(Razor::Engine::Get().GetAssetDirectory()->GetRootFolder());
 					}
 				}
 				if (_mAssetPickerPopup)
