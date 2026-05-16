@@ -380,6 +380,13 @@ namespace Razor
         float x = text.mPosition.X;
         for (c = message.begin(); c != message.end(); c++)
         {
+            //TODO space actually should have a advance width even if no bitmap we should do that instead
+            // Char 32 is space so we just increment the advance to create a space
+            if (*c == 32)
+            {
+                x += (1600 >> 6) * text.mScale; // bitshift by 6 to get value in pixels (2^6 = 64)
+                continue;
+            }
             Character ch = font.getCharacter(*c);
 
             float xpos = x + ch.mBearing.X * text.mScale;
