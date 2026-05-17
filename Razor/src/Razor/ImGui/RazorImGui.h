@@ -106,13 +106,13 @@ namespace Razor
 		static bool InputFloat(const char* Label, float* Value, float Step = 0.0f, float StepFast = 0.0f, const char* Format = "%.3f", ImGuiInputTextFlags Flags = 0);
 		static bool CollapsingHeader(const char* Label, ImGuiTreeNodeFlags Flags = 0);
 		static void SameLine(float OffsetFromStartX = 0.0f, float Spacing = -1.0f);
-		static bool Button(const char* Label, const Vector2& Size = Vector2(0, 0));
+		static bool Button(const std::string& Label, const Vector2& Size = Vector2(0, 0));
 		static bool BeginPopupModal(const char* Name, bool* pOpen = nullptr, ImGuiWindowFlags Flags = 0);
 		static void EndPopup();
 		static void OpenPopup(const char* Name, ImGuiPopupFlags Flags = 0);
 		static void CloseCurrentPopup();
 		static void Text(const char* Text, ImGuiTextFlags Flags = 0);
-		static bool TreeNode(const char* Label);
+		static bool TreeNode(const char* Label, Vector2 Padding = Vector2(0, 0), bool bDefaultOpen = false);
 		static void TreePop();
 		static bool BeginPopup(const char* Name, ImGuiWindowFlags Flags = 0);
 		static bool BeginTable(const char* Name, int Columns, ImGuiTableFlags Flags = 0, const Vector2& OuterSize = Vector2(0, 0), int RowBgColor = -1);
@@ -126,6 +126,7 @@ namespace Razor
 		static bool InputText(const char* label, char* buf, size_t bufSize);
 		static bool CheckBox(const char* label, bool* value);
 		static bool IsWindowHovered();
+		static bool ColorPicker(const std::string& label, Ref<float[]> color);
 		
 	private:
 		static ImGuiViewport& GetViewport(unsigned int ID);

@@ -1,5 +1,6 @@
 #pragma once
 #include "IRenderer.h"
+#include "Font/Font.h"
 
 
 typedef unsigned int GLenum;
@@ -164,6 +165,18 @@ namespace Razor
 		* @param TextureType - type of texture
 		*/
 		void GenerateMipmap(ETextureType TextureType) override;
+
+		void WriteTextureBitmapData(Bitmap& bitmap) override;
+
+		void DisableByteAlignment() override;
+
+		void SetByteAlignment(unsigned int alignment) override;
+
+		void CreateText(Text& text) override;
+
+		void RenderText(Text& text, Font& font) override;
+
+		void SetTextureParameterInt(ETextureType TextureType, ETextureOption TextureOption, ETextureValue TextureValue) override;
 	private:
 		GLenum Translate(EStencilAction StencilAction);
 		GLenum Translate(EStencilFunc StencilFunction);
@@ -176,6 +189,8 @@ namespace Razor
 		std::unordered_map<EStatusParam, GLenum> StatusParamTranslation; /** Translation map for shader status param */
 		std::unordered_map<EProgramStatusParam, GLenum> ProgramStatusParamTranslation; /** Translation map for shader program status param */
 		std::unordered_map<ETextureType, GLenum> TextureTypeTranslation; /** Translation map for texture type */
+		std::unordered_map<ETextureOption, GLenum> TextureOptionTranslation; /** Translation map for texture option */
+		std::unordered_map<ETextureValue, GLenum> TextureValueTranslation; /** Translation map for texture value */
 		std::unordered_map<EPixelDataFormat, GLenum> PixelDataFormatTranslation; /** Translation map for pixel data format */
 		std::unordered_map<EPixelDataType, GLenum> PixelDataTypeTranslation; /** Translation map for pixel data type */
 

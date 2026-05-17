@@ -29,13 +29,13 @@ namespace EdgeEditor
 			CurrentScene->CreateEntity();
 		}
 
-		if (Razor::RazorImGui::TreeNode("Entities"))
+		if (Razor::RazorImGui::TreeNode("Entities", {0.0f, 0.0f}, true))
 		{
 			// Need wrapper for the view type not lovely to have
 			auto View = CurrentScene->GetEntitiesWithComponents<Razor::Transform>();
 			for (auto Entity : View)
 			{
-				if (Razor::RazorImGui::Button(std::to_string((uint32_t)Entity).c_str()))
+				if (Razor::RazorImGui::Button(std::to_string((uint32_t)Entity), {200.0f, 30.0f}))
 				{
 					Storage->SelectedEntity = CurrentScene->GetEntity(Entity);
 				}

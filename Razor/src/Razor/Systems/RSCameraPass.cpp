@@ -1,4 +1,5 @@
 #include "RSCameraPass.h"
+#include "../Renderer/Font/Text.h"
 
 namespace Razor
 {
@@ -9,6 +10,7 @@ namespace Razor
 		auto View = CurrentScene->GetEntitiesWithComponents<Camera>();
 
 		glm::mat4 CameraProjection = glm::mat4(1.0f);
+		glm::mat4 CameraProjectionOrtho = glm::mat4(1.0f);
 		glm::mat4 CameraView = glm::mat4(1.0f);
 		glm::vec3 CameraPos = glm::vec3(0.0f);
 
@@ -17,6 +19,7 @@ namespace Razor
 			Camera& GameCamera = CurrentScene->GetComponent<Camera>(CameraEntity);
 			Transform& CameraTransform = CurrentScene->GetComponent<Transform>(CameraEntity);
 			CameraProjection = glm::perspective(glm::radians(45.0f), AspectRatio, 0.1f, 100.0f);
+			CameraProjectionOrtho = glm::ortho(0.0f, static_cast<float>(ViewportWidth), 0.0f, static_cast<float>(ViewportHeight));
 			CameraView = glm::lookAt(CameraTransform.Position, CameraTransform.Position + GameCamera.CameraFront, GameCamera.CameraUp);
 			CameraPos = CameraTransform.Position;
 
@@ -31,6 +34,22 @@ namespace Razor
 					Slot.AddProperty<glm::mat4>("view", CameraView);
 					Slot.AddProperty<glm::vec3>("viewPos", CameraTransform.Position);
 				}
+			}
+		}
+
+		auto TextView = CurrentScene->GetEntitiesWithComponents<Text>();
+
+		for(auto TextEntity : TextView)
+		{
+			if (data.mEntityRenderProperties.Properties.find(TextEntity) == data.mEntityRenderProperties.Properties.end())
+			{
+				data.mEntityRenderProperties.Properties.insert(std::pair(TextEntity, ShaderProperty()));
+			}
+			ShaderProperty& Property = data.mEntityRenderProperties.Properties[TextEntity];
+			for (int i = 0; i < 1; i++)
+			{
+				ShaderPropertySlot& Slot = Property.GetPropertySlot(i);
+				Slot.AddProperty<glm::mat4>("projection", CameraProjectionOrtho);
 			}
 		}
 

@@ -2,6 +2,8 @@
 #include "../Assets/AssetDirectory.h"
 #include "../Engine.h"
 #include "../Renderer/Shaders/DefaultMeshShader.h"
+#include "../Renderer/Font/Text.h"
+#include "../Renderer/Font/Font.h"
 
 namespace Razor
 {
@@ -32,6 +34,35 @@ namespace Razor
 
 				Renderer->DrawMesh({ Child });
 			}
+			data.mEntityRenderProperties.Properties[EntityToRender].Clear();
+		}
+
+		auto TextView = CurrentScene->GetEntitiesWithComponents<Text>();
+
+ 		for (auto EntityToRender : TextView)
+		{
+			Text& EntityText = CurrentScene->GetComponent<Text>(EntityToRender);
+			Transform& EntityTransform = CurrentScene->GetComponent<Transform>(EntityToRender);
+			// TODO get rid of this raw pointer
+			AssetWrapper<Font>* Font = Engine::Get().GetAssetDirectory()->ProcessRequest<Razor::Font>(EntityText.mFontKey);
+			if(!Font)
+			{
+				RZ_CORE_WARN("No font for font key on text object");
+				return;
+			}
+			// TODO probably should also rely on a material
+			Renderer->UseShader(EntityText.mShader.ID);
+			if (data.mEntityRenderProperties.Properties.find(EntityToRender) == data.mEntityRenderProperties.Properties.end() || data.mEntityRenderProperties.Properties[EntityToRender].GetNumberOfSlots() == 0)
+			{
+				continue;
+			}
+			ShaderPropertySlot& Slot = data.mEntityRenderProperties.Properties[EntityToRender].GetPropertySlot(0);
+			
+			HandleProperties(Slot, CreateRef<Shader>(EntityText.mShader));
+
+			EntityText.mPosition = {EntityTransform.Position.x, EntityTransform.Position.y};
+			Renderer->RenderText(EntityText, Font->asset);
+			
 			data.mEntityRenderProperties.Properties[EntityToRender].Clear();
 		}
 

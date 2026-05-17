@@ -214,9 +214,9 @@ ImGuiViewport& RazorImGui::GetViewport(unsigned int ID)
 		ImGui::SameLine(OffsetFromStartX, Spacing);
 	}
 
-	bool RazorImGui::Button(const char* Label, const Vector2& Size)
+	bool RazorImGui::Button(const std::string& Label, const Vector2& Size)
 	{
-		return ImGui::Button(Label, ToImVec2(Size));
+		return ImGui::Button(Label.c_str(), ToImVec2(Size));
 	}
 
 	bool RazorImGui::BeginPopupModal(const char* Name, bool* pOpen, ImGuiWindowFlags Flags)
@@ -244,9 +244,17 @@ ImGuiViewport& RazorImGui::GetViewport(unsigned int ID)
 		ImGui::Text(Text, Flags);
 	}
 
-	bool RazorImGui::TreeNode(const char* Label)
+	bool RazorImGui::TreeNode(const char* Label, Vector2 Padding, bool bIsDefaultOpen)
 	{
-		return ImGui::TreeNode(Label);
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(Padding.X, Padding.Y));
+		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_FramePadding;
+		if (bIsDefaultOpen)
+		{
+			flags |= ImGuiTreeNodeFlags_DefaultOpen;
+		}
+		bool ret = ImGui::TreeNodeEx(Label, flags);
+		ImGui::PopStyleVar();
+		return ret;
 	}
 
 	void RazorImGui::TreePop()
@@ -348,5 +356,10 @@ ImGuiViewport& RazorImGui::GetViewport(unsigned int ID)
 	bool RazorImGui::IsWindowHovered()
 	{
 		return ImGui::IsWindowHovered();
+	}
+
+	bool RazorImGui::ColorPicker(const std::string& label, Ref<float[]> color)
+	{
+		return ImGui::ColorEdit3(label.c_str(), color.get(), 0);
 	}
 }

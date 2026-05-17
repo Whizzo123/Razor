@@ -32,7 +32,7 @@ namespace EdgeEditor
 
 		Razor::Ref<Razor::Scene> CurrentScene = Engine.CurrentScene;
 		
-		if (Razor::RazorImGui::TreeNode(std::to_string((uint32_t)Storage->SelectedEntity->EntityHandle).c_str()))
+		if (Razor::RazorImGui::TreeNode(std::to_string((uint32_t)Storage->SelectedEntity->EntityHandle).c_str(), {0.0f, 0.0f}, true))
 		{
 			ComponentImGui::DrawComponents(Storage->SelectedEntity);
 			Razor::RazorImGui::TreePop();
@@ -63,6 +63,11 @@ namespace EdgeEditor
 			if (Razor::RazorImGui::Button("Collision Component"))
 			{
 				Storage->SelectedEntity->AddComponent<Razor::CollisionComponent>();
+			}
+			if (Razor::RazorImGui::Button("Text Component"))
+			{
+				std::string text = "Text";
+				Storage->SelectedEntity->AddComponent<Razor::Text>(*Razor::Engine::Get().GetShaderForType(typeid(Razor::DefaultTextShader).name()), text);
 			}
 			for (const auto& component : Engine.GetScriptInterface().GetComponentTypes())
 			{

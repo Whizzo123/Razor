@@ -4,6 +4,7 @@
 #include <unordered_set>
 #include <unordered_map>
 #include "../Renderer/Model.h"
+#include "../Renderer/Font/Font.h"
 
 namespace Razor
 {
@@ -77,6 +78,14 @@ namespace Razor
 					LoadModel(requestkey.key);
 				}
 				return &(_mModelCache[requestkey]);
+			} 
+			else if constexpr (std::is_same_v<T, Font>)
+			{
+				if(_mFontCache.find(requestkey) == _mFontCache.end())
+				{
+					LoadFont(requestkey.key);
+				}
+				return &(_mFontCache[requestkey]);
 			}
 			return nullptr;
 		}
@@ -103,11 +112,13 @@ namespace Razor
 		std::vector<AssetKey> ProcessDirectory(const std::string& directoryPath);
 
 		void LoadModel(const std::string& assetPath);
+		void LoadFont(const std::string& assetPath);
 
 	private:
 		std::string _mRootFolder;
 
 		std::unordered_map<AssetKey, AssetWrapper<Model>, AssetKeyHash> _mModelCache;
+		std::unordered_map<AssetKey, AssetWrapper<Font>, AssetKeyHash> _mFontCache;
 	};
 }
 
