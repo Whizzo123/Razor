@@ -77,6 +77,10 @@ namespace EdgeEditor
 						_mAssetPickerPopup = nullptr;
 					}
 				}
+				if(Razor::RazorImGui::Button("Remove Component", {200.0f, 30.0f}))
+				{
+					InEntity->RemoveComponent<Razor::Mesh>();
+				}
 			}
 		}
 	}
@@ -88,7 +92,10 @@ namespace EdgeEditor
 			Razor::DirectionalLight& mesh = InEntity->GetComponent<Razor::DirectionalLight>();
 			if (Razor::RazorImGui::CollapsingHeader("Directional Light"))
 			{
-				// Nothing really here to show just now maybe in the future but at least we know it's there
+				if(Razor::RazorImGui::Button("Remove Component", {200.0f, 30.0f}))
+				{
+					InEntity->RemoveComponent<Razor::DirectionalLight>();
+				}
 			}
 		}
 	}
@@ -98,6 +105,8 @@ namespace EdgeEditor
 		if (InEntity->HasComponent<Razor::ScriptComponent>())
 		{
 			Razor::ScriptComponent& scriptComp = InEntity->GetComponent<Razor::ScriptComponent>();
+			std::vector<int> instancesToRemove;
+			int i = 0;
 			for (uint64_t instanceID : scriptComp.mScriptInstances)
 			{
 				Razor::ScriptInstance& instance = Razor::Engine::Get().GetScriptInterface().GetScriptInstance(instanceID);
@@ -117,9 +126,26 @@ namespace EdgeEditor
 							}
 						}
 					}
+					if(Razor::RazorImGui::Button("Remove Component", {200.0f, 30.0f}))
+					{
+						instancesToRemove.push_back(i);
+					}
 				}
+				i += 1;
 			}
 			
+			for (int idx : instancesToRemove)
+			{
+				std::vector<size_t>::iterator it = scriptComp.mScriptInstances.begin();
+				it += idx;
+				scriptComp.mScriptInstances.erase(it);
+			}
+			instancesToRemove.clear();
+
+			if(scriptComp.mScriptInstances.size() == 0)
+			{
+				InEntity->RemoveComponent<Razor::ScriptComponent>();
+			}
 		}
 	}
 
@@ -171,6 +197,10 @@ namespace EdgeEditor
 					}
 					
 				}
+				if(Razor::RazorImGui::Button("Remove Component", {200.0f, 30.0f}))
+				{
+					inEntity->RemoveComponent<Razor::BoxBody>();
+				}
 			}
 		}
 	}
@@ -182,7 +212,10 @@ namespace EdgeEditor
 			Razor::Camera& camera = InEntity->GetComponent<Razor::Camera>();
 			if (Razor::RazorImGui::CollapsingHeader("Camera"))
 			{
-
+				if(Razor::RazorImGui::Button("Remove Component", {200.0f, 30.0f}))
+				{
+					InEntity->RemoveComponent<Razor::Camera>();
+				}
 			}
 		}
 	}
@@ -190,7 +223,15 @@ namespace EdgeEditor
 	void ComponentImGui::DrawCollisionComponent(Razor::Ref<Razor::Entity> InEntity)
 	{
 		if (InEntity->HasComponent<Razor::CollisionComponent>())
-			Razor::RazorImGui::CollapsingHeader("Collision");
+		{
+			if (Razor::RazorImGui::CollapsingHeader("Collision"))
+			{
+				if(Razor::RazorImGui::Button("Remove Component", {200.0f, 30.0f}))
+				{
+					InEntity->RemoveComponent<Razor::CollisionComponent>();
+				}
+			}
+		}
 	}
 
 
@@ -236,6 +277,10 @@ namespace EdgeEditor
 				if (Razor::RazorImGui::ColorPicker("Text Color", color))
 				{
 					text.mColor = Razor::Vector3{color[0], color[1], color[2]};
+				}
+				if(Razor::RazorImGui::Button("Remove Component", {200.0f, 30.0f}))
+				{
+					InEntity->RemoveComponent<Razor::Text>();
 				}
 			}
 		}

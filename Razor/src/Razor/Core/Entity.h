@@ -31,6 +31,17 @@ namespace Razor
 			return _Scene->registry.get<T>(EntityHandle);
 		}
 
+		template<typename T>
+		bool RemoveComponent()
+		{
+			if(_Scene->registry.try_get<T>(EntityHandle))
+			{
+				_Scene->registry.remove<T>(EntityHandle);
+				return true;
+			}
+			return false;
+		}
+
 		entt::entity EntityHandle;
 
 	private:
