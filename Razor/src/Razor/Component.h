@@ -149,5 +149,6 @@ namespace Razor
 	struct CollisionComponent
 	{
 		std::vector<CollisionEvent> Events;
+		bool bIsTrigger;
 	};
 }

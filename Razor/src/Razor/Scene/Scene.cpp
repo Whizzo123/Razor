@@ -52,6 +52,7 @@ namespace Razor
 		CopyComponent<Collider>        (registry, copy->registry, entityMap);
 		CopyComponent<BoxBody>         (registry, copy->registry, entityMap);
 		CopyComponent<Input>           (registry, copy->registry, entityMap);
+		CopyComponent<CollisionComponent>           (registry, copy->registry, entityMap);
 
 		return copy;
 	}
@@ -118,7 +119,13 @@ namespace Razor
 			Vector3 pos = { transform.Position.x, transform.Position.y, transform.Position.z };
 			BoxBody& body = GetEntity(entity)->GetComponent<BoxBody>();
 			body.OnCollisionStarted = []() { RZ_CORE_INFO("Collision started"); };
-			body.bodyId = Engine::Get().GetPhysicsEngine().CreateBoxRigidBody(pos, body.mMass, body.mMotionType, body.mbIsStatic);
+			bool bIsTrigger = false;
+			if(GetEntity(entity)->HasComponent<CollisionComponent>())
+			{
+				bIsTrigger = GetEntity(entity)->GetComponent<CollisionComponent>().bIsTrigger;
+			}
+			body.bodyId = Engine::Get().GetPhysicsEngine().CreateBoxRigidBody(pos, body.mMass, body.mMotionType, body.mbIsStatic, bIsTrigger);
+			
 			if (body.bodyId == 0xFFFFFFFF)
 			{
 				RZ_CORE_ERROR("Scene(StartScene): -> Failed to create BoxBody physics body for entity");

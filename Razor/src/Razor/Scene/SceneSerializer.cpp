@@ -181,8 +181,11 @@ namespace Razor
 		}
 		if (InEntity.HasComponent<CollisionComponent>())
 		{
+			CollisionComponent& comp = InEntity.GetComponent<CollisionComponent>();
 			yaml_emitter_key(Out, "CollisionComponent");
 			yaml_emitter_begin_map(Out);
+			yaml_emitter_key(Out, "Trigger");
+			yaml_emitter_value_bool(Out, comp.bIsTrigger);
 			yaml_emitter_end_map(Out);
 		}
 		if (InEntity.HasComponent<Text>())
@@ -447,8 +450,13 @@ namespace Razor
 			Camera camera;
 			DeserializedEntity->AddComponent<Camera>(camera);
 		}
-		if (yaml_get_child(EntityNode, "CollisionComponent"))
-			DeserializedEntity->AddComponent<CollisionComponent>();
+		auto CollisionComponent = yaml_get_child(EntityNode, "CollisionComponent");
+		if (CollisionComponent)
+		{
+			Razor::CollisionComponent comp;
+			comp.bIsTrigger = yaml_as_bool(yaml_get_child(CollisionComponent, "Trigger"), false);
+			DeserializedEntity->AddComponent<Razor::CollisionComponent>(comp);
+		}
 		auto TextComponent = yaml_get_child(EntityNode, "Text");
 		if (TextComponent)
 		{

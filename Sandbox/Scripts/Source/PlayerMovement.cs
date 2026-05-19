@@ -17,12 +17,18 @@ namespace Sandbox
             {
                 Player player = Scene.GetComponent<Player>(id);
                 if (player == null) continue;
-                logger.Print("Player Name is: " + player.Name);
+
+                foreach (CollisionEvent colEvent in Collision.GetEvents(id))
+                {
+                    if(colEvent.Type == CollisionEventType.Started)
+                    {
+                        logger.Print("Collided with entity: " + colEvent.OtherEntityId);
+                        player.Direction *= -1;
+                    }
+                }
+
                 var pos = Transform.GetPosition(id);
-                if (Input.IsKeyPressed(RazorKey.W))
-                    Transform.SetPosition(id, pos.X, pos.Y, pos.Z + 5.0f * deltaTime);
-                if (Input.IsKeyPressed(RazorKey.S))
-                    Transform.SetPosition(id, pos.X, pos.Y, pos.Z - 5.0f * deltaTime);
+                Transform.SetPosition(id, pos.X + (5.0f * player.Direction * deltaTime), pos.Y, pos.Z);
             }
         }
     }

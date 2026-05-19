@@ -14,6 +14,7 @@ namespace Razor
 		for (auto entity : CurrentScene->GetEntitiesWithComponents<BoxBody>())
 		{
 			BoxBody& body = CurrentScene->GetComponent<BoxBody>(entity);
+			// TODO what happens if an entity is destroyed?
 			bodyToEntity[body.bodyId] = static_cast<uint32_t>(entity);
 		}
 
@@ -30,7 +31,7 @@ namespace Razor
 			std::vector<ContactInfo> contacts = physics.GetContactInfo(body.bodyId);
 			for (const ContactInfo& contact : contacts)
 			{
-				if (contact.mContactType == EContactType::Started)
+				if (contact.mContactType == EContactType::Started && !contact.mContactProcessed)
 				{
 					if (body.OnCollisionStarted)
 						body.OnCollisionStarted();

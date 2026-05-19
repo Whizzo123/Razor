@@ -165,6 +165,12 @@ namespace Razor
 		processContact(inSubShapePair.GetBody2ID(), inSubShapePair.GetBody1ID());
 	}
 
+	void MyContactListener::ClearContactMap()
+	{
+		std::scoped_lock lock(_mBodyContactMapMutex);
+		_mBodyContactMap.clear();
+	}
+
 	void MyBodyActivationListener::OnBodyActivated(const JPH::BodyID& inBodyID, uint64_t inBodyUserData)
 	{
 		std::cout << "A body got activated" << std::endl;
@@ -271,6 +277,7 @@ namespace Razor
 		if (accumulator >= fixedStep)
 		{
 			// Step the world
+			_mContactListener.ClearContactMap();
 			_mPhysicsSystem.Update(fixedStep, cCollisionSteps, _mTempAllocator.get(), _mJobSystem.get());
 			accumulator -= fixedStep;
 		}
@@ -305,7 +312,7 @@ namespace Razor
 		_mBodyInterface->SetLinearVelocity(JPH::BodyID(bodyId), jphVelocity);
 	}
 	
-	unsigned int JoltPhysicsEngine::CreateBoxRigidBody(Vector3 position, float mass, EPhysicsMotionType motionType, bool bIsStatic)
+	unsigned int JoltPhysicsEngine::CreateBoxRigidBody(Vector3 position, float mass, EPhysicsMotionType motionType, bool bIsStatic, bool bIsTrigger)
 	{
 		JPH::BodyInterface& interface = _mPhysicsSystem.GetBodyInterface();
 
@@ -341,6 +348,7 @@ namespace Razor
 		JPH::MassProperties massOverride;
 		massOverride.ScaleToMass(mass);
 		floor_settings.mMassPropertiesOverride = massOverride;
+		floor_settings.mIsSensor = bIsTrigger;
 
 		// Create the actual rigid body
 		JPH::Body* boxBody = interface.CreateBody(floor_settings); // Note that if we run out of bodies this can return nullptr
@@ -409,5 +417,12 @@ namespace Razor
 	std::vector<ContactInfo> JoltPhysicsEngine::GetContactInfo(unsigned int bodyId)
 	{
 		return _mContactListener.GetContactInfo(bodyId);
+	}
+
+	void JoltPhysicsEngine::MoveKinematic(unsigned int bodyId, Vector3 position, float deltaTime)
+	{
+		JPH::BodyInterface& interface = _mPhysicsSystem.GetBodyInterface();
+		//float deltaTime = 0.01f;
+		interface.MoveKinematic(static_cast<JPH::BodyID>(bodyId), JPH::RVec3Arg(position.X, position.Y, position.Z), interface.GetRotation(static_cast<JPH::BodyID>(bodyId)), deltaTime);
 	}
 }

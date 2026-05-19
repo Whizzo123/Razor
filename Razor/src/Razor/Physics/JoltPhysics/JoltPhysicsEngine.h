@@ -84,6 +84,8 @@ namespace Razor
 
 		std::vector<ContactInfo> GetContactInfo(unsigned int bodyId);
 
+		void ClearContactMap();
+
 	private:
 		std::unordered_map<JPH::BodyID, std::vector<ContactInfo>> _mBodyContactMap;
 		std::mutex _mBodyContactMapMutex {};
@@ -106,10 +108,11 @@ namespace Razor
 		void Simulate(float deltaTime) override;
 		Vector3 GetPosition(unsigned int bodyId) const override;
 		void ApplyLinearVelocity(unsigned int bodyId, const Vector3& velocity) override;
-		unsigned int CreateBoxRigidBody(Vector3 position, float mass, EPhysicsMotionType motionType, bool bIsStatic) override;
+		unsigned int CreateBoxRigidBody(Vector3 position, float mass, EPhysicsMotionType motionType, bool bIsStatic, bool bIsTrigger) override;
 		void SetGravity(unsigned int bodyId, bool useGravity) override;
 		void DestroyBody(unsigned int bodyId) override;
 		std::vector<ContactInfo> GetContactInfo(unsigned int bodyId) override;
+		void MoveKinematic(unsigned int bodyId, Vector3 position, float deltaTime) override;
 
 	private:
 		JPH::PhysicsSystem _mPhysicsSystem;

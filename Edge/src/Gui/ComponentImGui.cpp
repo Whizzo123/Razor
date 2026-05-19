@@ -125,6 +125,14 @@ namespace EdgeEditor
 								field.SetValue<std::string>(std::string(buffer));
 							}
 						}
+						else if (type == Razor::ScriptFieldType::Int)
+						{
+							Razor::Ref<int> value = Razor::CreateRef<int>(field.GetValue<int>());
+							if (Razor::RazorImGui::InputInt(field.Field.Name.c_str(), value))
+							{
+								field.SetValue<int>(*value);
+							}
+						}
 					}
 					if(Razor::RazorImGui::Button("Remove Component", {200.0f, 30.0f}))
 					{
@@ -226,6 +234,11 @@ namespace EdgeEditor
 		{
 			if (Razor::RazorImGui::CollapsingHeader("Collision"))
 			{
+				Razor::CollisionComponent& collision = InEntity->GetComponent<Razor::CollisionComponent>();
+				if(Razor::RazorImGui::CheckBox("Is Trigger", &collision.bIsTrigger))
+				{
+					
+				}
 				if(Razor::RazorImGui::Button("Remove Component", {200.0f, 30.0f}))
 				{
 					InEntity->RemoveComponent<Razor::CollisionComponent>();

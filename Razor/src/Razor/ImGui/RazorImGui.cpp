@@ -344,6 +344,15 @@ ImGuiViewport& RazorImGui::GetViewport(unsigned int ID)
 		return false;
 	}
 
+	bool RazorImGui::InputInt(const std::string& label, Ref<int> val)
+	{
+		if (ImGui::InputInt(label.c_str(), val.get()))
+		{
+			return true;
+		}
+		return false;
+	}
+
 	bool RazorImGui::CheckBox(const char* label, bool* value)
 	{
 		if (ImGui::Checkbox(label, value))

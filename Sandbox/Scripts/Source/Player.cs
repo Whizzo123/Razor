@@ -10,5 +10,6 @@ namespace Sandbox
     public class Player : Razor.Component
     {
         public string Name;
+        public int Direction;
     }
 }

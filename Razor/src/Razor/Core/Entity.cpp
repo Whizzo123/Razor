@@ -7,6 +7,10 @@ namespace Razor
 {
 	void Entity::AddScriptComponent(std::string className)
 	{
+		if(!HasComponent<ScriptComponent>())
+		{
+			AddComponent<ScriptComponent>();
+		}
 		ScriptComponent& comp = GetComponent<ScriptComponent>();
 		ScriptInterface& interface = Engine::Get().GetScriptInterface();
 		int instanceId = interface.CreateScriptInstance(interface.GetType(className));
