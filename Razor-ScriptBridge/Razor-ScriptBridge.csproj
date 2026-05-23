@@ -6,6 +6,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Configurations>Debug;Release;Dist</Configurations>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <Platforms>AnyCpu;arm64;x64</Platforms>
+    <Configurations>debug;distribution;release</Configurations>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <PlatformTarget>x64</PlatformTarget>
@@ -55,6 +57,7 @@
     <Compile Include="Source\Razor\Log.cs" />
     <Compile Include="Source\Razor\Scene.cs" />
     <Compile Include="Source\Razor\System.cs" />
+    <Compile Include="Source\Razor\Text.cs" />
     <Compile Include="Source\Razor\Transform.cs" />
   </ItemGroup>
 </Project>

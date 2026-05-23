@@ -1,3 +1,4 @@
+using System.Threading.Tasks.Dataflow;
 using Razor;
 
 namespace Sandbox
@@ -8,11 +9,23 @@ namespace Sandbox
         {
             var entities = Scene.GetEntitiesWithScriptComponent<TestBox>();
             Log logger = new Log();
-            foreach (uint id in entities)
+            foreach(uint id in entities)
             {
-                foreach (CollisionEvent colEvent in Collision.GetEvents(id))
+                var pos = Transform.GetPosition(id);
+                TestBox box = Scene.GetScriptComponent<TestBox>(id);
+                if(box.PlayerIndex == 0)
                 {
-                    logger.Print("Collided with entity: " + colEvent.OtherEntityId);
+                    if (Input.IsKeyPressed(RazorKey.W))
+                        Transform.SetPosition(id, pos.X, pos.Y + 5.0f * deltaTime, pos.Z);
+                    if (Input.IsKeyPressed(RazorKey.S))
+                        Transform.SetPosition(id, pos.X, pos.Y - 5.0f * deltaTime, pos.Z);
+                }
+                else
+                {
+                    if (Input.IsKeyPressed(RazorKey.A))
+                        Transform.SetPosition(id, pos.X, pos.Y + 5.0f * deltaTime, pos.Z);
+                    if (Input.IsKeyPressed(RazorKey.D))
+                        Transform.SetPosition(id, pos.X, pos.Y - 5.0f * deltaTime, pos.Z);
                 }
             }
         }

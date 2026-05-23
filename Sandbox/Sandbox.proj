@@ -1,4 +1,4 @@
 ProjectName: Sandbox
 AssetDirectory: assets
-DllDirectory: Scripts/Binaries/net9.0
+DllDirectory: Scripts/Binaries/net9.0/net9.0
 MainScenePath: /assets/scenes/Main.rzscn
