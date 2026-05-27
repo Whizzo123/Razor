@@ -9,6 +9,7 @@
 #include "../Utils/Vector.h"
 #include "../Physics/Components/BoxBody.h"
 #include "../Physics/IPhysicsEngine.h"
+#include "../Renderer/Font/Text.h"
 
 namespace
 {
@@ -53,6 +54,7 @@ namespace Razor
 		CopyComponent<BoxBody>         (registry, copy->registry, entityMap);
 		CopyComponent<Input>           (registry, copy->registry, entityMap);
 		CopyComponent<CollisionComponent>           (registry, copy->registry, entityMap);
+		CopyComponent<Text>           (registry, copy->registry, entityMap);
 
 		return copy;
 	}
