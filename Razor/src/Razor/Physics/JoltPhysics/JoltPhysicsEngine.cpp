@@ -124,8 +124,23 @@ namespace Razor
 	void MyContactListener::OnContactAdded(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings)
 	{
 		std::scoped_lock lock(_mBodyContactMapMutex);
-		_mBodyContactMap[inBody1.GetID()].push_back({ EContactType::Started, inBody2.GetID().GetIndex(), false });
-		_mBodyContactMap[inBody2.GetID()].push_back({ EContactType::Started, inBody1.GetID().GetIndex(), false });
+		std::vector<Vector3> body1ContactPoints;
+		JPH::RVec3 baseOffset = inManifold.mBaseOffset;
+		for (int i = 0; i < inManifold.mRelativeContactPointsOn1.size(); i++) 
+		{
+			JPH::Vec3 point = inManifold.mRelativeContactPointsOn1[i];
+			JPH::RVec3 worldContactPoint = baseOffset + point;
+			body1ContactPoints.push_back({worldContactPoint.GetX(), worldContactPoint.GetY(), worldContactPoint.GetZ()});
+		}
+		std::vector<Vector3> body2ContactPoints;
+		for (int i = 0; i < inManifold.mRelativeContactPointsOn2.size(); i++) 
+		{
+			JPH::Vec3 point = inManifold.mRelativeContactPointsOn2[i];
+			JPH::RVec3 worldContactPoint = baseOffset + point;
+			body2ContactPoints.push_back({worldContactPoint.GetX(), worldContactPoint.GetY(), worldContactPoint.GetZ()});
+		}
+		_mBodyContactMap[inBody1.GetID()].push_back({ EContactType::Started, inBody2.GetID().GetIndexAndSequenceNumber(), false, body1ContactPoints });
+		_mBodyContactMap[inBody2.GetID()].push_back({ EContactType::Started, inBody1.GetID().GetIndexAndSequenceNumber(), false, body2ContactPoints });
 	}
 
 	void MyContactListener::OnContactPersisted(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings)
@@ -312,14 +327,14 @@ namespace Razor
 		_mBodyInterface->SetLinearVelocity(JPH::BodyID(bodyId), jphVelocity);
 	}
 	
-	unsigned int JoltPhysicsEngine::CreateBoxRigidBody(Vector3 position, float mass, EPhysicsMotionType motionType, bool bIsStatic, bool bIsTrigger)
+	unsigned int JoltPhysicsEngine::CreateBoxRigidBody(Vector3 position, Vector3 scale, float mass, EPhysicsMotionType motionType, bool bIsStatic, bool bIsTrigger)
 	{
 		JPH::BodyInterface& interface = _mPhysicsSystem.GetBodyInterface();
 
 		// Next we can create a rigid body to serve as the floor, we make a large box
 		// Create the settings for the collision volume (the shape).
 		// Note that for simple shapes (like boxes) you can also directly construct a BoxShape.
-		JPH::BoxShapeSettings floor_shape_settings(JPH::Vec3(1.0f, 1.0f, 1.0f));
+		JPH::BoxShapeSettings floor_shape_settings(JPH::Vec3(scale.X, scale.Y, scale.Z));
 		floor_shape_settings.SetEmbedded(); // A ref counted object on the stack (base class RefTarget) should be marked as such to prevent it from being freed when its reference count goes to 0.
 
 		// Create the shape

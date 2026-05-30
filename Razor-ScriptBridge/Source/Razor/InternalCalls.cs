@@ -19,7 +19,7 @@ namespace Razor
         internal static delegate* unmanaged[Cdecl]<uint, float*, float*, float*, void> Transform_GetPosition;
         internal static delegate* unmanaged[Cdecl]<uint, float, float, float, void>    Transform_SetPosition;
         internal static delegate* unmanaged[Cdecl]<uint, int>                          Collision_GetEventCount;
-        internal static delegate* unmanaged[Cdecl]<uint, int, int*, uint*, void>       Collision_GetEvent;
+        internal static delegate* unmanaged[Cdecl]<uint, int, int*, uint*, float**, float**, float**, int*, void>       Collision_GetEvent;
          internal static delegate* unmanaged[Cdecl]<uint, IntPtr, void>				Text_SetText;
         internal static delegate* unmanaged[Cdecl]<uint, byte*, int, void>			Text_GetText;
         internal static delegate* unmanaged[Cdecl]<uint, float, float, float, void>	Text_SetColor;
@@ -111,8 +111,10 @@ namespace Razor
         public static CollisionEvent CollisionGetEvent(uint entityId, int index)
         {
             int type; uint otherId;
-            Collision_GetEvent(entityId, index, &type, &otherId);
-            return new CollisionEvent { Type = (CollisionEventType)type, OtherEntityId = otherId };
+            float* x, y, z;
+            int hitLength;
+            Collision_GetEvent(entityId, index, &type, &otherId, &x, &y, &z, &hitLength);
+            return new CollisionEvent { Type = (CollisionEventType)type, OtherEntityId = otherId, hitX = new ReadOnlySpan<float>(x, hitLength).ToArray(), hitY = new ReadOnlySpan<float>(y, hitLength).ToArray(), hitZ = new ReadOnlySpan<float>(z, hitLength).ToArray() };
         }
 
         public static T GetComponent<T>(uint entityId) where T : Component

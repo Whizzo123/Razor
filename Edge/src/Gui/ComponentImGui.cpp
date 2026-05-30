@@ -43,9 +43,21 @@ namespace EdgeEditor
 			{
 				if (Razor::RazorImGui::CollapsingHeader("Position"))
 				{
-					Razor::RazorImGui::InputFloat("X", &transform.Position.x);
-					Razor::RazorImGui::InputFloat("Y", &transform.Position.y);
-					Razor::RazorImGui::InputFloat("Z", &transform.Position.z);
+					Razor::RazorImGui::InputFloat("Pos X", &transform.Position.x);
+					Razor::RazorImGui::InputFloat("Pos Y", &transform.Position.y);
+					Razor::RazorImGui::InputFloat("Pos Z", &transform.Position.z);
+				}
+				if (Razor::RazorImGui::CollapsingHeader("Scale"))
+				{
+					Razor::RazorImGui::InputFloat("Sca X", &transform.Scale.x);
+					Razor::RazorImGui::InputFloat("Sca Y", &transform.Scale.y);
+					Razor::RazorImGui::InputFloat("Sca Z", &transform.Scale.z);
+				}
+				if (Razor::RazorImGui::CollapsingHeader("Rotation"))
+				{
+					Razor::RazorImGui::InputFloat("Rot X", &transform.Rotation.x);
+					Razor::RazorImGui::InputFloat("Rot Y", &transform.Rotation.y);
+					Razor::RazorImGui::InputFloat("Rot Z", &transform.Rotation.z);
 				}
 			}
 		}
@@ -131,6 +143,14 @@ namespace EdgeEditor
 							if (Razor::RazorImGui::InputInt(field.Field.Name.c_str(), value))
 							{
 								field.SetValue<int>(*value);
+							}
+						}
+						else if (type == Razor::ScriptFieldType::Float)
+						{
+							Razor::Ref<float> value = Razor::CreateRef<float>(field.GetValue<float>());
+							if (Razor::RazorImGui::InputFloat(field.Field.Name.c_str(), value.get()))
+							{
+								field.SetValue<float>(*value);
 							}
 						}
 					}

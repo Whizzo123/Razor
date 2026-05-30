@@ -48,7 +48,7 @@ namespace Razor
 			if(!Font)
 			{
 				RZ_CORE_WARN("No font for font key on text object");
-				return;
+				continue;
 			}
 			// TODO probably should also rely on a material
 			Renderer->UseShader(EntityText.mShader.ID);

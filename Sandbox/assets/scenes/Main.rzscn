@@ -2,15 +2,15 @@ Scene: Untitled
 Entities:
   - Entity: 6
     Transform:
-      Position: [700, 700, 0]
+      Position: [900, 700, 0]
       Rotation: [0, 0, 0]
-      Scale: [0, 0, 0]
+      Scale: [1, 1, 1]
     ScriptComponent:
       - Sandbox.Score:
           ScriptFields:
             - playerIndex:
                 Type: System.Int
-                Data: 0
+                Data: 1
             - score:
                 Type: System.Int
                 Data: 0
@@ -20,39 +20,42 @@ Entities:
       Color: [1, 1, 1]
   - Entity: 5
     Transform:
-      Position: [0, 0, 35]
+      Position: [15, 0, 0]
       Rotation: [0, 0, 0]
-      Scale: [0, 0, 0]
-    Camera:
-      {}
-  - Entity: 4
-    Transform:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [0, 0, 0]
+      Scale: [1, 5, 1]
     Mesh:
       ModelKey: models/Cube.model
     ScriptComponent:
-      - Sandbox.Player:
+      - Sandbox.TestBox:
           ScriptFields:
-            - Direction:
-                Type: System.Int
-                Data: 1
             - Name:
                 Type: System.String
-                Data: Joe
+                Data: ""
+            - PlayerIndex:
+                Type: System.Int
+                Data: 1
     BoxBody:
       UseGravity: false
       IsStatic: false
       MotionType: Kinematic
-      Mass: 1
+      Mass: 10000
     CollisionComponent:
       Trigger: true
+  - Entity: 4
+    Transform:
+      Position: [1, 0, -10]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    DirectionalLight:
+      Diffuse: [1, 1, 1]
+      Ambient: [1, 1, 1]
+      Specular: [1, 1, 1]
+      Direction: [1, 0, 0]
   - Entity: 3
     Transform:
-      Position: [-10, 0, 0]
+      Position: [-15, 0, 0]
       Rotation: [0, 0, 0]
-      Scale: [0, 0, 0]
+      Scale: [1, 5, 1]
     Mesh:
       ModelKey: models/Cube.model
     ScriptComponent:
@@ -73,48 +76,53 @@ Entities:
       Trigger: true
   - Entity: 2
     Transform:
-      Position: [1, 0, -10]
+      Position: [0, 0, 0]
       Rotation: [0, 0, 0]
-      Scale: [0, 0, 0]
-    DirectionalLight:
-      Diffuse: [1, 1, 1]
-      Ambient: [1, 1, 1]
-      Specular: [1, 1, 1]
-      Direction: [1, 0, 0]
-  - Entity: 1
-    Transform:
-      Position: [10, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [0, 0, 0]
+      Scale: [1, 1, 1]
     Mesh:
       ModelKey: models/Cube.model
     ScriptComponent:
-      - Sandbox.TestBox:
+      - Sandbox.Player:
           ScriptFields:
-            - Name:
-                Type: System.String
-                Data: ""
-            - PlayerIndex:
+            - BaseSpeed:
+                Type: System.Float
+                Data: 5
+            - Direction:
                 Type: System.Int
                 Data: 1
+            - Name:
+                Type: System.String
+                Data: Joe
+            - YDirection:
+                Type: System.Float
+                Data: 0
     BoxBody:
       UseGravity: false
       IsStatic: false
       MotionType: Kinematic
-      Mass: 10000
+      Mass: 1
     CollisionComponent:
       Trigger: true
+  - Entity: 1
+    Transform:
+      Position: [0, 0, 30]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    ScriptComponent:
+      []
+    Camera:
+      {}
   - Entity: 0
     Transform:
-      Position: [900, 700, 0]
+      Position: [700, 700, 0]
       Rotation: [0, 0, 0]
-      Scale: [0, 0, 0]
+      Scale: [1, 1, 1]
     ScriptComponent:
       - Sandbox.Score:
           ScriptFields:
             - playerIndex:
                 Type: System.Int
-                Data: 1
+                Data: 0
             - score:
                 Type: System.Int
                 Data: 0

@@ -119,6 +119,7 @@ namespace Razor
 		{
 			Transform& transform = GetEntity(entity)->GetComponent<Transform>();
 			Vector3 pos = { transform.Position.x, transform.Position.y, transform.Position.z };
+			Vector3 scale = { transform.Scale.x, transform.Scale.y, transform.Scale.z };
 			BoxBody& body = GetEntity(entity)->GetComponent<BoxBody>();
 			body.OnCollisionStarted = []() { RZ_CORE_INFO("Collision started"); };
 			bool bIsTrigger = false;
@@ -126,7 +127,7 @@ namespace Razor
 			{
 				bIsTrigger = GetEntity(entity)->GetComponent<CollisionComponent>().bIsTrigger;
 			}
-			body.bodyId = Engine::Get().GetPhysicsEngine().CreateBoxRigidBody(pos, body.mMass, body.mMotionType, body.mbIsStatic, bIsTrigger);
+			body.bodyId = Engine::Get().GetPhysicsEngine().CreateBoxRigidBody(pos, scale, body.mMass, body.mMotionType, body.mbIsStatic, bIsTrigger);
 			
 			if (body.bodyId == 0xFFFFFFFF)
 			{

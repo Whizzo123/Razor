@@ -10,6 +10,9 @@ namespace Sandbox
     public class Player : Razor.Component
     {
         public string Name;
+        public float BaseSpeed = 5.0f;
         public int Direction;
+
+        public float YDirection;
     }
 }

@@ -16,7 +16,7 @@ namespace Razor
 	ScriptFieldType ScriptField::GetType() const
 	{
 		if (Type == "None")    return ScriptFieldType::None;
-		if (Type == "System.Float")   return ScriptFieldType::Float;
+		if (Type == "System.Single")   return ScriptFieldType::Float;
 		if (Type == "System.Double")  return ScriptFieldType::Double;
 		if (Type == "System.Bool")    return ScriptFieldType::Bool;
 		if (Type == "System.Char")    return ScriptFieldType::Char;
@@ -34,7 +34,7 @@ namespace Razor
 		if (Type == "System.Vector4") return ScriptFieldType::Vector4;
 		if (Type == "Razor.Entity")  return ScriptFieldType::Entity;
 
-		RZ_CORE_ERROR("ScriptField::GetType() -> Unknown ScriptFieldType");
+		RZ_CORE_ERROR("ScriptField::GetType() -> Unknown ScriptFieldType {0}", Type);
 		return ScriptFieldType::None;
 	}
 }

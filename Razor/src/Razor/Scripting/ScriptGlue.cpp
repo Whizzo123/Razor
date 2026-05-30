@@ -131,7 +131,7 @@ extern "C"
 		return static_cast<int>(entity->GetComponent<CollisionComponent>().Events.size());
 	}
 
-	static void RAZOR_CALL Collision_GetEvent(uint32_t entityId, int index, int* outType, uint32_t* outOtherId)
+	static void RAZOR_CALL Collision_GetEvent(uint32_t entityId, int index, int* outType, uint32_t* outOtherId, float** outHitX, float** outHitY, float** outHitZ, int* hitLen)
 	{
 		Ref<Entity> entity = Engine::Get().CurrentScene->GetEntity(static_cast<entt::entity>(entityId));
 		if (!entity || !entity->HasComponent<CollisionComponent>()) return;
@@ -139,6 +139,22 @@ extern "C"
 		if (index < 0 || index >= static_cast<int>(events.size())) return;
 		*outType    = static_cast<int>(events[index].Type);
 		*outOtherId = events[index].OtherEntityId;
+		static std::vector<float> x;
+		static std::vector<float> y;
+		static std::vector<float> z;
+
+		*hitLen = events[index].mCollisionPoints.size();
+
+		for(int i = 0; i < *hitLen; i++)
+		{
+			Vector3 pos = events[index].mCollisionPoints[i];
+			x.push_back(pos.X);
+			y.push_back(pos.Y);
+			z.push_back(pos.Z);
+		}
+		*outHitX = &x[0];
+		*outHitY = &y[0];
+		*outHitZ = &z[0];
 	}
 
 	 static void RAZOR_CALL Text_SetText(uint32_t entityId, const char* text)

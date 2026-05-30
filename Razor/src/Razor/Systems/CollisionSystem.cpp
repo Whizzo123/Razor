@@ -41,7 +41,7 @@ namespace Razor
 						uint32_t otherId = UINT32_MAX;
 						auto it = bodyToEntity.find(contact.mOtherBodyId);
 						if (it != bodyToEntity.end()) otherId = it->second;
-						collComp->Events.push_back({ CollisionEventType::Started, otherId });
+						collComp->Events.push_back({ CollisionEventType::Started, otherId, contact.mCollisionPoints });
 					}
 				}
 				else if (contact.mContactType == EContactType::Ended && collComp)
@@ -49,7 +49,7 @@ namespace Razor
 					uint32_t otherId = UINT32_MAX;
 					auto it = bodyToEntity.find(contact.mOtherBodyId);
 					if (it != bodyToEntity.end()) otherId = it->second;
-					collComp->Events.push_back({ CollisionEventType::Ended, otherId });
+					collComp->Events.push_back({ CollisionEventType::Ended, otherId, contact.mCollisionPoints });
 				}
 			}
 		}
