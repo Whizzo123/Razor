@@ -10,6 +10,10 @@ namespace Razor
     {
         public CollisionEventType Type;
         public uint OtherEntityId;
+
+        public float[] hitX;
+        public float[] hitY;
+        public float[] hitZ;
     }
 
     public static class Collision

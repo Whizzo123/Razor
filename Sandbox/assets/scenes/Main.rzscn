@@ -1,43 +1,28 @@
 Scene: Untitled
 Entities:
+  - Entity: 6
+    Transform:
+      Position: [900, 700, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    ScriptComponent:
+      - Sandbox.Score:
+          ScriptFields:
+            - playerIndex:
+                Type: System.Int
+                Data: 1
+            - score:
+                Type: System.Int
+                Data: 0
+    Text:
+      Text: 0
+      Font: fonts/Roboto-Light.ttf
+      Color: [1, 1, 1]
   - Entity: 5
     Transform:
-      Position: [200, 700, 0]
+      Position: [15, 0, 0]
       Rotation: [0, 0, 0]
-      Scale: [0, 0, 0]
-    ScriptComponent:
-      []
-    Text:
-      Text: Pong Reborn
-      Font: fonts/Roboto-Light.ttf
-      Color: [0.852941155, 0.196510956, 0.196510956]
-  - Entity: 4
-    Transform:
-      Position: [0, 0, 35]
-      Rotation: [0, 0, 0]
-      Scale: [0, 0, 0]
-    ScriptComponent:
-      []
-    Camera:
-      {}
-  - Entity: 3
-    Transform:
-      Position: [5, 0, 5.28765678]
-      Rotation: [0, 0, 0]
-      Scale: [0, 0, 0]
-    Mesh:
-      ModelKey: models/Cube.model
-    ScriptComponent:
-      - Sandbox.Player:
-          ScriptFields:
-            - Name:
-                Type: System.String
-                Data: Joe
-  - Entity: 2
-    Transform:
-      Position: [-2.51499678e-05, 1.98950827, -4.45543674e-06]
-      Rotation: [0, 0, 0]
-      Scale: [0, 0, 0]
+      Scale: [1, 5, 1]
     Mesh:
       ModelKey: models/Cube.model
     ScriptComponent:
@@ -46,37 +31,106 @@ Entities:
             - Name:
                 Type: System.String
                 Data: ""
+            - PlayerIndex:
+                Type: System.Int
+                Data: 1
     BoxBody:
-      UseGravity: true
+      UseGravity: false
       IsStatic: false
-      MotionType: Dynamic
-      Mass: 1
-  - Entity: 1
+      MotionType: Kinematic
+      Mass: 10000
+    CollisionComponent:
+      Trigger: true
+  - Entity: 4
     Transform:
       Position: [1, 0, -10]
       Rotation: [0, 0, 0]
-      Scale: [0, 0, 0]
+      Scale: [1, 1, 1]
     DirectionalLight:
       Diffuse: [1, 1, 1]
       Ambient: [1, 1, 1]
       Specular: [1, 1, 1]
       Direction: [1, 0, 0]
-    ScriptComponent:
-      []
-  - Entity: 0
+  - Entity: 3
     Transform:
-      Position: [0, 0, 0]
+      Position: [-15, 0, 0]
       Rotation: [0, 0, 0]
-      Scale: [0, 0, 0]
+      Scale: [1, 5, 1]
     Mesh:
       ModelKey: models/Cube.model
     ScriptComponent:
-      []
+      - Sandbox.TestBox:
+          ScriptFields:
+            - Name:
+                Type: System.String
+                Data: ""
+            - PlayerIndex:
+                Type: System.Int
+                Data: 0
     BoxBody:
       UseGravity: false
-      IsStatic: true
-      MotionType: Static
+      IsStatic: false
+      MotionType: Kinematic
       Mass: 1
+    CollisionComponent:
+      Trigger: true
+  - Entity: 2
+    Transform:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh:
+      ModelKey: models/Cube.model
+    ScriptComponent:
+      - Sandbox.Player:
+          ScriptFields:
+            - BaseSpeed:
+                Type: System.Float
+                Data: 5
+            - Direction:
+                Type: System.Int
+                Data: 1
+            - Name:
+                Type: System.String
+                Data: Joe
+            - YDirection:
+                Type: System.Float
+                Data: 0
+    BoxBody:
+      UseGravity: false
+      IsStatic: false
+      MotionType: Kinematic
+      Mass: 1
+    CollisionComponent:
+      Trigger: true
+  - Entity: 1
+    Transform:
+      Position: [0, 0, 30]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    ScriptComponent:
+      []
+    Camera:
+      {}
+  - Entity: 0
+    Transform:
+      Position: [700, 700, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    ScriptComponent:
+      - Sandbox.Score:
+          ScriptFields:
+            - playerIndex:
+                Type: System.Int
+                Data: 0
+            - score:
+                Type: System.Int
+                Data: 0
+    Text:
+      Text: 0
+      Font: fonts/Roboto-Light.ttf
+      Color: [1, 1, 1]
 Systems:
   - Sandbox.PlayerMovement
   - Sandbox.TestBoxBodySystem
+  - Sandbox.ScoreSystem

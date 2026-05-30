@@ -143,6 +143,10 @@ namespace Razor
 	void Engine::Step()
 	{
 		float CurrentFrame = TimeProvider->GetTime();
+		if(LastFrame == 0.0f)
+		{
+			LastFrame = TimeProvider->GetTime();
+		}
 		DeltaTime = CurrentFrame - LastFrame;
 		LastFrame = CurrentFrame;
 	}
@@ -228,6 +232,7 @@ namespace Razor
 		}
 
 		ProjectSerializer::Serialize(LoadedProject->m_ProjectPath, LoadedProject);
+		SceneSerializer::Serialize(CurrentScene);
 	}
 
 	void Engine::LoadProject(const std::string& ProjectPath)
@@ -293,6 +298,7 @@ namespace Razor
 			//ProcessInputForGame()
 			RunSystems();
 		}
+		LastFrame = 0.0f;
 		RZ_CORE_INFO("Exiting Runtime Thread");
 	}
 

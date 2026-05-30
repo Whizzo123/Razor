@@ -16,14 +16,14 @@ namespace Razor
 	ScriptFieldType ScriptField::GetType() const
 	{
 		if (Type == "None")    return ScriptFieldType::None;
-		if (Type == "System.Float")   return ScriptFieldType::Float;
+		if (Type == "System.Single")   return ScriptFieldType::Float;
 		if (Type == "System.Double")  return ScriptFieldType::Double;
 		if (Type == "System.Bool")    return ScriptFieldType::Bool;
 		if (Type == "System.Char")    return ScriptFieldType::Char;
 		if (Type == "System.String")  return ScriptFieldType::String;
 		if (Type == "System.Byte")    return ScriptFieldType::Byte;
 		if (Type == "System.Short")   return ScriptFieldType::Short;
-		if (Type == "System.Int")     return ScriptFieldType::Int;
+		if (Type == "System.Int32")   return ScriptFieldType::Int;
 		if (Type == "System.Long")    return ScriptFieldType::Long;
 		if (Type == "System.UByte")   return ScriptFieldType::UByte;
 		if (Type == "System.UShort")  return ScriptFieldType::UShort;
@@ -34,7 +34,7 @@ namespace Razor
 		if (Type == "System.Vector4") return ScriptFieldType::Vector4;
 		if (Type == "Razor.Entity")  return ScriptFieldType::Entity;
 
-		RZ_CORE_ERROR("ScriptField::GetType() -> Unknown ScriptFieldType");
+		RZ_CORE_ERROR("ScriptField::GetType() -> Unknown ScriptFieldType {0}", Type);
 		return ScriptFieldType::None;
 	}
 }

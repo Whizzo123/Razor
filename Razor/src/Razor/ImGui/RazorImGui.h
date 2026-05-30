@@ -124,6 +124,7 @@ namespace Razor
 		static void SetWindowSize(const Vector2& Size);
 		static bool Combo(const char* label, const char** data, int dataLength, int* selectedIdx);
 		static bool InputText(const char* label, char* buf, size_t bufSize);
+		static bool InputInt(const std::string& label, Ref<int> val);
 		static bool CheckBox(const char* label, bool* value);
 		static bool IsWindowHovered();
 		static bool ColorPicker(const std::string& label, Ref<float[]> color);

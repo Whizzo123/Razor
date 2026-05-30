@@ -19,7 +19,12 @@ namespace Razor
         internal static delegate* unmanaged[Cdecl]<uint, float*, float*, float*, void> Transform_GetPosition;
         internal static delegate* unmanaged[Cdecl]<uint, float, float, float, void>    Transform_SetPosition;
         internal static delegate* unmanaged[Cdecl]<uint, int>                          Collision_GetEventCount;
-        internal static delegate* unmanaged[Cdecl]<uint, int, int*, uint*, void>       Collision_GetEvent;
+        internal static delegate* unmanaged[Cdecl]<uint, int, int*, uint*, float**, float**, float**, int*, void>       Collision_GetEvent;
+         internal static delegate* unmanaged[Cdecl]<uint, IntPtr, void>				Text_SetText;
+        internal static delegate* unmanaged[Cdecl]<uint, byte*, int, void>			Text_GetText;
+        internal static delegate* unmanaged[Cdecl]<uint, float, float, float, void>	Text_SetColor;
+        internal static delegate* unmanaged[Cdecl]<uint, float, void>				Text_SetScale;
+        internal static delegate* unmanaged<int*, uint*>							Scene_GetEntitiesWithText;
 
         public static void LogMsg(string msg)
         {
@@ -106,8 +111,10 @@ namespace Razor
         public static CollisionEvent CollisionGetEvent(uint entityId, int index)
         {
             int type; uint otherId;
-            Collision_GetEvent(entityId, index, &type, &otherId);
-            return new CollisionEvent { Type = (CollisionEventType)type, OtherEntityId = otherId };
+            float* x, y, z;
+            int hitLength;
+            Collision_GetEvent(entityId, index, &type, &otherId, &x, &y, &z, &hitLength);
+            return new CollisionEvent { Type = (CollisionEventType)type, OtherEntityId = otherId, hitX = new ReadOnlySpan<float>(x, hitLength).ToArray(), hitY = new ReadOnlySpan<float>(y, hitLength).ToArray(), hitZ = new ReadOnlySpan<float>(z, hitLength).ToArray() };
         }
 
         public static T GetComponent<T>(uint entityId) where T : Component
@@ -127,5 +134,36 @@ namespace Razor
                 return obj as T;
             }
         }
+
+		 public static void TextSetText(uint entityId, string text)
+ 		{
+ 		    IntPtr p = Marshal.StringToHGlobalAnsi(text);
+ 		    try { Text_SetText(entityId, p); }
+ 		    finally { Marshal.FreeHGlobal(p); }
+ 		}
+		
+ 		public static string TextGetText(uint entityId)
+ 		{
+ 		    byte[] buffer = new byte[512];
+ 		    fixed (byte* buf = buffer)
+ 		        Text_GetText(entityId, buf, buffer.Length);
+ 		    return Encoding.UTF8.GetString(buffer).TrimEnd('\0');
+ 		}
+		
+ 		public static void TextSetColor(uint entityId, float r, float g, float b)
+ 		    => Text_SetColor(entityId, r, g, b);
+		
+ 		public static void TextSetScale(uint entityId, float scale)
+ 		    => Text_SetScale(entityId, scale);
+		
+ 		public static List<uint> GetEntitiesWithText()
+ 		{
+ 		    int count;
+ 		    uint* ptr = Scene_GetEntitiesWithText(&count);
+ 		    var entities = new List<uint>();
+ 		    for (int i = 0; i < count; i++)
+ 		        entities.Add(ptr[i]);
+ 		    return entities;
+ 		}
     }
 }

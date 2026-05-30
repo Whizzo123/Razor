@@ -124,8 +124,23 @@ namespace Razor
 	void MyContactListener::OnContactAdded(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings)
 	{
 		std::scoped_lock lock(_mBodyContactMapMutex);
-		_mBodyContactMap[inBody1.GetID()].push_back({ EContactType::Started, inBody2.GetID().GetIndex(), false });
-		_mBodyContactMap[inBody2.GetID()].push_back({ EContactType::Started, inBody1.GetID().GetIndex(), false });
+		std::vector<Vector3> body1ContactPoints;
+		JPH::RVec3 baseOffset = inManifold.mBaseOffset;
+		for (int i = 0; i < inManifold.mRelativeContactPointsOn1.size(); i++) 
+		{
+			JPH::Vec3 point = inManifold.mRelativeContactPointsOn1[i];
+			JPH::RVec3 worldContactPoint = baseOffset + point;
+			body1ContactPoints.push_back({worldContactPoint.GetX(), worldContactPoint.GetY(), worldContactPoint.GetZ()});
+		}
+		std::vector<Vector3> body2ContactPoints;
+		for (int i = 0; i < inManifold.mRelativeContactPointsOn2.size(); i++) 
+		{
+			JPH::Vec3 point = inManifold.mRelativeContactPointsOn2[i];
+			JPH::RVec3 worldContactPoint = baseOffset + point;
+			body2ContactPoints.push_back({worldContactPoint.GetX(), worldContactPoint.GetY(), worldContactPoint.GetZ()});
+		}
+		_mBodyContactMap[inBody1.GetID()].push_back({ EContactType::Started, inBody2.GetID().GetIndexAndSequenceNumber(), false, body1ContactPoints });
+		_mBodyContactMap[inBody2.GetID()].push_back({ EContactType::Started, inBody1.GetID().GetIndexAndSequenceNumber(), false, body2ContactPoints });
 	}
 
 	void MyContactListener::OnContactPersisted(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings)
@@ -163,6 +178,12 @@ namespace Razor
 			};
 		processContact(inSubShapePair.GetBody1ID(), inSubShapePair.GetBody2ID());
 		processContact(inSubShapePair.GetBody2ID(), inSubShapePair.GetBody1ID());
+	}
+
+	void MyContactListener::ClearContactMap()
+	{
+		std::scoped_lock lock(_mBodyContactMapMutex);
+		_mBodyContactMap.clear();
 	}
 
 	void MyBodyActivationListener::OnBodyActivated(const JPH::BodyID& inBodyID, uint64_t inBodyUserData)
@@ -271,6 +292,7 @@ namespace Razor
 		if (accumulator >= fixedStep)
 		{
 			// Step the world
+			_mContactListener.ClearContactMap();
 			_mPhysicsSystem.Update(fixedStep, cCollisionSteps, _mTempAllocator.get(), _mJobSystem.get());
 			accumulator -= fixedStep;
 		}
@@ -305,14 +327,14 @@ namespace Razor
 		_mBodyInterface->SetLinearVelocity(JPH::BodyID(bodyId), jphVelocity);
 	}
 	
-	unsigned int JoltPhysicsEngine::CreateBoxRigidBody(Vector3 position, float mass, EPhysicsMotionType motionType, bool bIsStatic)
+	unsigned int JoltPhysicsEngine::CreateBoxRigidBody(Vector3 position, Vector3 scale, float mass, EPhysicsMotionType motionType, bool bIsStatic, bool bIsTrigger)
 	{
 		JPH::BodyInterface& interface = _mPhysicsSystem.GetBodyInterface();
 
 		// Next we can create a rigid body to serve as the floor, we make a large box
 		// Create the settings for the collision volume (the shape).
 		// Note that for simple shapes (like boxes) you can also directly construct a BoxShape.
-		JPH::BoxShapeSettings floor_shape_settings(JPH::Vec3(1.0f, 1.0f, 1.0f));
+		JPH::BoxShapeSettings floor_shape_settings(JPH::Vec3(scale.X, scale.Y, scale.Z));
 		floor_shape_settings.SetEmbedded(); // A ref counted object on the stack (base class RefTarget) should be marked as such to prevent it from being freed when its reference count goes to 0.
 
 		// Create the shape
@@ -341,6 +363,7 @@ namespace Razor
 		JPH::MassProperties massOverride;
 		massOverride.ScaleToMass(mass);
 		floor_settings.mMassPropertiesOverride = massOverride;
+		floor_settings.mIsSensor = bIsTrigger;
 
 		// Create the actual rigid body
 		JPH::Body* boxBody = interface.CreateBody(floor_settings); // Note that if we run out of bodies this can return nullptr
@@ -409,5 +432,12 @@ namespace Razor
 	std::vector<ContactInfo> JoltPhysicsEngine::GetContactInfo(unsigned int bodyId)
 	{
 		return _mContactListener.GetContactInfo(bodyId);
+	}
+
+	void JoltPhysicsEngine::MoveKinematic(unsigned int bodyId, Vector3 position, float deltaTime)
+	{
+		JPH::BodyInterface& interface = _mPhysicsSystem.GetBodyInterface();
+		//float deltaTime = 0.01f;
+		interface.MoveKinematic(static_cast<JPH::BodyID>(bodyId), JPH::RVec3Arg(position.X, position.Y, position.Z), interface.GetRotation(static_cast<JPH::BodyID>(bodyId)), deltaTime);
 	}
 }

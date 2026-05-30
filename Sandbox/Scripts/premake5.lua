@@ -24,7 +24,7 @@ project "Sandbox"
         prebuildcommands {
             'dotnet build "%{prj.location}/Sandbox.csproj"' ..
             ' -c %{cfg.buildcfg}' ..
-            ' -o "%{prj.location}/Binaries/net9.0"' ..
+            ' -o "%{prj.location}/Binaries"' ..
             ' --nologo'
         }
 

@@ -8,6 +8,7 @@
 #include "ScriptClass.h"
 #include "ScriptInterface.h"
 #include "../IO/RazorIO.h"
+#include "../Renderer/Font/Text.h"
 
 #if defined(_MSC_VER)
     #define RAZOR_CALL __cdecl
@@ -130,7 +131,7 @@ extern "C"
 		return static_cast<int>(entity->GetComponent<CollisionComponent>().Events.size());
 	}
 
-	static void RAZOR_CALL Collision_GetEvent(uint32_t entityId, int index, int* outType, uint32_t* outOtherId)
+	static void RAZOR_CALL Collision_GetEvent(uint32_t entityId, int index, int* outType, uint32_t* outOtherId, float** outHitX, float** outHitY, float** outHitZ, int* hitLen)
 	{
 		Ref<Entity> entity = Engine::Get().CurrentScene->GetEntity(static_cast<entt::entity>(entityId));
 		if (!entity || !entity->HasComponent<CollisionComponent>()) return;
@@ -138,7 +139,64 @@ extern "C"
 		if (index < 0 || index >= static_cast<int>(events.size())) return;
 		*outType    = static_cast<int>(events[index].Type);
 		*outOtherId = events[index].OtherEntityId;
+		static std::vector<float> x;
+		static std::vector<float> y;
+		static std::vector<float> z;
+
+		*hitLen = events[index].mCollisionPoints.size();
+
+		for(int i = 0; i < *hitLen; i++)
+		{
+			Vector3 pos = events[index].mCollisionPoints[i];
+			x.push_back(pos.X);
+			y.push_back(pos.Y);
+			z.push_back(pos.Z);
+		}
+		*outHitX = &x[0];
+		*outHitY = &y[0];
+		*outHitZ = &z[0];
 	}
+
+	 static void RAZOR_CALL Text_SetText(uint32_t entityId, const char* text)
+ 	{
+ 	    Ref<Entity> entity = Engine::Get().CurrentScene->GetEntity(static_cast<entt::entity>(entityId));
+ 	    if (!entity || !entity->HasComponent<Text>()) return;
+ 	    entity->GetComponent<Text>().SetText(text);
+ 	}
+
+ 	static void RAZOR_CALL Text_GetText(uint32_t entityId, char* buffer, int bufferSize)
+ 	{
+ 	    Ref<Entity> entity = Engine::Get().CurrentScene->GetEntity(static_cast<entt::entity>(entityId));
+ 	    if (!entity || !entity->HasComponent<Text>()) return;
+ 	    const std::string& txt = entity->GetComponent<Text>().GetText();
+ 	    strncpy(buffer, txt.c_str(), bufferSize - 1);
+ 	    buffer[bufferSize - 1] = '\0';
+ 	}
+
+ 	static void RAZOR_CALL Text_SetColor(uint32_t entityId, float r, float g, float b)
+ 	{
+ 	    Ref<Entity> entity = Engine::Get().CurrentScene->GetEntity(static_cast<entt::entity>(entityId));
+ 	    if (!entity || !entity->HasComponent<Text>()) return;
+ 	    entity->GetComponent<Text>().mColor = Vector3(r, g, b);
+ 	}
+
+ 	static void RAZOR_CALL Text_SetScale(uint32_t entityId, float scale)
+ 	{
+ 	    Ref<Entity> entity = Engine::Get().CurrentScene->GetEntity(static_cast<entt::entity>(entityId));
+ 	    if (!entity || !entity->HasComponent<Text>()) return;
+ 	    entity->GetComponent<Text>().mScale = scale;
+ 	}
+
+ 	static void* Scene_GetEntitiesWithText(int* count)
+ 	{
+ 	    static std::vector<uint32_t> ids;
+ 	    ids.clear();
+ 	    auto entities = Engine::Get().CurrentScene->GetEntitiesWithComponents<Text>();
+ 	    for (const entt::entity& e : entities)
+ 	        ids.push_back(static_cast<uint32_t>(e));
+ 	    *count = static_cast<int>(ids.size());
+ 	    return ids.data();
+ 	}
 
 	void ScriptGlue::RegisterFunctions(Ref<Coral::ManagedAssembly> Assembly)
 	{
@@ -153,6 +211,11 @@ extern "C"
 		Assembly->AddInternalCall("Razor.InternalCalls", "Transform_SetPosition",    (void*)Transform_SetPosition);
 		Assembly->AddInternalCall("Razor.InternalCalls", "Collision_GetEventCount", (void*)Collision_GetEventCount);
 		Assembly->AddInternalCall("Razor.InternalCalls", "Collision_GetEvent",      (void*)Collision_GetEvent);
+		Assembly->AddInternalCall("Razor.InternalCalls", "Text_SetText",              (void*)Text_SetText);
+ 		Assembly->AddInternalCall("Razor.InternalCalls", "Text_GetText",              (void*)Text_GetText);
+ 		Assembly->AddInternalCall("Razor.InternalCalls", "Text_SetColor",             (void*)Text_SetColor);
+ 		Assembly->AddInternalCall("Razor.InternalCalls", "Text_SetScale",             (void*)Text_SetScale);
+ 		Assembly->AddInternalCall("Razor.InternalCalls", "Scene_GetEntitiesWithText", (void*)Scene_GetEntitiesWithText);
 
 		Assembly->UploadInternalCalls();
 	}

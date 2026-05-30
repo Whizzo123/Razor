@@ -14,6 +14,7 @@ namespace Razor
 		for (auto entity : CurrentScene->GetEntitiesWithComponents<BoxBody>())
 		{
 			BoxBody& body = CurrentScene->GetComponent<BoxBody>(entity);
+			// TODO what happens if an entity is destroyed?
 			bodyToEntity[body.bodyId] = static_cast<uint32_t>(entity);
 		}
 
@@ -30,7 +31,7 @@ namespace Razor
 			std::vector<ContactInfo> contacts = physics.GetContactInfo(body.bodyId);
 			for (const ContactInfo& contact : contacts)
 			{
-				if (contact.mContactType == EContactType::Started)
+				if (contact.mContactType == EContactType::Started && !contact.mContactProcessed)
 				{
 					if (body.OnCollisionStarted)
 						body.OnCollisionStarted();
@@ -40,7 +41,7 @@ namespace Razor
 						uint32_t otherId = UINT32_MAX;
 						auto it = bodyToEntity.find(contact.mOtherBodyId);
 						if (it != bodyToEntity.end()) otherId = it->second;
-						collComp->Events.push_back({ CollisionEventType::Started, otherId });
+						collComp->Events.push_back({ CollisionEventType::Started, otherId, contact.mCollisionPoints });
 					}
 				}
 				else if (contact.mContactType == EContactType::Ended && collComp)
@@ -48,7 +49,7 @@ namespace Razor
 					uint32_t otherId = UINT32_MAX;
 					auto it = bodyToEntity.find(contact.mOtherBodyId);
 					if (it != bodyToEntity.end()) otherId = it->second;
-					collComp->Events.push_back({ CollisionEventType::Ended, otherId });
+					collComp->Events.push_back({ CollisionEventType::Ended, otherId, contact.mCollisionPoints });
 				}
 			}
 		}

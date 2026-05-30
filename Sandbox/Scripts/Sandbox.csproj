@@ -50,6 +50,8 @@
   <ItemGroup>
     <Compile Include="Source\Player.cs" />
     <Compile Include="Source\PlayerMovement.cs" />
+    <Compile Include="Source\Score.cs" />
+    <Compile Include="Source\ScoreSystem.cs" />
     <Compile Include="Source\TestBox.cs" />
     <Compile Include="Source\TestBoxBodySystem.cs" />
   </ItemGroup>
