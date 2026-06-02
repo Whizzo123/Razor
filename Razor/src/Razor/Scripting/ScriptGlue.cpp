@@ -35,7 +35,7 @@ extern "C"
 	{
 		static std::vector<uint32_t> ids;
 		ids.clear();
-		auto entities = Engine::Get().CurrentScene->GetEntitiesWithComponents<Transform>();
+		auto entities = Engine::Get().mCurrentScene->GetEntitiesWithComponents<Transform>();
 		for (const entt::entity& entity : entities) 
 		{
 			ids.push_back(static_cast<uint32_t>(entity));
@@ -48,7 +48,7 @@ extern "C"
 	{
 		static std::vector<uint32_t> ids;
 		ids.clear();
-		Ref<Scene> scene = Engine::Get().CurrentScene;
+		Ref<Scene> scene = Engine::Get().mCurrentScene;
 		ScriptInterface& interface = Engine::Get().GetScriptInterface();
 		auto entities = scene->GetEntitiesWithComponents<ScriptComponent>();
 		for (const entt::entity& entity : entities)
@@ -85,7 +85,7 @@ extern "C"
 
 	static void* Scene_GetComponentOnEntity(int typeId, uint32_t entityId)
 	{
-		Ref<Scene> scene = Engine::Get().CurrentScene;
+		Ref<Scene> scene = Engine::Get().mCurrentScene;
 		ScriptInterface& interface = Engine::Get().GetScriptInterface();
 
 		Ref<Entity> entity = scene->GetEntity(static_cast<entt::entity>(entityId));
@@ -111,7 +111,7 @@ extern "C"
 
 	static void RAZOR_CALL Transform_GetPosition(uint32_t entityId, float* x, float* y, float* z)
 	{
-		Ref<Entity> entity = Engine::Get().CurrentScene->GetEntity(static_cast<entt::entity>(entityId));
+		Ref<Entity> entity = Engine::Get().mCurrentScene->GetEntity(static_cast<entt::entity>(entityId));
 		if (!entity) return;
 		Transform& t = entity->GetComponent<Transform>();
 		*x = t.Position.x; *y = t.Position.y; *z = t.Position.z;
@@ -119,21 +119,21 @@ extern "C"
 
 	static void RAZOR_CALL Transform_SetPosition(uint32_t entityId, float x, float y, float z)
 	{
-		Ref<Entity> entity = Engine::Get().CurrentScene->GetEntity(static_cast<entt::entity>(entityId));
+		Ref<Entity> entity = Engine::Get().mCurrentScene->GetEntity(static_cast<entt::entity>(entityId));
 		if (!entity) return;
 		entity->GetComponent<Transform>().Position = glm::vec3(x, y, z);
 	}
 
 	static int RAZOR_CALL Collision_GetEventCount(uint32_t entityId)
 	{
-		Ref<Entity> entity = Engine::Get().CurrentScene->GetEntity(static_cast<entt::entity>(entityId));
+		Ref<Entity> entity = Engine::Get().mCurrentScene->GetEntity(static_cast<entt::entity>(entityId));
 		if (!entity || !entity->HasComponent<CollisionComponent>()) return 0;
 		return static_cast<int>(entity->GetComponent<CollisionComponent>().Events.size());
 	}
 
 	static void RAZOR_CALL Collision_GetEvent(uint32_t entityId, int index, int* outType, uint32_t* outOtherId, float** outHitX, float** outHitY, float** outHitZ, int* hitLen)
 	{
-		Ref<Entity> entity = Engine::Get().CurrentScene->GetEntity(static_cast<entt::entity>(entityId));
+		Ref<Entity> entity = Engine::Get().mCurrentScene->GetEntity(static_cast<entt::entity>(entityId));
 		if (!entity || !entity->HasComponent<CollisionComponent>()) return;
 		const auto& events = entity->GetComponent<CollisionComponent>().Events;
 		if (index < 0 || index >= static_cast<int>(events.size())) return;
@@ -159,14 +159,14 @@ extern "C"
 
 	 static void RAZOR_CALL Text_SetText(uint32_t entityId, const char* text)
  	{
- 	    Ref<Entity> entity = Engine::Get().CurrentScene->GetEntity(static_cast<entt::entity>(entityId));
+ 	    Ref<Entity> entity = Engine::Get().mCurrentScene->GetEntity(static_cast<entt::entity>(entityId));
  	    if (!entity || !entity->HasComponent<Text>()) return;
  	    entity->GetComponent<Text>().SetText(text);
  	}
 
  	static void RAZOR_CALL Text_GetText(uint32_t entityId, char* buffer, int bufferSize)
  	{
- 	    Ref<Entity> entity = Engine::Get().CurrentScene->GetEntity(static_cast<entt::entity>(entityId));
+ 	    Ref<Entity> entity = Engine::Get().mCurrentScene->GetEntity(static_cast<entt::entity>(entityId));
  	    if (!entity || !entity->HasComponent<Text>()) return;
  	    const std::string& txt = entity->GetComponent<Text>().GetText();
  	    strncpy(buffer, txt.c_str(), bufferSize - 1);
@@ -175,14 +175,14 @@ extern "C"
 
  	static void RAZOR_CALL Text_SetColor(uint32_t entityId, float r, float g, float b)
  	{
- 	    Ref<Entity> entity = Engine::Get().CurrentScene->GetEntity(static_cast<entt::entity>(entityId));
+ 	    Ref<Entity> entity = Engine::Get().mCurrentScene->GetEntity(static_cast<entt::entity>(entityId));
  	    if (!entity || !entity->HasComponent<Text>()) return;
  	    entity->GetComponent<Text>().mColor = Vector3(r, g, b);
  	}
 
  	static void RAZOR_CALL Text_SetScale(uint32_t entityId, float scale)
  	{
- 	    Ref<Entity> entity = Engine::Get().CurrentScene->GetEntity(static_cast<entt::entity>(entityId));
+ 	    Ref<Entity> entity = Engine::Get().mCurrentScene->GetEntity(static_cast<entt::entity>(entityId));
  	    if (!entity || !entity->HasComponent<Text>()) return;
  	    entity->GetComponent<Text>().mScale = scale;
  	}
@@ -191,7 +191,7 @@ extern "C"
  	{
  	    static std::vector<uint32_t> ids;
  	    ids.clear();
- 	    auto entities = Engine::Get().CurrentScene->GetEntitiesWithComponents<Text>();
+ 	    auto entities = Engine::Get().mCurrentScene->GetEntitiesWithComponents<Text>();
  	    for (const entt::entity& e : entities)
  	        ids.push_back(static_cast<uint32_t>(e));
  	    *count = static_cast<int>(ids.size());

@@ -22,7 +22,7 @@ namespace EdgeEditor
 		Razor::RazorImGui::SetWindowSize(Razor::Vector2(200.0f, 200.0f));
 		Razor::RazorImGui::Text("Hello Scene View, %d", 123);
 
-		Razor::Ref<Razor::Scene> CurrentScene = Engine.CurrentScene;
+		Razor::Ref<Razor::Scene> CurrentScene = Engine.mCurrentScene;
 
 		if(Razor::RazorImGui::Button("Add Entity"))
 		{

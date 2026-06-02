@@ -74,7 +74,7 @@ void Edge::Run()
 {
 	Razor::Engine& Engine = Razor::Engine::Get();
 
-	_mEditorCameraSystem = Engine.GetCoordinator()->RegisterSystem<EdgeEditor::RSEditorCamera>(EdgeEditor::RSEditorCamera(Engine.CurrentScene, Engine.GetRenderer(), EditorCamera.GetCamera()));
+	_mEditorCameraSystem = Engine.GetCoordinator()->RegisterSystem<EdgeEditor::RSEditorCamera>(EdgeEditor::RSEditorCamera(Engine.mCurrentScene, Engine.GetRenderer(), EditorCamera.GetCamera()));
 
 	// RSCameraPass is registered by Engine::InitSystems() — no explicit RegisterSystem call needed here
 	Razor::RenderPipelineConfig GamePipelineConfig;
@@ -113,9 +113,9 @@ void Edge::Run()
 
 	Engine.InitSystems();
 
-	SceneBuffer = Engine.Renderer->CreateFrameBuffer(300, 200);
-	PickBuffer  = Engine.Renderer->CreateFrameBuffer(300, 200);
-	GameBuffer  = Engine.Renderer->CreateFrameBuffer(300, 200);
+	SceneBuffer = Engine.mRenderer->CreateFrameBuffer(300, 200);
+	PickBuffer  = Engine.mRenderer->CreateFrameBuffer(300, 200);
+	GameBuffer  = Engine.mRenderer->CreateFrameBuffer(300, 200);
 
 	const char* path = "resources/models/Cube.obj";
 	Razor::Model DefaultModel;
@@ -137,10 +137,10 @@ void Edge::Run()
 	_mProjectExplorerWindow = EdgeEditor::ProjectExplorer(Storage);
 	EdgeEditor::SystemView SystemViewWindow;
 
-	Razor::SceneSerializer::Deserialize(Engine.CurrentScene);
+	Razor::SceneSerializer::Deserialize(Engine.mCurrentScene);
 	while (!Engine.ShouldEngineClose())
 	{
-		std::shared_ptr<Razor::IRenderer> Renderer = Engine.Renderer;
+		std::shared_ptr<Razor::IRenderer> Renderer = Engine.mRenderer;
 
 		const uint32_t SizeX     = static_cast<uint32_t>(std::max(0.0f, ViewportSize.X));
 		const uint32_t SizeY     = static_cast<uint32_t>(std::max(0.0f, ViewportSize.Y));
@@ -186,11 +186,11 @@ void Edge::Run()
 				CurrentPopup = nullptr;
 			}
 		}
-		Engine.GetGUI().EndFrame(Razor::Engine::Get().GetWindow(), Razor::Engine::Get().Renderer);
-		Engine.Renderer->SwapBuffer(Razor::Engine::Get().GetWindow());
+		Engine.GetGUI().EndFrame(Razor::Engine::Get().GetWindow(), Razor::Engine::Get().mRenderer);
+		Engine.mRenderer->SwapBuffer(Razor::Engine::Get().GetWindow());
 	}
-	Razor::SceneSerializer::Serialize(Engine.CurrentScene);
-	Razor::Engine::Get().Renderer->TerminateRendererAPI();
+	Razor::SceneSerializer::Serialize(Engine.mCurrentScene);
+	Razor::Engine::Get().mRenderer->TerminateRendererAPI();
 }
 
 void Edge::RenderSceneViewport(Razor::Ref<Razor::Framebuffer> SceneBuffer)
@@ -249,7 +249,7 @@ void Edge::PickObject(Razor::Vector2 MousePos)
 	std::uint32_t PickedEntity = 0;
 	PickedEntity = static_cast<std::uint32_t>(Pixel[0] * 255.0f) + (std::uint32_t(Pixel[1] * 255.0f) << 8)
 			+ (std::uint32_t(Pixel[2] * 255.0f) << 16);
-	Storage->SelectedEntity = Razor::Engine::Get().CurrentScene->GetEntity(entt::entity(PickedEntity));
+	Storage->SelectedEntity = Razor::Engine::Get().mCurrentScene->GetEntity(entt::entity(PickedEntity));
 }
 
 void Edge::CreateDockspace(const std::string& Title)
@@ -289,7 +289,7 @@ void Edge::CreateDockspace(const std::string& Title)
 				if (!Razor::Engine::Get().IsRuntimeRunning())
 				{
 					Razor::Engine& engine = Razor::Engine::Get();
-					_mPlaybackSceneBackup = engine.CurrentScene->Clone();
+					_mPlaybackSceneBackup = engine.mCurrentScene->Clone();
 					engine.RuntimeStart();
 				}
 			}
@@ -298,7 +298,7 @@ void Edge::CreateDockspace(const std::string& Title)
 				Razor::Engine& engine = Razor::Engine::Get();
 				engine.RuntimeStop();
 				if (_mPlaybackSceneBackup)
-					*engine.CurrentScene = std::move(*_mPlaybackSceneBackup);
+					*engine.mCurrentScene = std::move(*_mPlaybackSceneBackup);
 				_mPlaybackSceneBackup = nullptr;
 			}
 			Razor::RazorImGui::EndMenu();

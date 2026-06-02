@@ -11,7 +11,7 @@ namespace EdgeEditor
 		Razor::RazorImGui::Begin("System View", &bIsOpen, Razor::RazorGuiWindowFlags_MenuBar);
 		Razor::RazorImGui::SetWindowSize(Razor::Vector2(200.0f, 200.0f));
 
-		Razor::Ref<Razor::Scene> CurrentScene = Engine.CurrentScene;
+		Razor::Ref<Razor::Scene> CurrentScene = Engine.mCurrentScene;
 		
 		std::vector<Razor::ScriptClass> SystemClasses = Engine.GetScriptInterface().GetSystemTypes();
 		std::vector<const char*> SystemClassNames(SystemClasses.size());
