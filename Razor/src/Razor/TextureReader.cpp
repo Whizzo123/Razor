@@ -2,17 +2,17 @@
 #include "stb_image.h"
 #include "Engine.h"
 #include "Renderer/IRenderer.h"
+#include "Log.h"
 
 namespace Razor
 {
-    unsigned TextureReader::CreateTexture(std::string fileName)
+    unsigned TextureReader::CreateTexture(const std::string& fileName)
     {
         Ref<IRenderer> Renderer = Engine::Get().GetRenderer();
         int width, height, nrChannels;
-        std::string temp = ("resources/textures/" + fileName);
-        const char* filePath = temp.c_str();
+        std::string fullPath = ("resources/textures/" + fileName);
         stbi_set_flip_vertically_on_load(true);
-        unsigned char* data = stbi_load(filePath, &width, &height, &nrChannels, 0);
+        unsigned char* data = stbi_load(fullPath.c_str(), &width, &height, &nrChannels, 0);
         unsigned int texture;
         if (data)
         {
@@ -25,7 +25,7 @@ namespace Razor
         }
         else
         {
-            std::cout << "ERROR::FAILED::TO::LOAD::TEXTURE" << std::endl;
+            RZ_CORE_ERROR("TextureReader::CreateTexture -> Failed to load texture");
         }
         stbi_image_free(data);
 

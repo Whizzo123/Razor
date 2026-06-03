@@ -9,7 +9,7 @@ namespace Razor
     ShaderReader::ShaderReader() = default;
     ShaderReader::~ShaderReader() = default;
 
-    std::string ShaderReader::ReadInShader(std::string shaderName)
+    std::string ShaderReader::ReadInShader(const std::string& shaderName)
     {
         std::ifstream t("Edge/resources/shaders/" + shaderName);
         std::stringstream buffer;
@@ -18,19 +18,19 @@ namespace Razor
     }
 
 
-    unsigned int ShaderReader::CreateShader(std::string shaderName, ShaderType type)
+    Scope<unsigned int> ShaderReader::CreateShader(const std::string& shaderName, ShaderType type)
     {
-        std::string temp = ReadInShader(shaderName);
+        std::string shaderFileContent = ReadInShader(shaderName);
 
-        unsigned int shader = -1;
+        Scope<unsigned int> shader = nullptr;
 
-        if (temp.empty())
+        if (shaderFileContent.empty())
         {
             RZ_CORE_ERROR("ERROR::SHADER:: {0} ::COMPILATION::FAILED no file found or empty file at {1}", type, shaderName);
             return shader;
         }
 
-        const char* source = temp.c_str();
+        const char* source = shaderFileContent.c_str();
 
         Ref<IRenderer> Renderer = Engine::Get().GetRenderer();
 
@@ -38,55 +38,61 @@ namespace Razor
         {
         case VERTEX:
         {
-            shader = Renderer->CreateShader(EShader::VERTEX);
+            shader = CreateScope<unsigned int>(Renderer->CreateShader(EShader::VERTEX));
             break;
         }
         case FRAGMENT:
         {
-            shader = Renderer->CreateShader(EShader::FRAGMENT);
+            shader = CreateScope<unsigned int>(Renderer->CreateShader(EShader::FRAGMENT));
             break;
         }
         }
-        Renderer->SetShaderSource(shader, 1, &source, nullptr);
-        Renderer->CompileShader(shader);
+        Renderer->SetShaderSource(*shader, 1, &source, nullptr);
+        Renderer->CompileShader(*shader);
 
         int success;
         char infoLog[512];
-        Renderer->GetShaderStatusParam(shader, EStatusParam::COMPILE, &success);
+        Renderer->GetShaderStatusParam(*shader, EStatusParam::COMPILE, &success);
         if (!success)
         {
-            Renderer->GetShaderLog(shader, 512, nullptr, infoLog);
+            Renderer->GetShaderLog(*shader, 512, nullptr, infoLog);
             RZ_CORE_ERROR("ERROR::SHADER::{0}::COMPILATION::FAILED\n{1}", type, infoLog);
         }
 
         return shader;
     }
 
-    unsigned ShaderReader::CreateShaderProgram(std::string vertexShaderFile, std::string fragmentShaderFile)
+    Scope<unsigned int> ShaderReader::CreateShaderProgram(const std::string& vertexShaderFile, const std::string& fragmentShaderFile)
     {
         Ref<IRenderer> Renderer = Engine::Get().GetRenderer();
 
-        unsigned int vertexShader = CreateShader(vertexShaderFile, VERTEX);
-        unsigned int fragmentShader = CreateShader(fragmentShaderFile, FRAGMENT);
+        Scope<unsigned int> vertexShader = CreateShader(vertexShaderFile, VERTEX);
+        Scope<unsigned int> fragmentShader = CreateShader(fragmentShaderFile, FRAGMENT);
+        Scope<unsigned int> shaderProgram = nullptr;
 
-        unsigned int shaderProgram;
-        shaderProgram = Renderer->CreateShaderProgram();
+        if (!vertexShader || !fragmentShader) {
+            RZ_CORE_ERROR("Failed to create shader program one of the shaders were null");
+            return shaderProgram;
+        }
 
-        Renderer->AttachShader(shaderProgram, vertexShader);
-        Renderer->AttachShader(shaderProgram, fragmentShader);
-        Renderer->LinkShaderProgram(shaderProgram);
+        
+        shaderProgram = CreateScope<unsigned int>(Renderer->CreateShaderProgram());
+
+        Renderer->AttachShader(*shaderProgram, *vertexShader);
+        Renderer->AttachShader(*shaderProgram, *fragmentShader);
+        Renderer->LinkShaderProgram(*shaderProgram);
 
         int success;
-        Renderer->GetShaderProgramStatusParam(shaderProgram, EProgramStatusParam::LINK, &success);
+        Renderer->GetShaderProgramStatusParam(*shaderProgram, EProgramStatusParam::LINK, &success);
         if (!success)
         {
             char infoLog[512];
-            Renderer->GetShaderProgramLog(shaderProgram, 512, nullptr, infoLog);
+            Renderer->GetShaderProgramLog(*shaderProgram, 512, nullptr, infoLog);
             RZ_CORE_ERROR("ERROR::PROGRAM::LINKING::FAILED\n{0}", infoLog);
         }
 
-        Renderer->DeleteShader(vertexShader);
-        Renderer->DeleteShader(fragmentShader);
+        Renderer->DeleteShader(*vertexShader);
+        Renderer->DeleteShader(*fragmentShader);
 
         return shaderProgram;
     }
