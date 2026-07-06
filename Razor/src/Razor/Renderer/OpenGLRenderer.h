@@ -177,12 +177,20 @@ namespace Razor
 		void RenderText(Text& text, Font& font) override;
 
 		void SetTextureParameterInt(ETextureType TextureType, ETextureOption TextureOption, ETextureValue TextureValue) override;
+
+		unsigned int GenerateVertexArrays(int num) override;
+		unsigned int GenerateBuffer(int num) override;
+		void SetBufferData(unsigned int buffer, EBufferType type, size_t bufferSize, void* data, EUsage usage) override;
+		void SetVertexAttribArray(unsigned int vao, unsigned int arrayIndex, size_t size, EDataType type, bool bNormalized, size_t stride, void* dataOffset) override;
+		void FreeVertexArray() override;
+		void SetupMesh(std::vector<MeshData>& meshes) override;
 	private:
 		GLenum Translate(EStencilAction StencilAction);
 		GLenum Translate(EStencilFunc StencilFunction);
 
 		GLFWwindow* GLFWBackupContext;
 
+		// TODO replace this if we can with just ensuring our enums have the same codes as the GLenum if we can
 		std::unordered_map<EStencilAction, GLenum> StencilActionTranslation;
 		std::unordered_map<EStencilFunc, GLenum> StencilFuncTranslation;
 		std::unordered_map<EShader, GLenum> ShaderTranslation; /** Translation map for shader type */
@@ -193,6 +201,10 @@ namespace Razor
 		std::unordered_map<ETextureValue, GLenum> TextureValueTranslation; /** Translation map for texture value */
 		std::unordered_map<EPixelDataFormat, GLenum> PixelDataFormatTranslation; /** Translation map for pixel data format */
 		std::unordered_map<EPixelDataType, GLenum> PixelDataTypeTranslation; /** Translation map for pixel data type */
+		std::unordered_map<EBufferType, GLenum> _mBufferTypeTranslation;
+		std::unordered_map<EUsage, GLenum> _mUsageTypeTranslation;
+		std::unordered_map<EDataType, GLenum> _mDataTypeTranslation;
+
 
 		GLuint SceneTexture;
 	};

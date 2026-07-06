@@ -5,10 +5,10 @@ namespace Razor
 {
     void RSTextPass::Render(RenderPipelineData& data)
     {
-        auto View = CurrentScene->GetEntitiesWithComponents<Text>();
+        auto View = _mCurrentScene->GetEntitiesWithComponents<Text>();
 		for (auto RenderingEntity : View)
 		{
-			Text& EntityText = CurrentScene->GetComponent<Text>(RenderingEntity);
+			Text& EntityText = _mCurrentScene->GetComponent<Text>(RenderingEntity);
 			
 			if (data.mEntityRenderProperties.Properties.find(RenderingEntity) == data.mEntityRenderProperties.Properties.end())
 			{

@@ -117,10 +117,11 @@ void Edge::Run()
 	PickBuffer  = Engine.mRenderer->CreateFrameBuffer(300, 200);
 	GameBuffer  = Engine.mRenderer->CreateFrameBuffer(300, 200);
 
+	// Remove this should be better way of grabbing default models
 	const char* path = "resources/models/Cube.obj";
 	Razor::Model DefaultModel;
 	if (fopen(path, "r")) {
-		 DefaultModel = Engine.ProcessModel(path);
+		DefaultModel.LoadMesh(path);
 	}
 
 	if (std::shared_ptr<Razor::Shader> DefaultShader = Engine.GetShaderForType(typeid(Razor::DefaultMeshShader).name()))

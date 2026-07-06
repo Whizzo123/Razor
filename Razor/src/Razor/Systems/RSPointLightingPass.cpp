@@ -5,11 +5,11 @@ namespace Razor
 {
 	void RSPointLightingPass::Render(RenderPipelineData& data)
 	{
-		auto View = CurrentScene->GetEntitiesWithComponents<PointLight>();
+		auto View = _mCurrentScene->GetEntitiesWithComponents<PointLight>();
 
 		for (auto RenderingEntity : View)
 		{
-			PointLight& Light = CurrentScene->GetComponent<PointLight>(RenderingEntity);
+			PointLight& Light = _mCurrentScene->GetComponent<PointLight>(RenderingEntity);
 			for (auto& Pair : data.mEntityRenderProperties.Properties)
 			{
 				ShaderProperty& Property = Pair.second;

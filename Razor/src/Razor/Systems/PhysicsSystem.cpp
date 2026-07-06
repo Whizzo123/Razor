@@ -8,11 +8,11 @@ namespace Razor
 {
 	void PhysicsSystem::Run(float deltaTime)
 	{
-		for (auto entity : CurrentScene->GetEntitiesWithComponents<BoxBody, Transform>())
+		for (auto entity : _mCurrentScene->GetEntitiesWithComponents<BoxBody, Transform>())
 		{
 			
-			BoxBody& body = CurrentScene->GetComponent<BoxBody>(entity);
-			Transform& transform = CurrentScene->GetComponent<Transform>(entity);
+			BoxBody& body = _mCurrentScene->GetComponent<BoxBody>(entity);
+			Transform& transform = _mCurrentScene->GetComponent<Transform>(entity);
 			Vector3 physicsPos = Engine::Get().GetPhysicsEngine().GetPosition(body.bodyId);
 			if(body.mMotionType != EPhysicsMotionType::Kinematic)
 			{

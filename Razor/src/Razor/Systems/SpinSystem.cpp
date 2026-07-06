@@ -6,10 +6,10 @@ namespace Razor
 
 	void SpinSystem::Run(float dt)
 	{
-		auto View = CurrentScene->GetEntitiesWithComponents<Transform>();
+		auto View = _mCurrentScene->GetEntitiesWithComponents<Transform>();
 		for (auto Entity : View)
 		{
-			Transform& EntityTransform = CurrentScene->GetComponent<Transform>(Entity);
+			Transform& EntityTransform = _mCurrentScene->GetComponent<Transform>(Entity);
 			glm::vec3 TransformRotation = EntityTransform.Rotation;
 			float lastRotateX = TransformRotation.x;
 			float lastRotateY = TransformRotation.y;

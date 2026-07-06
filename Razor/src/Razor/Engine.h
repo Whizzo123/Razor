@@ -128,15 +128,6 @@ namespace Razor
 		* This just checks for the close event on the window
 		*/
 		void ProcessInput();
-		// TODO move this
-		/**
-		* Function to process Model from .obj file to Model object
-		*
-		* @param path - File path to .obj file
-		* 
-		* @return A Model object
-		*/
-		Model ProcessModel(const char* path);
 
 		Ref<IRenderer> mRenderer; /** Shared Ptr to IRenderer object used for rendering */
 		/**

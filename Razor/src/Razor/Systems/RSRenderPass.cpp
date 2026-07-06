@@ -9,11 +9,11 @@ namespace Razor
 {
 	void RSRenderPass::Render(RenderPipelineData& data)
 	{
-		auto View = CurrentScene->GetEntitiesWithComponents<Mesh>();
+		auto View = _mCurrentScene->GetEntitiesWithComponents<Mesh>();
 
 		for (auto EntityToRender : View)
 		{
-			Mesh& EntityMesh = CurrentScene->GetComponent<Mesh>(EntityToRender);
+			Mesh& EntityMesh = _mCurrentScene->GetComponent<Mesh>(EntityToRender);
 			AssetWrapper<Model>* Model = Engine::Get().GetAssetDirectory()->ProcessRequest<Razor::Model>(EntityMesh.mKey);
 			if (!Model)
 			{
@@ -37,12 +37,12 @@ namespace Razor
 			data.mEntityRenderProperties.Properties[EntityToRender].Clear();
 		}
 
-		auto TextView = CurrentScene->GetEntitiesWithComponents<Text>();
+		auto TextView = _mCurrentScene->GetEntitiesWithComponents<Text>();
 
  		for (auto EntityToRender : TextView)
 		{
-			Text& EntityText = CurrentScene->GetComponent<Text>(EntityToRender);
-			Transform& EntityTransform = CurrentScene->GetComponent<Transform>(EntityToRender);
+			Text& EntityText = _mCurrentScene->GetComponent<Text>(EntityToRender);
+			Transform& EntityTransform = _mCurrentScene->GetComponent<Transform>(EntityToRender);
 			// TODO get rid of this raw pointer
 			AssetWrapper<Font>* Font = Engine::Get().GetAssetDirectory()->ProcessRequest<Razor::Font>(EntityText.mFontKey);
 			if(!Font)

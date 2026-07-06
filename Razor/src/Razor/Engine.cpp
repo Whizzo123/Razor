@@ -1,5 +1,4 @@
 #include "Engine.h"
-#include "MeshRenderer.h"
 #include "Component.h"
 #include "Renderer/OpenGLRenderer.h"
 #include "Renderer/Model.h"
@@ -93,7 +92,6 @@ namespace Razor
 
 		_mSceneLights = CreateRef<std::vector<Light*>>();
 		// TODO rename mesh renderer doesn't do rendering just sets up the mesh for renderering
-		_mCoordinator->RegisterSystem<MeshRenderer>(MeshRenderer(mCurrentScene, mRenderer, _mShaderIDMap, _mSceneLights));
 		_mCoordinator->RegisterSystem<CollisionSystem>(CollisionSystem(mCurrentScene));
 		_mCoordinator->RegisterSystem<CameraController>(CameraController(mCurrentScene));
 		_mCoordinator->RegisterSystem<PhysicsSystem>(mCurrentScene);
@@ -144,14 +142,6 @@ namespace Razor
 		}
 		_mDeltaTime = currentFrame - _mLastFrame;
 		_mLastFrame = currentFrame;
-	}
-
-	Model Engine::ProcessModel(const char* path)
-	{
-		Model model = Model();
-		model.LoadMesh(path);
-		MeshRenderer::InitMesh(model.GetModelMeshData());
-		return model;
 	}
 
 	void Engine::ProcessInput()
@@ -261,7 +251,7 @@ namespace Razor
 			ProjectSerializer::Serialize("../", _mLoadedProject);
 		}
 		*mCurrentScene = std::move(*mainScene);
-		_mAssetDirectory = CreateRef<AssetDirectory>(path + "/" + _mLoadedProject->m_AssetDirectory);
+		_mAssetDirectory = CreateRef<AssetDirectory>(path + "/" + _mLoadedProject->m_AssetDirectory, mRenderer);
 	}
 
 	void Engine::SetGameCameraViewportSize(uint32_t w, uint32_t h)
