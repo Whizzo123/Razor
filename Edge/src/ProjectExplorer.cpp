@@ -190,12 +190,12 @@ namespace EdgeEditor
 
 	bool ProjectExplorer::SaveModelToProject(const std::string& Name)
 	{
-		Razor::Model Model = Razor::Engine::Get().ProcessModel(Name.c_str());
+		//Razor::Model Model = Razor::Engine::Get().ProcessModel(Name.c_str());
 		int LastIndexOf = Name.find_last_of('\\');
 		std::string FileName = Name.substr(LastIndexOf + 1);
 		int FirstIndexOf = FileName.find_first_of('.');
 		FileName = FileName.substr(0, FirstIndexOf);
-		Razor::ModelSerializer::Serialize(_mRootPath + "/" + FileName, Razor::CreateRef<Razor::Model>(Model));
+		//Razor::ModelSerializer::Serialize(_mRootPath + "/" + FileName, Razor::CreateRef<Razor::Model>(Model));
 		return true;
 	}
 

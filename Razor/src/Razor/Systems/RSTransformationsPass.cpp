@@ -5,10 +5,10 @@ namespace Razor
 {
 	void RSTransformationsPass::Render(RenderPipelineData& data)
 	{
-		auto View = CurrentScene->GetEntitiesWithComponents<Transform>();
+		auto View = _mCurrentScene->GetEntitiesWithComponents<Transform>();
 		for (auto Entity : View)
 		{
-			Transform& EntityTransform = CurrentScene->GetComponent<Transform>(Entity);
+			Transform& EntityTransform = _mCurrentScene->GetComponent<Transform>(Entity);
 			if (data.mEntityRenderProperties.Properties.find(Entity) == data.mEntityRenderProperties.Properties.end())
 			{
 				continue;

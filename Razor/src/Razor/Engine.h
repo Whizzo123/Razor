@@ -49,7 +49,7 @@ namespace Razor
 		* 
 		* @return Shared Ptr to IRenderer object
 		*/
-		std::shared_ptr<IRenderer> GetRenderer();
+		Ref<IRenderer> GetRenderer();
 
 		/**
 		* Deconstructor for the Engine object
@@ -61,6 +61,7 @@ namespace Razor
 		* @return Reference to the Engine
 		*/
 		static Engine& Get();
+		Engine(const Razor::Engine&) = delete;
 	protected:
 		/**
 		* Default Engine Constructor
@@ -81,7 +82,7 @@ namespace Razor
 		* 
 		* @return A float representing the DeltaTime
 		*/
-		float GetDeltaTime() { return DeltaTime; }
+		float GetDeltaTime() { return _mDeltaTime; }
 		/**
 		* Function to determine if engine should close if the window has recieved an exit instruction
 		* 
@@ -95,17 +96,17 @@ namespace Razor
 		/**
 		* Function to run the render systems registered to the Coordinator 
 		* 
-		* @param Config - The pipeline configuration we want to run with this render
+		* @param config - The pipeline configuration we want to run with this render
 		*/
-		void Render(int32_t targetId, const RenderPipelineConfig& Config);
+		void Render(int32_t targetId, const RenderPipelineConfig& config);
 		/**
 		* Getter function for the RazorImGui object
 		* 
-		* This moves the RazorGUI unique_ptr ownership to whoever called this function
+		* This moves the _mRazorGUI unique_ptr ownership to whoever called this function
 		* 
 		* @return A reference to the RazorImGui object
 		*/
-		RazorImGui& GetGUI() { return *RazorGUI; }
+		RazorImGui& GetGUI() { return *_mRazorGUI; }
 		/**
 		* Getter function for the Window object
 		* 
@@ -119,7 +120,7 @@ namespace Razor
 		* 
 		* @return A shared ptr to the Coordinator object
 		*/
-		std::shared_ptr<Coordinator> GetCoordinator();
+		Ref<Coordinator> GetCoordinator();
 
 		/**
 		* Function to Process Input via the RazorIO class
@@ -127,17 +128,8 @@ namespace Razor
 		* This just checks for the close event on the window
 		*/
 		void ProcessInput();
-		// TODO move this
-		/**
-		* Function to process Model from .obj file to Model object
-		*
-		* @param Path - File path to .obj file
-		* 
-		* @return A Model object
-		*/
-		Model ProcessModel(const char* Path);
 
-		std::shared_ptr<IRenderer> Renderer; /** Shared Ptr to IRenderer object used for rendering */
+		Ref<IRenderer> mRenderer; /** Shared Ptr to IRenderer object used for rendering */
 		/**
 		* Function to initialise different parts of the engine and set them up
 		*/
@@ -145,35 +137,35 @@ namespace Razor
 		/**
 		* Getter function for a Shader from ID
 		*
-		* @param ID - A uint8_t representing the ID of the Shader
+		* @param id - A uint8_t representing the ID of the Shader
 		* 
 		* @return A shared ptr to the Shader object
 		*/
-		std::shared_ptr<Shader> GetShaderForID(uint8_t ID);
+		Ref<Shader> GetShaderForID(uint8_t id);
 		/**
 		* Getter function for a Shader from Type
 		*
-		* @param Type - A std::string representing the type of the object
+		* @param type - A std::string representing the type of the object
 		* 
 		* @return A shared ptr to the Shader object
 		*/
-		std::shared_ptr<Shader> GetShaderForType(const char* Type);
+		Ref<Shader> GetShaderForType(const char* type);
 
 		ScriptInterface& GetScriptInterface();
 
 		void SaveProject();
-		void LoadProject(const std::string& ProjectPath);
+		void LoadProject(const std::string& projectPath);
 
 		void RuntimeStart();
 		void RuntimeStop();
-		bool IsRuntimeRunning() const { return bIsRuntimeRunning.load(); }
+		bool IsRuntimeRunning() const { return _mbIsRuntimeRunning.load(); }
 
-		void SetGameInputEnabled(bool bEnabled) { bIsGameInputEnabled.store(bEnabled); }
-		bool IsGameInputEnabled() const { return bIsGameInputEnabled.load(); }
+		void SetGameInputEnabled(bool bEnabled) { _mbIsGameInputEnabled.store(bEnabled); }
+		bool IsGameInputEnabled() const { return _mbIsGameInputEnabled.load(); }
 
 		void SetGameCameraViewportSize(uint32_t w, uint32_t h);
 
-		Ref<Scene> CurrentScene; /** Ref to the current scene we have*/
+		Ref<Scene> mCurrentScene; /** Ref to the current scene we have*/
 
 		Ref<AssetDirectory> GetAssetDirectory();
 
@@ -185,36 +177,38 @@ namespace Razor
 
 		void ClearDebugDrawBuffer();
 
+		void CreateProject();
+
 	private:
 		
-		void RenderImGui(uint64_t SceneTexture);
+		void RenderImGui(uint64_t sceneTexture);
 		void RunRuntime();
 
-		std::unique_ptr<Window> EngineWindow;
-		std::shared_ptr<Coordinator> _mCoordinator;
-		std::unordered_map<uint8_t, std::shared_ptr<Shader>> ShaderIDMap;
-		std::unordered_map<std::string, std::shared_ptr<Shader>> ShaderTypeMap;
-		std::shared_ptr<std::vector<Light*>> SceneLights;
-		std::unique_ptr<RazorImGui> RazorGUI;
-		float DeltaTime = 0.0f;
-		float LastFrame = 0.0f;
-		static Engine* GEngine;
-		std::unique_ptr<IPlatformIO> PlatformIO;
-		std::unique_ptr<ITimeProvider> TimeProvider; /** Generic object to provide time functionality */
-		std::unique_ptr<ScriptInterface> _mScriptInterface;
-		Ref<Project> LoadedProject;
-		Scope<ScriptAssembly> BridgeAssembly;
-		Scope<ScriptAssembly> GameAssembly;
+		Scope<Window> _mEngineWindow;
+		Ref<Coordinator> _mCoordinator;
+		std::unordered_map<uint8_t, std::shared_ptr<Shader>> _mShaderIDMap;
+		std::unordered_map<std::string, std::shared_ptr<Shader>> _mShaderTypeMap;
+		Ref<std::vector<Light*>> _mSceneLights;
+		Scope<RazorImGui> _mRazorGUI;
+		float _mDeltaTime = 0.0f;
+		float _mLastFrame = 0.0f;
+		static Scope<Engine> _mGEngine;
+		Scope<IPlatformIO> _mPlatformIO;
+		Scope<ITimeProvider> _mTimeProvider; /** Generic object to provide time functionality */
+		Scope<ScriptInterface> _mScriptInterface;
+		Ref<Project> _mLoadedProject;
+		Scope<ScriptAssembly> _mBridgeAssembly;
+		Scope<ScriptAssembly> _mGameAssembly;
 		Ref<AssetDirectory> _mAssetDirectory;
 		Scope<IPhysicsEngine> _mPhysicsEngine;
 		Ref<IPhysicsDebugRenderer> _mPhysicsDebugRenderer;
 
-		PhysicsDebugDrawBuffer* _mDebugDrawBuffer;
+		Scope<PhysicsDebugDrawBuffer> _mDebugDrawBuffer;
 
-		std::atomic<bool> bIsRuntimeRunning { false };
-		std::atomic<bool> bIsGameInputEnabled { true };
-		std::thread RuntimeThread;
-		std::shared_ptr<RSCameraPass> _mCameraPass;
+		std::atomic<bool> _mbIsRuntimeRunning { false };
+		std::atomic<bool> _mbIsGameInputEnabled { true };
+		std::thread _mRuntimeThread;
+		Ref<RSCameraPass> _mCameraPass;
 		Scope<FontLoader> _mFontLoader;
 	};
 }

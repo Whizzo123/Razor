@@ -86,6 +86,22 @@ namespace Razor
         {
             {EPixelDataType::UNSIGNED_BYTE, GL_UNSIGNED_BYTE}
         };
+
+        _mBufferTypeTranslation = std::unordered_map<EBufferType, GLenum>
+        {
+            {EBufferType::ARRAY, GL_ARRAY_BUFFER},
+            {EBufferType::ELEMENT_ARRAY, GL_ELEMENT_ARRAY_BUFFER}
+        };
+
+        _mUsageTypeTranslation = std::unordered_map<EUsage, GLenum>
+        {
+            {EUsage::STATIC_DRAW, GL_STATIC_DRAW}
+        };
+
+        _mDataTypeTranslation = std::unordered_map<EDataType, GLenum>
+        {
+            {EDataType::FLOAT, GL_FLOAT}
+        };
     }
 
     void OpenGLRenderer::PollForEvents()
@@ -423,5 +439,60 @@ namespace Razor
     void OpenGLRenderer::SetTextureParameterInt(ETextureType TextureType, ETextureOption TextureOption, ETextureValue TextureValue)
     {
         glTexParameteri(TextureTypeTranslation[TextureType], TextureOptionTranslation[TextureOption], TextureValueTranslation[TextureValue]);
+    }
+
+    unsigned int OpenGLRenderer::GenerateVertexArrays(int num) 
+    {
+        unsigned int vao;
+        glGenVertexArrays(num, &vao);
+        return vao;
+    }
+	unsigned int OpenGLRenderer::GenerateBuffer(int num)
+    {
+        unsigned int buf;
+        glGenBuffers(1, &buf);
+        return buf;
+    }
+
+	void OpenGLRenderer::SetBufferData(unsigned int buffer, EBufferType type, size_t bufferSize, void* data, EUsage usage)
+    {
+        glBindBuffer(_mBufferTypeTranslation[type], buffer);
+        glBufferData(_mBufferTypeTranslation[type], bufferSize, data, _mUsageTypeTranslation[usage]);
+    }
+	void OpenGLRenderer::SetVertexAttribArray(unsigned int vao, unsigned int arrayIndex, size_t size, EDataType type, bool bNormalized, size_t stride, void* dataOffset)
+    {
+        glBindVertexArray(vao);
+        glEnableVertexAttribArray(arrayIndex);
+        glVertexAttribPointer(arrayIndex, size, _mDataTypeTranslation[type], bNormalized, stride, dataOffset);
+    }
+	void OpenGLRenderer::FreeVertexArray()
+    {
+        glBindVertexArray(0);
+    }
+
+    void OpenGLRenderer::SetupMesh(std::vector<MeshData>& meshes)
+    {
+        for (MeshData& Mesh : meshes)
+        {
+            Mesh.VAO = GenerateVertexArrays(1);
+            Mesh.VBO = GenerateBuffer(1);
+            Mesh.EBO = GenerateBuffer(1);
+
+            glBindVertexArray(Mesh.VAO);
+
+            SetBufferData(Mesh.VBO, EBufferType::ARRAY, Mesh.Vertices.size() * sizeof(MeshData::Vertex), &Mesh.Vertices[0], EUsage::STATIC_DRAW);
+            SetBufferData(Mesh.EBO, EBufferType::ELEMENT_ARRAY, Mesh.Indices.size() * sizeof(unsigned int), &Mesh.Indices[0], EUsage::STATIC_DRAW);
+
+            SetVertexAttribArray(Mesh.VAO, 0, 3, EDataType::FLOAT, false, sizeof(MeshData::Vertex), (void*)0);
+            SetVertexAttribArray(Mesh.VAO, 1, 3, EDataType::FLOAT, false, sizeof(MeshData::Vertex), (void*)offsetof(MeshData::Vertex, Normal));
+            SetVertexAttribArray(Mesh.VAO, 2, 2, EDataType::FLOAT, false, sizeof(MeshData::Vertex), (void*)offsetof(MeshData::Vertex, TexCoords));
+
+            FreeVertexArray();
+            
+            if (Mesh.Meshes.size() > 0)
+            {
+                SetupMesh(Mesh.Meshes);
+            }
+        }
     }
 }

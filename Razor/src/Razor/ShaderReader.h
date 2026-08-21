@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include "Core.h"
 
 enum ShaderType {VERTEX, FRAGMENT};
 
@@ -14,12 +15,10 @@ namespace Razor
         ShaderReader();
         ~ShaderReader();
 
-
-        static unsigned int CreateShader(std::string shaderName, ShaderType type);
-        static unsigned int CreateShaderProgram(std::string vertexShader, std::string fragmentShader);
-
+        static Scope<unsigned int> CreateShaderProgram(const std::string& vertexShader, const std::string& fragmentShader);
 
     private:
-        static std::string ReadInShader(std::string shaderName);
+        static Scope<unsigned int> CreateShader(const std::string& shaderName, ShaderType type);
+        static std::string ReadInShader(const std::string& shaderName);
     };
 }

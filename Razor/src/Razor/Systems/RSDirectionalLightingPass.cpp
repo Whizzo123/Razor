@@ -6,10 +6,10 @@ namespace Razor
 
 	void RSDirectionalLightingPass::Render(RenderPipelineData& data)
 	{
-		for (auto RenderingEntity : CurrentScene->GetEntitiesWithComponents<DirectionalLight, Transform>())
+		for (auto RenderingEntity : _mCurrentScene->GetEntitiesWithComponents<DirectionalLight, Transform>())
 		{
-			DirectionalLight& Light = CurrentScene->GetComponent<DirectionalLight>(RenderingEntity);
-			Transform& transform = CurrentScene->GetComponent<Transform>(RenderingEntity);
+			DirectionalLight& Light = _mCurrentScene->GetComponent<DirectionalLight>(RenderingEntity);
+			Transform& transform = _mCurrentScene->GetComponent<Transform>(RenderingEntity);
 			for (auto& Pair : data.mEntityRenderProperties.Properties)
 			{
 				ShaderProperty& Property = Pair.second;

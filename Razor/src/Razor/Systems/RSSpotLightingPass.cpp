@@ -5,11 +5,11 @@ namespace Razor
 {
 	void RSSpotLightingPass::Render(RenderPipelineData& data)
 	{
-		auto View = CurrentScene->GetEntitiesWithComponents<SpotLight, Transform>();
+		auto View = _mCurrentScene->GetEntitiesWithComponents<SpotLight, Transform>();
 		for (auto RenderingEntity : View)
 		{
-			SpotLight& Light = CurrentScene->GetComponent<SpotLight>(RenderingEntity);
-			Transform& transform = CurrentScene->GetComponent<Transform>(RenderingEntity);
+			SpotLight& Light = _mCurrentScene->GetComponent<SpotLight>(RenderingEntity);
+			Transform& transform = _mCurrentScene->GetComponent<Transform>(RenderingEntity);
 			for (auto& Pair : data.mEntityRenderProperties.Properties)
 			{
 				ShaderProperty& Property = Pair.second;

@@ -30,7 +30,7 @@ namespace EdgeEditor
 			return;
 		}
 
-		Razor::Ref<Razor::Scene> CurrentScene = Engine.CurrentScene;
+		Razor::Ref<Razor::Scene> CurrentScene = Engine.mCurrentScene;
 		
 		if (Razor::RazorImGui::TreeNode(std::to_string((uint32_t)Storage->SelectedEntity->EntityHandle).c_str(), {0.0f, 0.0f}, true))
 		{
@@ -84,7 +84,7 @@ namespace EdgeEditor
 	void Inspector::CreateEntity()
 	{
 		Razor::Engine& Engine = Razor::Engine::Get();
-		Razor::Ref<Razor::Entity> NewEntity = Engine.CurrentScene->CreateEntity();
+		Razor::Ref<Razor::Entity> NewEntity = Engine.mCurrentScene->CreateEntity();
 		NewEntity->AddComponent<Razor::Transform>();
 	}
 

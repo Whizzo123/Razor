@@ -1,16 +1,17 @@
 #include "AssetDirectory.h"
-#include "../MeshRenderer.h"
 #include "ModelSerializer.h"
 #include "../Engine.h"
 #include "../Renderer/Shaders/DefaultMeshShader.h"
 #include "../Renderer/Font/FontLoader.h"
 #include "FilePath.h"
+#include "../Renderer/IRenderer.h"
 
 namespace Razor
 {
-	AssetDirectory::AssetDirectory(const std::string& assetFolder)
+	AssetDirectory::AssetDirectory(const std::string& assetFolder, Ref<IRenderer> renderer)
 	{
 		_mRootFolder = assetFolder;
+		_mRenderer = renderer;
 	}
 	AssetDirectory::~AssetDirectory()
 	{
@@ -32,7 +33,7 @@ namespace Razor
 		Ref<Model> model = CreateRef<Model>();
 		FilePath path = FilePath(_mRootFolder) + FilePath(assetPath);
 		ModelSerializer::Deserialize(path, model);
-		MeshRenderer::InitMesh(model->GetModelMeshData());
+		_mRenderer->SetupMesh(model->GetModelMeshData());
 		model->SetModelShader(Engine::Get().GetShaderForType(typeid(DefaultMeshShader).name())->ID);
 		_mModelCache[assetPath] = AssetWrapper<Model>({ *model });
 	}
@@ -43,5 +44,12 @@ namespace Razor
 		std::string pathStr = static_cast<std::string>(path);
 		Font font(Engine::Get().GetFontLoader().LoadFontMap(pathStr));
 		_mFontCache[assetPath] = AssetWrapper<Font>({font});
+	}
+
+	bool AssetDirectory::SaveModelToProject(const Model& model)
+	{
+		ModelSerializer::Serialize(_mRootFolder + "/" + model.GetName(), CreateRef<Model>(model));
+		// Probably should have some kind of error handling here what happens if the serialization fails
+		return true;
 	}
 }

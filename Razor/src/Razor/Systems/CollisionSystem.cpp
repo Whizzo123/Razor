@@ -11,19 +11,19 @@ namespace Razor
 	{
 		// Built each frame — acceptable for current entity counts; cache if this becomes a hotspot
 		std::unordered_map<unsigned int, uint32_t> bodyToEntity;
-		for (auto entity : CurrentScene->GetEntitiesWithComponents<BoxBody>())
+		for (auto entity : _mCurrentScene->GetEntitiesWithComponents<BoxBody>())
 		{
-			BoxBody& body = CurrentScene->GetComponent<BoxBody>(entity);
+			BoxBody& body = _mCurrentScene->GetComponent<BoxBody>(entity);
 			// TODO what happens if an entity is destroyed?
 			bodyToEntity[body.bodyId] = static_cast<uint32_t>(entity);
 		}
 
 		IPhysicsEngine& physics = Engine::Get().GetPhysicsEngine();
 
-		for (auto entity : CurrentScene->GetEntitiesWithComponents<BoxBody>())
+		for (auto entity : _mCurrentScene->GetEntitiesWithComponents<BoxBody>())
 		{
-			BoxBody& body = CurrentScene->GetComponent<BoxBody>(entity);
-			CollisionComponent* collComp = CurrentScene->TryGetComponent<CollisionComponent>(entity);
+			BoxBody& body = _mCurrentScene->GetComponent<BoxBody>(entity);
+			CollisionComponent* collComp = _mCurrentScene->TryGetComponent<CollisionComponent>(entity);
 
 			if (collComp)
 				collComp->Events.clear();

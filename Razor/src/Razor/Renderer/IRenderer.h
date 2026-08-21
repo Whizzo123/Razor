@@ -74,6 +74,22 @@ namespace Razor
 		LINEAR
 	};
 
+	enum class EBufferType
+	{
+		ARRAY,
+		ELEMENT_ARRAY
+	};
+
+	enum class EUsage
+	{
+		STATIC_DRAW
+	};
+
+	enum class EDataType
+	{
+		FLOAT
+	};
+
 	class RAZOR_API IRenderer
 	{
 	public:
@@ -109,6 +125,15 @@ namespace Razor
 		virtual void* GetSceneRenderedToTexture() = 0;
 		virtual void SetFrameBufferTextureForScene(unsigned int SceneTexture) = 0;
 		virtual void ResizeFramebuffers(unsigned int Width, unsigned int Height) = 0;
+
+		virtual unsigned int GenerateVertexArrays(int num) = 0;
+		virtual unsigned int GenerateBuffer(int num) = 0;
+		virtual void SetBufferData(unsigned int buffer, EBufferType type, size_t bufferSize, void* data, EUsage usage) = 0;
+		virtual void SetVertexAttribArray(unsigned int vao, unsigned int arrayIndex, size_t size, EDataType type, bool bNormalized, size_t stride, void* dataOffset) = 0;
+		virtual void FreeVertexArray() = 0;
+
+		virtual void SetupMesh(std::vector<MeshData>& meshes) = 0;
+
 		/**
 		* Function to set the viewport
 		* 

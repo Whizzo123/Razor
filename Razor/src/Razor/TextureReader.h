@@ -7,7 +7,7 @@ namespace Razor
     class TextureReader
     {
     public:
-        static unsigned int CreateTexture(std::string fileName);
+        static unsigned int CreateTexture(const std::string& fileName);
 
     };
 }

@@ -7,7 +7,7 @@ namespace Razor
 	{
 		const float AspectRatio = ViewportHeight > 0 ? (float)ViewportWidth / (float)ViewportHeight : 1.0f;
 
-		auto View = CurrentScene->GetEntitiesWithComponents<Camera>();
+		auto View = _mCurrentScene->GetEntitiesWithComponents<Camera>();
 
 		glm::mat4 CameraProjection = glm::mat4(1.0f);
 		glm::mat4 CameraProjectionOrtho = glm::mat4(1.0f);
@@ -16,8 +16,8 @@ namespace Razor
 
 		for(auto CameraEntity : View)
 		{
-			Camera& GameCamera = CurrentScene->GetComponent<Camera>(CameraEntity);
-			Transform& CameraTransform = CurrentScene->GetComponent<Transform>(CameraEntity);
+			Camera& GameCamera = _mCurrentScene->GetComponent<Camera>(CameraEntity);
+			Transform& CameraTransform = _mCurrentScene->GetComponent<Transform>(CameraEntity);
 			CameraProjection = glm::perspective(glm::radians(45.0f), AspectRatio, 0.1f, 100.0f);
 			CameraProjectionOrtho = glm::ortho(0.0f, static_cast<float>(ViewportWidth), 0.0f, static_cast<float>(ViewportHeight));
 			CameraView = glm::lookAt(CameraTransform.Position, CameraTransform.Position + GameCamera.CameraFront, GameCamera.CameraUp);
@@ -37,7 +37,7 @@ namespace Razor
 			}
 		}
 
-		auto TextView = CurrentScene->GetEntitiesWithComponents<Text>();
+		auto TextView = _mCurrentScene->GetEntitiesWithComponents<Text>();
 
 		for(auto TextEntity : TextView)
 		{

@@ -6,17 +6,17 @@ namespace Razor
 {
 	void RSPickBufferMaterialPass::Render(RenderPipelineData& data)
 	{
-		auto View = CurrentScene->GetEntitiesWithComponents<Mesh>();
+		auto View = _mCurrentScene->GetEntitiesWithComponents<Mesh>();
 		for (auto RenderingEntity : View)
 		{
-			Mesh& EntityMesh = CurrentScene->GetComponent<Mesh>(RenderingEntity);
+			Mesh& EntityMesh = _mCurrentScene->GetComponent<Mesh>(RenderingEntity);
 			AssetWrapper<Model>* Model = Engine::Get().GetAssetDirectory()->ProcessRequest<Razor::Model>(EntityMesh.mKey);
 			if (!Model)
 			{
 				continue;
 			}
 			Material& EntityMat = Model->asset.GetMaterial();
-			auto View = CurrentScene->GetEntitiesWithComponents<Material>();
+			auto View = _mCurrentScene->GetEntitiesWithComponents<Material>();
 
 			if (data.mEntityRenderProperties.Properties.find(RenderingEntity) == data.mEntityRenderProperties.Properties.end())
 			{

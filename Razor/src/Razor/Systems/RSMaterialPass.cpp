@@ -9,10 +9,10 @@ namespace Razor
 
 	void RSMaterialPass::Render(RenderPipelineData& data)
 	{
-		auto View = CurrentScene->GetEntitiesWithComponents<Mesh>();
+		auto View = _mCurrentScene->GetEntitiesWithComponents<Mesh>();
 		for (auto RenderingEntity : View)
 		{
-			Mesh& EntityMesh = CurrentScene->GetComponent<Mesh>(RenderingEntity);
+			Mesh& EntityMesh = _mCurrentScene->GetComponent<Mesh>(RenderingEntity);
 			AssetWrapper<Model>* Model = Engine::Get().GetAssetDirectory()->ProcessRequest<Razor::Model>(EntityMesh.mKey);
 			if (!Model)
 			{

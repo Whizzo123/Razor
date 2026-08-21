@@ -93,10 +93,13 @@ namespace Razor
 		std::vector<MeshData>& GetModelMeshData();
 		ModelInfo& GetModelInfo() { return Info; }
 		void SetModelInfo(const ModelInfo& Info) { this->Info = Info; }
+
+		const std::string& GetName() const { return _mName; }
 	private:
 		std::vector<MeshData::Texture> Textures_Loaded;
 		std::vector<MaterialData> Materials_Loaded;
 		std::string Directory;
+		std::string _mName;
 		ModelInfo Info;
 	};
 }

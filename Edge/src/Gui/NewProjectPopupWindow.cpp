@@ -7,10 +7,7 @@ namespace EdgeEditor
 		const std::string MagicalPathToFixWithActualSelectedPathSoon = "../../Sandboxes/";
 
 		bool bIsOpen = true;
-		/*if (NewProject == nullptr)
-		{
-			Open();
-		}*/
+
 		if (Razor::RazorImGui::BeginPopupModal("New Project Window", nullptr))
 		{
 			//ImGui::InputText("Project Name", &NewProject->ProjectName);
@@ -32,7 +29,6 @@ namespace EdgeEditor
 	}
 	void NewProjectPopupWindow::Open()
 	{
-		//NewProject = Razor::CreateRef<Project>();
 		Razor::RazorImGui::OpenPopup("New Project Window");
 	}
 	void NewProjectPopupWindow::Close()

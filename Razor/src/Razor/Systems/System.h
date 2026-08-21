@@ -119,12 +119,12 @@ namespace Razor
 	class RAZOR_API System
 	{
 	public:
-		System(Ref<Scene> Scene) : CurrentScene(Scene) {}
+		System(Ref<Scene> scene) : _mCurrentScene(scene) {}
 		virtual void Init() {}
 		virtual void Run(float dt) {}
 
 	protected:
-		Ref<Scene> CurrentScene;
+		Ref<Scene> _mCurrentScene;
 	};
 
 	class RAZOR_API RenderSystem : public System

@@ -3,11 +3,15 @@
 #include <vector>
 #include <unordered_set>
 #include <unordered_map>
+#include "../Core.h"
 #include "../Renderer/Model.h"
 #include "../Renderer/Font/Font.h"
 
+
 namespace Razor
 {
+	class IRenderer;
+	
 	struct AssetKey
 	{
 		AssetKey() : key(std::string()) {}
@@ -61,7 +65,7 @@ namespace Razor
 	class AssetDirectory
 	{
 	public:
-		AssetDirectory(const std::string& assetFolder);
+		AssetDirectory(const std::string& assetFolder, Ref<IRenderer> renderer);
 		~AssetDirectory();
 
 		template<typename T> 
@@ -119,6 +123,7 @@ namespace Razor
 
 		std::unordered_map<AssetKey, AssetWrapper<Model>, AssetKeyHash> _mModelCache;
 		std::unordered_map<AssetKey, AssetWrapper<Font>, AssetKeyHash> _mFontCache;
+		Ref<IRenderer> _mRenderer;
 	};
 }
 
