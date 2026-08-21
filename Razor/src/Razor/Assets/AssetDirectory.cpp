@@ -45,4 +45,11 @@ namespace Razor
 		Font font(Engine::Get().GetFontLoader().LoadFontMap(pathStr));
 		_mFontCache[assetPath] = AssetWrapper<Font>({font});
 	}
+
+	bool AssetDirectory::SaveModelToProject(const Model& model)
+	{
+		ModelSerializer::Serialize(_mRootFolder + "/" + model.GetName(), CreateRef<Model>(model));
+		// Probably should have some kind of error handling here what happens if the serialization fails
+		return true;
+	}
 }

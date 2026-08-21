@@ -478,6 +478,8 @@ namespace Razor
             Mesh.VBO = GenerateBuffer(1);
             Mesh.EBO = GenerateBuffer(1);
 
+            glBindVertexArray(Mesh.VAO);
+
             SetBufferData(Mesh.VBO, EBufferType::ARRAY, Mesh.Vertices.size() * sizeof(MeshData::Vertex), &Mesh.Vertices[0], EUsage::STATIC_DRAW);
             SetBufferData(Mesh.EBO, EBufferType::ELEMENT_ARRAY, Mesh.Indices.size() * sizeof(unsigned int), &Mesh.Indices[0], EUsage::STATIC_DRAW);
 

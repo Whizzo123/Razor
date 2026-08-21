@@ -220,6 +220,14 @@ namespace Razor
 		SceneSerializer::Serialize(mCurrentScene);
 	}
 
+	void Engine::CreateProject()
+	{
+		//TODO need to link up how the save is gonna work for this as they have no paths setup
+		_mLoadedProject = CreateRef<Project>();
+		mCurrentScene = CreateRef<Scene>("");
+	}
+
+
 	void Engine::LoadProject(const std::string& projectPath)
 	{
 		if (projectPath.empty())

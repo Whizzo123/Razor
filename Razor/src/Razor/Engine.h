@@ -177,6 +177,8 @@ namespace Razor
 
 		void ClearDebugDrawBuffer();
 
+		void CreateProject();
+
 	private:
 		
 		void RenderImGui(uint64_t sceneTexture);
