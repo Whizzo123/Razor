@@ -62,7 +62,7 @@ namespace Razor
 		T asset;
 	};
 
-	class AssetDirectory
+	class RAZOR_API AssetDirectory
 	{
 	public:
 		AssetDirectory(const std::string& assetFolder, Ref<IRenderer> renderer);
@@ -97,6 +97,8 @@ namespace Razor
 		std::vector<AssetKey> RequestKeys(const std::string& directoryPath);
 		
 		std::string GetRootFolder() const { return _mRootFolder; }
+
+		bool SaveModelToProject(const Model& model);
 
 	private:
 		template<typename T>
