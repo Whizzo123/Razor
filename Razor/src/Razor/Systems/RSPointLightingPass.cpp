@@ -3,19 +3,19 @@
 
 namespace Razor
 {
-	void RSPointLightingPass::Render(RenderPipelineEntityProperties& Properties)
+	void RSPointLightingPass::Render(RenderPipelineData& data)
 	{
-		auto View = CurrentScene->GetEntitiesWithComponents<PointLight>();
+		auto View = _mCurrentScene->GetEntitiesWithComponents<PointLight>();
 
 		for (auto RenderingEntity : View)
 		{
-			PointLight& Light = CurrentScene->GetComponent<PointLight>(RenderingEntity);
-			for (auto& Pair : Properties.Properties)
+			PointLight& Light = _mCurrentScene->GetComponent<PointLight>(RenderingEntity);
+			for (auto& Pair : data.mEntityRenderProperties.Properties)
 			{
-				EntityRenderProperty& Property = Pair.second;
+				ShaderProperty& Property = Pair.second;
 				for (int i = 0; i < Property.GetNumberOfSlots(); i++)
 				{
-					PropertySlot& Slot = Property.GetPropertySlot(i);
+					ShaderPropertySlot& Slot = Property.GetPropertySlot(i);
 
 					Slot.AddProperty<glm::vec3>("light.position", Light.Position);
 					Slot.AddProperty<glm::vec3>("light.ambient", Light.Ambient);

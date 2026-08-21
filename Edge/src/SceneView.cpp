@@ -1,5 +1,5 @@
 #include "SceneView.h"
-
+#include "EditorStorage.h"
 
 namespace EdgeEditor
 {
@@ -18,25 +18,30 @@ namespace EdgeEditor
 		Razor::Engine& Engine = Razor::Engine::Get();
 
 		bool bIsOpen;
-		ImGui::Begin("Scene View", &bIsOpen, ImGuiWindowFlags_MenuBar);
-		ImGui::SetWindowSize(ImVec2(200.0f, 200.0f));
-		ImGui::Text("Hello Scene View, %d", 123);
+		Razor::RazorImGui::Begin("Scene View", &bIsOpen, Razor::RazorGuiWindowFlags_MenuBar);
+		Razor::RazorImGui::SetWindowSize(Razor::Vector2(200.0f, 200.0f));
+		Razor::RazorImGui::Text("Hello Scene View, %d", 123);
 
-		Razor::Ref<Razor::Scene> CurrentScene = Engine.CurrentScene;
+		Razor::Ref<Razor::Scene> CurrentScene = Engine.mCurrentScene;
 
-		if (ImGui::TreeNode("Entities"))
+		if(Razor::RazorImGui::Button("Add Entity"))
+		{
+			CurrentScene->CreateEntity();
+		}
+
+		if (Razor::RazorImGui::TreeNode("Entities", {0.0f, 0.0f}, true))
 		{
 			// Need wrapper for the view type not lovely to have
 			auto View = CurrentScene->GetEntitiesWithComponents<Razor::Transform>();
 			for (auto Entity : View)
 			{
-				if (ImGui::Button(std::to_string((uint32_t)Entity).c_str()))
+				if (Razor::RazorImGui::Button(std::to_string((uint32_t)Entity), {200.0f, 30.0f}))
 				{
 					Storage->SelectedEntity = CurrentScene->GetEntity(Entity);
 				}
 			}
-			ImGui::TreePop();
+			Razor::RazorImGui::TreePop();
 		}
-		ImGui::End();
+		Razor::RazorImGui::End();
 	}
 }

@@ -2,179 +2,205 @@
 #include <fstream>
 #include "../Coordinator.h"
 #include "../Component.h"
-
-namespace YAML
-{
-	template<>
-	struct convert<glm::vec3>
-	{
-		static Node encode(const glm::vec3& rhs)
-		{
-			Node node;
-			node.push_back(rhs.x);
-			node.push_back(rhs.y);
-			node.push_back(rhs.z);
-			node.SetStyle(EmitterStyle::Flow);
-			return node;
-		}
-
-		static bool decode(const Node& node, glm::vec3& rhs)
-		{
-			if (!node.IsSequence() || node.size() != 3)
-				return false;
-
-			rhs.x = node[0].as<float>();
-			rhs.y = node[1].as<float>();
-			rhs.z = node[2].as<float>();
-			return true;
-		}
-	};
-
-	template<>
-	struct convert<glm::vec2>
-	{
-		static Node encode(const glm::vec2& rhs)
-		{
-			Node node;
-			node.push_back(rhs.x);
-			node.push_back(rhs.y);
-			node.SetStyle(EmitterStyle::Flow);
-			return node;
-		}
-
-		static bool decode(const Node& node, glm::vec2& rhs)
-		{
-			if (!node.IsSequence() || node.size() != 2)
-				return false;
-
-			rhs.x = node[0].as<float>();
-			rhs.y = node[1].as<float>();
-			return true;
-		}
-	};
-
-	template<>
-	struct convert<Razor::MeshData::Vertex>
-	{
-		static Node encode(const Razor::MeshData::Vertex& rhs)
-		{
-			Node node;
-			node.push_back(rhs.Position);
-			node.push_back(rhs.Normal);
-			node.push_back(rhs.TexCoords);
-			node.push_back(rhs.Tangent);
-			node.push_back(rhs.Bitangent);
-			node.SetStyle(EmitterStyle::Flow);
-			return node;
-		}
-
-		static bool decode(const Node& node, Razor::MeshData::Vertex& rhs)
-		{
-			if (!node.IsSequence() || node.size() != 5)
-				return false;
-
-			rhs.Position = node[0].as<glm::vec3>();
-			rhs.Normal = node[1].as<glm::vec3>();
-			rhs.TexCoords = node[2].as<glm::vec2>();
-			rhs.Tangent = node[3].as<glm::vec3>();
-			rhs.Bitangent = node[4].as<glm::vec3>();
-			return true;
-		}
-	};
-
-	template<>
-	struct convert<Razor::MeshData::Texture>
-	{
-		static Node encode(const Razor::MeshData::Texture& rhs)
-		{
-			Node node;
-			node.push_back(rhs.Id);
-			node.push_back(rhs.Type);
-			node.push_back(rhs.Path);
-			node.SetStyle(EmitterStyle::Flow);
-			return node;
-		}
-
-		static bool decode(const Node& node, Razor::MeshData::Texture& rhs)
-		{
-			if (!node.IsSequence() || node.size() != 3)
-				return false;
-
-			rhs.Id = node[0].as<unsigned int>();
-			rhs.Type = node[1].as<std::string>();
-			rhs.Path = node[2].as<std::string>();
-			return true;
-		}
-	};
-
-	template<>
-	struct convert<Razor::MeshData>
-	{
-		static Node encode(const Razor::MeshData& rhs)
-		{
-			Node node;
-			node.push_back(rhs.Vertices);
-			node.push_back(rhs.Meshes);
-			node.push_back(rhs.Indices);
-			node.push_back(rhs.Textures);
-			node.push_back(rhs.VAO);
-			node.push_back(rhs.VBO);
-			node.push_back(rhs.EBO);
-			node.push_back(rhs.MaterialId);
-			node.push_back(rhs.bHasIndices);
-			node.SetStyle(EmitterStyle::Flow);
-			return node;
-		}
-
-		static bool decode(const Node& node, Razor::MeshData& rhs)
-		{
-			if (!node.IsSequence() || node.size() != 9)
-				return false;
-
-			rhs.Vertices = node[0].as<std::vector<Razor::MeshData::Vertex>>();
-			rhs.Meshes = node[1].as<std::vector<Razor::MeshData>>();
-			rhs.Indices = node[2].as<std::vector<unsigned int>>();
-			rhs.Textures = node[3].as<std::vector<Razor::MeshData::Texture>>();
-			rhs.VAO = node[4].as<unsigned int>();
-			rhs.VBO = node[5].as<unsigned int>();
-			rhs.EBO = node[6].as<unsigned int>();
-			rhs.MaterialId = node[7].as<unsigned int>();
-			rhs.bHasIndices = node[8].as<bool>();
-			return true;
-		}
-	};
-}
+#include "../IO/YamlWrapper.h"
+#include "../Utils/Vector.h"
+#include "../Core/Entity.h"
+#include "Scene.h"
+#include "../Scripting/ScriptEngine.h"
+#include "../Scripting/ScriptInterface.h"
+#include "../Assert.h"
+#include "../Engine.h"
+#include "../Physics/Components/BoxBody.h"
+#include "../Renderer/Font/Text.h"
+#include "../Renderer/Shaders/DefaultTextShader.h"
 
 namespace Razor
 {
-	YAML::Emitter& operator<<(YAML::Emitter& Out, const glm::vec3& Vec)
+
+	Vector3 ToVec3(const glm::vec3& Vec)
 	{
-		Out << YAML::Flow;
-		Out << YAML::BeginSeq << Vec.x << Vec.y << Vec.z << YAML::EndSeq;
-		return Out;
+		return Vector3(Vec.x, Vec.y, Vec.z);
 	}
 
-	template<typename T>
-	YAML::Emitter& operator<<(YAML::Emitter& Out, const T& rhs)
+	glm::vec3 ToGVec3(const Vector3& Vec)
 	{
-		Out << YAML::convert<T>::encode(rhs);
-		return Out;
+		return glm::vec3(Vec.X, Vec.Y, Vec.Z);
 	}
 
-	void SceneSerializer::SerializeEntity(YAML::Emitter& Out, Entity InEntity)
+	void SceneSerializer::SerializeEntity(YamlEmitter* Out, Entity InEntity)
 	{
-		Out << YAML::BeginMap;
-		Out << YAML::Key << "Entity" << YAML::Value << (uint32_t)InEntity.EntityHandle;
+		yaml_emitter_begin_map(Out);
+		yaml_emitter_key(Out, "Entity");
+		yaml_emitter_value_int32(Out, (uint32_t)InEntity.EntityHandle);
 		if (InEntity.HasComponent<Transform>())
 		{
-			Out << YAML::Key << "Transform";
-			Out << YAML::BeginMap;
+			yaml_emitter_key(Out, "Transform");
+			yaml_emitter_begin_map(Out);
 
 			Transform& EntityTransform = InEntity.GetComponent<Transform>();
-			Out << YAML::Key << "Position" << YAML::Value << EntityTransform.Position;
-			Out << YAML::Key << "Rotation" << YAML::Value << EntityTransform.Rotation;
-			Out << YAML::Key << "Scale" << YAML::Value << EntityTransform.Scale;
-			Out << YAML::EndMap;
+			yaml_emitter_key(Out, "Position");
+			yaml_emitter_value_vec3(Out, ToVec3(EntityTransform.Position));
+			yaml_emitter_key(Out, "Rotation");
+			yaml_emitter_value_vec3(Out, ToVec3(EntityTransform.Rotation));
+			yaml_emitter_key(Out, "Scale");
+			yaml_emitter_value_vec3(Out, ToVec3(EntityTransform.Scale));
+			yaml_emitter_end_map(Out);
+			
+		}
+		if (InEntity.HasComponent<Mesh>())
+		{
+			yaml_emitter_key(Out, "Mesh");
+			yaml_emitter_begin_map(Out);
+
+			Mesh& EntityMesh = InEntity.GetComponent<Mesh>();
+			yaml_emitter_key(Out, "ModelKey");
+			yaml_emitter_value_string(Out, EntityMesh.mKey.GetKey().c_str());
+			
+			yaml_emitter_end_map(Out);
+		}
+		if (InEntity.HasComponent<DirectionalLight>())
+		{
+			yaml_emitter_key(Out, "DirectionalLight");
+			yaml_emitter_begin_map(Out);
+
+			DirectionalLight& DirLight = InEntity.GetComponent<DirectionalLight>();
+			yaml_emitter_key(Out, "Diffuse");
+			yaml_emitter_value_vec3(Out, ToVec3(DirLight.Diffuse));
+			yaml_emitter_key(Out, "Ambient");
+			yaml_emitter_value_vec3(Out, ToVec3(DirLight.Ambient));
+			yaml_emitter_key(Out, "Specular");
+			yaml_emitter_value_vec3(Out, ToVec3(DirLight.Specular));
+			yaml_emitter_key(Out, "Direction");
+			yaml_emitter_value_vec3(Out, ToVec3(DirLight.Direction));
+
+			yaml_emitter_end_map(Out);
+		}
+		if (InEntity.HasComponent<ScriptComponent>())
+		{
+			auto& scriptComponent = InEntity.GetComponent<ScriptComponent>();
+
+			yaml_emitter_key(Out, "ScriptComponent");
+			yaml_emitter_value_seq(Out);
+
+			// Fields
+			for (uint64_t instanceID : scriptComponent.mScriptInstances)
+			{
+				ScriptInstance& instance = Engine::Get().GetScriptInterface().GetScriptInstance(instanceID);
+				const auto& fields = instance.fields;
+				// NOTE: You cannot use keys in a sequence it has to begin with a map
+				yaml_emitter_begin_map(Out); // Script instance map entry
+				yaml_emitter_key(Out, instance.className.c_str());
+				yaml_emitter_begin_map(Out); // ScriptInstance
+				if (fields.size() > 0)
+				{
+					yaml_emitter_key(Out, "ScriptFields");
+					yaml_emitter_value_seq(Out); //Script Fields
+					for (ScriptFieldInstance field : fields)
+					{
+						yaml_emitter_begin_map(Out); // Field instance map entry
+						yaml_emitter_key(Out, field.Field.Name.c_str());
+						yaml_emitter_begin_map(Out); //Field instance
+						yaml_emitter_key(Out, "Type");
+						yaml_emitter_value_string(Out, Utils::ScriptFieldTypeToString(field.Field.GetType()));
+
+						yaml_emitter_key(Out, "Data");
+
+						switch (field.Field.GetType())
+						{
+						case ScriptFieldType::Float:
+							yaml_emitter_value_float(Out, field.GetValue<float>());
+							break;
+						case ScriptFieldType::Double:
+							yaml_emitter_value_double(Out, field.GetValue<double>());
+							break;
+						case ScriptFieldType::Bool:
+							yaml_emitter_value_bool(Out, field.GetValue<bool>());
+							break;
+						case ScriptFieldType::Char:
+							yaml_emitter_value_char(Out, field.GetValue<char>());
+							break;
+						case ScriptFieldType::String:
+							yaml_emitter_value_string(Out, field.GetValue<std::string>().c_str());
+							break;
+						case ScriptFieldType::Int:
+							yaml_emitter_value_int(Out, field.GetValue<int>());
+							break;
+						case ScriptFieldType::Vector2:
+							yaml_emitter_value_vec2(Out, field.GetValue<Vector2>());
+							break;
+						case ScriptFieldType::Vector3:
+							yaml_emitter_value_vec3(Out, field.GetValue<Vector3>());
+							break;
+						case ScriptFieldType::Entity:
+							yaml_emitter_value_int32(Out, field.GetValue<uint32_t>());
+							break;
+						}
+						yaml_emitter_end_map(Out); // Field instance
+						yaml_emitter_end_map(Out); // Field instance map entry 
+					}
+					yaml_emitter_end_seq(Out); // ScriptFields
+				}
+				yaml_emitter_end_map(Out); // ScriptInstance
+				yaml_emitter_end_map(Out); // ScriptInstance map entry
+			}
+
+			yaml_emitter_end_seq(Out); // ScriptComponent
+		}
+		if (InEntity.HasComponent<BoxBody>())
+		{
+			yaml_emitter_key(Out, "BoxBody");
+			yaml_emitter_begin_map(Out);
+
+			BoxBody& body = InEntity.GetComponent<BoxBody>();
+			yaml_emitter_key(Out, "UseGravity");
+			yaml_emitter_value_bool(Out, body.mbUseGravity);
+			yaml_emitter_key(Out, "IsStatic");
+			yaml_emitter_value_bool(Out, body.mbIsStatic);
+			yaml_emitter_key(Out, "MotionType");
+			switch (body.mMotionType)
+			{
+			case(EPhysicsMotionType::Static):
+				yaml_emitter_value_string(Out, std::string("Static").c_str());
+				break;
+			case(EPhysicsMotionType::Kinematic):
+				yaml_emitter_value_string(Out, std::string("Kinematic").c_str());
+				break;
+			case(EPhysicsMotionType::Dynamic):
+				yaml_emitter_value_string(Out, std::string("Dynamic").c_str());
+				break;
+			}
+			yaml_emitter_key(Out, "Mass");
+			yaml_emitter_value_float(Out, body.mMass);
+			yaml_emitter_end_map(Out);
+		}
+		if (InEntity.HasComponent<Camera>())
+		{
+			yaml_emitter_key(Out, "Camera");
+			yaml_emitter_begin_map(Out);
+			yaml_emitter_end_map(Out);
+		}
+		if (InEntity.HasComponent<CollisionComponent>())
+		{
+			CollisionComponent& comp = InEntity.GetComponent<CollisionComponent>();
+			yaml_emitter_key(Out, "CollisionComponent");
+			yaml_emitter_begin_map(Out);
+			yaml_emitter_key(Out, "Trigger");
+			yaml_emitter_value_bool(Out, comp.bIsTrigger);
+			yaml_emitter_end_map(Out);
+		}
+		if (InEntity.HasComponent<Text>())
+		{
+			yaml_emitter_key(Out, "Text");
+			yaml_emitter_begin_map(Out);
+
+			Text& text = InEntity.GetComponent<Text>();
+			yaml_emitter_key(Out, "Text");
+			yaml_emitter_value_string(Out, text.GetText().c_str());
+			yaml_emitter_key(Out, "Font");
+			yaml_emitter_value_string(Out, text.mFontKey.GetKey().c_str());
+			yaml_emitter_key(Out, "Color");
+			yaml_emitter_value_vec3(Out, text.mColor);
+			yaml_emitter_end_map(Out);
 		}
 		//if (InEntity.HasComponent<Mesh>())
 		//{
@@ -188,78 +214,270 @@ namespace Razor
 		//	Out << YAML::EndMap;
 		//}
 
-		Out << YAML::EndMap;
+		yaml_emitter_end_map(Out);
 	}
 
 
 
 	void SceneSerializer::Serialize(Ref<Scene> OutScene)
 	{
-		YAML::Emitter Out;
-		Out << YAML::BeginMap;
-		Out << YAML::Key << "Scene" << YAML::Value << "Untitled";
-		Out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
+		YamlEmitter* Out = yaml_emitter_new();
+		yaml_emitter_begin_map(Out);
+		yaml_emitter_key(Out, "Scene");
+		yaml_emitter_value_string(Out, "Untitled");
+		yaml_emitter_key(Out, "Entities");
+		yaml_emitter_value_seq(Out);
 		auto View = OutScene->GetEntitiesWithComponents<Transform>();
 		for (auto Handle : View)
 		{
 			SerializeEntity(Out, *OutScene->GetEntity(Handle));
 		}
-		Out << YAML::EndSeq;
-		Out << YAML::EndMap;
+		yaml_emitter_end_seq(Out);
+		yaml_emitter_key(Out, "Systems");
+		yaml_emitter_value_seq(Out);
+		for (uint64_t handle : OutScene->mSystemInstanceHandles)
+		{
+			ScriptInstance& instance = Engine::Get().GetScriptInterface().GetScriptInstance(handle);
+			yaml_emitter_value_string(Out, instance.className.c_str());
+		}
+		yaml_emitter_end_seq(Out);
+		yaml_emitter_end_map(Out);
 
 		std::ofstream FOut(OutScene->GetPath().c_str());
 		const char* ErrorMsg = new char(' ');
 		std::perror(ErrorMsg);
 		RZ_CORE_WARN("Error Msg: {0}", ErrorMsg);
-		FOut << Out.c_str();
+		FOut << yaml_emitter_cstr(Out);
 		FOut.close();
 	}
 
-	void SceneSerializer::Deserialize(Ref<Scene> OutScene)
+	bool SceneSerializer::Deserialize(Ref<Scene> OutScene)
 	{
-		YAML::Node Data;
-		try
+		bool bContainsExt = false;
+		for (int i = 0; i < OutScene->GetPath().length(); i++)
 		{
-			Data = YAML::LoadFile(OutScene->GetPath());
+			if (OutScene->GetPath()[i] == '.')
+			{
+				const std::string Extension = OutScene->GetPath().substr(i, 6);
+				if (Extension == ".rzscn")
+				{
+					bContainsExt = true;
+					break;
+				}
+			}
 		}
-		catch (YAML::ParserException e)
+		if (bContainsExt == false)
 		{
-			RZ_CORE_ERROR("Failed to load .rzscn file '{0}'\n	{1}", OutScene->GetPath(), e.what());
-			return;
+			return false;
+		}
+		struct stat Buffer;
+		if (stat(OutScene->GetPath().c_str(), &Buffer) != 0)
+		{
+			RZ_CORE_WARN("SceneSerializer.Deserialize: Attempted to load scene file that didn't exist called: {0}", OutScene->GetPath());
+			return false;
+		}
+		YamlNode* Data = yaml_load_file(OutScene->GetPath().c_str());
+		if(!Data)
+		{
+			RZ_CORE_ERROR("Failed to load .rzscn file '{0}'\n	{1}", OutScene->GetPath(), yaml_get_last_error());
+			return false;
 		}
 
-		if (!Data["Scene"])
+		if (!yaml_get_child(Data, "Scene"))
 		{
 			RZ_CORE_ERROR("Incomplete .rzscn file missing 'Scene' key");
-			return;
+			return false;
 		}
 
-		std::string SceneName = Data["Scene"].as<std::string>();
+		std::string SceneName = yaml_as_string(yaml_get_child(Data, "Scene"));
 		RZ_CORE_TRACE("Deserializing scene '{0}'", SceneName);
 
-		auto Entities = Data["Entities"];
+		auto Entities = yaml_get_child(Data, "Entities");
 		if (Entities)
 		{
-			for (auto EntityNode : Entities)
+			for (auto EntityNode : yaml_get_children(Data, "Entities"))
 			{
-				Ref<Entity> DeserializedEntity = OutScene->CreateEntity();
-				auto TransformComponent = EntityNode["Transform"];
-				if (TransformComponent)
-				{
-					glm::vec3 Position = TransformComponent["Position"].as<glm::vec3>();
-					glm::vec3 Rotation = TransformComponent["Rotation"].as<glm::vec3>();
-					glm::vec3 Scale = TransformComponent["Scale"].as<glm::vec3>();
-					Transform EntityTransform = { Position, Scale, Rotation };
-					DeserializedEntity->AddComponent<Transform>(EntityTransform);
-				}
-				auto MeshComponent = EntityNode["Mesh"];
-				/*if (MeshComponent)
-				{
-					std::vector<MeshData> Data = MeshComponent["Data"].as<std::vector<MeshData>>();
-					Mesh EntityMesh = { Data };
-					DeserializedEntity->AddComponent<Mesh>(EntityMesh);
-				}*/
+				DeserializeEntity(EntityNode, OutScene);
 			}
+		}
+
+		auto Systems = yaml_get_child(Data, "Systems");
+		for (auto SystemNode : yaml_get_children(Data, "Systems"))
+		{
+			std::string typeName = yaml_as_string(SystemNode);
+			Razor::ScriptClass type = Engine::Get().GetScriptInterface().GetType(typeName);
+			if (type)
+			{
+				RZ_CORE_INFO("Creating System Object for type: {0}", typeName);
+				OutScene->CreateSystemInstance(type);
+			}
+			else
+			{
+				RZ_CORE_WARN("Could not find type for system: {0}", typeName);
+			}
+		}
+		return true;
+	}
+
+	void SceneSerializer::DeserializeEntity(YamlNode* EntityNode, Ref<Scene> OutScene)
+	{
+		Ref<Entity> DeserializedEntity = OutScene->CreateEntity();
+		auto TransformComponent = yaml_get_child(EntityNode, "Transform");
+		/* This is a one-off case as all entities are created with transform & script components so we don't need to add one just pass data */
+		if (TransformComponent)
+		{
+			Transform& comp = DeserializedEntity->GetComponent<Transform>();
+			comp.Position = ToGVec3(yaml_as_vec3(yaml_get_child(TransformComponent, "Position")));
+			comp.Rotation = ToGVec3(yaml_as_vec3(yaml_get_child(TransformComponent, "Rotation")));
+			comp.Scale = ToGVec3(yaml_as_vec3(yaml_get_child(TransformComponent, "Scale")));
+		}
+		auto ScriptComponent = yaml_get_child(EntityNode, "ScriptComponent");
+		if (ScriptComponent)
+		{ 
+			Razor::ScriptComponent& sc = DeserializedEntity->GetComponent<Razor::ScriptComponent>();
+			ScriptInterface& interface = Engine::Get().GetScriptInterface();
+			for (const auto& node : yaml_get_children(ScriptComponent)) // Seq
+			{
+				for (const auto& [className, classNode] : yaml_get_children_map(node)) // Map (each entry is single key class name)
+				{
+					uint64_t instanceId = interface.CreateScriptInstance(interface.GetType(className));
+					ScriptInstance& instance = interface.GetScriptInstance(instanceId);
+
+					auto scriptFieldsNode = yaml_get_child(classNode, "ScriptFields");
+					for (const auto& fieldEntry : yaml_get_children(scriptFieldsNode)) // Seq
+					{
+						for (const auto& [fieldName, fieldNode] : yaml_get_children_map(fieldEntry)) // Map (each entry is name of field with mapped details)
+						{
+							std::string typeString = yaml_as_string(yaml_get_child(fieldNode, "Type"));
+							ScriptFieldInstance& fieldInstance = instance.GetFieldInstance(fieldName);
+							ScriptFieldType type = Utils::ScriptFieldTypeFromString(typeString);
+
+
+							switch (type)
+							{
+							case ScriptFieldType::Float:
+							{
+								float data = yaml_as_float(yaml_get_child(fieldNode, "Data"), 0.0f);
+								fieldInstance.SetValue(data);
+								break;
+							}
+							case ScriptFieldType::Double:
+							{
+								double data = yaml_as_double(yaml_get_child(fieldNode, "Data"), 0.0);
+								fieldInstance.SetValue(data);
+								break;
+							}
+							case ScriptFieldType::Bool:
+							{
+								bool data = yaml_as_bool(yaml_get_child(fieldNode, "Data"), false);
+								fieldInstance.SetValue(data);
+								break;
+							}
+							case ScriptFieldType::Char:
+							{
+								char data = yaml_as_char(yaml_get_child(fieldNode, "Data"));
+								fieldInstance.SetValue(data);
+								break;
+							}
+							case ScriptFieldType::String:
+							{
+								std::string data = yaml_as_string(yaml_get_child(fieldNode, "Data"));
+								fieldInstance.SetValue(data);
+								break;
+							}
+							case ScriptFieldType::Int:
+							{
+								int data = yaml_as_int(yaml_get_child(fieldNode, "Data"), 0);
+								fieldInstance.SetValue(data);
+								break;
+							}
+							case ScriptFieldType::Vector2:
+							{
+								Vector2 data = yaml_as_vec2(yaml_get_child(fieldNode, "Data"));
+								fieldInstance.SetValue(data);
+								break;
+							}
+							case ScriptFieldType::Vector3:
+							{
+								Vector3 data = yaml_as_vec3(yaml_get_child(fieldNode, "Data"));
+								fieldInstance.SetValue(data);
+								break;
+							}
+							case ScriptFieldType::Entity:
+							{
+								uint32_t data = yaml_as_int32(yaml_get_child(fieldNode, "Data"), 0);
+								fieldInstance.SetValue(data);
+								break;
+							}
+							}
+						}
+					}
+					sc.mScriptInstances.push_back(instanceId);
+				}
+			}
+		}
+		auto MeshComponent = yaml_get_child(EntityNode, "Mesh");
+		if (MeshComponent)
+		{
+			AssetKey key(yaml_as_string(yaml_get_child(MeshComponent, "ModelKey")));
+			Mesh EntityMesh = { key };
+			DeserializedEntity->AddComponent<Mesh>(EntityMesh);
+		}
+		auto DirectionalLightComponent = yaml_get_child(EntityNode, "DirectionalLight");
+		if(DirectionalLightComponent)
+		{
+			DirectionalLight dirLight;
+			dirLight.Diffuse = ToGVec3(yaml_as_vec3(yaml_get_child(DirectionalLightComponent, "Diffuse")));
+			dirLight.Ambient = ToGVec3(yaml_as_vec3(yaml_get_child(DirectionalLightComponent, "Ambient")));
+			dirLight.Specular = ToGVec3(yaml_as_vec3(yaml_get_child(DirectionalLightComponent, "Specular")));
+			dirLight.Direction = ToGVec3(yaml_as_vec3(yaml_get_child(DirectionalLightComponent, "Direction")));
+			DeserializedEntity->AddComponent<DirectionalLight>(dirLight);
+		}
+		auto BoxBodyComponent = yaml_get_child(EntityNode, "BoxBody");
+		if (BoxBodyComponent)
+		{
+			BoxBody body;
+			body.mbUseGravity = yaml_as_bool(yaml_get_child(BoxBodyComponent, "UseGravity"), false);
+			body.mbIsStatic = yaml_as_bool(yaml_get_child(BoxBodyComponent, "IsStatic"), false);
+			std::string motionTypeStr = yaml_as_string(yaml_get_child(BoxBodyComponent, "MotionType"));
+			if (motionTypeStr == "Static")
+			{
+				body.mMotionType = EPhysicsMotionType::Static;
+			}
+			else if (motionTypeStr == "Kinematic")
+			{
+				body.mMotionType = EPhysicsMotionType::Kinematic;
+			}
+			else if (motionTypeStr == "Dynamic")
+			{
+				body.mMotionType = EPhysicsMotionType::Dynamic;
+			}
+			body.mMass = yaml_as_float(yaml_get_child(BoxBodyComponent, "Mass"), 1.0f);
+			DeserializedEntity->AddComponent<BoxBody>(body);
+		}
+		auto CameraComponent = yaml_get_child(EntityNode, "Camera");
+		if (CameraComponent)
+		{
+			Camera camera;
+			DeserializedEntity->AddComponent<Camera>(camera);
+		}
+		auto CollisionComponent = yaml_get_child(EntityNode, "CollisionComponent");
+		if (CollisionComponent)
+		{
+			Razor::CollisionComponent comp;
+			comp.bIsTrigger = yaml_as_bool(yaml_get_child(CollisionComponent, "Trigger"), false);
+			DeserializedEntity->AddComponent<Razor::CollisionComponent>(comp);
+		}
+		auto TextComponent = yaml_get_child(EntityNode, "Text");
+		if (TextComponent)
+		{
+			std::string textContents = yaml_as_string(yaml_get_child(TextComponent, "Text"));
+			Vector3 color = yaml_as_vec3(yaml_get_child(TextComponent, "Color"));
+			AssetKey key(yaml_as_string(yaml_get_child(TextComponent, "Font")));
+			Text textComp(*Engine::Get().GetShaderForType(typeid(DefaultTextShader).name()), textContents);
+			textComp.mFontKey = key;
+			textComp.mColor = color;
+			DeserializedEntity->AddComponent<Text>(textComp);
 		}
 	}
 }

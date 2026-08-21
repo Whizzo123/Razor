@@ -3,21 +3,22 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include <glad/glad.h>
+#include "Core.h"
 
 enum ShaderType {VERTEX, FRAGMENT};
 
-class ShaderReader
+namespace Razor
 {
-public:
-    ShaderReader();
-    ~ShaderReader();
+    class ShaderReader
+    {
+    public:
+        ShaderReader();
+        ~ShaderReader();
 
-    
-    static unsigned int CreateShader(std::string shaderName, ShaderType type);
-    static unsigned int CreateShaderProgram(std::string vertexShader, std::string fragmentShader);
-    
+        static Scope<unsigned int> CreateShaderProgram(const std::string& vertexShader, const std::string& fragmentShader);
 
-private:
-    static std::string ReadInShader(std::string shaderName);
-};
+    private:
+        static Scope<unsigned int> CreateShader(const std::string& shaderName, ShaderType type);
+        static std::string ReadInShader(const std::string& shaderName);
+    };
+}

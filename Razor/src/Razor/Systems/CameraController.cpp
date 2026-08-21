@@ -1,15 +1,19 @@
 #include "CameraController.h"
 #include "../Component.h"
+#include "../Engine.h"
 
 namespace Razor
 {
 	void CameraController::Run(float dt)
 	{
-		auto View = CurrentScene->GetEntitiesWithComponents<Camera>();
+		if (!Engine::Get().IsGameInputEnabled())
+			return;
+
+		auto View = _mCurrentScene->GetEntitiesWithComponents<Camera>();
 
 		for (auto Entity : View)
 		{
-			Camera& EntityCamera = CurrentScene->GetComponent<Camera>(Entity);
+			Camera& EntityCamera = _mCurrentScene->GetComponent<Camera>(Entity);
 			
 			const float CameraSpeed = 5.0f * dt; // adjust accordingly
 			const glm::vec3 CameraFront = EntityCamera.CameraFront;

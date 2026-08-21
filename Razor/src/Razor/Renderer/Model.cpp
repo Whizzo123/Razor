@@ -1,10 +1,13 @@
 #include "Model.h"
 #include <assimp/Importer.hpp>
+#include <assimp/mesh.h>
+#include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include "../Log.h"
 
 namespace Razor
 {
@@ -21,6 +24,8 @@ namespace Razor
 			return;
 		}
 		Directory = Path.substr(0, Path.find_last_of('/'));
+		_mName = Path.substr(1, Path.find_last_of('/'));
+		_mName = _mName.substr(0, Path.find_last_of('.'));
 
 		std::vector<MeshData> Meshes;
 

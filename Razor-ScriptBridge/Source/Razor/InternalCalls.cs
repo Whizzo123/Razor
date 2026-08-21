@@ -1,0 +1,169 @@
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Text;
+
+namespace Razor
+{
+    internal static unsafe class InternalCalls
+    {
+        // <Params,..., return>
+        internal static delegate* unmanaged<ulong, Type, bool> Entity_HasComponent;
+        internal static delegate* unmanaged[Cdecl]<IntPtr, void> Print_Message;
+        internal static delegate* unmanaged<int*, uint*> Scene_GetEntitiesWithTransforms;
+        internal static delegate* unmanaged[Cdecl]<int, uint*, int*, int> Scene_GetEntitiesWithScriptComponent;
+        internal static delegate* unmanaged[Cdecl]<sbyte*, int> Util_GetTypeIdForManagedType;
+        internal static delegate* unmanaged[Cdecl]<int, uint, IntPtr> Scene_GetComponentOnEntity;
+        internal static delegate* unmanaged[Cdecl]<int, int>                            Input_GetKey;
+        internal static delegate* unmanaged[Cdecl]<uint, float*, float*, float*, void> Transform_GetPosition;
+        internal static delegate* unmanaged[Cdecl]<uint, float, float, float, void>    Transform_SetPosition;
+        internal static delegate* unmanaged[Cdecl]<uint, int>                          Collision_GetEventCount;
+        internal static delegate* unmanaged[Cdecl]<uint, int, int*, uint*, float**, float**, float**, int*, void>       Collision_GetEvent;
+         internal static delegate* unmanaged[Cdecl]<uint, IntPtr, void>				Text_SetText;
+        internal static delegate* unmanaged[Cdecl]<uint, byte*, int, void>			Text_GetText;
+        internal static delegate* unmanaged[Cdecl]<uint, float, float, float, void>	Text_SetColor;
+        internal static delegate* unmanaged[Cdecl]<uint, float, void>				Text_SetScale;
+        internal static delegate* unmanaged<int*, uint*>							Scene_GetEntitiesWithText;
+
+        public static void LogMsg(string msg)
+        {
+            IntPtr p = Marshal.StringToHGlobalAnsi(msg);
+
+            try
+            {
+                Print_Message(p);
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(p);
+            }
+        }
+
+        public static bool HasComponent(ulong entityHandle, Type componentType)
+        {
+            return Entity_HasComponent(entityHandle, componentType);
+        }
+
+        public static List<UInt32> GetEntitiesWithTransforms()
+        {
+            int count;
+            uint* ptr = Scene_GetEntitiesWithTransforms(&count);
+
+            List<UInt32> entities = new List<UInt32>();
+            for(int i = 0; i < count; i++)
+            {
+                entities.Add(ptr[i]);
+            }
+
+            return entities;
+        }
+
+        public static uint[] GetEntitiesWithComponent<T>()
+        {
+            string fullName = typeof(T).FullName;
+            fixed (byte* name = Encoding.UTF8.GetBytes(fullName + '\0'))
+            {
+                int typeId = Util_GetTypeIdForManagedType((sbyte*)name);  // Get the Coral TypeId for T
+
+                int count = 0;
+                Scene_GetEntitiesWithScriptComponent(typeId, null, &count);
+
+                if (count == 0)
+                {
+                    return Array.Empty<uint>();
+                }
+
+                uint[] result = new uint[count];
+                fixed (uint* buf = result)
+                {
+                    int written = Scene_GetEntitiesWithScriptComponent(typeId, buf, &count); // Call C++ bridge
+                    if (written != count)
+                    {
+                        Array.Resize(ref result, written);
+                    }
+                }
+
+                return result;
+            }
+        }
+
+        public static RazorKeyState GetInputKey(RazorKey key)
+        {
+            return (RazorKeyState)Input_GetKey((int)key);
+        }
+
+        public static (float X, float Y, float Z) GetTransformPosition(uint entityId)
+        {
+            float x, y, z;
+            Transform_GetPosition(entityId, &x, &y, &z);
+            return (x, y, z);
+        }
+
+        public static void SetTransformPosition(uint entityId, float x, float y, float z)
+        {
+            Transform_SetPosition(entityId, x, y, z);
+        }
+
+        public static int CollisionGetEventCount(uint entityId)
+            => Collision_GetEventCount(entityId);
+
+        public static CollisionEvent CollisionGetEvent(uint entityId, int index)
+        {
+            int type; uint otherId;
+            float* x, y, z;
+            int hitLength;
+            Collision_GetEvent(entityId, index, &type, &otherId, &x, &y, &z, &hitLength);
+            return new CollisionEvent { Type = (CollisionEventType)type, OtherEntityId = otherId, hitX = new ReadOnlySpan<float>(x, hitLength).ToArray(), hitY = new ReadOnlySpan<float>(y, hitLength).ToArray(), hitZ = new ReadOnlySpan<float>(z, hitLength).ToArray() };
+        }
+
+        public static T GetComponent<T>(uint entityId) where T : Component
+        {
+            string fullName = typeof(T).FullName;
+            fixed (byte* name = Encoding.UTF8.GetBytes(fullName + '\0'))
+            {
+                int typeId = Util_GetTypeIdForManagedType((sbyte*)name);  // Get the Coral TypeId for T
+
+                IntPtr ptr = Scene_GetComponentOnEntity(typeId, entityId);
+                if (ptr == IntPtr.Zero)
+                    return default(T);
+
+                GCHandle handle = GCHandle.FromIntPtr(ptr);
+                object obj = handle.Target!;
+
+                return obj as T;
+            }
+        }
+
+		 public static void TextSetText(uint entityId, string text)
+ 		{
+ 		    IntPtr p = Marshal.StringToHGlobalAnsi(text);
+ 		    try { Text_SetText(entityId, p); }
+ 		    finally { Marshal.FreeHGlobal(p); }
+ 		}
+		
+ 		public static string TextGetText(uint entityId)
+ 		{
+ 		    byte[] buffer = new byte[512];
+ 		    fixed (byte* buf = buffer)
+ 		        Text_GetText(entityId, buf, buffer.Length);
+ 		    return Encoding.UTF8.GetString(buffer).TrimEnd('\0');
+ 		}
+		
+ 		public static void TextSetColor(uint entityId, float r, float g, float b)
+ 		    => Text_SetColor(entityId, r, g, b);
+		
+ 		public static void TextSetScale(uint entityId, float scale)
+ 		    => Text_SetScale(entityId, scale);
+		
+ 		public static List<uint> GetEntitiesWithText()
+ 		{
+ 		    int count;
+ 		    uint* ptr = Scene_GetEntitiesWithText(&count);
+ 		    var entities = new List<uint>();
+ 		    for (int i = 0; i < count; i++)
+ 		        entities.Add(ptr[i]);
+ 		    return entities;
+ 		}
+    }
+}

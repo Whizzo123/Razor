@@ -3,7 +3,7 @@
 	url = https://github.com/gabime/spdlog
 [submodule "Razor/vendor/assimp"]
 	path = Razor/vendor/assimp
-	url = https://github.com/AminAliari/assimp
+	url = https://github.com/Whizzo123/assimp
 [submodule "Razor/vendor/glm"]
 	path = Razor/vendor/glm
 	url = https://github.com/g-truc/glm
@@ -19,3 +19,12 @@
 [submodule "Razor/vendor/entt"]
 	path = Razor/vendor/entt
 	url = https://github.com/Whizzo123/entt.git
+[submodule "Razor/vendor/Coral"]
+	path = Razor/vendor/Coral
+	url = https://github.com/Whizzo123/Coral.git
+[submodule "Razor/vendor/JoltPhysics"]
+	path = Razor/vendor/JoltPhysics
+	url = https://github.com/Whizzo123/JoltPhysics
+[submodule "Razor/vendor/freetype"]
+	path = Razor/vendor/freetype
+	url = git@github.com:Whizzo123/freetype.git

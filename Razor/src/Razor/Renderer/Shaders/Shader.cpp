@@ -1,37 +1,15 @@
 #include "Shader.h"
+
+#include "../../Component.h"
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
-
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/ext/matrix_float4x4.hpp>
+#include <string>
 
 namespace Razor
 {
-    //void SetTextures(std::vector<MeshData::Texture>& Textures)
-    //{
-    //    unsigned int DiffuseNr = 1;
-    //    unsigned int SpecularNr = 1;
-    //    unsigned int NormalNr = 1;
-    //    unsigned int HeightNr = 1;
-    //    int count = 0;
-    //    for (const MeshData::Texture& Texture : Textures)
-    //    {
-    //        std::string number;
-    //        std::string name = Texture.Type;
-    //        if (name == "texture_diffuse")
-    //            number = std::to_string(DiffuseNr++);
-    //        else if (name == "texture_specular")
-    //            number = std::to_string(SpecularNr++); // transfer unsigned int to string
-    //        else if (name == "texture_normal")
-    //            number = std::to_string(NormalNr++); // transfer unsigned int to string
-    //        else if (name == "texture_height")
-    //            number = std::to_string(HeightNr++); // transfer unsigned int to string
-    //        //SetInt((name + number), count);
-    //        glActiveTexture(GL_TEXTURE0 + count);
-    //        glBindTexture(GL_TEXTURE_2D, Texture.Id);
-    //        count++;
-    //    }
-    //}
 
     unsigned int Shader::GetUniformLocation(std::string Name)
     {

@@ -1,11 +1,12 @@
 #pragma once
 
 #include "Razor.h"
-#include "../EditorStorage.h"
-
 
 namespace EdgeEditor
 {
+	struct EditorStorage;
+	class AssetPickerPopupWindow;
+
 	class Inspector
 	{
 	public:
@@ -19,6 +20,7 @@ namespace EdgeEditor
 
 	private:
 		Razor::Ref<EditorStorage> Storage;
+		Razor::Ref<AssetPickerPopupWindow> _mAssetPickerPopup = nullptr;
 	};
 }
 

@@ -8,28 +8,28 @@ namespace EdgeEditor
 		const glm::vec3 CameraFront = Camera.CameraFront;
 		const glm::vec3 CameraUp = Camera.CameraUp;
 
-		if (RazorIO::Get().GetStateForKey(RazorKey::W) == KEY_PRESSED)
+		if (Razor::RazorIO::Get().GetStateForKey(Razor::RazorKey::W) == Razor::KEY_PRESSED || Razor::RazorIO::Get().GetStateForKey(Razor::RazorKey::W) == Razor::KEY_HELD)
 		{
 			Camera.CameraPos += CameraSpeed * CameraFront;
 		}
-		if (RazorIO::Get().GetStateForKey(RazorKey::S) == KEY_PRESSED)
+		if (Razor::RazorIO::Get().GetStateForKey(Razor::RazorKey::S) == Razor::KEY_PRESSED || Razor::RazorIO::Get().GetStateForKey(Razor::RazorKey::S) == Razor::KEY_HELD)
 		{
 			Camera.CameraPos -= CameraSpeed * CameraFront;
 		}
-		if (RazorIO::Get().GetStateForKey(RazorKey::A) == KEY_PRESSED)
+		if (Razor::RazorIO::Get().GetStateForKey(Razor::RazorKey::A) == Razor::KEY_PRESSED || Razor::RazorIO::Get().GetStateForKey(Razor::RazorKey::A) == Razor::KEY_HELD)
 		{
 			Camera.CameraPos -= glm::normalize(glm::cross(CameraFront, CameraUp)) * CameraSpeed;
 		}
-		if (RazorIO::Get().GetStateForKey(RazorKey::D) == KEY_PRESSED)
+		if (Razor::RazorIO::Get().GetStateForKey(Razor::RazorKey::D) == Razor::KEY_PRESSED || Razor::RazorIO::Get().GetStateForKey(Razor::RazorKey::D) == Razor::KEY_HELD)
 		{
 			Camera.CameraPos += glm::normalize(glm::cross(CameraFront, CameraUp)) * CameraSpeed;
 		}
 
-		const Vector2D CurrentMouseCoords = RazorIO::Get().CurrentMousePos;
+		const Razor::Vector2D CurrentMouseCoords = Razor::RazorIO::Get().CurrentMousePos;
 		// Capture moment we click down
 		// Move us each update by the distance we have moved
 		// Capture moment we stop clicking
-		if (RazorIO::Get().GetStateForMouseButton(RazorMouseButton::RIGHT) == RazorMouseState::MOUSE_DOWN)
+		if (Razor::RazorIO::Get().GetStateForMouseButton(Razor::RazorMouseButton::RIGHT) == Razor::RazorMouseState::MOUSE_DOWN)
 		{
 			if (bIsFirstFrameDown)
 			{
@@ -40,10 +40,8 @@ namespace EdgeEditor
 
 			if (MouseLastX != CurrentMouseCoords.X || MouseLastY != CurrentMouseCoords.Y)
 			{
-				RZ_CORE_INFO("MouseCoords: {0},{1}", CurrentMouseCoords.X, CurrentMouseCoords.Y);
-				RZ_CORE_INFO("LastMouseCoords: {0},{1}", MouseLastX, MouseLastY);
-				float Xoffset = RazorIO::Get().CurrentMousePos.X - MouseLastX;
-				float Yoffset = RazorIO::Get().CurrentMousePos.Y - MouseLastY;
+				float Xoffset = Razor::RazorIO::Get().CurrentMousePos.X - MouseLastX;
+				float Yoffset = Razor::RazorIO::Get().CurrentMousePos.Y - MouseLastY;
 
 				const float MouseSensitivity = 0.1f;
 				Xoffset *= MouseSensitivity;
@@ -58,13 +56,13 @@ namespace EdgeEditor
 				Camera.CameraDirection.y = sin(glm::radians(Pitch));
 				Camera.CameraDirection.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
 
-				MouseLastX = RazorIO::Get().CurrentMousePos.X;
-				MouseLastY = RazorIO::Get().CurrentMousePos.Y;
+				MouseLastX = Razor::RazorIO::Get().CurrentMousePos.X;
+				MouseLastY = Razor::RazorIO::Get().CurrentMousePos.Y;
 			}
 			Camera.CameraFront = Camera.CameraDirection;
 		}
 
-		if (RazorIO::Get().GetStateForMouseButton(RazorMouseButton::RIGHT) == RazorMouseState::MOUSE_UP)
+		if (Razor::RazorIO::Get().GetStateForMouseButton(Razor::RazorMouseButton::RIGHT) == Razor::RazorMouseState::MOUSE_UP)
 		{
 			bIsFirstFrameDown = true;
 		}

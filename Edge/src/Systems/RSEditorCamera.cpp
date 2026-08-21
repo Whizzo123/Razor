@@ -3,19 +3,17 @@
 namespace EdgeEditor
 {
 
-	void RSEditorCamera::Render(Razor::RenderPipelineEntityProperties& EntityProperties)
+	void RSEditorCamera::Render(Razor::RenderPipelineData& data)
 	{
-		const int SCREEN_WIDTH = 800;
-		const int SCREEN_HEIGHT = 600;
-
-		glm::mat4 CameraProjection = glm::perspective(glm::radians(45.0f), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
+		const float AspectRatio = ViewportHeight > 0 ? (float)ViewportWidth / (float)ViewportHeight : 1.0f;
+		glm::mat4 CameraProjection = glm::perspective(glm::radians(45.0f), AspectRatio, 0.1f, 100.0f);
 		glm::mat4 CameraView = glm::lookAt(EditorCamera.CameraPos, EditorCamera.CameraPos + EditorCamera.CameraFront, EditorCamera.CameraUp);
-		for (auto& Pair : EntityProperties.Properties)
+		for (auto& Pair : data.mEntityRenderProperties.Properties)
 		{
-			Razor::EntityRenderProperty& Property = Pair.second;
+			Razor::ShaderProperty& Property = Pair.second;
 			for (int j = 0; j < Property.GetNumberOfSlots(); j++)
 			{
-				Razor::PropertySlot& Slot = Property.GetPropertySlot(j);
+				Razor::ShaderPropertySlot& Slot = Property.GetPropertySlot(j);
 
 				Slot.AddProperty<glm::mat4>("projection", CameraProjection);
 				Slot.AddProperty<glm::mat4>("view", CameraView);

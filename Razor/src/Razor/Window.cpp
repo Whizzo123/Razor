@@ -2,36 +2,46 @@
 
 namespace Razor
 {
-    Window::Window(int width, int height, std::shared_ptr<IWindowProvider> Provider)
+    Window::Window(int width, int height, Ref<IWindowProvider> provider)
     {
-        Provider->CreateProviderWindow(width, height, "Edge");
-        this->Provider = Provider;
-        Width = width;
-        Height = height;
+        provider->CreateProviderWindow(width, height, "Edge");
+        this->_mProvider = provider;
+        _mWidth = width;
+        _mHeight = height;
     }
 
-    std::shared_ptr<IWindowProvider> Window::GetWindowProvider()
+    Ref<IWindowProvider> Window::GetWindowProvider()
     {
-        return Provider;
+        return _mProvider;
     }
 
     bool Window::ShouldWindowClose()
     {
-        return Provider->ShouldWindowClose();
+        return _mProvider->ShouldWindowClose();
     }
 
     void Window::SetWindowToClose()
     {
-        Provider->SetWindowToClose();
+        _mProvider->SetWindowToClose();
     }
 
     int Window::GetWidth() const
     {
-        return Width;
+        return _mWidth;
     }
 
     int Window::GetHeight() const
     {
-        return Height;
+        return _mHeight;
+    }
+
+    void Window::SetWidth(int value)
+    {
+        _mWidth = value;
+    }
+
+    void Window::SetHeight(int value)
+    {
+        _mHeight = value;
     }
 }

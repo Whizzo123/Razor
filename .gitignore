@@ -35,7 +35,10 @@
 .vs/
 bin/
 intermediate/
+Intermediates/
 documentation/
+obj/
+Binaries/
 
 !vendor/
 
@@ -46,3 +49,13 @@ documentation/
 *.vcxproj.filters
 *.sln
 *.ini
+Edge/resources/imgui.ini
+*.csproj
+!Razor/vendor/Coral/Coral.Managed/Coral.Managed.csproj
+!Razor-ScriptBridge/Razor-ScriptBridge.csproj
+!Sandbox/Scripts/Sandbox.csproj
+*.csproj.Backup.tmp
+*.deps.json
+*.pdb
+
+Makefile

@@ -1,31 +1,34 @@
 ﻿#include "TextureReader.h"
-
 #include "stb_image.h"
+#include "Engine.h"
+#include "Renderer/IRenderer.h"
+#include "Log.h"
 
-unsigned TextureReader::CreateTexture(std::string fileName)
+namespace Razor
 {
-
-    int width, height, nrChannels;
-    std::string temp = ("resources/textures/" + fileName);
-    const char* filePath = temp.c_str();
-    stbi_set_flip_vertically_on_load(true);
-    unsigned char* data = stbi_load(filePath, &width, &height, &nrChannels, 0);
-    unsigned int texture;
-    if(data)
+    unsigned TextureReader::CreateTexture(const std::string& fileName)
     {
-        
-        glGenTextures(1, &texture);
+        Ref<IRenderer> Renderer = Engine::Get().GetRenderer();
+        int width, height, nrChannels;
+        std::string fullPath = ("resources/textures/" + fileName);
+        stbi_set_flip_vertically_on_load(true);
+        unsigned char* data = stbi_load(fullPath.c_str(), &width, &height, &nrChannels, 0);
+        unsigned int texture;
+        if (data)
+        {
+            Renderer->GenerateTextures(1, &texture);
 
-        glBindTexture(GL_TEXTURE_2D, texture);
+            Renderer->BindTexture(ETextureType::TEXTURE_2D, texture);
+            Renderer->WriteTexture2dData(ETextureType::TEXTURE_2D, 0, EPixelDataFormat::RGBA, width, height, 0, EPixelDataFormat::RGBA, EPixelDataType::UNSIGNED_BYTE, data);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
+            Renderer->GenerateMipmap(ETextureType::TEXTURE_2D);
+        }
+        else
+        {
+            RZ_CORE_ERROR("TextureReader::CreateTexture -> Failed to load texture");
+        }
+        stbi_image_free(data);
+
+        return texture;
     }
-    else
-    {
-        std::cout << "ERROR::FAILED::TO::LOAD::TEXTURE" << std::endl;
-    }
-    stbi_image_free(data);
-
-    return texture;
 }

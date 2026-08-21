@@ -5,22 +5,34 @@
 
 namespace Razor
 {
-    class   Window
+    class RAZOR_API Window
     {
     public:
-        Window(int width, int height, std::shared_ptr<IWindowProvider> Provider);
+        Window(int width, int height, Ref<IWindowProvider> Provider);
         ~Window() {};
 
-        std::shared_ptr<IWindowProvider> GetWindowProvider();
+        Ref<IWindowProvider> GetWindowProvider();
         bool ShouldWindowClose();
         void SetWindowToClose();
         int GetWidth() const;
         int GetHeight() const;
+        /**
+        * Setter function for window width
+        * 
+        * @param value - the value to set Window Width to
+        */
+        void SetWidth(int value);
+        /**
+        * Setter function for window height
+        *
+        * @param value - the value to set Window Height to
+        */
+        void SetHeight(int value);
 
     protected:
-        std::shared_ptr<IWindowProvider> Provider;
-        int Width;
-        int Height;
+        Ref<IWindowProvider> _mProvider;
+        int _mWidth;
+        int _mHeight;
     };
 }
 

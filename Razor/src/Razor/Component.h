@@ -1,6 +1,5 @@
 #pragma once
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+
 #include <glm/ext/vector_float3.hpp>
 #include <bitset>
 #include <unordered_map>
@@ -10,6 +9,7 @@
 #include <memory>
 #include "IO/RazorIO.h"
 #include "Renderer/Model.h"
+#include "Assets/AssetDirectory.h"
 
 namespace Razor
 {
@@ -19,7 +19,7 @@ namespace Razor
 		glm::vec3 Scale;
 		glm::vec3 Rotation;
 
-		Transform() : Position(0.0f, 0.0f, 0.0f), Scale(0.0f, 0.0f, 0.0f), Rotation(0.0f, 0.0f, 0.0f), RotationQ(0.0f, 0.0f, 0.0f, 1.0f) {}
+		Transform() : Position(0.0f, 0.0f, 0.0f), Scale(1.0f, 1.0f, 1.0f), Rotation(0.0f, 0.0f, 0.0f), RotationQ(0.0f, 0.0f, 0.0f, 1.0f) {}
 		Transform(glm::vec3 Pos, glm::vec3 Scl, glm::vec3 Rot) : Position(Pos), Scale(Scl), Rotation(Rot), RotationQ(0.0f, 0.0f, 0.0f, 1.0f) {}
 
 		void Rotate(glm::vec3 EulerAngles)
@@ -32,6 +32,7 @@ namespace Razor
 			glm::mat4 model = glm::mat4(1.0f);
 			model = glm::translate(model, Position);
 			model = model * glm::toMat4(RotationQ);
+			model = glm::scale(model, Scale);
 			return model;
 		}
 
@@ -57,13 +58,12 @@ namespace Razor
 
 	struct DirectionalLight
 	{
-		glm::vec3 Position;
 		glm::vec3 Diffuse;
 		glm::vec3 Ambient;
 		glm::vec3 Specular;
 		glm::vec3 Direction;
 
-		DirectionalLight() : Position(glm::vec3(0.0f, 0.0f, 0.0f)), Diffuse(glm::vec3(1.0f, 1.0f, 1.0f)), Ambient(glm::vec3(1.0f, 1.0f, 1.0f)), Specular(glm::vec3(1.0f, 1.0f, 1.0f)), Direction(glm::vec3(1.0f, 0.0f, 0.0f)){}
+		DirectionalLight() : Diffuse(glm::vec3(1.0f, 1.0f, 1.0f)), Ambient(glm::vec3(1.0f, 1.0f, 1.0f)), Specular(glm::vec3(1.0f, 1.0f, 1.0f)), Direction(glm::vec3(1.0f, 0.0f, 0.0f)){}
 	};
 
 	struct PointLight : public Light
@@ -82,9 +82,9 @@ namespace Razor
 
 	struct Mesh
 	{
-		Mesh() {}
-		Mesh(Ref<Model> Model) : Model(Model) {}
-		Ref<Model> Model;
+		Mesh() : mKey(AssetKey("")) {}
+		Mesh(AssetKey assetKey) : mKey(assetKey) {}
+		AssetKey mKey;
 	};
 
 	struct Collider
@@ -92,7 +92,7 @@ namespace Razor
 		float Radius;
 	};
 
-	struct Camera
+	struct RAZOR_API Camera
 	{
 		// TODO Potentially move this and pass responsiblity onto the developer
 		Camera()
@@ -129,5 +129,28 @@ namespace Razor
 		RazorKey Keyboard;
 		// MouseBut [Key] -> State (0, 1)
 		// MousePos -> Pos
+	};
+
+	struct ScriptComponent
+	{
+		std::vector<uint64_t> mScriptInstances;
+
+		ScriptComponent() = default;
+		ScriptComponent(const ScriptComponent&) = default;
+	};
+
+	enum class CollisionEventType { Started, Ended };
+
+	struct CollisionEvent
+	{
+		CollisionEventType Type;
+		uint32_t OtherEntityId;
+		std::vector<Vector3> mCollisionPoints;
+	};
+
+	struct CollisionComponent
+	{
+		std::vector<CollisionEvent> Events;
+		bool bIsTrigger;
 	};
 }

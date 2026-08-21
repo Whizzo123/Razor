@@ -27,11 +27,15 @@ namespace EdgeEditor
 		* 
 		* @param EntityProperties - Shader properties for all the entities in the scene
 		*/
-		void Render(Razor::RenderPipelineEntityProperties& EntityProperties) override;
+		void Render(Razor::RenderPipelineData& data) override;
+
+		void SetViewportSize(uint32_t w, uint32_t h) { ViewportWidth = w; ViewportHeight = h; }
 
 	protected:
 		std::shared_ptr<Razor::IRenderer> Renderer; /** Shared Ptr to current IRenderer object */
 		Razor::Camera& EditorCamera; /** Ref to Camera object */
+		uint32_t ViewportWidth = 800;
+		uint32_t ViewportHeight = 600;
 	};
 }
 

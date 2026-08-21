@@ -4,7 +4,7 @@
 
 namespace Razor
 {
-	class Entity
+	class RAZOR_API Entity
 	{
 	public:
 		Entity() {}
@@ -17,6 +17,8 @@ namespace Razor
 			return component;
 		}
 
+		void AddScriptComponent(std::string className);
+
 		template<typename T>
 		bool HasComponent()
 		{
@@ -27,6 +29,17 @@ namespace Razor
 		T& GetComponent()
 		{
 			return _Scene->registry.get<T>(EntityHandle);
+		}
+
+		template<typename T>
+		bool RemoveComponent()
+		{
+			if(_Scene->registry.try_get<T>(EntityHandle))
+			{
+				_Scene->registry.remove<T>(EntityHandle);
+				return true;
+			}
+			return false;
 		}
 
 		entt::entity EntityHandle;
