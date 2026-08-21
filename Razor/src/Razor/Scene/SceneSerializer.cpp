@@ -202,6 +202,17 @@ namespace Razor
 			yaml_emitter_value_vec3(Out, text.mColor);
 			yaml_emitter_end_map(Out);
 		}
+		//if (InEntity.HasComponent<Mesh>())
+		//{
+		//	Out << YAML::Key << "Mesh";
+		//	Out << YAML::BeginMap;
+
+		//	Mesh& EntityMesh = InEntity.GetComponent<Mesh>();
+		//	Out << YAML::Key << "Data" << YAML::Value << YAML::BeginSeq;
+		//	//Out << YAML::Flow << EntityMesh.Data;
+		//	Out << YAML::EndSeq;
+		//	Out << YAML::EndMap;
+		//}
 
 		yaml_emitter_end_map(Out);
 	}
