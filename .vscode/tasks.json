@@ -2,7 +2,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build Debug",
+            "label": "Build Debug (CMake)",
             "type": "shell",
             "group": {
                 "kind": "build",
@@ -37,6 +37,41 @@
                         ]
                     }
                 },
+                "problemMatcher": "$msCompile"
+            }
+        },
+        {
+            "label": "Build Debug (Premake)",
+            "type": "shell",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "linux": {
+                "command": "make",
+                "args": [
+                    "-j$(nproc)",
+                    "config=debug"
+                ],
+                "options": {
+                    "cwd": "${workspaceFolder}",
+                    "env": {
+                        "PATH": "${env:HOME}/CMake/cmake-4.2.1-linux-x86_64/bin:${env:HOME}/.dotnet:${env:PATH}"
+                    }
+                },
+                "problemMatcher": "$gcc"
+            },
+            "windows": {
+                "command": "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
+                 "args": [
+                    "${workspaceFolder}\\Razor.sln",
+                    "/p:Configuration=Debug",
+                    "-maxcpucount:8"
+                ],
                 "problemMatcher": "$msCompile"
             }
         },
