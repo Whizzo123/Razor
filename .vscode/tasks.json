@@ -27,12 +27,16 @@
                 "problemMatcher": "$gcc"
             },
             "windows": {
-                "command": "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
-                "args": [
-                    "${workspaceFolder}\\Razor.sln",
-                    "/p:Configuration=Debug",
-                    "-maxcpucount:8"
-                ],
+                "command": "call \"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\VsDevCmd.bat\" -arch=x64 -vcvars_ver=14.44 && cmake --build \"${workspaceFolder}\\build\\cmake\" --parallel",
+                "options": {
+                    "shell": {
+                        "executable": "cmd.exe",
+                        "args": [
+                            "/d",
+                            "/c"
+                        ]
+                    }
+                },
                 "problemMatcher": "$msCompile"
             }
         },
@@ -72,6 +76,11 @@
             "group": "build",
             "problemMatcher": "$msCompile"
 
+        },
+        {
+        "label": "Clean project",
+        "type": "shell",
+        "command": "cmake --build \"${workspaceFolder}\\build\\cmake\" --target clean-all; if ($LASTEXITCODE -eq 0) { Remove-Item -Recurse -Force \"${workspaceFolder}\\build\\cmake\" }"
         }
     ]
 }

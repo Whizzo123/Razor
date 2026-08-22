@@ -43,10 +43,12 @@ target_compile_definitions(Razor PRIVATE
 )
 
 # GLFW backend define
-if(RAZOR_GLFW_BACKEND STREQUAL "wayland")
-    target_compile_definitions(Razor PRIVATE RZ_GLFW_WAYLAND)
-else()
-    target_compile_definitions(Razor PRIVATE RZ_GLFW_X11)
+if(UNIX AND NOT APPLE)
+    if(RAZOR_GLFW_BACKEND STREQUAL "wayland")
+        target_compile_definitions(Razor PRIVATE RZ_GLFW_WAYLAND)
+    else()
+        target_compile_definitions(Razor PRIVATE RZ_GLFW_X11)
+    endif()
 endif()
 
 # Include directories for header-only and non-target deps

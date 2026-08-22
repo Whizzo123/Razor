@@ -37,12 +37,15 @@ add_compile_definitions(
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-if(RAZOR_GLFW_BACKEND STREQUAL "wayland")
-    set(GLFW_BUILD_WAYLAND ON  CACHE BOOL "" FORCE)
-    set(GLFW_BUILD_X11     OFF CACHE BOOL "" FORCE)
-else()
-    set(GLFW_BUILD_X11     ON  CACHE BOOL "" FORCE)
-    set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "" FORCE)
+
+if(UNIX AND NOT APPLE)
+    if(RAZOR_GLFW_BACKEND STREQUAL "wayland")
+        set(GLFW_BUILD_WAYLAND ON  CACHE BOOL "" FORCE)
+        set(GLFW_BUILD_X11     OFF CACHE BOOL "" FORCE)
+    else()
+        set(GLFW_BUILD_X11     ON  CACHE BOOL "" FORCE)
+        set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "" FORCE)
+    endif()
 endif()
 
 # JoltPhysics
@@ -54,6 +57,7 @@ set(BUILD_SHARED_LIBS         OFF CACHE BOOL "" FORCE)
 set(TARGET_UNIT_TESTS         OFF CACHE BOOL "" FORCE)
 set(TARGET_PERFORMANCE_TEST   OFF CACHE BOOL "" FORCE)
 set(INTERPROCEDURAL_OPTIMIZATION OFF CACHE BOOL "" FORCE)
+set(USE_STATIC_MSVC_RUNTIME_LIBRARY OFF CACHE BOOL "" FORCE)
 
 # Assimp
 set(ASSIMP_BUILD_TESTS          OFF CACHE BOOL "" FORCE)
@@ -71,6 +75,20 @@ set(YAML_BUILD_SHARED_LIBS    OFF CACHE BOOL "" FORCE)
 # Coral
 set(CORAL_EXAMPLE  OFF CACHE BOOL "" FORCE)
 set(CORAL_TESTING  OFF CACHE BOOL "" FORCE)
+
+# ---- MSVC -----------------------------------------------------------------
+
+if(MSVC)
+    add_compile_options(/EHsc)
+    # Use the DLL MSVC runtime:
+    # Debug   -> /MDd
+    # Release -> /MD
+    # This must be consistent across Razor and all static dependencies.
+    set(CMAKE_MSVC_RUNTIME_LIBRARY
+        "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
+        CACHE STRING "MSVC runtime library" FORCE
+    )
+endif()
 
 # ---- Vendor subdirectories ------------------------------------------------
 
@@ -97,3 +115,22 @@ add_subdirectory(Razor)
 add_subdirectory(Edge)
 add_subdirectory(Razor-ScriptBridge)
 add_subdirectory(Sandbox)
+
+# ---- Clean targets --------------------------------------------------------
+
+add_custom_target(clean-vendor
+    COMMAND ${CMAKE_COMMAND} -E rm -rf
+        "${CMAKE_CURRENT_SOURCE_DIR}/Razor/vendor/JoltPhysics/Build/VS2022_CL"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Razor/vendor/assimp/bin"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Razor/vendor/freetype/build"
+    COMMENT "Removing vendor build artifacts..."
+)
+
+add_custom_target(clean-all
+    COMMAND ${CMAKE_COMMAND} -E rm -rf
+        "${CMAKE_CURRENT_SOURCE_DIR}/bin"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Razor/vendor/JoltPhysics/Build/VS2022_CL"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Razor/vendor/assimp/bin"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Razor/vendor/freetype/build"
+    COMMENT "Removing Razor and vendor build artifacts..."
+)
