@@ -7,7 +7,7 @@
 
 namespace Razor
 {
-    void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+    void framebuffer_size_callback([[maybe_unused]]GLFWwindow* window, int width, int height)
     {
         glViewport(0, 0, width, height);
         Engine::Get().GetWindow().SetWidth(width);
@@ -23,7 +23,7 @@ namespace Razor
 
         if (Window == nullptr) {
             const char* buffer_ptr = new char[512];
-            int ret = glfwGetError(&buffer_ptr);
+            glfwGetError(&buffer_ptr);
             std::string buffer_str = buffer_ptr;
             RZ_CORE_ERROR("Failed to create window GLFW {0}", buffer_str);
             glfwTerminate();

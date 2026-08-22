@@ -3,6 +3,12 @@ file(GLOB_RECURSE RAZOR_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h"
 )
 
+# These are ImGui backend sources, so they belong to the ImGui target.
+list(REMOVE_ITEM RAZOR_SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/OpenGL/imgui_impl_glfw.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/OpenGL/imgui_impl_opengl3.cpp"
+)
+
 add_library(Razor SHARED ${RAZOR_SOURCES})
 
 set_target_properties(Razor PROPERTIES
@@ -16,7 +22,8 @@ set_target_properties(Razor PROPERTIES
 # RTTI required by JoltPhysics
 target_compile_options(Razor PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/GR>
-    $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-frtti>
+    $<$<AND:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_FRONTEND_VARIANT:MSVC>>:/GR>
+    $<$<AND:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_FRONTEND_VARIANT:GNU>>:-frtti>
 )
 
 # Per-config optimization
@@ -34,6 +41,7 @@ target_compile_definitions(Razor PRIVATE
     JPH_OBJECT_STREAM
     YAML_CPP_STATIC_DEFINE
     RZ_BUILD_DLL
+    IMGUI_IMPL_OPENGL_LOADER_CUSTOM
 )
 
 # Platform defines
@@ -55,12 +63,25 @@ endif()
 target_include_directories(Razor PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
 )
-target_include_directories(Razor PRIVATE
+target_include_directories(Razor SYSTEM PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/vendor/spdlog/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/vendor/stb_image/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/vendor/glm"
     "${CMAKE_CURRENT_SOURCE_DIR}/vendor/entt/src"
     "${CMAKE_CURRENT_SOURCE_DIR}/vendor/JoltPhysics"
+)
+
+target_link_libraries(Razor PRIVATE
+    RazorWarnings
+)
+
+target_compile_options(ImGui PRIVATE
+    $<$<CXX_COMPILER_ID:Clang>:-Wno-nontrivial-memcall>
+)
+
+target_link_libraries(ImGui PRIVATE
+    glfw
+    Glad
 )
 
 # Vendor targets (propagate includes via PUBLIC interface of each target)

@@ -66,6 +66,7 @@ set(ASSIMP_INSTALL              OFF CACHE BOOL "" FORCE)
 set(ASSIMP_NO_EXPORT            ON  CACHE BOOL "" FORCE)
 # Prevent assimp from setting CMAKE_DEBUG_POSTFIX="d" globally
 set(ASSIMP_INJECT_DEBUG_POSTFIX OFF CACHE BOOL "" FORCE)
+set(ASSIMP_WARNINGS_AS_ERRORS   OFF CACHE BOOL "" FORCE)
 
 # yaml-cpp
 set(YAML_CPP_BUILD_TOOLS      OFF CACHE BOOL "" FORCE)
@@ -94,6 +95,13 @@ endif()
 
 add_subdirectory(Razor/vendor/GLFW)
 add_subdirectory(Razor/vendor/ImGui)
+target_sources(ImGui PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/Razor/src/Platform/OpenGL/imgui_impl_glfw.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Razor/src/Platform/OpenGL/imgui_impl_opengl3.cpp"
+)
+target_compile_options(ImGui PRIVATE
+    $<$<CXX_COMPILER_ID:Clang>:-Wno-nontrivial-memcall>
+)
 add_subdirectory(Razor/vendor/Glad)
 add_subdirectory(Razor/vendor/yaml-cpp)
 add_subdirectory(Razor/vendor/JoltPhysics/Build)
@@ -107,6 +115,31 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Razor/vendor/freetype/CMakeLists.txt")
 else()
     find_package(Freetype REQUIRED)
     set(FREETYPE_TARGET Freetype::Freetype)
+endif()
+
+# ---- Project warning policy ----------------------------------------------
+
+add_library(RazorWarnings INTERFACE)
+
+if(MSVC)
+    target_compile_options(RazorWarnings INTERFACE
+        /W4
+        /WX
+    )
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_compile_options(RazorWarnings INTERFACE
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Werror
+    )
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(RazorWarnings INTERFACE
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Werror
+    )
 endif()
 
 # ---- Projects -------------------------------------------------------------
