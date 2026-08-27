@@ -4,11 +4,11 @@
 namespace Razor
 {
 	ScriptClass::ScriptClass(const std::string& classNamespace, const std::string& className, bool IsSystemClass, bool isComponentClass, bool isCore)
-		: m_ClassNamespace(classNamespace),
-		m_ClassName(className),
-		m_IsSystemClass(IsSystemClass),
+		: m_IsSystemClass(IsSystemClass),
 		m_IsComponentClass(isComponentClass),
-		m_IsCore(isCore)
+		m_IsCore(isCore),
+		m_ClassNamespace(classNamespace),
+		m_ClassName(className)
 	{
 
 	}

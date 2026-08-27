@@ -223,6 +223,9 @@ namespace Razor
 				manObj->SetFieldValue<Entity>(field.Field.Name, value);
 				break;
 			}
+			default:
+				RZ_CORE_WARN("PopulateObjectFields unhandled ScriptFieldType {0}", field.Field.GetType());
+				break;
 			}
 		}
 	}

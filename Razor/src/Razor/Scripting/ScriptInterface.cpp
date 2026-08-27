@@ -45,7 +45,7 @@ namespace Razor
 	{
 		for (auto& assembly : AssemblyPool)
 		{
-			Coral::Type& objType = assembly->GetType(type.GetName());
+			Coral::Type& objType = assembly->GetLocalType(type.GetName());
 			if (objType)
 			{
 				return GetType(objType.GetBaseType().GetFullName());
@@ -58,10 +58,10 @@ namespace Razor
 	{
 		for (auto& assembly : AssemblyPool)
 		{
-			Coral::Type& objType = assembly->GetType(type.GetName());
+			Coral::Type& objType = assembly->GetLocalType(type.GetName());
 			if (objType)
 			{
-				ObjectPool.push_back(std::move(Razor::CreateRef<Coral::ManagedObject>(objType.CreateInstance())));
+				ObjectPool.push_back(Razor::CreateRef<Coral::ManagedObject>(objType.CreateInstance()));
 				return ScriptObject{ static_cast<int>(ObjectPool.size()) - 1, type };
 			}
 		}
@@ -73,10 +73,10 @@ namespace Razor
 	{
 		for (auto& assembly : AssemblyPool)
 		{
-			Coral::Type& objType = assembly->GetType(type.GetName());
+			Coral::Type& objType = assembly->GetLocalType(type.GetName());
 			if (objType)
 			{
-				ScriptInstance inst = ScriptInstance{ 0, type.GetName()};
+				ScriptInstance inst = ScriptInstance{ 0, type.GetName(), {}};
 				for (const auto& [fieldName, field] : type.GetFields())
 				{
 					ScriptFieldInstance fieldInstance;
@@ -119,7 +119,7 @@ namespace Razor
 	{
 		for (auto& assembly : AssemblyPool)
 		{
-			Coral::Type& objType = assembly->GetType(type.GetName());
+			Coral::Type& objType = assembly->GetLocalType(type.GetName());
 			if (objType)
 			{
 				return objType.GetTypeId();
@@ -130,7 +130,7 @@ namespace Razor
 	
 	Ref<Coral::ManagedObject> ScriptInterface::GetManagedObject(int handle)
 	{
-		if (handle < 0 || handle >= ObjectPool.size())
+		if (handle < 0 || handle >= static_cast<int>(ObjectPool.size()))
 		{
 			RZ_CORE_ERROR("ScriptInterface(GetManagedObject): -> Invalid object handle: {0}", handle);
 			return nullptr;

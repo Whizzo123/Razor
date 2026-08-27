@@ -153,11 +153,6 @@ namespace Razor
 		}
 	}
 
-	void Engine::RenderImGui(uint64_t sceneTexture)
-	{
-		
-	}
-
 	// This is fine to have no checks as it would return 0 anyway if there was no shader for that ID meaning we always get a shader
 	std::shared_ptr<Shader> Engine::GetShaderForID(uint8_t id)
 	{

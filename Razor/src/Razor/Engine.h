@@ -180,8 +180,6 @@ namespace Razor
 		void CreateProject();
 
 	private:
-		
-		void RenderImGui(uint64_t sceneTexture);
 		void RunRuntime();
 
 		Scope<Window> _mEngineWindow;

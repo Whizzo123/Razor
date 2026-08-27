@@ -5,7 +5,7 @@
 
 namespace Razor
 {
-	class Framebuffer;
+	struct Framebuffer;
 	class Window;
 	struct DebugLine;
 	struct DebugTriangle;
@@ -122,9 +122,7 @@ namespace Razor
 		virtual void ReadPixels(unsigned int X, unsigned int Y, unsigned int Width, unsigned int Height, float* OutPixels, unsigned int Buffer) = 0;
 		virtual void BackupContext() = 0;
 		virtual void ResetCurrentContext() = 0;
-		virtual void* GetSceneRenderedToTexture() = 0;
 		virtual void SetFrameBufferTextureForScene(unsigned int SceneTexture) = 0;
-		virtual void ResizeFramebuffers(unsigned int Width, unsigned int Height) = 0;
 
 		virtual unsigned int GenerateVertexArrays(int num) = 0;
 		virtual unsigned int GenerateBuffer(int num) = 0;

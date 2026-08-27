@@ -216,6 +216,11 @@ namespace Razor
 				format = GL_RGB;
 			else if (NrComponents == 4)
 				format = GL_RGBA;
+			else
+			{
+				RZ_CORE_WARN("Model::TextureFromFile -> Path was {0} and was able to load file but couldn't handle number of components for color defaulting to just red channel", Path);
+				format = GL_RED;
+			}
 
 			glBindTexture(GL_TEXTURE_2D, TextureID);
 			glTexImage2D(GL_TEXTURE_2D, 0, format, Width, Height, 0, format, GL_UNSIGNED_BYTE, Data);
