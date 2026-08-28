@@ -93,6 +93,7 @@ namespace Razor
 	class RAZOR_API IRenderer
 	{
 	public:
+		virtual ~IRenderer() = default;
 		virtual void InitRendererAPI() = 0;
 		virtual void PollForEvents() = 0;
 		virtual void TerminateRendererAPI() = 0;

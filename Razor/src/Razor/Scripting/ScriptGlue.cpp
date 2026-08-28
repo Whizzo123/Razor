@@ -198,26 +198,26 @@ extern "C"
  	    return ids.data();
  	}
 
-	void ScriptGlue::RegisterFunctions(Ref<Coral::ManagedAssembly> Assembly)
+	void ScriptGlue::RegisterFunctions(Coral::ManagedAssembly& assembly)
 	{
-		Assembly->AddInternalCall("Razor.InternalCalls", "Entity_HasComponent", (void*)Entity_HasComponent);
-		Assembly->AddInternalCall("Razor.InternalCalls", "Print_Message", (void*)Print_Message);
-		Assembly->AddInternalCall("Razor.InternalCalls", "Scene_GetEntitiesWithTransforms", (void*)Scene_GetEntitiesWithTransforms);
-		Assembly->AddInternalCall("Razor.InternalCalls", "Scene_GetEntitiesWithScriptComponent", (void*)Scene_GetEntitiesWithScriptComponent);
-		Assembly->AddInternalCall("Razor.InternalCalls", "Util_GetTypeIdForManagedType", (void*)Util_GetTypeIdForManagedType);
-		Assembly->AddInternalCall("Razor.InternalCalls", "Scene_GetComponentOnEntity", (void*)Scene_GetComponentOnEntity);
-		Assembly->AddInternalCall("Razor.InternalCalls", "Input_GetKey",           (void*)Input_GetKey);
-		Assembly->AddInternalCall("Razor.InternalCalls", "Transform_GetPosition",    (void*)Transform_GetPosition);
-		Assembly->AddInternalCall("Razor.InternalCalls", "Transform_SetPosition",    (void*)Transform_SetPosition);
-		Assembly->AddInternalCall("Razor.InternalCalls", "Collision_GetEventCount", (void*)Collision_GetEventCount);
-		Assembly->AddInternalCall("Razor.InternalCalls", "Collision_GetEvent",      (void*)Collision_GetEvent);
-		Assembly->AddInternalCall("Razor.InternalCalls", "Text_SetText",              (void*)Text_SetText);
- 		Assembly->AddInternalCall("Razor.InternalCalls", "Text_GetText",              (void*)Text_GetText);
- 		Assembly->AddInternalCall("Razor.InternalCalls", "Text_SetColor",             (void*)Text_SetColor);
- 		Assembly->AddInternalCall("Razor.InternalCalls", "Text_SetScale",             (void*)Text_SetScale);
- 		Assembly->AddInternalCall("Razor.InternalCalls", "Scene_GetEntitiesWithText", (void*)Scene_GetEntitiesWithText);
+		assembly.AddInternalCall("Razor.InternalCalls", "Entity_HasComponent", (void*)Entity_HasComponent);
+		assembly.AddInternalCall("Razor.InternalCalls", "Print_Message", (void*)Print_Message);
+		assembly.AddInternalCall("Razor.InternalCalls", "Scene_GetEntitiesWithTransforms", (void*)Scene_GetEntitiesWithTransforms);
+		assembly.AddInternalCall("Razor.InternalCalls", "Scene_GetEntitiesWithScriptComponent", (void*)Scene_GetEntitiesWithScriptComponent);
+		assembly.AddInternalCall("Razor.InternalCalls", "Util_GetTypeIdForManagedType", (void*)Util_GetTypeIdForManagedType);
+		assembly.AddInternalCall("Razor.InternalCalls", "Scene_GetComponentOnEntity", (void*)Scene_GetComponentOnEntity);
+		assembly.AddInternalCall("Razor.InternalCalls", "Input_GetKey",           (void*)Input_GetKey);
+		assembly.AddInternalCall("Razor.InternalCalls", "Transform_GetPosition",    (void*)Transform_GetPosition);
+		assembly.AddInternalCall("Razor.InternalCalls", "Transform_SetPosition",    (void*)Transform_SetPosition);
+		assembly.AddInternalCall("Razor.InternalCalls", "Collision_GetEventCount", (void*)Collision_GetEventCount);
+		assembly.AddInternalCall("Razor.InternalCalls", "Collision_GetEvent",      (void*)Collision_GetEvent);
+		assembly.AddInternalCall("Razor.InternalCalls", "Text_SetText",              (void*)Text_SetText);
+ 		assembly.AddInternalCall("Razor.InternalCalls", "Text_GetText",              (void*)Text_GetText);
+ 		assembly.AddInternalCall("Razor.InternalCalls", "Text_SetColor",             (void*)Text_SetColor);
+ 		assembly.AddInternalCall("Razor.InternalCalls", "Text_SetScale",             (void*)Text_SetScale);
+ 		assembly.AddInternalCall("Razor.InternalCalls", "Scene_GetEntitiesWithText", (void*)Scene_GetEntitiesWithText);
 
-		Assembly->UploadInternalCalls();
+		assembly.UploadInternalCalls();
 	}
 
 }

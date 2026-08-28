@@ -242,8 +242,8 @@ namespace Razor
 		ProjectSerializer::Deserialize(projectPath, _mLoadedProject);
 		RZ_CORE_INFO("Loading up project: {0}", _mLoadedProject->m_ProjectName);
 		// TODO move assembly holding into ScriptEngine
-		_mBridgeAssembly = CreateScope<ScriptAssembly>(_mScriptInterface->LoadAssembly(path + "/" + _mLoadedProject->m_DllDirectory + "/" + "Razor-ScriptBridge.dll", true));
-		_mGameAssembly = CreateScope<ScriptAssembly>(_mScriptInterface->LoadAssembly(path + "/" + _mLoadedProject->m_DllDirectory + "/" + _mLoadedProject->m_ProjectName + ".dll", false));
+		_mBridgeAssembly = _mScriptInterface->LoadAssembly(path + "/" + _mLoadedProject->m_DllDirectory + "/" + "Razor-ScriptBridge.dll", true);
+		_mGameAssembly = _mScriptInterface->LoadAssembly(path + "/" + _mLoadedProject->m_DllDirectory + "/" + _mLoadedProject->m_ProjectName + ".dll", false);
 
 		// Load main scene
 		Ref<Scene> mainScene = CreateRef<Scene>(path + _mLoadedProject->m_MainScenePath);

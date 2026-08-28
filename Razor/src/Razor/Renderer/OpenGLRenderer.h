@@ -14,6 +14,7 @@ namespace Razor
 	{
 
 	public:
+		~OpenGLRenderer() override = default;
 		void InitRendererAPI() override;
 		void PollForEvents() override;
 		void TerminateRendererAPI() override;

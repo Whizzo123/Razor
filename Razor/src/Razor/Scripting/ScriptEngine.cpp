@@ -48,13 +48,12 @@ namespace Razor
 		ScriptEngineInitialised = true;
 	}
 
-	Coral::ManagedAssembly& ScriptEngine::LoadAssembly(const std::string& AssemblyPath)
+	Scope<Coral::ManagedAssembly> ScriptEngine::LoadAssembly(const std::string& AssemblyPath)
 	{
 		if (!ScriptEngineInitialised)
 		{
 			RZ_CORE_ERROR("ScriptEngine: -> Attempting to load assembly before scriptengine is initialised");
-			Coral::ManagedAssembly emptyAssembly;
-			return emptyAssembly;
+			return nullptr;
 		}
 		Coral::ManagedAssembly& assembly = Context.LoadAssembly(AssemblyPath);
 
@@ -91,7 +90,7 @@ namespace Razor
 			}
 		}
 
-		return assembly;
+		return CreateScope<Coral::ManagedAssembly>(assembly);
 	}
 
 	void ScriptEngine::Shutdown()

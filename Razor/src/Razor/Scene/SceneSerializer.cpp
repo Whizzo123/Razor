@@ -135,7 +135,7 @@ namespace Razor
 							yaml_emitter_value_int32(Out, field.GetValue<uint32_t>());
 							break;
 						default:
-							RZ_CORE_WARN("Missing script field type handle for SerializeEntity of type {0}", field.Field.GetType());
+							RZ_CORE_WARN("Missing script field type handle for SerializeEntity of type {0}", static_cast<int>(field.Field.GetType()));
 							break;
 						}
 						
@@ -417,7 +417,7 @@ namespace Razor
 								break;
 							}
 							default:
-								RZ_CORE_WARN("DeserializeEntity unhandled ScriptFieldType {0}", type);
+								RZ_CORE_WARN("DeserializeEntity unhandled ScriptFieldType {0}", static_cast<int>(type));
 								break;
 							}
 						}

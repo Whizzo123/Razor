@@ -12,27 +12,37 @@ namespace Razor
 
 	}
 
-	ScriptAssembly ScriptInterface::LoadAssembly(std::string assemblyPath, bool isBridgeAssembly)
-	{
-		// Coral requires absolute paths; resolve relative paths against cwd
-		std::string absolutePath = std::filesystem::absolute(assemblyPath).string();
-		AssemblyPool.push_back(CreateRef<Coral::ManagedAssembly>(ScriptEngine::LoadAssembly(absolutePath)));
+	ScriptInterface::~ScriptInterface() = default;
 
-		Ref<Coral::ManagedAssembly> Assembly = AssemblyPool.back();
-		if (Assembly->GetLoadStatus() != Coral::AssemblyLoadStatus::Success)
+	ScriptInterface::ScriptInterface(ScriptInterface&&) noexcept = default;
+
+	ScriptInterface& ScriptInterface::operator=(ScriptInterface&&) noexcept = default;
+
+	Scope<ScriptAssembly> ScriptInterface::LoadAssembly(std::string assemblyPath, bool isBridgeAssembly)
+	{
+		std::string absolutePath = std::filesystem::absolute(assemblyPath).string();
+		Scope<Coral::ManagedAssembly> assembly = ScriptEngine::LoadAssembly(absolutePath);
+		if(!assembly)
+		{
+			return nullptr;
+		}
+
+		AssemblyPool.emplace_back(assembly);
+
+		if (assembly->GetLoadStatus() != Coral::AssemblyLoadStatus::Success)
 		{
 			RZ_CORE_ERROR("ScriptInterface: -> Failed to load assembly at path: {0}", absolutePath);
 			AssemblyPool.pop_back();
-			return ScriptAssembly{ -1 };
+			return nullptr;
 		}
 
 		if (isBridgeAssembly)
 		{
-			ScriptGlue::RegisterFunctions(Assembly);
+			ScriptGlue::RegisterFunctions(*assembly);
 		}
-		// This is a nightmare how do we fix it hahaha
-		;
-		return ScriptAssembly { static_cast<int>(AssemblyPool.size()) - 1};
+		Scope<ScriptAssembly> scriptAssembly = CreateScope<ScriptAssembly>();
+		scriptAssembly->assemblyIndex = static_cast<int>(AssemblyPool.size()) - 1;
+		return scriptAssembly;
 	}
 
 	ScriptClass ScriptInterface::GetType(const std::string& typeName)
@@ -90,9 +100,9 @@ namespace Razor
 		return -1;
 	}
 
-	void ScriptInterface::InvokeMethod(ScriptObject object, const std::string& methodName, float param)
+	void ScriptInterface::InvokeMethod(int handle, const std::string& methodName, float param)
 	{
-		ObjectPool[object.id]->InvokeMethod(methodName, param);
+		ObjectPool[handle]->InvokeMethod(methodName, param);
 	}
 
 	std::vector<ScriptClass> ScriptInterface::GetSystemTypes()
