@@ -224,12 +224,12 @@ namespace Razor
 	}
 
 
-	void Engine::LoadProject(const std::string& projectPath)
+	bool Engine::LoadProject(const std::string& projectPath)
 	{
 		if (projectPath.empty())
 		{
 			RZ_CORE_ERROR("Project path is empty");
-			return;
+			return false;
 		}
 
 		if (_mLoadedProject == nullptr)
@@ -242,8 +242,15 @@ namespace Razor
 		ProjectSerializer::Deserialize(projectPath, _mLoadedProject);
 		RZ_CORE_INFO("Loading up project: {0}", _mLoadedProject->m_ProjectName);
 		// TODO move assembly holding into ScriptEngine
-		_mBridgeAssembly = _mScriptInterface->LoadAssembly(path + "/" + _mLoadedProject->m_DllDirectory + "/" + "Razor-ScriptBridge.dll", true);
-		_mGameAssembly = _mScriptInterface->LoadAssembly(path + "/" + _mLoadedProject->m_DllDirectory + "/" + _mLoadedProject->m_ProjectName + ".dll", false);
+		_mBridgeAssembly = _mScriptInterface->LoadAssembly(path + "/" + _mLoadedProject->m_DllDirectory, "Razor-ScriptBridge.dll", true);
+		_mGameAssembly = _mScriptInterface->LoadAssembly(path + "/" + _mLoadedProject->m_DllDirectory, _mLoadedProject->m_ProjectName + ".dll", false);
+
+		if (!_mBridgeAssembly || !_mGameAssembly)
+		{
+			RZ_CORE_ERROR("LoadProject: Could not load C# assemblies failed to load project");
+			_mLoadedProject = nullptr;
+			return false;
+		}
 
 		// Load main scene
 		Ref<Scene> mainScene = CreateRef<Scene>(path + _mLoadedProject->m_MainScenePath);
@@ -256,6 +263,7 @@ namespace Razor
 		}
 		*mCurrentScene = std::move(*mainScene);
 		_mAssetDirectory = CreateRef<AssetDirectory>(path + "/" + _mLoadedProject->m_AssetDirectory, mRenderer);
+		return true;
 	}
 
 	void Engine::SetGameCameraViewportSize(uint32_t w, uint32_t h)

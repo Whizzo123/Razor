@@ -352,7 +352,7 @@ namespace Razor
 						for (const auto& [fieldName, fieldNode] : yaml_get_children_map(fieldEntry)) // Map (each entry is name of field with mapped details)
 						{
 							std::string typeString = yaml_as_string(yaml_get_child(fieldNode, "Type"));
-							Scope<ScriptFieldInstance> fieldInstance = instance.GetFieldInstance(fieldName);
+							ScriptFieldInstance* fieldInstance = instance.GetFieldInstance(fieldName);
 							if(!fieldInstance)
 							{
 								continue;

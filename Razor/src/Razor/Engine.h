@@ -154,7 +154,7 @@ namespace Razor
 		ScriptInterface& GetScriptInterface();
 
 		void SaveProject();
-		void LoadProject(const std::string& projectPath);
+		bool LoadProject(const std::string& projectPath);
 
 		void RuntimeStart();
 		void RuntimeStop();

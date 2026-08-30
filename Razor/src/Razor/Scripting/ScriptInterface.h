@@ -57,7 +57,7 @@ namespace Razor
 		ScriptInterface(ScriptInterface&&) noexcept;
 		ScriptInterface& operator=(ScriptInterface&&) noexcept;
 
-		Scope<ScriptAssembly> LoadAssembly(std::string assemblyPath, bool isBridgeAssembly);
+		Scope<ScriptAssembly> LoadAssembly(std::string binaryPath, std::string assemblyName, bool isBridgeAssembly);
 		ScriptClass GetType(const std::string& typeName);
 		ScriptClass GetBaseType(ScriptClass type);
 		std::vector<ScriptClass> GetSystemTypes();
@@ -72,6 +72,8 @@ namespace Razor
 		void ClearObjectPool();
 
 	private:
+		std::optional<std::string> SearchFiles(const std::string& path, const std::string& searchFileName);
+
 		std::vector<Razor::Ref<Coral::ManagedObject>> ObjectPool;
 		std::unordered_map<int32_t, ScriptType> TypePool;
 		std::vector<Scope<Coral::ManagedAssembly>> AssemblyPool;

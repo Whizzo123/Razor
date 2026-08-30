@@ -193,7 +193,6 @@ void Edge::Run()
 		Engine.GetGUI().EndFrame(Razor::Engine::Get().GetWindow(), Razor::Engine::Get().mRenderer);
 		Engine.mRenderer->SwapBuffer(Razor::Engine::Get().GetWindow());
 	}
-	Razor::SceneSerializer::Serialize(Engine.mCurrentScene);
 	Razor::Engine::Get().mRenderer->TerminateRendererAPI();
 }
 
@@ -315,7 +314,8 @@ void Edge::CreateDockspace(const std::string& Title)
 void Edge::OnNewProjectSet()
 {
 	Razor::Engine& Engine = Razor::Engine::Get();
-	Engine.LoadProject(Storage->GetProjectPath());
-	_mProjectExplorerWindow.Refresh(Engine.GetAssetDirectory()->GetRootFolder());
-	
+	if (Engine.LoadProject(Storage->GetProjectPath()))
+	{
+		_mProjectExplorerWindow.Refresh(Engine.GetAssetDirectory()->GetRootFolder());
+	}
 }

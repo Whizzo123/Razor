@@ -19,11 +19,13 @@ set_target_properties(Razor PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/${OUTPUT_SUFFIX}/Razor"
 )
 
-# RTTI required by JoltPhysics
 target_compile_options(Razor PRIVATE
+    # RTTI required by JoltPhysics
     $<$<CXX_COMPILER_ID:MSVC>:/GR>
     $<$<AND:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_FRONTEND_VARIANT:MSVC>>:/GR>
     $<$<AND:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_FRONTEND_VARIANT:GNU>>:-frtti>
+
+    $<$<CXX_COMPILER_ID:Clang>:-Wno-nontrivial-memcall>
 )
 
 # Per-config optimization
@@ -75,10 +77,6 @@ target_link_libraries(Razor PRIVATE
     RazorWarnings
 )
 
-target_compile_options(ImGui PRIVATE
-    $<$<CXX_COMPILER_ID:Clang>:-Wno-nontrivial-memcall>
-)
-
 target_link_libraries(ImGui PRIVATE
     glfw
     Glad
@@ -102,6 +100,9 @@ if(UNIX AND NOT APPLE)
     )
     add_dependencies(Razor Jolt)
 else()
+    target_compile_definitions(Jolt PUBLIC
+        JPH_FLOATING_POINT_EXCEPTIONS_ENABLED
+    )
     target_link_libraries(Razor PRIVATE Jolt)
 endif()
 

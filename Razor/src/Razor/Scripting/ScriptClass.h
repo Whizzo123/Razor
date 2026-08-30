@@ -76,10 +76,10 @@ namespace Razor
 
 		std::vector<ScriptFieldInstance> fields;
 
-		Scope<ScriptFieldInstance> GetFieldInstance(const std::string& name) {
+		ScriptFieldInstance* GetFieldInstance(const std::string& name) {
 			for (auto& fieldInstance : fields) {
 				if (fieldInstance.Field.Name == name) {
-					return CreateScope<ScriptFieldInstance>(fieldInstance);
+					return &fieldInstance;
 				}
 			}
 			RZ_CORE_ERROR("Field not found: {0}", name);

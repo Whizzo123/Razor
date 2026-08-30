@@ -18,21 +18,21 @@ namespace Razor
 
 	ScriptInterface& ScriptInterface::operator=(ScriptInterface&&) noexcept = default;
 
-	Scope<ScriptAssembly> ScriptInterface::LoadAssembly(std::string assemblyPath, bool isBridgeAssembly)
+	Scope<ScriptAssembly> ScriptInterface::LoadAssembly(std::string binaryPath, std::string assemblyName, bool isBridgeAssembly)
 	{
-		std::string absolutePath = std::filesystem::absolute(assemblyPath).string();
-		Scope<Coral::ManagedAssembly> assembly = ScriptEngine::LoadAssembly(absolutePath);
+		std::string absolutePath = std::filesystem::absolute(binaryPath).string();
+
+		std::optional<std::string> assemblyPath = SearchFiles(binaryPath, assemblyName);
+
+		Scope<Coral::ManagedAssembly> assembly = ScriptEngine::LoadAssembly(assemblyPath.value());
 		if(!assembly)
 		{
 			return nullptr;
 		}
 
-		AssemblyPool.emplace_back(assembly);
-
 		if (assembly->GetLoadStatus() != Coral::AssemblyLoadStatus::Success)
 		{
 			RZ_CORE_ERROR("ScriptInterface: -> Failed to load assembly at path: {0}", absolutePath);
-			AssemblyPool.pop_back();
 			return nullptr;
 		}
 
@@ -40,6 +40,7 @@ namespace Razor
 		{
 			ScriptGlue::RegisterFunctions(*assembly);
 		}
+		AssemblyPool.emplace_back(std::move(assembly));
 		Scope<ScriptAssembly> scriptAssembly = CreateScope<ScriptAssembly>();
 		scriptAssembly->assemblyIndex = static_cast<int>(AssemblyPool.size()) - 1;
 		return scriptAssembly;
@@ -115,6 +116,7 @@ namespace Razor
 		return ScriptEngine::GetComponentClasses();
 	}
 
+	// TODO if this can be null should be ptr
 	ScriptInstance& ScriptInterface::GetScriptInstance(uint64_t instanceId)
 	{
 		if (instanceId >= ScriptInstancePool.size())
@@ -160,5 +162,37 @@ namespace Razor
 	void ScriptInterface::ClearObjectPool()
 	{
 		ObjectPool.clear();
+	}
+
+	std::optional<std::string> ScriptInterface::SearchFiles(const std::string& path, const std::string& searchFileName)
+	{
+		try
+		{
+			for (const std::filesystem::directory_entry& DirectoryEntry : std::filesystem::directory_iterator(path))
+			{
+				const std::filesystem::path& filePath = DirectoryEntry.path();
+				// Do some substring logic on path to get filename
+				const std::string fileName = filePath.filename().string();
+				if(fileName == searchFileName)
+				{
+					return std::optional<std::string>(filePath.string());
+				}
+
+				if (DirectoryEntry.is_directory())
+				{
+					std::optional<std::string> file = SearchFiles(filePath.string(), searchFileName);
+					if (file.has_value())
+					{
+						return file;
+					}
+				}
+			}
+		}
+		catch (const std::filesystem::filesystem_error& e)
+		{
+			RZ_CORE_ERROR("ScriptInterface::SearchFiles: Failed to iterate directory '{0}': {1}", path, e.what());
+		}
+
+		return std::nullopt;
 	}
 }
