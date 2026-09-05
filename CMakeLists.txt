@@ -99,9 +99,19 @@ target_sources(ImGui PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/Razor/src/Platform/OpenGL/imgui_impl_glfw.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/Razor/src/Platform/OpenGL/imgui_impl_opengl3.cpp"
 )
-target_compile_options(ImGui PRIVATE
-    $<$<CXX_COMPILER_ID:Clang>:-Wno-nontrivial-memcall>
-)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    if(CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+        target_compile_options(ImGui PRIVATE
+            -Wno-nontrivial-memcall 
+        )
+    endif()
+    if(CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "GNU")
+        target_compile_options(ImGui PRIVATE
+            -Wno-nontrivial-memaccess
+        )
+    endif()
+endif()
+
 add_subdirectory(Razor/vendor/Glad)
 add_subdirectory(Razor/vendor/yaml-cpp)
 add_subdirectory(Razor/vendor/JoltPhysics/Build)

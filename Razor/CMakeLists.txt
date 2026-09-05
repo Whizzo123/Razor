@@ -24,9 +24,20 @@ target_compile_options(Razor PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/GR>
     $<$<AND:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_FRONTEND_VARIANT:MSVC>>:/GR>
     $<$<AND:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_FRONTEND_VARIANT:GNU>>:-frtti>
-
-    $<$<CXX_COMPILER_ID:Clang>:-Wno-nontrivial-memcall>
 )
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    if(CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+        target_compile_options(Razor PRIVATE
+            -Wno-nontrivial-memcall 
+        )
+    endif()
+    if(CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "GNU")
+        target_compile_options(Razor PRIVATE
+            -Wno-nontrivial-memaccess
+        )
+    endif()
+endif()
 
 # Per-config optimization
 target_compile_options(Razor PRIVATE

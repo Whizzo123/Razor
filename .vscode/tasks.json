@@ -13,10 +13,11 @@
                 "panel": "shared"
             },
             "linux": {
-                "command": "make",
+                "command": "cmake",
                 "args": [
-                    "-j$(nproc)",
-                    "config=debug"
+                    "--build",
+                    "${workspaceFolder}/build/cmake",
+                    "--parallel"
                 ],
                 "options": {
                     "cwd": "${workspaceFolder}",
