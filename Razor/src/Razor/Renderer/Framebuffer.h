@@ -7,6 +7,7 @@ namespace Razor
 
 	struct RAZOR_API Framebuffer
 	{
+		virtual ~Framebuffer() = default;
 		virtual void CreateFramebuffer() = 0;
 		virtual void Invalidate() = 0;
 		virtual void Refresh(uint32_t InWidth, uint32_t InHeight) = 0;

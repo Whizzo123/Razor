@@ -6,7 +6,7 @@
 
 namespace Razor
 {
-	enum class RAZOR_API RazorKey
+	enum class RazorKey
 	{
 		A,
 		D,
@@ -112,6 +112,5 @@ private:
 		{
 			MouseButtons[MouseButton] = State;
 		}
-		bool bIsFirstMouse = true;
 	};
 }

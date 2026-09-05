@@ -70,14 +70,14 @@ namespace Razor
 		if (data.mDebugLineProperties.size() > 0) {
 			Renderer->UseShader(defaultShader->ID);
 			HandleProperties(data.mDebugLineProperties[0].GetPropertySlot(0), defaultShader);
-			for (int i = 0; i < data.mDebugLines.size(); i++)
+			for (size_t i = 0; i < data.mDebugLines.size(); i++)
 			{
 				Renderer->DrawLine(data.mDebugLines[i]);
 			}
 		}
 		data.mDebugLineProperties.clear();
 		
-		for (int i = 0; i < data.mDebugTriangles.size(); i++)
+		for (size_t i = 0; i < data.mDebugTriangles.size(); i++)
 		{
 			Renderer->UseShader(defaultShader->ID);
 			HandleProperties(data.mDebugTriangleProperties[i].GetPropertySlot(0), defaultShader);

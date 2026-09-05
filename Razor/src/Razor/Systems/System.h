@@ -71,7 +71,7 @@ namespace Razor
 		void GeneratePropertySlots(size_t NumberOfSlots)
 		{
 			Slots.reserve(NumberOfSlots);
-			for (int i = 0; i < NumberOfSlots; i++)
+			for (size_t i = 0; i < NumberOfSlots; i++)
 			{
 				Slots.push_back(ShaderPropertySlot());
 			}
@@ -91,7 +91,7 @@ namespace Razor
 	public:
 		ShaderPropertySlot& GetPropertySlot(int32_t SlotIndex)
 		{
-			if (SlotIndex >= 0 && SlotIndex < Slots.size())
+			if (SlotIndex >= 0 && SlotIndex < static_cast<int32_t>(Slots.size()))
 			{
 				return Slots[SlotIndex];
 			}
@@ -120,8 +120,9 @@ namespace Razor
 	{
 	public:
 		System(Ref<Scene> scene) : _mCurrentScene(scene) {}
+		virtual ~System() {}
 		virtual void Init() {}
-		virtual void Run(float dt) {}
+		virtual void Run([[maybe_unused]]float dt) {};
 
 	protected:
 		Ref<Scene> _mCurrentScene;
@@ -131,7 +132,7 @@ namespace Razor
 	{
 	public:
 		RenderSystem(Ref<Scene> Scene) : System(Scene) {}
-		virtual void Render(RenderPipelineData& data) {}
+		virtual void Render(RenderPipelineData& data) = 0;
 		static RenderStage SystemRenderStage;
 	};
 

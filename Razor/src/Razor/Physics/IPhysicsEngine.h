@@ -4,7 +4,7 @@
 
 namespace Razor
 {
-	class Vector3;
+	struct Vector3;
 
 	enum class EPhysicsMotionType
 	{

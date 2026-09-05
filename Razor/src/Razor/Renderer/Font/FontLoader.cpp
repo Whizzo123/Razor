@@ -128,7 +128,7 @@ namespace Razor
                     texture,
                     Vector2u{bitmap.width, bitmap.rows},
                     Vector2i{face->glyph->bitmap_left, face->glyph->bitmap_top},
-                    face->glyph->advance.x
+                    static_cast<unsigned int>(face->glyph->advance.x)
                 };
                 Characters.insert(std::pair(c, character));
                 renderer->BindTexture(ETextureType::TEXTURE_2D, 0);

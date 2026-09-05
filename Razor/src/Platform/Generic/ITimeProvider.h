@@ -8,6 +8,7 @@ namespace Razor
 	class ITimeProvider
 	{
 	public:
+		virtual ~ITimeProvider() = default;
 		/**
 		* Returns the current time
 		* 

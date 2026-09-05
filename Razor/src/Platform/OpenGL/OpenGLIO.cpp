@@ -31,7 +31,7 @@ namespace Razor
 			{
 				MouseButtonCallback(window, button, action, mods);
 			});
-		glfwSetKeyCallback(Window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+		glfwSetKeyCallback(Window, [](GLFWwindow* window, int key, [[maybe_unused]]int scancode, int action, [[maybe_unused]]int mods)
 			{
 				KeyCallback(window, key, action);
 			});
@@ -41,7 +41,7 @@ namespace Razor
 			});
 	}
 
-	void OpenGLIO::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+	void OpenGLIO::MouseButtonCallback([[maybe_unused]]GLFWwindow* window, int button, int action, [[maybe_unused]]int mods)
 	{
 		RazorIO& EngineIO = RazorIO::Get();
 		// Eventually combine these delegates into one
@@ -55,7 +55,7 @@ namespace Razor
 		}
 	}
 
-	void OpenGLIO::KeyCallback(GLFWwindow* window, int button, int action)
+	void OpenGLIO::KeyCallback([[maybe_unused]]GLFWwindow* window, int button, int action)
 	{
 		RazorIO& EngineIO = RazorIO::Get();
 		if (GLFWToCustomKeyMap.find(button) == GLFWToCustomKeyMap.end())

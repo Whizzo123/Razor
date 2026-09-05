@@ -3,6 +3,12 @@ file(GLOB_RECURSE RAZOR_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h"
 )
 
+# These are ImGui backend sources, so they belong to the ImGui target.
+list(REMOVE_ITEM RAZOR_SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/OpenGL/imgui_impl_glfw.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/OpenGL/imgui_impl_opengl3.cpp"
+)
+
 add_library(Razor SHARED ${RAZOR_SOURCES})
 
 set_target_properties(Razor PROPERTIES
@@ -13,11 +19,25 @@ set_target_properties(Razor PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/${OUTPUT_SUFFIX}/Razor"
 )
 
-# RTTI required by JoltPhysics
 target_compile_options(Razor PRIVATE
+    # RTTI required by JoltPhysics
     $<$<CXX_COMPILER_ID:MSVC>:/GR>
-    $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-frtti>
+    $<$<AND:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_FRONTEND_VARIANT:MSVC>>:/GR>
+    $<$<AND:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_FRONTEND_VARIANT:GNU>>:-frtti>
 )
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    if(CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+        target_compile_options(Razor PRIVATE
+            -Wno-nontrivial-memcall 
+        )
+    endif()
+    if(CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "GNU")
+        target_compile_options(Razor PRIVATE
+            -Wno-nontrivial-memaccess
+        )
+    endif()
+endif()
 
 # Per-config optimization
 target_compile_options(Razor PRIVATE
@@ -34,11 +54,12 @@ target_compile_definitions(Razor PRIVATE
     JPH_OBJECT_STREAM
     YAML_CPP_STATIC_DEFINE
     RZ_BUILD_DLL
+    IMGUI_IMPL_OPENGL_LOADER_CUSTOM
 )
 
 # Platform defines
 target_compile_definitions(Razor PRIVATE
-    $<$<PLATFORM_ID:Windows>:RZ_PLATFORM_WINDOWS;CORAL_WINDOWS;JPH_FLOATING_POINT_EXCEPTIONS_ENABLED>
+    $<$<PLATFORM_ID:Windows>:RZ_PLATFORM_WINDOWS;JPH_FLOATING_POINT_EXCEPTIONS_ENABLED>
     $<$<PLATFORM_ID:Linux>:RZ_PLATFORM_LINUX;CORAL_LINUX>
 )
 
@@ -55,12 +76,21 @@ endif()
 target_include_directories(Razor PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
 )
-target_include_directories(Razor PRIVATE
+target_include_directories(Razor SYSTEM PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/vendor/spdlog/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/vendor/stb_image/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/vendor/glm"
     "${CMAKE_CURRENT_SOURCE_DIR}/vendor/entt/src"
     "${CMAKE_CURRENT_SOURCE_DIR}/vendor/JoltPhysics"
+)
+
+target_link_libraries(Razor PRIVATE
+    RazorWarnings
+)
+
+target_link_libraries(ImGui PRIVATE
+    glfw
+    Glad
 )
 
 # Vendor targets (propagate includes via PUBLIC interface of each target)
@@ -81,6 +111,9 @@ if(UNIX AND NOT APPLE)
     )
     add_dependencies(Razor Jolt)
 else()
+    target_compile_definitions(Jolt PUBLIC
+        JPH_FLOATING_POINT_EXCEPTIONS_ENABLED
+    )
     target_link_libraries(Razor PRIVATE Jolt)
 endif()
 

@@ -38,7 +38,7 @@ namespace Razor
 	public:
 		static void Init();
 		static void Shutdown();
-		static Coral::ManagedAssembly& LoadAssembly(const std::string& AssemblyPath);
+		static Scope<Coral::ManagedAssembly> LoadAssembly(const std::string& AssemblyPath);
 		static Ref<ScriptClass> GetEntityClass(const std::string& name);
 		static ScriptFieldMap& GetScriptFieldMap(Entity entity);
 		static std::vector<ScriptClass> GetSystemClasses();
