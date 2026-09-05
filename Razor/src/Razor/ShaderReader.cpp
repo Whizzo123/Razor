@@ -26,7 +26,7 @@ namespace Razor
 
         if (shaderFileContent.empty())
         {
-            RZ_CORE_ERROR("ERROR::SHADER:: {0} ::COMPILATION::FAILED no file found or empty file at {1}", type, shaderName);
+            RZ_CORE_ERROR("ERROR::SHADER:: {0} ::COMPILATION::FAILED no file found or empty file at {1}", static_cast<int>(type), shaderName);
             return shader;
         }
 
@@ -56,7 +56,7 @@ namespace Razor
         if (!success)
         {
             Renderer->GetShaderLog(*shader, 512, nullptr, infoLog);
-            RZ_CORE_ERROR("ERROR::SHADER::{0}::COMPILATION::FAILED\n{1}", type, infoLog);
+            RZ_CORE_ERROR("ERROR::SHADER::{0}::COMPILATION::FAILED\n{1}", static_cast<int>(type), infoLog);
         }
 
         return shader;

@@ -4,7 +4,7 @@
 namespace Razor
 {
     Text::Text(Shader& shader, const std::string& text) :
-        mShader(shader), _mText(text), mColor({1.0f, 1.0f, 1.0f}), mScale(1.0f)
+        mScale(1.0f), mColor({1.0f, 1.0f, 1.0f}), mShader(shader), _mText(text)
     {
         Engine::Get().GetRenderer()->CreateText(*this);
     }

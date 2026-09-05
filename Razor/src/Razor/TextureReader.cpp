@@ -13,7 +13,8 @@ namespace Razor
         std::string fullPath = ("resources/textures/" + fileName);
         stbi_set_flip_vertically_on_load(true);
         unsigned char* data = stbi_load(fullPath.c_str(), &width, &height, &nrChannels, 0);
-        unsigned int texture;
+        //TODO there is no way to tell from this if texture actually worked or not we are just defaulting to whatever texture is living in slot 1 not ideal possibly optional here
+        unsigned int texture = 0;
         if (data)
         {
             Renderer->GenerateTextures(1, &texture);

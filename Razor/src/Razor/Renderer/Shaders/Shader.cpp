@@ -11,6 +11,13 @@
 namespace Razor
 {
 
+    void Shader::Setup(CameraInfo* CamInfo, glm::mat4 model, [[maybe_unused]]MaterialData Mat, [[maybe_unused]]std::shared_ptr<std::vector<Light*>> Light)
+    {
+        SetMat4Float("projection", CamInfo->CameraProjection);
+        SetMat4Float("view", CamInfo->CameraView);
+        SetMat4Float("model", model);
+    }
+
     unsigned int Shader::GetUniformLocation(std::string Name)
     {
         return glGetUniformLocation(ID, Name.c_str());

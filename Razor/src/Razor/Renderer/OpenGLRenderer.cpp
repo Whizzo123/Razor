@@ -241,7 +241,7 @@ namespace Razor
         glfwSwapBuffers(std::dynamic_pointer_cast<OpenGLWindowProvider>(window.GetWindowProvider())->GetPlatformWindowPtr());
     }
 
-    void OpenGLRenderer::ReadPixels(unsigned int X, unsigned int Y, unsigned int Width, unsigned int Height, float* OutPixels, unsigned int Buffer)
+    void OpenGLRenderer::ReadPixels(unsigned int X, unsigned int Y, unsigned int Width, unsigned int Height, float* OutPixels, [[maybe_unused]]unsigned int Buffer)
     {
         glReadBuffer(GL_COLOR_ATTACHMENT0);
         glReadPixels(X, Y, Width, Height, GL_RGB, GL_FLOAT, OutPixels);
@@ -264,22 +264,9 @@ namespace Razor
         }
     }
 
-    void* OpenGLRenderer::GetSceneRenderedToTexture()
-    {
-        return (void*)(GLuint)SceneTexture;
-    }
-
     void OpenGLRenderer::SetFrameBufferTextureForScene(unsigned int InSceneTexture)
     {
         SceneTexture = InSceneTexture;
-    }
-
-    //TODO potentially remove this do we actually use this?
-    void OpenGLRenderer::ResizeFramebuffers(unsigned int Width, unsigned int Height)
-    {
-        //There are things that depend on these framebuffers so how do we notify them that the framebuffers have been regenerated and they need to grab the new ones
-        //How do we know what framebuffers to regenerate?
-        //Do we keep a list of these framebuffers and there relevant textures a new type?
     }
     
     void OpenGLRenderer::SetViewport(uint32_t X, uint32_t Y, uint32_t Width, uint32_t Height)
@@ -300,7 +287,7 @@ namespace Razor
     {
         glCompileShader(ShaderHandle);
     }
-    void OpenGLRenderer::GetShaderStatusParam(uint32_t ShaderHandle, EStatusParam Param, int* SuccessCode)
+    void OpenGLRenderer::GetShaderStatusParam(uint32_t ShaderHandle, [[maybe_unused]]EStatusParam Param, int* SuccessCode)
     {
         glGetShaderiv(ShaderHandle, GL_COMPILE_STATUS, SuccessCode);
     }
@@ -450,7 +437,7 @@ namespace Razor
 	unsigned int OpenGLRenderer::GenerateBuffer(int num)
     {
         unsigned int buf;
-        glGenBuffers(1, &buf);
+        glGenBuffers(num, &buf);
         return buf;
     }
 

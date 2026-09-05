@@ -14,8 +14,12 @@ fi
 cmake -B build/cmake \
       -DCMAKE_BUILD_TYPE=Debug \
       -DRAZOR_GLFW_BACKEND="$BACKEND" \
-      "${GENERATOR_ARGS[@]}"
+      "${GENERATOR_ARGS[@]}" \
+      -DCMAKE_C_COMPILER="clang" \
+      -DCMAKE_CXX_COMPILER="clang++"
 
-echo ""
+echo "Running with GLFW backend: $BACKEND"
+echo "GENERATOR ARGS:"
+printf ' [%s]\n' "${GENERATOR_ARGS[@]}"
 echo "CMake project generated at build/cmake/"
 echo "Build with: cmake --build build/cmake"

@@ -80,9 +80,9 @@ namespace Razor
 		for (uint64_t handle : mSystemInstanceHandles)
 		{
 			ScriptInterface& interface = Engine::Get().GetScriptInterface();
-			// TODO do we actually need ScriptObject does it serve any purpose?
-			ScriptObject obj = ScriptObject{ static_cast<int>(interface.GetScriptInstance(handle).handle) };
-			Engine::Get().GetScriptInterface().InvokeMethod(obj, "Run", DeltaTime);
+			// TODO have a look at the whole ObjectPool mSystemInstance thing and actually figure out properly what these handles map back to
+			// is this actually what we want or can we simplify it?
+			interface.InvokeMethod(static_cast<int>(interface.GetScriptInstance(handle).handle), "Run", DeltaTime);
 		}
 	}
 
@@ -223,6 +223,9 @@ namespace Razor
 				manObj->SetFieldValue<Entity>(field.Field.Name, value);
 				break;
 			}
+			default:
+				RZ_CORE_WARN("PopulateObjectFields unhandled ScriptFieldType {0}", static_cast<int>(field.Field.GetType()));
+				break;
 			}
 		}
 	}

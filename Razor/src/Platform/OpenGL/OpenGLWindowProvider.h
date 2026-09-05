@@ -9,7 +9,7 @@ namespace Razor
 	{
 	public:
 		OpenGLWindowProvider() : Window(nullptr), Width(0), Height(0) {};
-		~OpenGLWindowProvider() {};
+		~OpenGLWindowProvider() override = default;
 		void CreateProviderWindow(int Width, int Height, const std::string& Title) override;
 		bool ShouldWindowClose() override;
 		void SetWindowToClose() override;

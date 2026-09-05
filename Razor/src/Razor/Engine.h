@@ -154,7 +154,7 @@ namespace Razor
 		ScriptInterface& GetScriptInterface();
 
 		void SaveProject();
-		void LoadProject(const std::string& projectPath);
+		bool LoadProject(const std::string& projectPath);
 
 		void RuntimeStart();
 		void RuntimeStop();
@@ -180,8 +180,6 @@ namespace Razor
 		void CreateProject();
 
 	private:
-		
-		void RenderImGui(uint64_t sceneTexture);
 		void RunRuntime();
 
 		Scope<Window> _mEngineWindow;

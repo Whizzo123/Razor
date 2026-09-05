@@ -134,7 +134,11 @@ namespace Razor
 						case ScriptFieldType::Entity:
 							yaml_emitter_value_int32(Out, field.GetValue<uint32_t>());
 							break;
+						default:
+							RZ_CORE_WARN("Missing script field type handle for SerializeEntity of type {0}", static_cast<int>(field.Field.GetType()));
+							break;
 						}
+						
 						yaml_emitter_end_map(Out); // Field instance
 						yaml_emitter_end_map(Out); // Field instance map entry 
 					}
@@ -254,7 +258,7 @@ namespace Razor
 	bool SceneSerializer::Deserialize(Ref<Scene> OutScene)
 	{
 		bool bContainsExt = false;
-		for (int i = 0; i < OutScene->GetPath().length(); i++)
+		for (size_t i = 0; i < OutScene->GetPath().length(); i++)
 		{
 			if (OutScene->GetPath()[i] == '.')
 			{
@@ -301,7 +305,6 @@ namespace Razor
 			}
 		}
 
-		auto Systems = yaml_get_child(Data, "Systems");
 		for (auto SystemNode : yaml_get_children(Data, "Systems"))
 		{
 			std::string typeName = yaml_as_string(SystemNode);
@@ -349,66 +352,73 @@ namespace Razor
 						for (const auto& [fieldName, fieldNode] : yaml_get_children_map(fieldEntry)) // Map (each entry is name of field with mapped details)
 						{
 							std::string typeString = yaml_as_string(yaml_get_child(fieldNode, "Type"));
-							ScriptFieldInstance& fieldInstance = instance.GetFieldInstance(fieldName);
+							ScriptFieldInstance* fieldInstance = instance.GetFieldInstance(fieldName);
+							if(!fieldInstance)
+							{
+								continue;
+							}
 							ScriptFieldType type = Utils::ScriptFieldTypeFromString(typeString);
 
-
+							
 							switch (type)
 							{
 							case ScriptFieldType::Float:
 							{
 								float data = yaml_as_float(yaml_get_child(fieldNode, "Data"), 0.0f);
-								fieldInstance.SetValue(data);
+								fieldInstance->SetValue(data);
 								break;
 							}
 							case ScriptFieldType::Double:
 							{
 								double data = yaml_as_double(yaml_get_child(fieldNode, "Data"), 0.0);
-								fieldInstance.SetValue(data);
+								fieldInstance->SetValue(data);
 								break;
 							}
 							case ScriptFieldType::Bool:
 							{
 								bool data = yaml_as_bool(yaml_get_child(fieldNode, "Data"), false);
-								fieldInstance.SetValue(data);
+								fieldInstance->SetValue(data);
 								break;
 							}
 							case ScriptFieldType::Char:
 							{
 								char data = yaml_as_char(yaml_get_child(fieldNode, "Data"));
-								fieldInstance.SetValue(data);
+								fieldInstance->SetValue(data);
 								break;
 							}
 							case ScriptFieldType::String:
 							{
 								std::string data = yaml_as_string(yaml_get_child(fieldNode, "Data"));
-								fieldInstance.SetValue(data);
+								fieldInstance->SetValue(data);
 								break;
 							}
 							case ScriptFieldType::Int:
 							{
 								int data = yaml_as_int(yaml_get_child(fieldNode, "Data"), 0);
-								fieldInstance.SetValue(data);
+								fieldInstance->SetValue(data);
 								break;
 							}
 							case ScriptFieldType::Vector2:
 							{
 								Vector2 data = yaml_as_vec2(yaml_get_child(fieldNode, "Data"));
-								fieldInstance.SetValue(data);
+								fieldInstance->SetValue(data);
 								break;
 							}
 							case ScriptFieldType::Vector3:
 							{
 								Vector3 data = yaml_as_vec3(yaml_get_child(fieldNode, "Data"));
-								fieldInstance.SetValue(data);
+								fieldInstance->SetValue(data);
 								break;
 							}
 							case ScriptFieldType::Entity:
 							{
 								uint32_t data = yaml_as_int32(yaml_get_child(fieldNode, "Data"), 0);
-								fieldInstance.SetValue(data);
+								fieldInstance->SetValue(data);
 								break;
 							}
+							default:
+								RZ_CORE_WARN("DeserializeEntity unhandled ScriptFieldType {0}", static_cast<int>(type));
+								break;
 							}
 						}
 					}

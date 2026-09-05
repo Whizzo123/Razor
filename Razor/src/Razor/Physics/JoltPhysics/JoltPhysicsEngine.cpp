@@ -126,14 +126,14 @@ namespace Razor
 		std::scoped_lock lock(_mBodyContactMapMutex);
 		std::vector<Vector3> body1ContactPoints;
 		JPH::RVec3 baseOffset = inManifold.mBaseOffset;
-		for (int i = 0; i < inManifold.mRelativeContactPointsOn1.size(); i++) 
+		for (size_t i = 0; i < inManifold.mRelativeContactPointsOn1.size(); i++) 
 		{
 			JPH::Vec3 point = inManifold.mRelativeContactPointsOn1[i];
 			JPH::RVec3 worldContactPoint = baseOffset + point;
 			body1ContactPoints.push_back({worldContactPoint.GetX(), worldContactPoint.GetY(), worldContactPoint.GetZ()});
 		}
 		std::vector<Vector3> body2ContactPoints;
-		for (int i = 0; i < inManifold.mRelativeContactPointsOn2.size(); i++) 
+		for (size_t i = 0; i < inManifold.mRelativeContactPointsOn2.size(); i++) 
 		{
 			JPH::Vec3 point = inManifold.mRelativeContactPointsOn2[i];
 			JPH::RVec3 worldContactPoint = baseOffset + point;

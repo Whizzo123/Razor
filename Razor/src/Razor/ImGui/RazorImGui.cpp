@@ -1,5 +1,3 @@
-#pragma once
-
 #include "RazorImGui.h"
 #include "../Utils/Delegates.h"
 

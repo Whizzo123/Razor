@@ -15,7 +15,7 @@ namespace Razor
 		buffer->lines.push_back(line);
 	}
 
-	void JoltDebugRenderer::DrawTriangle(JPH::RVec3Arg v1, JPH::RVec3Arg v2, JPH::RVec3Arg v3, JPH::ColorArg color, ECastShadow inCastShadow)
+	void JoltDebugRenderer::DrawTriangle(JPH::RVec3Arg v1, JPH::RVec3Arg v2, JPH::RVec3Arg v3, JPH::ColorArg color, [[maybe_unused]]ECastShadow inCastShadow)
 	{
 		std::lock_guard<std::mutex> lock(buffer->mutex);
 		DebugTriangle triangle;
@@ -26,18 +26,19 @@ namespace Razor
 		buffer->triangles.push_back(triangle);
 	}
 
-	JPH::DebugRenderer::Batch JoltDebugRenderer::CreateTriangleBatch(const Triangle* inTriangles, int inTriangleCount)
+	JPH::DebugRenderer::Batch JoltDebugRenderer::CreateTriangleBatch([[maybe_unused]]const Triangle* inTriangles, [[maybe_unused]]int inTriangleCount)
 	{
 		return Batch();
 	}
-	JPH::DebugRenderer::Batch JoltDebugRenderer::CreateTriangleBatch(const Vertex* inVertices, int inVertexCount, const JPH::uint32* inIndices, int inIndexCount)
+	JPH::DebugRenderer::Batch JoltDebugRenderer::CreateTriangleBatch([[maybe_unused]]const Vertex* inVertices, [[maybe_unused]]int inVertexCount, [[maybe_unused]]const JPH::uint32* inIndices, [[maybe_unused]]int inIndexCount)
 	{
 		return Batch();
 	}
-	void JoltDebugRenderer::DrawGeometry(JPH::RMat44Arg inModelMatrix, const JPH::AABox& inWorldSpaceBounds, float inLODScaleSq, JPH::ColorArg inModelColor, const GeometryRef& inGeometry, ECullMode inCullMode, ECastShadow inCastShadow, EDrawMode inDrawMode)
+	void JoltDebugRenderer::DrawGeometry([[maybe_unused]]JPH::RMat44Arg inModelMatrix, [[maybe_unused]]const JPH::AABox& inWorldSpaceBounds, [[maybe_unused]]float inLODScaleSq, [[maybe_unused]]JPH::ColorArg inModelColor, [[maybe_unused]]const GeometryRef& inGeometry,
+		[[maybe_unused]]ECullMode inCullMode, [[maybe_unused]]ECastShadow inCastShadow, [[maybe_unused]]EDrawMode inDrawMode)
 	{
 	}
-	void JoltDebugRenderer::DrawText3D(JPH::RVec3Arg inPosition, const std::string_view& inString, JPH::ColorArg inColor, float inHeight)
+	void JoltDebugRenderer::DrawText3D([[maybe_unused]]JPH::RVec3Arg inPosition, [[maybe_unused]]const std::string_view& inString, [[maybe_unused]]JPH::ColorArg inColor, [[maybe_unused]]float inHeight)
 	{
 	}
 }
