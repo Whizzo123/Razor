@@ -16,18 +16,6 @@ namespace Razor
 	AssetDirectory::~AssetDirectory()
 	{
 	}
-	std::vector<AssetKey> AssetDirectory::RequestKeys(const std::string& directoryPath)
-	{
-		return std::vector<AssetKey>();
-	}
-	std::vector<AssetKey> AssetDirectory::LoadCachedKeys(const std::string& directoryPath)
-	{
-		return std::vector<AssetKey>();
-	}
-	std::vector<AssetKey> AssetDirectory::ProcessDirectory(const std::string& directoryPath)
-	{
-		return std::vector<AssetKey>();
-	}
 	void AssetDirectory::LoadModel(const std::string& assetPath)
 	{
 		Ref<Model> model = CreateRef<Model>();

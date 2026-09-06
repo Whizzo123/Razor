@@ -48,50 +48,49 @@ namespace Razor
 		ScriptEngineInitialised = true;
 	}
 
-	Coral::ManagedAssembly& ScriptEngine::LoadAssembly(const std::string& AssemblyPath)
+	Scope<Coral::ManagedAssembly> ScriptEngine::LoadAssembly(const std::string& AssemblyPath)
 	{
 		if (!ScriptEngineInitialised)
 		{
 			RZ_CORE_ERROR("ScriptEngine: -> Attempting to load assembly before scriptengine is initialised");
-			Coral::ManagedAssembly emptyAssembly;
-			return emptyAssembly;
+			return nullptr;
 		}
 		Coral::ManagedAssembly& assembly = Context.LoadAssembly(AssemblyPath);
 
-		for (Coral::Type* Type : assembly.GetTypes())
+		for (Coral::Type Type : assembly.GetLocalTypes())
 		{
-			std::string Name = Type->GetFullName();
+			std::string Name = Type.GetFullName();
 			const char* splitter = ".";
 			bool bIsSystem = false;
 			bool bIsComponent = false;
 			// Traverse base type chain via pointer — never assign through the reference,
 			// which would overwrite TypeCache entries and corrupt m_Id for later types.
-			Coral::Type* baseTypePtr = &Type->GetBaseType();
+			Coral::Type* baseTypePtr = &Type.GetBaseType();
 			while (*baseTypePtr)
 			{
 				if (baseTypePtr->GetFullName() == "Razor.System") {
-					RZ_CORE_INFO("Found System Class: {0}",  std::string(Type->GetFullName()));
+					RZ_CORE_INFO("Found System Class: {0}",  std::string(Type.GetFullName()));
 					bIsSystem = true;
 					break;
 				}
 				if (baseTypePtr->GetFullName() == "Razor.Component") {
-					RZ_CORE_INFO("Found Component Class: {0}", std::string(Type->GetFullName()));
+					RZ_CORE_INFO("Found Component Class: {0}", std::string(Type.GetFullName()));
 					bIsComponent = true;
 					break;
 				}
 				baseTypePtr = &baseTypePtr->GetBaseType();
 			}
 
-			Ref<ScriptClass> Class = CreateRef<ScriptClass>(std::strtok(&Name[0], splitter), Type->GetFullName(), bIsSystem, bIsComponent);
-			s_Data->ScriptClasses[Type->GetFullName()] = Class;
+			Ref<ScriptClass> Class = CreateRef<ScriptClass>(std::strtok(&Name[0], splitter), Type.GetFullName(), bIsSystem, bIsComponent);
+			s_Data->ScriptClasses[Type.GetFullName()] = Class;
 
-			for (Coral::FieldInfo& Field : Type->GetFields())
+			for (Coral::FieldInfo& Field : Type.GetFields())
 			{
 				Class->m_Fields[Field.GetName()] = { Field.GetType().GetFullName(), Field.GetName()};
 			}
 		}
 
-		return assembly;
+		return CreateScope<Coral::ManagedAssembly>(assembly);
 	}
 
 	void ScriptEngine::Shutdown()

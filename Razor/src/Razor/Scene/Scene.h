@@ -9,7 +9,7 @@ namespace Razor
 {
 	class Entity;
 	struct ScriptObject;
-	struct ScriptClass;
+	class ScriptClass;
 	struct ScriptInstance;
 
 	class RAZOR_API Scene

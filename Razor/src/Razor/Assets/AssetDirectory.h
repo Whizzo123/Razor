@@ -101,17 +101,6 @@ namespace Razor
 		bool SaveModelToProject(const Model& model);
 
 	private:
-		template<typename T>
-		T* LoadAsset(AssetKey key)
-		{
-			return new T();
-		}
-
-		template<typename T>
-		T* LoadCacheAsset(AssetKey key)
-		{
-			return new T();
-		}
 
 		std::vector<AssetKey> LoadCachedKeys(const std::string& directoryPath);
 

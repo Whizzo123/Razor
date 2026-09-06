@@ -6,7 +6,7 @@
       "type": "cppdbg",
       "request": "launch",
       "cwd": "${workspaceFolder}",
-      "preLaunchTask": "Build Debug",
+      "preLaunchTask": "Build Debug (CMake)",
       "program": "${workspaceFolder}/bin/Debug-linux-x86_64/Edge/Edge",
       "MIMode": "gdb",
       "environment": [
@@ -26,7 +26,7 @@
       "type": "cppvsdbg",
       "request": "launch",
       "cwd": "${workspaceFolder}",
-      "preLaunchTask": "Build Debug",
+      "preLaunchTask": "Build Debug (CMake)",
       "program": "${workspaceFolder}/bin/Debug-windows-x86_64/Edge/Edge.exe"
     }
   ]

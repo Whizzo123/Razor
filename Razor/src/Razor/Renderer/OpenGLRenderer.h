@@ -14,6 +14,7 @@ namespace Razor
 	{
 
 	public:
+		~OpenGLRenderer() override = default;
 		void InitRendererAPI() override;
 		void PollForEvents() override;
 		void TerminateRendererAPI() override;
@@ -33,9 +34,7 @@ namespace Razor
 		void SwapBuffer(Window& window) override;
 		void BackupContext() override;
 		void ResetCurrentContext() override;
-		void* GetSceneRenderedToTexture() override;
 		void SetFrameBufferTextureForScene(unsigned int SceneTexture) override;
-		void ResizeFramebuffers(unsigned int Width, unsigned int Height) override;
 		/**
 		* Function to set viewport
 		* 

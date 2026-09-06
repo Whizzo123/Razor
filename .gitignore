@@ -39,6 +39,7 @@ Intermediates/
 documentation/
 obj/
 Binaries/
+build/
 
 !vendor/
 

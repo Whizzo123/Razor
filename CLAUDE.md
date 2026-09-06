@@ -12,12 +12,39 @@ The engine is compiled as a shared library (DLL on Windows, .so on Linux).
 
 ## Build System
 
-Razor uses **Premake5** to generate IDE project files.
+Razor supports two build systems: **CMake** (preferred, first-class) and **Premake5** (still available).
 
-**Prerequisites:**
-- Premake5 binary at `vendor/bin/premake/premake5.exe` (Windows) or `vendor/bin/premake/premake5` (Linux)
+**Prerequisites (both systems):**
 - All git submodules initialized: `git submodule update --init --recursive`
-- JoltPhysics and Assimp are built automatically as pre-build steps on first compile
+  - The `freetype` submodule must be explicitly initialized: `git submodule update --init Razor/vendor/freetype`
+- JoltPhysics, Assimp, and FreeType are compiled as part of the CMake build automatically
+
+### CMake (preferred)
+
+**Linux:**
+```sh
+./GenerateProjects-cmake.sh           # x11 backend (default)
+./GenerateProjects-cmake.sh wayland   # Wayland backend
+cmake --build build/cmake
+```
+
+**Windows (from a VS Developer Command Prompt):**
+```bat
+GenerateProjects-cmake.bat
+cmake --build build\cmake
+```
+
+**Build configurations:** `Debug` (default), `Release`, `Dist`
+```sh
+cmake -B build/cmake -DCMAKE_BUILD_TYPE=Release
+cmake --build build/cmake
+```
+
+**Output paths:** `bin/[Config]-[system]-x86_64/[Project]/` — identical to Premake output.
+
+### Premake5 (legacy, still available)
+
+- Premake5 binary at `vendor/bin/premake/premake5.exe` (Windows) or `vendor/bin/premake/premake5` (Linux)
 
 **Windows (Visual Studio 2022):**
 ```bat
@@ -31,10 +58,6 @@ Then open `Razor.sln` in Visual Studio and build.
 ./GenerateProjects.sh         # generates Makefiles via gmake
 make config=debug
 ```
-
-**Build configurations:** `Debug`, `Release`, `Dist`
-
-**Output paths:** `bin/[Config]-[system]-x64/[Project]/`
 
 There is no standalone test suite — testing is done by running Edge.
 

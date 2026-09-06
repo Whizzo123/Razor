@@ -10,6 +10,7 @@ namespace Razor
 	class GLFWTimeProvider : public ITimeProvider
 	{
 	public:
+		~GLFWTimeProvider() override = default;
 		/**
 		* Function to get current GLFW time
 		* 

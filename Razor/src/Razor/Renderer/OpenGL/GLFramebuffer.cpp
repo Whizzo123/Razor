@@ -49,7 +49,8 @@ namespace Razor
     {
         glDeleteFramebuffers(1, &ID);
         glDeleteTextures(1, &Texture);
-        ID, Texture = 0;
+        ID = 0;
+        Texture = 0;
         CreateFramebuffer();
     }
 }

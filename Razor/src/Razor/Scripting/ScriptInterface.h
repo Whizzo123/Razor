@@ -49,14 +49,22 @@ namespace Razor
 	{
 	public:
 		ScriptInterface();
-		ScriptAssembly LoadAssembly(std::string assemblyPath, bool isBridgeAssembly);
+		~ScriptInterface();
+
+		ScriptInterface(const ScriptInterface&) = delete;
+		ScriptInterface& operator=(const ScriptInterface&) = delete;
+
+		ScriptInterface(ScriptInterface&&) noexcept;
+		ScriptInterface& operator=(ScriptInterface&&) noexcept;
+
+		Scope<ScriptAssembly> LoadAssembly(std::string binaryPath, std::string assemblyName, bool isBridgeAssembly);
 		ScriptClass GetType(const std::string& typeName);
 		ScriptClass GetBaseType(ScriptClass type);
 		std::vector<ScriptClass> GetSystemTypes();
 		std::vector<ScriptClass> GetComponentTypes();
 		ScriptObject CreateInstance(ScriptClass type);
 		uint64_t CreateScriptInstance(ScriptClass type);
-		void InvokeMethod(ScriptObject object, const std::string& methodName, float param);
+		void InvokeMethod(int handle, const std::string& methodName, float param);
 		ScriptInstance& GetScriptInstance(uint64_t instanceId);
 		int GetManagedTypeId(ScriptClass type);
 		Ref<Coral::ManagedObject> GetManagedObject(int handle);
@@ -64,9 +72,11 @@ namespace Razor
 		void ClearObjectPool();
 
 	private:
+		std::optional<std::string> SearchFiles(const std::string& path, const std::string& searchFileName);
+
 		std::vector<Razor::Ref<Coral::ManagedObject>> ObjectPool;
 		std::unordered_map<int32_t, ScriptType> TypePool;
-		std::vector<Ref<Coral::ManagedAssembly>> AssemblyPool;
+		std::vector<Scope<Coral::ManagedAssembly>> AssemblyPool;
 		std::vector<ScriptInstance> ScriptInstancePool;
 	};
 }

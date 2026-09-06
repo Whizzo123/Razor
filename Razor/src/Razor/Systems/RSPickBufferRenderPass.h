@@ -16,7 +16,7 @@ namespace Razor
 			ShaderMap = IDToShaderMap;
 		}
 		void Render(RenderPipelineData& data) override;
-
+		
 	protected:
 		std::shared_ptr<IRenderer> Renderer;
 		std::unordered_map<uint8_t, std::shared_ptr<Shader>> ShaderMap;

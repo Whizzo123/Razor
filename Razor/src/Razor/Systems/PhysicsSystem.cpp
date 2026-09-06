@@ -6,7 +6,7 @@
 
 namespace Razor
 {
-	void PhysicsSystem::Run(float deltaTime)
+	void PhysicsSystem::Run([[maybe_unused]]float deltaTime)
 	{
 		for (auto entity : _mCurrentScene->GetEntitiesWithComponents<BoxBody, Transform>())
 		{

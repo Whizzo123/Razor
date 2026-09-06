@@ -16,7 +16,6 @@ namespace Razor
 				continue;
 			}
 			Material& EntityMat = Model->asset.GetMaterial();
-			auto View = _mCurrentScene->GetEntitiesWithComponents<Material>();
 
 			if (data.mEntityRenderProperties.Properties.find(RenderingEntity) == data.mEntityRenderProperties.Properties.end())
 			{
@@ -24,7 +23,7 @@ namespace Razor
 			}
 			ShaderProperty& Property = data.mEntityRenderProperties.Properties[RenderingEntity];
 			Property.GeneratePropertySlots(EntityMat.Materials.size());
-			for (int i = 0; i < EntityMat.Materials.size(); i++)
+			for (size_t i = 0; i < EntityMat.Materials.size(); i++)
 			{
 				ShaderPropertySlot& Slot = Property.GetPropertySlot(i);
 				//Red, Green, Blue

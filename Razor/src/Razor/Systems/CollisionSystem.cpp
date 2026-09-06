@@ -7,7 +7,7 @@
 
 namespace Razor
 {
-	void CollisionSystem::Run(float dt)
+	void CollisionSystem::Run([[maybe_unused]]float dt)
 	{
 		// Built each frame — acceptable for current entity counts; cache if this becomes a hotspot
 		std::unordered_map<unsigned int, uint32_t> bodyToEntity;

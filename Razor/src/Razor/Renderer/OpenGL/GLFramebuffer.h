@@ -5,6 +5,8 @@ namespace Razor
 {
     struct RAZOR_API GLFramebuffer : public Framebuffer
     {
+        ~GLFramebuffer() override = default;
+
         void CreateFramebuffer() override;
 
         void Refresh(uint32_t InWidth, uint32_t InHeight) override;

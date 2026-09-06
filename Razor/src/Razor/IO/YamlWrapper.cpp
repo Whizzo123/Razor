@@ -377,7 +377,7 @@ namespace Razor
 
         auto impl = reinterpret_cast<YamlNodeImpl*>(node);
 
-        for (int i = 0; i < impl->node.size(); i++)
+        for (int i = 0; i < static_cast<int>(impl->node.size()); i++)
         {
             auto childImpl = new YamlNodeImpl();
             childImpl->node = impl->node[i];
@@ -423,7 +423,7 @@ namespace Razor
         if (!impl->node.IsMap())
             return result;
             
-        int i = 0;
+        size_t i = 0;
         for (auto it = impl->node.begin(); it != impl->node.end(); ++it, ++i)
         {
             if (i == index)
@@ -451,7 +451,7 @@ namespace Razor
             YAML::Node children = impl->node[key];
             if (children.IsSequence())
             {
-                for (int i = 0; i < children.size(); i++) 
+                for (size_t i = 0; i < children.size(); i++) 
                 {
                     auto childImpl = new YamlNodeImpl();
                     childImpl->node = children[i];

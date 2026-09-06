@@ -136,7 +136,6 @@ namespace Razor
 		std::vector<uint64_t> mScriptInstances;
 
 		ScriptComponent() = default;
-		ScriptComponent(const ScriptComponent&) = default;
 	};
 
 	enum class CollisionEventType { Started, Ended };
