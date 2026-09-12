@@ -8,6 +8,7 @@ namespace EdgeEditor
 	class PopupWindow
 	{
 	public:
+		virtual ~PopupWindow() = default;
 		/**
 		* Function to draw popup window function to be called when wishing to draw popup
 		*/

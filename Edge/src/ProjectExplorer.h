@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Gui/IEditorWindow.h"
 #include "Razor.h"
 #include "EditorStorage.h"
 #include <stack>
@@ -8,7 +9,7 @@ namespace EdgeEditor
 {
 
 
-	class ProjectExplorer
+	class ProjectExplorer : public IEditorWindow
 	{
 	public:
 		ProjectExplorer() 
@@ -20,7 +21,10 @@ namespace EdgeEditor
 			
 		}
 
-		void Render();
+		virtual ~ProjectExplorer() override = default;
+
+		EditorWindowName GetName() override { return EditorWindowName::PROJECTEXPLORER; }
+		void Render() override;
 		void Refresh(const std::string& path);
 	private:
 		std::vector<Razor::FilePath> GrabFiles(const std::string& Path);

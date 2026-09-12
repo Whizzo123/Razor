@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Gui/IEditorWindow.h"
 #include "Razor.h"
 
 namespace EdgeEditor
@@ -7,12 +8,15 @@ namespace EdgeEditor
 	struct EditorStorage;
 	class AssetPickerPopupWindow;
 
-	class Inspector
+	class Inspector : public IEditorWindow
 	{
 	public:
 		Inspector();
 		Inspector(Razor::Ref<EditorStorage> Storage);
-		void Render();
+		virtual ~Inspector() override = default;
+		
+		EditorWindowName GetName() override { return EditorWindowName::INSPECTOR; }
+		void Render() override;
 
 	private:
 		void CreateEntity();
