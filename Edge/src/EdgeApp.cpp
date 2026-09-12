@@ -2,6 +2,9 @@
 #include <Razor/EntryPoint.h>
 #include <algorithm>
 
+#include "Gui/IEditorWindow.h"
+#include "Gui/SceneWindow.h"
+#include "Gui/GameWindow.h"
 #include "Inspector.h"
 #include "SceneView.h"
 #include "EditorStorage.h"
@@ -11,7 +14,9 @@
 #include "Gui/NewProjectPopupWindow.h"
 #include "Gui/OpenProjectPopupWindow.h"
 #include "SystemView.h"
+#include "Gui/IEditorWindow.h"
 #include <Razor/Systems/RSCameraPass.h>
+#include <unordered_map>
 
 
 
@@ -21,20 +26,11 @@ public:
 	Edge() {};
 	~Edge() {};
 	void Run() override;
+	
 	/**
 	* Processes input from the user for the editor as well as calls Engine::ProcessInput()
 	*/
 	void ProcessInput();
-	void RenderSceneViewport(Razor::Ref<Razor::Framebuffer> SceneBuffer);
-	void RenderGameViewport(Razor::Ref<Razor::Framebuffer> GameBuffer);
-	/**
-	* Function to pick and object via the PickBuffer
-	* Needs it's functionality properly implemented
-	*
-	* @param PickBuffer - Shared Ptr to the FrameBuffer used as the PickBuffer
-	* @param Offset - 2D vector to offset mouse position based on viewport position
-	*/
-	void PickObject(Razor::Vector2 Offset);
 	/**
 	* Function to create an ImGui dockspace
 	* 
@@ -47,22 +43,13 @@ public:
 	void OnNewProjectSet();
 
 private:
+	std::unordered_map<EdgeEditor::EditorWindowName, Razor::Scope<EdgeEditor::IEditorWindow>> _mEditorWindows;
 	EdgeEditor::PopupWindow* CurrentPopup = nullptr; /** Holds current popup open */
 
 private:
-	EdgeEditor::EditorCamera EditorCamera; /** Object to house and control the camera we will use for rendering the scene to the viewport */
-	Razor::Ref<Razor::Framebuffer> PickBuffer; /** Framebuffer object for picking objects */
-	Razor::Ref<Razor::Framebuffer> SceneBuffer; /** Framebuffer object for rendering scene */
-	Razor::Ref<Razor::Framebuffer> GameBuffer; /** Framebuffer object for rendering game camera view */
-	bool bSceneViewHovered = false; /** True when cursor hovers the Scene viewport panel */
-	bool bGameViewHovered  = false; /** True when cursor hovers the Game viewport panel */
-	Razor::Vector2 ViewportSize { 0.0f, 0.0f }; /** 2D vector to hold size of viewport window */
-	Razor::Vector2 GameViewportSize { 0.0f, 0.0f }; /** 2D vector to hold size of Game viewport panel */
-	Razor::Vector2 ViewportPos { 0.0f, 0.0f }; /** 2D vector to hold position of image displaying scene texture for viewport*/
 	Razor::Ref<EdgeEditor::EditorStorage> Storage; /** Container object to hold data to be shared among windows*/
-	EdgeEditor::ProjectExplorer _mProjectExplorerWindow;
 	Razor::Ref<Razor::Scene> _mPlaybackSceneBackup;
-	Razor::Ref<EdgeEditor::RSEditorCamera> _mEditorCameraSystem;
+	
 };
 
 Razor::Application* Razor::CreateApplication()
@@ -72,50 +59,10 @@ Razor::Application* Razor::CreateApplication()
 
 void Edge::Run()
 {
+	
 	Razor::Engine& Engine = Razor::Engine::Get();
 
-	_mEditorCameraSystem = Engine.GetCoordinator()->RegisterSystem<EdgeEditor::RSEditorCamera>(EdgeEditor::RSEditorCamera(Engine.mCurrentScene, Engine.GetRenderer(), EditorCamera.GetCamera()));
-
-	// RSCameraPass is registered by Engine::InitSystems() — no explicit RegisterSystem call needed here
-	Razor::RenderPipelineConfig GamePipelineConfig;
-	GamePipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_MATERIAL_PASS, std::vector<const char*> { typeid(Razor::RSMaterialPass).name() } });
-	GamePipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_TEXT_PASS, std::vector<const char*> { typeid(Razor::RSTextPass).name() } });
-	GamePipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_LIGHTING_PASS, std::vector<const char*>
-	{
-		typeid(Razor::RSDirectionalLightingPass).name(),
-		typeid(Razor::RSPointLightingPass).name(),
-		typeid(Razor::RSSpotLightingPass).name()
-	} });
-	GamePipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_TRANSFORMATION_PASS, std::vector<const char*> { typeid(Razor::RSTransformationsPass).name() } });
-	GamePipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_CAMERA_PASS, std::vector<const char*> { typeid(Razor::RSCameraPass).name() } });
-	GamePipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_RENDER, std::vector<const char*> { typeid(Razor::RSRenderPass).name() } });
-
-	Razor::RenderPipelineConfig EditorPipelineConfig;
-	EditorPipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_MATERIAL_PASS, std::vector<const char*> { typeid(Razor::RSMaterialPass).name() } });
-	EditorPipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_TEXT_PASS, std::vector<const char*> { typeid(Razor::RSTextPass).name() } });
-	EditorPipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_LIGHTING_PASS, std::vector<const char*>
-	{
-		typeid(Razor::RSDirectionalLightingPass).name(),
-		typeid(Razor::RSPointLightingPass).name(),
-		typeid(Razor::RSSpotLightingPass).name()
-	} });
-	EditorPipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_TRANSFORMATION_PASS, std::vector<const char*> { typeid(Razor::RSTransformationsPass).name() } });
-	EditorPipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_CAMERA_PASS, std::vector<const char*> { typeid(EdgeEditor::RSEditorCamera).name() } });
-	EditorPipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_RENDER, std::vector<const char*> { typeid(Razor::RSRenderPass).name() } });
-
-	Razor::RenderPipelineConfig PickPipelineConfig;
-	PickPipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_MATERIAL_PASS, std::vector<const char*> { typeid(Razor::RSPickBufferMaterialPass).name() } });
-	PickPipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_TRANSFORMATION_PASS, std::vector<const char*> { typeid(Razor::RSTransformationsPass).name() } });
-	PickPipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_CAMERA_PASS, std::vector<const char*> { typeid(EdgeEditor::RSEditorCamera).name() } });
-	PickPipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_RENDER, std::vector<const char*> { typeid(Razor::RSPickBufferRenderPass).name() } });
-
-	
-
 	Engine.InitSystems();
-
-	SceneBuffer = Engine.mRenderer->CreateFrameBuffer(300, 200);
-	PickBuffer  = Engine.mRenderer->CreateFrameBuffer(300, 200);
-	GameBuffer  = Engine.mRenderer->CreateFrameBuffer(300, 200);
 
 	// Remove this should be better way of grabbing default models
 	const char* path = "resources/models/Cube.obj";
@@ -136,50 +83,27 @@ void Edge::Run()
 	Storage->DefaultModel = defaultModel;
 	Storage->OnProjectSet().AddRaw(this, &Edge::OnNewProjectSet);
 
-	EdgeEditor::Inspector InspectorWindow(Storage);
-	EdgeEditor::SceneView SceneViewWindow(Storage);
-	_mProjectExplorerWindow = EdgeEditor::ProjectExplorer(Storage);
-	EdgeEditor::SystemView SystemViewWindow;
+	_mEditorWindows.insert({EdgeEditor::EditorWindowName::INSPECTOR, Razor::CreateScope<EdgeEditor::Inspector>(Storage)});
+	_mEditorWindows.insert({EdgeEditor::EditorWindowName::SCENEVIEW, Razor::CreateScope<EdgeEditor::SceneView>(Storage)});
+	_mEditorWindows.insert({EdgeEditor::EditorWindowName::PROJECTEXPLORER, Razor::CreateScope<EdgeEditor::ProjectExplorer>(Storage)});
+	_mEditorWindows.insert({EdgeEditor::EditorWindowName::SYSTEMVIEW,  Razor::CreateScope<EdgeEditor::SystemView>()});
+	_mEditorWindows.insert({EdgeEditor::EditorWindowName::SCENEWINDOW, Razor::CreateScope<EdgeEditor::SceneWindow>(Storage)});
+	_mEditorWindows.insert({EdgeEditor::EditorWindowName::GAMEWINDOW, Razor::CreateScope<EdgeEditor::GameWindow>(Storage)});
 
 	Razor::SceneSerializer::Deserialize(Engine.mCurrentScene);
 	while (!Engine.ShouldEngineClose())
 	{
-		std::shared_ptr<Razor::IRenderer> Renderer = Engine.mRenderer;
-
-		const uint32_t SizeX     = static_cast<uint32_t>(std::max(0.0f, ViewportSize.X));
-		const uint32_t SizeY     = static_cast<uint32_t>(std::max(0.0f, ViewportSize.Y));
-		const uint32_t GameSizeX = static_cast<uint32_t>(std::max(0.0f, GameViewportSize.X));
-		const uint32_t GameSizeY = static_cast<uint32_t>(std::max(0.0f, GameViewportSize.Y));
-
-		PickBuffer->Refresh(SizeX, SizeY);
-		SceneBuffer->Refresh(SizeX, SizeY);
-		GameBuffer->Refresh(GameSizeX, GameSizeY);
-		Renderer->SetViewport(0, 0, SizeX, SizeY);
-
-		_mEditorCameraSystem->SetViewportSize(SizeX, SizeY);
-		Engine.SetGameCameraViewportSize(GameSizeX, GameSizeY);
-
-		Engine.PopulateRenderPipelineDebugData();
-
-		Engine.Render(PickBuffer->GetID(), PickPipelineConfig);
-
 		ProcessInput();
-
-		Engine.Render(SceneBuffer->GetID(), EditorPipelineConfig);
-		Engine.Render(GameBuffer->GetID(), GamePipelineConfig);
-
-		Engine.ClearDebugDrawBuffer();
-
-		Renderer->PollForEvents();
 
 		Engine.GetGUI().BeginNewFrame();
 		CreateDockspace("Edge");
-		InspectorWindow.Render();
-		SceneViewWindow.Render();
-		_mProjectExplorerWindow.Render();
-		SystemViewWindow.Render();
-		RenderSceneViewport(SceneBuffer);
-		RenderGameViewport(GameBuffer);
+		for (const auto& [name, window] : _mEditorWindows)
+		{
+			window->Render();
+		}
+
+		Engine.mRenderer->PollForEvents();
+
 		Razor::RazorImGui::ShowMetricsWindow();
 		Razor::RazorImGui::End();
 		if (CurrentPopup)
@@ -196,63 +120,13 @@ void Edge::Run()
 	Razor::Engine::Get().mRenderer->TerminateRendererAPI();
 }
 
-void Edge::RenderSceneViewport(Razor::Ref<Razor::Framebuffer> SceneBuffer)
-{
-	bool bIsOpen;
-	Razor::RazorImGui::Begin("Scene", &bIsOpen, Razor::RazorGuiWindowFlags_MenuBar | Razor::RazorGuiWindowFlags_NoScrollbar);
-	bSceneViewHovered = Razor::RazorImGui::IsWindowHovered();
-	ViewportSize = Razor::Vector2(Razor::RazorImGui::GetContentRegionAvail().X, Razor::RazorImGui::GetContentRegionAvail().Y);
-	Razor::RazorImGui::Image(reinterpret_cast<void*>(SceneBuffer->GetTexture()), Razor::Vector2(ViewportSize.X, ViewportSize.Y), Razor::Vector2(0, 1), Razor::Vector2(1, 0));
-	ViewportPos = Razor::RazorImGui::GetItemRectMin();
-	Razor::RazorImGui::End();
-}
-
-void Edge::RenderGameViewport(Razor::Ref<Razor::Framebuffer> GameBuffer)
-{
-	bool bIsOpen;
-	Razor::RazorImGui::Begin("Game", &bIsOpen, Razor::RazorGuiWindowFlags_NoScrollbar);
-	bGameViewHovered = Razor::RazorImGui::IsWindowHovered();
-	GameViewportSize = Razor::Vector2(Razor::RazorImGui::GetContentRegionAvail().X, Razor::RazorImGui::GetContentRegionAvail().Y);
-	Razor::RazorImGui::Image(reinterpret_cast<void*>(GameBuffer->GetTexture()), Razor::Vector2(GameViewportSize.X, GameViewportSize.Y), Razor::Vector2(0, 1), Razor::Vector2(1, 0));
-	Razor::RazorImGui::End();
-}
-
 void Edge::ProcessInput()
 {
 	Razor::Engine::Get().ProcessInput();
-
-	const bool bRuntimeRunning = Razor::Engine::Get().IsRuntimeRunning();
-
-	// Editor camera gets input when not in play mode, or when hovering the Scene panel
-	if (!bRuntimeRunning || bSceneViewHovered)
-		EditorCamera.ProcessInput(0.01f);
-
-	// Game input is only enabled when playing and the Game panel is hovered
-	Razor::Engine::Get().SetGameInputEnabled(bRuntimeRunning && bGameViewHovered);
-
-	// Object picking only fires from within the Scene panel
-	if (bSceneViewHovered && Razor::RazorIO::Get().GetStateForMouseButton(Razor::LEFT) == Razor::MOUSE_DOWN)
+	for (const auto& [name, window] : _mEditorWindows)
 	{
-		Razor::Vector2D MousePos = Razor::RazorIO::Get().CurrentMousePos;
-		unsigned int OffsetMousePosX = MousePos.X - ViewportPos.X;
-		unsigned int OffsetMousePosY = MousePos.Y - ViewportPos.Y;
-
-		if (OffsetMousePosX < 0 || OffsetMousePosX > PickBuffer->GetWidth() || OffsetMousePosY < 0 || OffsetMousePosY > PickBuffer->GetHeight())
-		{
-			return;
-		}
-		PickObject(Razor::Vector2(OffsetMousePosX, OffsetMousePosY));
+		window->ProcessInput();
 	}
-}
-
-void Edge::PickObject(Razor::Vector2 MousePos)
-{
-	float Pixel[3];
-	Razor::Engine::Get().GetRenderer()->ReadPixels(MousePos.X, PickBuffer->GetHeight() - MousePos.Y, 1, 1, Pixel, PickBuffer->GetID());
-	std::uint32_t PickedEntity = 0;
-	PickedEntity = static_cast<std::uint32_t>(Pixel[0] * 255.0f) + (std::uint32_t(Pixel[1] * 255.0f) << 8)
-			+ (std::uint32_t(Pixel[2] * 255.0f) << 16);
-	Storage->SelectedEntity = Razor::Engine::Get().mCurrentScene->GetEntity(entt::entity(PickedEntity));
 }
 
 void Edge::CreateDockspace(const std::string& Title)
@@ -316,6 +190,11 @@ void Edge::OnNewProjectSet()
 	Razor::Engine& Engine = Razor::Engine::Get();
 	if (Engine.LoadProject(Storage->GetProjectPath()))
 	{
-		_mProjectExplorerWindow.Refresh(Engine.GetAssetDirectory()->GetRootFolder());
+		if (_mEditorWindows.contains(EdgeEditor::EditorWindowName::PROJECTEXPLORER))
+		{
+			EdgeEditor::IEditorWindow* window = _mEditorWindows[EdgeEditor::EditorWindowName::PROJECTEXPLORER].get();
+			EdgeEditor::ProjectExplorer* explorer = dynamic_cast<EdgeEditor::ProjectExplorer*>(window);
+			explorer->Refresh(Engine.GetAssetDirectory()->GetRootFolder());
+		}
 	}
 }
