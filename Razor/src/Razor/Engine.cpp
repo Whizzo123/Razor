@@ -69,8 +69,8 @@ namespace Razor
 		_mRazorGUI = CreateScope<RazorImGui>();
 		_mRazorGUI->Setup(_mEngineWindow->GetWindowProvider());
 
-		_mDebugDrawBuffer = CreateScope<PhysicsDebugDrawBuffer>();
-		_mPhysicsDebugRenderer = CreateRef<JoltDebugRenderer>(_mDebugDrawBuffer.get());
+		_mDebugDrawBuffer = CreateRef<PhysicsDebugDrawBuffer>();
+		_mPhysicsDebugRenderer = CreateRef<JoltDebugRenderer>(_mDebugDrawBuffer);
 		_mPhysicsEngine = CreateScope<JoltPhysicsEngine>(std::dynamic_pointer_cast<JoltDebugRenderer>(_mPhysicsDebugRenderer));
 		
 		
@@ -320,10 +320,14 @@ namespace Razor
 
 	void Engine::PopulateRenderPipelineDebugData()
 	{
-		std::unique_lock lock(_mDebugDrawBuffer->mutex, std::try_to_lock);
-		if (!lock.owns_lock())
-			return;
-		_mCoordinator->SetRenderPipelineDebugData(_mDebugDrawBuffer->lines, _mDebugDrawBuffer->triangles);
+		std::vector<DebugLine> lines;
+    	std::vector<DebugTriangle> triangles;
+		{
+			std::scoped_lock lock(_mDebugDrawBuffer->mutex);
+			lines = _mDebugDrawBuffer->lines;
+			triangles = _mDebugDrawBuffer->triangles;
+		}
+		_mCoordinator->SetRenderPipelineDebugData(std::move(lines), std::move(triangles));
 	}
 
 	void Engine::ClearDebugDrawBuffer()

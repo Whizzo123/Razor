@@ -1,14 +1,16 @@
 #pragma once
 
+#include "Gui/IEditorWindow.h"
 namespace EdgeEditor
 {
-	class SystemView
+	class SystemView : public IEditorWindow
 	{
 	public:
 		SystemView() = default;
-		~SystemView() = default;
+		virtual ~SystemView() override = default;
 
-		void Render();
+		EditorWindowName GetName() override { return EditorWindowName::SYSTEMVIEW; }
+		void Render() override;
 	};
 }
 
