@@ -12,3 +12,6 @@ All libraries required for this project are included as submodules in Razor/vend
 
 ## Useful Git command if new submodule prevents switching to branch
 branch=<whatever branch you're switching to> && rm -rf <eg. git/modules/Razor/vendor/Coral Razor/vendor/Coral whatever submodule it's complaing about> && git checkout "$branch" && git submodule sync && git submodule update --init --recursive
+
+## Performance Logging
+Under scripts/ you'll find a profile.sh that can be ran in order to record CPU time for different processes and then have it generated into a Flamegraph the scripts stackcollapse-perf.pl and flamegraph.pl come from the flamegraph repository here https://github.com/brendangregg/flamegraph .
