@@ -440,4 +440,10 @@ namespace Razor
 		//float deltaTime = 0.01f;
 		interface.MoveKinematic(static_cast<JPH::BodyID>(bodyId), JPH::RVec3Arg(position.X, position.Y, position.Z), interface.GetRotation(static_cast<JPH::BodyID>(bodyId)), deltaTime);
 	}
+
+	void JoltPhysicsEngine::ClearDebugData()
+	{
+		JoltDebugRenderer* renderer = dynamic_cast<JoltDebugRenderer*>(JPH::DebugRenderer::sInstance);
+		renderer->ClearDebugDrawBuffer();
+	}
 }

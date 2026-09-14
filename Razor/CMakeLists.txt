@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.15)
+
 file(GLOB_RECURSE RAZOR_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h"
@@ -19,12 +21,16 @@ set_target_properties(Razor PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/${OUTPUT_SUFFIX}/Razor"
 )
 
-target_compile_options(Razor PRIVATE
-    # RTTI required by JoltPhysics
-    $<$<CXX_COMPILER_ID:MSVC>:/GR>
-    $<$<AND:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_FRONTEND_VARIANT:MSVC>>:/GR>
-    $<$<AND:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_FRONTEND_VARIANT:GNU>>:-frtti>
-)
+# RTTI required by JoltPhysics
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    target_compile_options(Razor PRIVATE /GR)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    if(CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+        target_compile_options(Razor PRIVATE /GR)
+    else()
+        target_compile_options(Razor PRIVATE -frtti)
+    endif()
+endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     if(CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
@@ -41,10 +47,14 @@ endif()
 
 # Per-config optimization
 target_compile_options(Razor PRIVATE
+    $<$<AND:$<NOT:$<CXX_COMPILER_ID:MSVC>>,$<CONFIG:Debug>>:-O2>
+    $<$<AND:$<NOT:$<CXX_COMPILER_ID:MSVC>>,$<CONFIG:Debug>>:-fno-omit-frame-pointer>
     $<$<AND:$<NOT:$<CXX_COMPILER_ID:MSVC>>,$<CONFIG:Release>>:-O2>
     $<$<AND:$<NOT:$<CXX_COMPILER_ID:MSVC>>,$<CONFIG:Dist>>:-O3>
     $<$<AND:$<CXX_COMPILER_ID:MSVC>,$<OR:$<CONFIG:Release>,$<CONFIG:Dist>>>:/O2>
 )
+
+
 
 # Global defines
 target_compile_definitions(Razor PRIVATE

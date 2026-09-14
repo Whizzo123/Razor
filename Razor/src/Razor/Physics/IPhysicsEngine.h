@@ -46,6 +46,7 @@ namespace Razor
 		virtual void DestroyBody(unsigned int bodyId) = 0;
 		virtual std::vector<ContactInfo> GetContactInfo(unsigned int bodyId) = 0;
 		virtual void MoveKinematic(unsigned int bodyId, Vector3 position, float deltaTime) = 0;
+		virtual void ClearDebugData() = 0;
 	};
 }
 

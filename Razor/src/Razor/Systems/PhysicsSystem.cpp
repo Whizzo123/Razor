@@ -8,6 +8,7 @@ namespace Razor
 {
 	void PhysicsSystem::Run([[maybe_unused]]float deltaTime)
 	{
+		Engine::Get().GetPhysicsEngine().ClearDebugData();
 		for (auto entity : _mCurrentScene->GetEntitiesWithComponents<BoxBody, Transform>())
 		{
 			

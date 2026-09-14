@@ -113,6 +113,7 @@ namespace Razor
 		void DestroyBody(unsigned int bodyId) override;
 		std::vector<ContactInfo> GetContactInfo(unsigned int bodyId) override;
 		void MoveKinematic(unsigned int bodyId, Vector3 position, float deltaTime) override;
+		void ClearDebugData() override;
 
 	private:
 		JPH::PhysicsSystem _mPhysicsSystem;

@@ -201,7 +201,7 @@ namespace Razor
 		Scope<IPhysicsEngine> _mPhysicsEngine;
 		Ref<IPhysicsDebugRenderer> _mPhysicsDebugRenderer;
 
-		Scope<PhysicsDebugDrawBuffer> _mDebugDrawBuffer;
+		Ref<PhysicsDebugDrawBuffer> _mDebugDrawBuffer;
 
 		std::atomic<bool> _mbIsRuntimeRunning { false };
 		std::atomic<bool> _mbIsGameInputEnabled { true };

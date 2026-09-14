@@ -38,9 +38,10 @@ namespace Razor
 		HostSettings.MessageCallback = CoralMessageCallback;
 		HostSettings.ExceptionCallback = ExceptionCallback;
 
-		if (CoralInstance.Initialize(HostSettings) != Coral::CoralInitStatus::Success)
+		Coral::CoralInitStatus status = CoralInstance.Initialize(HostSettings);
+		if (status != Coral::CoralInitStatus::Success)
 		{
-			RZ_CORE_ERROR("Failed to initialise Coral");
+			RZ_CORE_ERROR("Failed to initialise Coral {0}", static_cast<int>(status));
 			return;
 		}
 		Context = CoralInstance.CreateAssemblyLoadContext("Game");
@@ -95,6 +96,10 @@ namespace Razor
 
 	void ScriptEngine::Shutdown()
 	{
+		if (!ScriptEngineInitialised) 
+		{
+			return;
+		}
 		CoralInstance.UnloadAssemblyLoadContext(Context);
 		CoralInstance.Shutdown();
 	}
