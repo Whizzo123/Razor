@@ -7,6 +7,7 @@
 #include <mutex>
 #include "../../Renderer/Debug/DebugLine.h"
 #include "../../Renderer/Debug/DebugTriangle.h"
+#include "../../Core.h"
 
 namespace Razor
 {
@@ -22,7 +23,9 @@ namespace Razor
 	class JoltDebugRenderer : public JPH::DebugRenderer, public IPhysicsDebugRenderer
 	{
 	public:
-		JoltDebugRenderer(PhysicsDebugDrawBuffer* b) : buffer(b) {}
+		JoltDebugRenderer(Ref<PhysicsDebugDrawBuffer> b) : buffer(b) {}
+
+		void ClearDebugDrawBuffer();
 
 		void DrawLine(JPH::RVec3Arg from, JPH::RVec3Arg to, JPH::ColorArg color) override;
 
@@ -36,6 +39,6 @@ namespace Razor
 		void DrawText3D(JPH::RVec3Arg inPosition, const std::string_view& inString, JPH::ColorArg inColor = JPH::Color::sWhite, float inHeight = 0.5f) override;
 
 	private:
-		PhysicsDebugDrawBuffer* buffer;
+		Ref<PhysicsDebugDrawBuffer> buffer;
 	};
 }

@@ -38,6 +38,16 @@ namespace Razor
         {
             std::cout << "Failed to initialise GLAD" << std::endl;
         }
+
+        const GLubyte *vendor = glGetString(GL_VENDOR);
+        const GLubyte *renderer = glGetString(GL_RENDERER);
+        const GLubyte *version = glGetString(GL_VERSION);
+        RZ_CORE_INFO("OpenGL Vendor: {0}", reinterpret_cast<const char*>(vendor));
+        RZ_CORE_INFO("OpenGL Renderer: {0}", reinterpret_cast<const char*>(renderer));
+        RZ_CORE_INFO("OpenGL Version: {0}", reinterpret_cast<const char*>(version));
+
+        glfwSwapInterval(0);
+
         this->Width = Width;
         this->Height = Height;
         glViewport(0, 0, Width, Height);

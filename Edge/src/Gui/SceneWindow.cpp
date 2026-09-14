@@ -41,14 +41,12 @@ namespace EdgeEditor
 		_mPickBuffer->Refresh(SizeX, SizeY);
         Razor::Engine::Get().GetRenderer()->SetViewport(0, 0, SizeX, SizeY);
 		_mEditorCameraSystem->SetViewportSize(SizeX, SizeY);
-        // TODO you need another call like this for the game view with it's size
-        Razor::Engine::Get().Render(_mSceneBuffer->GetID(), _mEditorPipelineConfig);
-
+        
 		Razor::Engine::Get().PopulateRenderPipelineDebugData();
+        Razor::Engine::Get().Render(_mSceneBuffer->GetID(), _mEditorPipelineConfig);
+		Razor::Engine::Get().ClearDebugDrawBuffer();
 
 		Razor::Engine::Get().Render(_mPickBuffer->GetID(), _mPickPipelineConfig);
-
-		Razor::Engine::Get().ClearDebugDrawBuffer();
 
         bool bIsOpen;
 	    Razor::RazorImGui::Begin("Scene", &bIsOpen, Razor::RazorGuiWindowFlags_MenuBar | Razor::RazorGuiWindowFlags_NoScrollbar);
