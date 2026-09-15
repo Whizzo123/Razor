@@ -80,6 +80,8 @@ namespace Razor
 	class RAZOR_API Model
 	{
 	public:
+		Model();
+		Model(const std::string& path);
 		void LoadMesh(std::string Path);
 		void ProcessNode(aiNode* Node, const aiScene* Scene, std::vector<MeshData>& Parts);
 		MeshData ProcessMesh(aiMesh* Mesh, const aiScene* Scene);
@@ -91,11 +93,23 @@ namespace Razor
 		Material& GetMaterial() { return Info.ModelMaterial; }
 
 		std::vector<MeshData>& GetModelMeshData();
-		ModelInfo& GetModelInfo() { return Info; }
+		const ModelInfo& GetModelInfo() const { return Info; }
 		void SetModelInfo(const ModelInfo& Info) { this->Info = Info; }
 
 		const std::string& GetName() const { return _mName; }
+		/**
+		* Serialize a Model object and save to the provided path in YAML format
+		*
+		* @param path The path which we will save the YAML file to
+		*/
+		void Serialize(const std::string& path) const;
 	private:
+		/**
+		* Deserialize a Model object from the provided path
+		*
+		* @param path The path which we will load the YAML file from
+		*/
+		void Deserialize(const std::string& path);
 		std::vector<MeshData::Texture> Textures_Loaded;
 		std::vector<MaterialData> Materials_Loaded;
 		std::string Directory;
