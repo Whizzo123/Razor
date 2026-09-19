@@ -59,6 +59,7 @@ namespace EdgeEditor
 
 	void SceneWindow::ProcessInput()
 	{
+		static bool bMouseDown = false;
 		const bool bRuntimeRunning = Razor::Engine::Get().IsRuntimeRunning();
 		// Editor camera gets input when not in play mode, or when hovering the Scene panel
 		if (!bRuntimeRunning || bSceneViewHovered)
@@ -67,17 +68,19 @@ namespace EdgeEditor
 		}
 
 		// Object picking only fires from within the Scene panel
-		if (bSceneViewHovered && Razor::RazorIO::Get().GetStateForMouseButton(Razor::LEFT) == Razor::MOUSE_DOWN)
+		if (bSceneViewHovered && Razor::RazorIO::Get().GetStateForMouseButton(Razor::LEFT) == Razor::MOUSE_DOWN && !bMouseDown)
 		{
+			bMouseDown = true;
 			Razor::Vector2D mousePos = Razor::RazorIO::Get().CurrentMousePos;
 			unsigned int offsetMousePosX = mousePos.X - _mViewportPos.X;
 			unsigned int offsetMousePosY = mousePos.Y - _mViewportPos.Y;
-
 			if (offsetMousePosX < 0 || offsetMousePosX > _mPickBuffer->GetWidth() || offsetMousePosY < 0 || offsetMousePosY > _mPickBuffer->GetHeight())
 			{
 				return;
 			}
 			PickObject(Razor::Vector2(offsetMousePosX, offsetMousePosY));
+		} else if (Razor::RazorIO::Get().GetStateForMouseButton(Razor::LEFT) == Razor::MOUSE_UP) {
+			bMouseDown = false;
 		}
 	}
 
@@ -86,8 +89,7 @@ namespace EdgeEditor
 		float pixel[3];
 		Razor::Engine::Get().GetRenderer()->ReadPixels(mousePos.X, _mPickBuffer->GetHeight() - mousePos.Y, 1, 1, pixel, _mPickBuffer->GetID());
 		std::uint32_t pickedEntity = 0;
-		pickedEntity = static_cast<std::uint32_t>(pixel[0] * 255.0f) + (std::uint32_t(pixel[1] * 255.0f) << 8)
-				+ (std::uint32_t(pixel[2] * 255.0f) << 16);
+		pickedEntity = static_cast<std::uint32_t>(pixel[0] * 255.0f);
 		_mStorage->SelectedEntity = Razor::Engine::Get().mCurrentScene->GetEntity(entt::entity(pickedEntity));
 	}
 }
