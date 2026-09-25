@@ -11,11 +11,12 @@ namespace EdgeEditor
 	class Inspector : public IEditorWindow
 	{
 	public:
+		static constexpr EditorWindowName NAME = EditorWindowName::INSPECTOR;
 		Inspector();
 		Inspector(Razor::Ref<EditorStorage> Storage);
 		virtual ~Inspector() override = default;
 		
-		EditorWindowName GetName() override { return EditorWindowName::INSPECTOR; }
+		EditorWindowName GetName() override { return NAME; }
 		void Render() override;
 
 	private:

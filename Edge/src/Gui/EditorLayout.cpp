@@ -5,9 +5,9 @@
 
 namespace EdgeEditor
 {
-    EditorLayout::EditorLayout(const std::string& layoutFilePath) : _mFilePath(layoutFilePath)
+    EditorLayout::EditorLayout(const std::string& layoutFilePath, Razor::Ref<EditorStorage> storage) : _mFilePath(layoutFilePath)
     {
-        LoadLayout();
+        LoadLayout(storage);
     }
 
     EditorLayout::~EditorLayout()
@@ -23,7 +23,7 @@ namespace EdgeEditor
         ProjectExplorer
     */
 
-    void EditorLayout::LoadLayout()
+    void EditorLayout::LoadLayout(Razor::Ref<EditorStorage> storage)
     {
         Razor::YamlNode* data = Razor::yaml_load_file(_mFilePath.c_str());
         if (!data) 
@@ -42,7 +42,7 @@ namespace EdgeEditor
         {
             int windowId = Razor::yaml_as_int(node, -1);
             EditorWindowName name = static_cast<EditorWindowName>(windowId);
-            _mWindows.insert({name, EditorWindowRegistry::Instance().Create(name)});
+            _mWindows.insert({name, EditorWindowRegistry::Instance().Create(name, storage)});
         }
     }
 

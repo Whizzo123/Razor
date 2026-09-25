@@ -2,6 +2,7 @@
 #include <Razor/EntryPoint.h>
 #include <algorithm>
 
+#include "Gui/EditorLayout.h"
 #include "Gui/IEditorWindow.h"
 #include "Gui/SceneWindow.h"
 #include "Gui/GameWindow.h"
@@ -90,6 +91,8 @@ void Edge::Run()
 	_mEditorWindows.insert({EdgeEditor::EditorWindowName::SCENEWINDOW, Razor::CreateScope<EdgeEditor::SceneWindow>(Storage)});
 	_mEditorWindows.insert({EdgeEditor::EditorWindowName::GAMEWINDOW, Razor::CreateScope<EdgeEditor::GameWindow>(Storage)});
 
+	EdgeEditor::EditorLayout layout("", Storage);
+
 	Razor::SceneSerializer::Deserialize(Engine.mCurrentScene);
 	while (!Engine.ShouldEngineClose())
 	{
@@ -97,7 +100,7 @@ void Edge::Run()
 
 		Engine.GetGUI().BeginNewFrame();
 		CreateDockspace("Edge");
-		for (const auto& [name, window] : _mEditorWindows)
+		for (const auto& [name, window] : layout.GetWindows())
 		{
 			window->Render();
 		}
@@ -123,7 +126,7 @@ void Edge::Run()
 void Edge::ProcessInput()
 {
 	Razor::Engine::Get().ProcessInput();
-	for (const auto& [name, window] : _mEditorWindows)
+	for (const auto& [name, window] : layout.GetWindows())
 	{
 		window->ProcessInput();
 	}

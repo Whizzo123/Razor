@@ -1,8 +1,20 @@
 #include "SystemView.h"
+#include "EditorStorage.h"
+#include "Gui/Layout/EditorWindowRegistry.h"
 #include <Razor.h>
 
 namespace EdgeEditor
 {
+	SystemView::SystemView()
+	{
+		RegisterEditorWindow<SystemView>();
+	}
+
+	SystemView::SystemView(Razor::Ref<EditorStorage> storage) : _mStorage(storage)
+	{
+		RegisterEditorWindow<SystemView>();
+	}
+
 	void SystemView::Render()
 	{
 		Razor::Engine& Engine = Razor::Engine::Get();

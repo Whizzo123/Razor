@@ -1,6 +1,7 @@
 #include "Inspector.h"
 #include "Gui/ComponentImGui.h"
 #include "EditorStorage.h"
+#include "Gui/Layout/EditorWindowRegistry.h"
 
 namespace EdgeEditor
 {
@@ -12,6 +13,7 @@ namespace EdgeEditor
 
 	Inspector::Inspector(Razor::Ref<EditorStorage> Storage) : Storage(Storage)
 	{
+		RegisterEditorWindow<Inspector>();
 		ComponentImGui::SetAssetPickerPopup(_mAssetPickerPopup);
 	}
 

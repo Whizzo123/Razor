@@ -19,9 +19,9 @@ namespace EdgeEditor
         return *_mInstance;
     }
 
-    Razor::Scope<IEditorWindow> EditorWindowRegistry::Create(EditorWindowName name)
+    Razor::Scope<IEditorWindow> EditorWindowRegistry::Create(EditorWindowName name, Razor::Ref<EditorStorage> storage)
     {
-        return _mCreateFuncs.at(name)();
+        return _mCreateFuncs.at(name)(storage);
     }
 
     void EditorWindowRegistry::Register(EditorWindowName name, CreateFunc func)

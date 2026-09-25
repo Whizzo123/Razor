@@ -1,4 +1,5 @@
 #include "SceneWindow.h"
+#include "Layout/EditorWindowRegistry.h"
 
 
 namespace EdgeEditor
@@ -6,6 +7,8 @@ namespace EdgeEditor
 
     SceneWindow::SceneWindow(Razor::Ref<EditorStorage> storage)
     {
+		RegisterEditorWindow<SceneWindow>();
+		
         _mEditorPipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_MATERIAL_PASS, std::vector<const char*> { typeid(Razor::RSMaterialPass).name() } });
 	    _mEditorPipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_TEXT_PASS, std::vector<const char*> { typeid(Razor::RSTextPass).name() } });
 	    _mEditorPipelineConfig.push_back(Razor::RenderStageConfig{ Razor::RenderStage::RENDER_STAGE_LIGHTING_PASS, std::vector<const char*>
