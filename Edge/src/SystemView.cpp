@@ -12,7 +12,7 @@ namespace EdgeEditor
 
 	SystemView::SystemView(Razor::Ref<EditorStorage> storage) : _mStorage(storage)
 	{
-		RegisterEditorWindow<SystemView>();
+		
 	}
 
 	void SystemView::Render()

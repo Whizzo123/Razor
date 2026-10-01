@@ -15,6 +15,8 @@ namespace EdgeEditor
         ~EditorLayout();
 
         const Layout& GetWindows();
+        bool Contains(EditorWindowName name);
+        IEditorWindow* GetWindow(EditorWindowName name);
     private:
         void LoadLayout(Razor::Ref<EditorStorage> storage);
         void SaveLayout();

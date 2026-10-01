@@ -38,7 +38,7 @@ namespace EdgeEditor
         {
             RZ_ERROR("LoadLayout failed layout file is corrupted: {0} missing 'Windows' key", _mFilePath);
         }
-        for (auto node : Razor::yaml_get_children(data, "Windows"))
+        for (auto node : Razor::yaml_get_children(windows))
         {
             int windowId = Razor::yaml_as_int(node, -1);
             EditorWindowName name = static_cast<EditorWindowName>(windowId);
@@ -54,6 +54,20 @@ namespace EdgeEditor
     const Layout& EditorLayout::GetWindows()
     {
         return _mWindows;
+    }
+
+    bool EditorLayout::Contains(EditorWindowName name)
+    {
+        return _mWindows.contains(name);
+    }
+
+    IEditorWindow* EditorLayout::GetWindow(EditorWindowName name)
+    {
+        if(!Contains(name))
+        {
+            return nullptr;
+        }
+        return _mWindows[name].get();
     }
 }
 

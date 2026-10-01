@@ -11,7 +11,7 @@ namespace EdgeEditor
 
 	SceneView::SceneView(Razor::Ref<EditorStorage> Storage) : Storage(Storage)
 	{
-		RegisterEditorWindow<SceneView>();
+		
 	}
 
 	void SceneView::Render()

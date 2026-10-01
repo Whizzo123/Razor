@@ -17,6 +17,7 @@ namespace EdgeEditor
         Razor::Scope<IEditorWindow> Create(EditorWindowName name, Razor::Ref<EditorStorage> storage);
     private:
         EditorWindowRegistry();
+        void Register();
         static Razor::Scope<EditorWindowRegistry> _mInstance;
 
         std::unordered_map<EditorWindowName, CreateFunc> _mCreateFuncs;

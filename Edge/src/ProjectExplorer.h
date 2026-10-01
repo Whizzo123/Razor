@@ -19,7 +19,7 @@ namespace EdgeEditor
 		}
 		ProjectExplorer(Razor::Ref<EditorStorage> Storage) : Storage(Storage), _mRootPath("")
 		{
-			RegisterEditorWindow<ProjectExplorer>();
+			
 		}
 
 		virtual ~ProjectExplorer() override = default;

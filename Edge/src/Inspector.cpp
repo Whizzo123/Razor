@@ -5,6 +5,7 @@
 
 namespace EdgeEditor
 {
+
 	// TODO don't really think we want this
 	Inspector::Inspector() : Storage(std::make_shared<EditorStorage>())
 	{
@@ -13,7 +14,6 @@ namespace EdgeEditor
 
 	Inspector::Inspector(Razor::Ref<EditorStorage> Storage) : Storage(Storage)
 	{
-		RegisterEditorWindow<Inspector>();
 		ComponentImGui::SetAssetPickerPopup(_mAssetPickerPopup);
 	}
 
