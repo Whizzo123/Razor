@@ -1,6 +1,7 @@
 #include "EditorLayout.h"
 #include "IEditorWindow.h"
 #include "Layout/EditorWindowRegistry.h"
+#include <fstream>
 
 
 namespace EdgeEditor
@@ -12,16 +13,8 @@ namespace EdgeEditor
 
     EditorLayout::~EditorLayout()
     {
-
+        SaveLayout();
     }
-
-    /*
-    Windows:
-        Inspector
-        Scene
-        Game
-        ProjectExplorer
-    */
 
     void EditorLayout::LoadLayout(Razor::Ref<EditorStorage> storage)
     {
@@ -48,7 +41,20 @@ namespace EdgeEditor
 
     void EditorLayout::SaveLayout()
     {
+        Razor::YamlEmitter* Out = Razor::yaml_emitter_new();
+        Razor::yaml_emitter_begin_map(Out);
+        Razor::yaml_emitter_key(Out, "Windows");
+        Razor::yaml_emitter_value_seq(Out);
+        for (const auto& [name, window] : _mWindows)
+        {
+            Razor::yaml_emitter_value_int(Out, static_cast<int>(name));
+        }
 
+        Razor::yaml_emitter_end_seq(Out);
+        Razor::yaml_emitter_end_map(Out);
+        std::ofstream FOut(_mFilePath.c_str());
+        FOut << yaml_emitter_cstr(Out);
+        FOut.close();
     }
 
     const Layout& EditorLayout::GetWindows()
