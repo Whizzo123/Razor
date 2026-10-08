@@ -1,4 +1,5 @@
 #include "GameWindow.h"
+#include "Layout/EditorWindowRegistry.h"
 
 
 namespace EdgeEditor

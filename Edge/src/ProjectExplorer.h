@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Gui/IEditorWindow.h"
+#include "Gui/Layout/EditorWindowRegistry.h"
 #include "Razor.h"
 #include "EditorStorage.h"
 #include <stack>
@@ -22,8 +23,8 @@ namespace EdgeEditor
 		}
 
 		virtual ~ProjectExplorer() override = default;
-
-		EditorWindowName GetName() override { return EditorWindowName::PROJECTEXPLORER; }
+		static constexpr EditorWindowName NAME = EditorWindowName::PROJECTEXPLORER;
+		EditorWindowName GetName() override { return NAME; }
 		void Render() override;
 		void Refresh(const std::string& path);
 	private:

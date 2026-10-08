@@ -2,6 +2,7 @@
 #include <Razor/EntryPoint.h>
 #include <algorithm>
 
+#include "Gui/EditorLayout.h"
 #include "Gui/IEditorWindow.h"
 #include "Gui/SceneWindow.h"
 #include "Gui/GameWindow.h"
@@ -49,6 +50,7 @@ private:
 private:
 	Razor::Ref<EdgeEditor::EditorStorage> Storage; /** Container object to hold data to be shared among windows*/
 	Razor::Ref<Razor::Scene> _mPlaybackSceneBackup;
+	Razor::Scope<EdgeEditor::EditorLayout> _mLayout;
 	
 };
 
@@ -56,6 +58,8 @@ Razor::Application* Razor::CreateApplication()
 {
 	return new Edge();
 }
+
+
 
 void Edge::Run()
 {
@@ -83,12 +87,7 @@ void Edge::Run()
 	Storage->DefaultModel = defaultModel;
 	Storage->OnProjectSet().AddRaw(this, &Edge::OnNewProjectSet);
 
-	_mEditorWindows.insert({EdgeEditor::EditorWindowName::INSPECTOR, Razor::CreateScope<EdgeEditor::Inspector>(Storage)});
-	_mEditorWindows.insert({EdgeEditor::EditorWindowName::SCENEVIEW, Razor::CreateScope<EdgeEditor::SceneView>(Storage)});
-	_mEditorWindows.insert({EdgeEditor::EditorWindowName::PROJECTEXPLORER, Razor::CreateScope<EdgeEditor::ProjectExplorer>(Storage)});
-	_mEditorWindows.insert({EdgeEditor::EditorWindowName::SYSTEMVIEW,  Razor::CreateScope<EdgeEditor::SystemView>()});
-	_mEditorWindows.insert({EdgeEditor::EditorWindowName::SCENEWINDOW, Razor::CreateScope<EdgeEditor::SceneWindow>(Storage)});
-	_mEditorWindows.insert({EdgeEditor::EditorWindowName::GAMEWINDOW, Razor::CreateScope<EdgeEditor::GameWindow>(Storage)});
+	_mLayout = Razor::CreateScope<EdgeEditor::EditorLayout>("Edge/config/layout.yaml", Storage);
 
 	Razor::SceneSerializer::Deserialize(Engine.mCurrentScene);
 	while (!Engine.ShouldEngineClose())
@@ -97,7 +96,7 @@ void Edge::Run()
 
 		Engine.GetGUI().BeginNewFrame();
 		CreateDockspace("Edge");
-		for (const auto& [name, window] : _mEditorWindows)
+		for (const auto& [name, window] : _mLayout->GetWindows())
 		{
 			window->Render();
 		}
@@ -123,7 +122,7 @@ void Edge::Run()
 void Edge::ProcessInput()
 {
 	Razor::Engine::Get().ProcessInput();
-	for (const auto& [name, window] : _mEditorWindows)
+	for (const auto& [name, window] : _mLayout->GetWindows())
 	{
 		window->ProcessInput();
 	}
@@ -190,9 +189,9 @@ void Edge::OnNewProjectSet()
 	Razor::Engine& Engine = Razor::Engine::Get();
 	if (Engine.LoadProject(Storage->GetProjectPath()))
 	{
-		if (_mEditorWindows.contains(EdgeEditor::EditorWindowName::PROJECTEXPLORER))
+		if (_mLayout->Contains(EdgeEditor::EditorWindowName::PROJECTEXPLORER))
 		{
-			EdgeEditor::IEditorWindow* window = _mEditorWindows[EdgeEditor::EditorWindowName::PROJECTEXPLORER].get();
+			EdgeEditor::IEditorWindow* window = _mLayout->GetWindow(EdgeEditor::EditorWindowName::PROJECTEXPLORER);
 			EdgeEditor::ProjectExplorer* explorer = dynamic_cast<EdgeEditor::ProjectExplorer*>(window);
 			explorer->Refresh(Engine.GetAssetDirectory()->GetRootFolder());
 		}

@@ -10,10 +10,11 @@ namespace EdgeEditor
     class GameWindow : public IEditorWindow
     {
     public:
+        static constexpr EditorWindowName NAME = EditorWindowName::GAMEWINDOW;
         GameWindow(Razor::Ref<EditorStorage> storage);
         virtual ~GameWindow() override = default;
 
-        EditorWindowName GetName() override { return EditorWindowName::GAMEWINDOW; }
+        EditorWindowName GetName() override { return NAME; }
         void Render() override;
         void ProcessInput() override;
 
