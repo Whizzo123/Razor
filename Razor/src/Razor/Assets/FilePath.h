@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <filesystem>
 #include "../Core.h"
 
 namespace Razor
@@ -23,6 +24,10 @@ namespace Razor
 
 		operator std::string() const
 		{
+			return _mPath;
+		}
+
+		operator std::filesystem::path() const{
 			return _mPath;
 		}
 

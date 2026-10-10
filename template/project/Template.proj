@@ -1,0 +1,4 @@
+ProjectName: Sandbox
+AssetDirectory: assets
+DllDirectory: Scripts/Binaries
+MainScenePath: /assets/scenes/Main.rzscn

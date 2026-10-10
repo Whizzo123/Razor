@@ -27,7 +27,7 @@ namespace EdgeEditor
 		* Function to handle closing logic for popup such as ImGui calls
 		*/
 		void Close() override;
-
+		bool bIsOpen = false;
 		Razor::Ref<Project> NewProject; /** New Project to potentially be created */
 	};
 }
