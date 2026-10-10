@@ -1,9 +1,9 @@
 local RazorRootDir = '../../'
 include (RazorRootDir .. "/vendor/premake/premake_customization/solution_items.lua")
 
-workspace "Sandbox"
+workspace "@ProjectName"
 	architecture "x86_64"
-	startproject "Sandbox"
+	startproject "@ProjectName"
 
 	configurations
 	{
@@ -15,14 +15,14 @@ workspace "Sandbox"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
-project "Sandbox"
+project "@ProjectName"
 
     filter { "not action:vs*", "not system:windows" }
         kind "StaticLib"
         language "C++"
         files { "Source/Dummy.cpp" }
         prebuildcommands {
-            'dotnet build "%{prj.location}/Sandbox.csproj"' ..
+            'dotnet build "%{prj.location}/@ProjectName.csproj"' ..
             ' -c %{cfg.buildcfg}' ..
             ' -o "%{prj.location}/Binaries"' ..
             ' --nologo'

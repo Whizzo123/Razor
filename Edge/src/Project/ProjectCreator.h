@@ -14,7 +14,7 @@ public:
 private:
     static bool CopyFile(const Razor::FilePath& source, const Razor::FilePath& dest);
     static bool CreateDirectory(const Razor::FilePath& dir);
-    static bool Replace(std::string& text, const std::string& patternText, const std::string& replacementText);
+    static bool Replace(Razor::FilePath& file, const std::string& patternText, const std::string& replacementText);
 };
 
 }
