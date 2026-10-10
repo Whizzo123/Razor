@@ -37,4 +37,12 @@ namespace Razor
 	{
 		return mbIsDirectory;
 	}
+
+	std::optional<FilePath> FilePath::GetParent() const {
+		size_t pos = _mPath.find_last_of('/');
+		if (pos != std::string::npos) {
+			return FilePath(_mPath.substr(0, pos), true);
+		}
+		return std::nullopt;
+	}
 }

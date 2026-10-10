@@ -2,6 +2,7 @@
 
 #include <string>
 #include <filesystem>
+#include <optional>
 #include "../Core.h"
 
 namespace Razor
@@ -21,6 +22,8 @@ namespace Razor
 			bool bIsDirectory = IsDir() && other.IsDir();
 			return FilePath(_mPath + "/" + other._mPath, bIsDirectory);
 		}
+
+		std::optional<FilePath> GetParent() const;
 
 		operator std::string() const
 		{

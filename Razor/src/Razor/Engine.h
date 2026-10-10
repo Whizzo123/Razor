@@ -7,6 +7,7 @@
 #include "Scene/Project.h"
 #include <thread>
 #include <atomic>
+#include "Assets/FilePath.h"
 
 namespace Razor
 {
@@ -154,7 +155,7 @@ namespace Razor
 		ScriptInterface& GetScriptInterface();
 
 		void SaveProject();
-		bool LoadProject(const std::string& projectPath);
+		bool LoadProject(FilePath& projectPath);
 
 		void RuntimeStart();
 		void RuntimeStop();

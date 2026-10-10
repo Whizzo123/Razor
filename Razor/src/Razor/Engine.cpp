@@ -42,6 +42,7 @@
 #include "Systems/PhysicsSystem.h"
 #include "Renderer/Font/FontLoader.h"
 
+
 namespace Razor
 {
 
@@ -224,9 +225,9 @@ namespace Razor
 	}
 
 
-	bool Engine::LoadProject(const std::string& projectPath)
+	bool Engine::LoadProject(FilePath& projectFilePath)
 	{
-		if (projectPath.empty())
+		if (static_cast<std::string>(projectFilePath).empty())
 		{
 			RZ_CORE_ERROR("Project path is empty");
 			return false;
@@ -237,32 +238,33 @@ namespace Razor
 			_mLoadedProject = CreateRef<Project>();
 		}
 
-		const std::string path = "Sandbox";
-
-		ProjectSerializer::Deserialize(projectPath, _mLoadedProject);
+		ProjectSerializer::Deserialize(projectFilePath, _mLoadedProject);
 		RZ_CORE_INFO("Loading up project: {0}", _mLoadedProject->m_ProjectName);
 		// TODO move assembly holding into ScriptEngine
-		_mBridgeAssembly = _mScriptInterface->LoadAssembly(path + "/" + _mLoadedProject->m_DllDirectory, "Razor-ScriptBridge.dll", true);
-		_mGameAssembly = _mScriptInterface->LoadAssembly(path + "/" + _mLoadedProject->m_DllDirectory, _mLoadedProject->m_ProjectName + ".dll", false);
-
-		if (!_mBridgeAssembly || !_mGameAssembly)
-		{
-			RZ_CORE_ERROR("LoadProject: Could not load C# assemblies failed to load project");
+		std::optional<FilePath> projectFolder = projectFilePath.GetParent();
+		if (!projectFolder) {
+			RZ_CORE_ERROR("Engine::LoadProject -> Error attempting to get parent folder of project path: {0}", static_cast<std::string>(projectFilePath));
 			_mLoadedProject = nullptr;
 			return false;
 		}
+		_mBridgeAssembly = _mScriptInterface->LoadAssembly(projectFolder.value() + FilePath(_mLoadedProject->m_DllDirectory, true), "Razor-ScriptBridge.dll", true);
+		_mGameAssembly = _mScriptInterface->LoadAssembly(projectFolder.value() + FilePath(_mLoadedProject->m_DllDirectory, true), _mLoadedProject->m_ProjectName + ".dll", false);
+
+		if (!_mBridgeAssembly || !_mGameAssembly)
+		{
+			RZ_CORE_ERROR("LoadProject: Could not load C# assemblies");
+		}
 
 		// Load main scene
-		Ref<Scene> mainScene = CreateRef<Scene>(path + _mLoadedProject->m_MainScenePath);
+		Ref<Scene> mainScene = CreateRef<Scene>(projectFolder.value() + FilePath(_mLoadedProject->m_MainScenePath));
 		if (SceneSerializer::Deserialize(mainScene) == false)
 		{
-			_mLoadedProject->m_MainScenePath = "/assets/scenes/Main.rzscn";
-			mainScene = CreateRef<Scene>(_mLoadedProject->m_MainScenePath);
-			SceneSerializer::Serialize(mainScene);
-			ProjectSerializer::Serialize("../", _mLoadedProject);
+			_mLoadedProject->m_MainScenePath = FilePath(_mLoadedProject->m_AssetDirectory + "/" + "Main.rzscn");
+			mainScene = CreateRef<Scene>(projectFolder.value() + FilePath(_mLoadedProject->m_AssetDirectory + "/" + "Main.rzscn"));
+			ProjectSerializer::Serialize(projectFolder.value(), _mLoadedProject);
 		}
 		*mCurrentScene = std::move(*mainScene);
-		_mAssetDirectory = CreateRef<AssetDirectory>(path + "/" + _mLoadedProject->m_AssetDirectory, mRenderer);
+		_mAssetDirectory = CreateRef<AssetDirectory>(projectFolder.value() + FilePath(_mLoadedProject->m_AssetDirectory, true), mRenderer);
 		return true;
 	}
 

@@ -23,7 +23,10 @@ namespace Razor
 		std::string absolutePath = std::filesystem::absolute(binaryPath).string();
 
 		std::optional<std::string> assemblyPath = SearchFiles(binaryPath, assemblyName);
-
+		if (!assemblyPath) {
+			RZ_TRACE("ScriptInterface::LoadAssembly -> No assemblies found under: {0}, of the name: {1}", absolutePath, assemblyName);
+			return nullptr;
+		}
 		Scope<Coral::ManagedAssembly> assembly = ScriptEngine::LoadAssembly(assemblyPath.value());
 		if(!assembly)
 		{
