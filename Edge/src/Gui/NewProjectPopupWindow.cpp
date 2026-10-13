@@ -4,10 +4,13 @@
 namespace EdgeEditor
 {
 	static constexpr const char* POPUP_NAME = "New Project Window";
+
+	NewProjectPopupWindow::NewProjectPopupWindow() : fileSelector([this](Razor::FilePath path) { location = path; }){
+
+	}
+
 	bool NewProjectPopupWindow::Draw()
 	{
-		const std::string MagicalPathToFixWithActualSelectedPathSoon = "../../Sandboxes/";
-
 		if (!bIsOpen)
 		{
 			Open();
@@ -15,11 +18,21 @@ namespace EdgeEditor
 
 		if (Razor::RazorImGui::BeginPopupModal(POPUP_NAME, nullptr))
 		{
-			//ImGui::InputText("Project Name", &NewProject->ProjectName);
+			// Replace with folder selector
+			Razor::RazorImGui::Text(static_cast<std::string>(location).c_str());
+			if (Razor::RazorImGui::Button("Select folder")) {
+				_mbIsFileSelectorOpen = true;
+			}
+
+			if (_mbIsFileSelectorOpen) {
+				_mbIsFileSelectorOpen = fileSelector.Draw();
+			}
+
+			Razor::RazorImGui::InputText("Project Name", name, sizeof(name));
 			if (Razor::RazorImGui::Button("Create"))
 			{
-				Razor::FilePath projectPath(std::filesystem::current_path().string() + "/Test", true);
-				ProjectCreator::Create(projectPath);
+				Razor::FilePath projectPath(name, true);
+				ProjectCreator::Create(location + Razor::FilePath(std::string(name)));
 				/*TODO actually load project up*/
 				Razor::RazorImGui::CloseCurrentPopup();
 			}

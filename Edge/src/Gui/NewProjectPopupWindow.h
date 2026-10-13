@@ -1,5 +1,6 @@
 #pragma once
 
+#include "FileSelectorPopupWindow.h"
 #include "Razor.h"
 #include "PopupWindow.h"
 
@@ -13,6 +14,7 @@ namespace EdgeEditor
 	class NewProjectPopupWindow : public PopupWindow
 	{
 	public:
+		NewProjectPopupWindow();
 		/**
 		* Function to draw popup window function to be called when wishing to draw popup
 		*/
@@ -28,7 +30,10 @@ namespace EdgeEditor
 		*/
 		void Close() override;
 		bool bIsOpen = false;
-		Razor::Ref<Project> NewProject; /** New Project to potentially be created */
+		char name[512]; /** New Project to potentially be created */
+		Razor::FilePath location;
+		FileSelectorPopupWindow fileSelector;
+		bool _mbIsFileSelectorOpen = false;
 	};
 }
 

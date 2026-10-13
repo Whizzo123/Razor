@@ -9,7 +9,7 @@ namespace EdgeEditor {
 
 bool ProjectCreator::Create(const Razor::FilePath& projectDir) {
     static Razor::FilePath templateDir("template", true);
-    std::string projectName = "Test";
+    std::string projectName = projectDir.GetName();
 
     bool ret = true;
 

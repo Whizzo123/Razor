@@ -45,4 +45,12 @@ namespace Razor
 		}
 		return std::nullopt;
 	}
+
+	std::string FilePath::GetName() const {
+		size_t pos = _mPath.find_last_of('/');
+		if (pos != std::string::npos) {
+			return std::string(_mPath.substr(pos + 1, _mPath.length() - pos));
+		}
+		return "";
+	}
 }
