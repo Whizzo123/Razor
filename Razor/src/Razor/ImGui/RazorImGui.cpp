@@ -369,4 +369,13 @@ ImGuiViewport& RazorImGui::GetViewport(unsigned int ID)
 	{
 		return ImGui::ColorEdit3(label.c_str(), color.get(), 0);
 	}
+
+	bool RazorImGui::IsMouseClicked(RazorImGuiMouseButton_ button) {
+		return ImGui::IsMouseClicked(button);
+	}
+
+	bool RazorImGui::IsAnyItemHovered() {
+		return ImGui::IsAnyItemHovered();
+	}
+
 }

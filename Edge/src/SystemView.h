@@ -1,16 +1,21 @@
 #pragma once
 
+#include "EditorStorage.h"
 #include "Gui/IEditorWindow.h"
 namespace EdgeEditor
 {
 	class SystemView : public IEditorWindow
 	{
 	public:
-		SystemView() = default;
+		SystemView();
+		SystemView(Razor::Ref<EditorStorage> storage);
 		virtual ~SystemView() override = default;
-
-		EditorWindowName GetName() override { return EditorWindowName::SYSTEMVIEW; }
+		static constexpr EditorWindowName NAME = EditorWindowName::SYSTEMVIEW;
+		EditorWindowName GetName() override { return NAME; }
 		void Render() override;
+
+	private:
+		Razor::Ref<EditorStorage> _mStorage;
 	};
 }
 

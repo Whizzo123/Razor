@@ -1,5 +1,6 @@
 #include "SceneView.h"
 #include "EditorStorage.h"
+#include "Gui/Layout/EditorWindowRegistry.h"
 
 namespace EdgeEditor
 {
@@ -10,7 +11,7 @@ namespace EdgeEditor
 
 	SceneView::SceneView(Razor::Ref<EditorStorage> Storage) : Storage(Storage)
 	{
-
+		
 	}
 
 	void SceneView::Render()

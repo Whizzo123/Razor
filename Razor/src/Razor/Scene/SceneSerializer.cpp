@@ -248,9 +248,9 @@ namespace Razor
 		yaml_emitter_end_map(Out);
 
 		std::ofstream FOut(OutScene->GetPath().c_str());
-		const char* ErrorMsg = new char(' ');
-		std::perror(ErrorMsg);
-		RZ_CORE_WARN("Error Msg: {0}", ErrorMsg);
+		if (!FOut) {
+			RZ_CORE_WARN("Error with scene saving");
+		}
 		FOut << yaml_emitter_cstr(Out);
 		FOut.close();
 	}

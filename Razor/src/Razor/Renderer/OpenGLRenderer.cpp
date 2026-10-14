@@ -4,6 +4,7 @@
 #include "../Log.h"
 #include "../../Platform/OpenGL/OpenGLWindowProvider.h"
 #include "../Assert.h"
+#include "Framebuffer.h"
 #include "OpenGL/GLFramebuffer.h"
 #include "../Window.h"
 #include "Debug/DebugLine.h"
@@ -241,10 +242,12 @@ namespace Razor
         glfwSwapBuffers(std::dynamic_pointer_cast<OpenGLWindowProvider>(window.GetWindowProvider())->GetPlatformWindowPtr());
     }
 
-    void OpenGLRenderer::ReadPixels(unsigned int X, unsigned int Y, unsigned int Width, unsigned int Height, float* OutPixels, [[maybe_unused]]unsigned int Buffer)
+    void OpenGLRenderer::ReadPixels(unsigned int X, unsigned int Y, unsigned int Width, unsigned int Height, float* OutPixels, [[maybe_unused]]unsigned int buffer)
     {
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, buffer);
         glReadBuffer(GL_COLOR_ATTACHMENT0);
         glReadPixels(X, Y, Width, Height, GL_RGB, GL_FLOAT, OutPixels);
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
     }
 
     void OpenGLRenderer::BackupContext()

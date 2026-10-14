@@ -10,10 +10,11 @@ namespace EdgeEditor
     class SceneWindow : public IEditorWindow
     {
     public:
+        static constexpr EditorWindowName NAME = EditorWindowName::SCENEWINDOW;
         SceneWindow(Razor::Ref<EditorStorage> storage);
         virtual ~SceneWindow() override = default;
 
-        EditorWindowName GetName() override { return EditorWindowName::SCENEWINDOW; }
+        EditorWindowName GetName() override { return NAME; }
         void Render() override;
         void ProcessInput() override;
 

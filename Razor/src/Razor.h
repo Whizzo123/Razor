@@ -26,7 +26,6 @@
 #include "Razor/IO/YamlWrapper.h"
 #include "Razor/Core/Entity.h"
 #include "Razor/Assets/FilePath.h"
-#include "Razor/Assets/ModelSerializer.h"
 #include "Razor/Physics/Components/BoxBody.h"
 #include "Razor/Renderer/Font/Text.h"
 #include "Razor/Renderer/Shaders/DefaultTextShader.h"

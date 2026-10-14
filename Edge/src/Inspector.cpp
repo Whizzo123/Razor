@@ -1,9 +1,11 @@
 #include "Inspector.h"
 #include "Gui/ComponentImGui.h"
 #include "EditorStorage.h"
+#include "Gui/Layout/EditorWindowRegistry.h"
 
 namespace EdgeEditor
 {
+
 	// TODO don't really think we want this
 	Inspector::Inspector() : Storage(std::make_shared<EditorStorage>())
 	{

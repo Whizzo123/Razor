@@ -1,6 +1,8 @@
 #pragma once
 
 #include <string>
+#include <filesystem>
+#include <optional>
 #include "../Core.h"
 
 namespace Razor
@@ -21,12 +23,22 @@ namespace Razor
 			return FilePath(_mPath + "/" + other._mPath, bIsDirectory);
 		}
 
+		std::optional<FilePath> GetParent() const;
+
 		operator std::string() const
 		{
 			return _mPath;
 		}
 
+		operator std::filesystem::path() const{
+			return _mPath;
+		}
+
+		std::string GetName() const;
+
 		bool IsDir() const;
+
+		bool Empty() const;
 	private:
 		std::string _mPath;
 		bool mbIsDirectory;

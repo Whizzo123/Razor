@@ -3,14 +3,83 @@
 #include <assimp/mesh.h>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <string>
+#include <fstream>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "../Log.h"
+#include "../IO/YamlWrapper.h"
 
 namespace Razor
 {
+
+	Model::Model()
+	{
+
+	}
+
+	Model::Model(const std::string& path)
+	{
+		Deserialize(path);
+	}
+
+	void Model::Serialize(const std::string& path) const
+	{
+		YamlEmitter* out = Razor::yaml_emitter_new();
+		yaml_emitter_begin_map(out);
+		yaml_emitter_key(out, "ModelInfo");
+		yaml_emitter_value_modelinfo(out, GetModelInfo());
+		yaml_emitter_end_map(out);
+
+		const std::string pathPlusExt = path + "/" + _mName + ".model";
+
+		std::ofstream fOut(pathPlusExt.c_str());
+		bool bFileWriteSuccessful = true;
+		std::stringstream errorStream;
+		if (!fOut)
+		{
+			bFileWriteSuccessful = false;
+			errorStream << "Failed to open " << pathPlusExt;
+		}
+		fOut << Razor::yaml_emitter_cstr(out);
+		if (!fOut)
+		{
+			bFileWriteSuccessful = false;
+			errorStream << "Failed to write " << pathPlusExt;
+		}
+		fOut.close();
+		if (!bFileWriteSuccessful)
+		{
+			RZ_CORE_WARN("Model::Serialize -> {0}", errorStream.str());
+		}
+
+	}
+
+	void Model::Deserialize(const std::string& path)
+	{
+		Razor::YamlNode* data;
+		const std::string pathPlusExt = path;
+		try
+		{
+			data = yaml_load_file(pathPlusExt.c_str());
+		}
+		catch (std::exception e)
+		{
+			RZ_CORE_ERROR("Model::Deserialize -> Failed to load .model file '{0}'\n	{1}", pathPlusExt, e.what());
+			return;
+		}
+
+		if (!yaml_get_child(data, "ModelInfo"))
+		{
+			RZ_CORE_ERROR("Model::Deserialize -> Incomplete .model file missing 'ModelInfo' key");
+			return;
+		}
+
+		Razor::ModelInfo info = yaml_as_modelinfo(yaml_get_child(data, "ModelInfo"));
+		SetModelInfo(info);
+	}
 
 	void Model::LoadMesh(std::string Path)
 	{

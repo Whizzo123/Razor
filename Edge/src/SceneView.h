@@ -13,8 +13,8 @@ namespace EdgeEditor
 		SceneView();
 		SceneView(Razor::Ref<EditorStorage> Storage);
 		virtual ~SceneView() override = default;
-
-		EditorWindowName GetName() override { return EditorWindowName::SCENEVIEW; }
+		static constexpr EditorWindowName NAME = EditorWindowName::SCENEVIEW;
+		EditorWindowName GetName() override { return NAME; }
 		void Render() override;
 
 	private:
