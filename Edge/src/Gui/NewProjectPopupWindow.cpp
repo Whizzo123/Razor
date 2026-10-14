@@ -34,9 +34,9 @@ namespace EdgeEditor
 			if (Razor::RazorImGui::Button("Create"))
 			{
 				Razor::FilePath projectPath = location + Razor::FilePath(name);
-				ProjectCreator::Create(projectPath);
-				
-				_mStorage->SetProjectPath(projectPath + Razor::FilePath(name));
+				if(ProjectCreator::Create(projectPath)) {
+					_mStorage->SetProjectPath(projectPath + Razor::FilePath(name));
+				}
 				Razor::RazorImGui::CloseCurrentPopup();
 			}
 			Razor::RazorImGui::SameLine();
