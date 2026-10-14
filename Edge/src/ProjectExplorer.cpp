@@ -87,7 +87,7 @@ namespace EdgeEditor
 			char buffer[512];
 			buffer[0] = '\0';
 			getcwd(&buffer[0], 512);
-			RZ_ERROR("ProjectExplorer::GrabFiles -> Threw file system error path was {0}, current working directory is {1}", Path, buffer);
+			RZ_ERROR("ProjectExplorer::GrabFiles -> Threw file system error path was {0}, current working directory is {1}, err: {2}", Path, buffer, err.what());
 		}
 
 		return fileNames;

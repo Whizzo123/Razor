@@ -1,11 +1,13 @@
 #pragma once
 
+#include "FileSelectorPopupWindow.h"
 #include "Razor.h"
 #include "PopupWindow.h"
 
 namespace EdgeEditor
 {
 	struct Project;
+	struct EditorStorage;
 
 	/**
 	* Class for popup window to create new project inherits from base PopupWindow class
@@ -13,6 +15,7 @@ namespace EdgeEditor
 	class NewProjectPopupWindow : public PopupWindow
 	{
 	public:
+		NewProjectPopupWindow(Razor::Ref<EditorStorage> storage);
 		/**
 		* Function to draw popup window function to be called when wishing to draw popup
 		*/
@@ -27,8 +30,12 @@ namespace EdgeEditor
 		* Function to handle closing logic for popup such as ImGui calls
 		*/
 		void Close() override;
-
-		Razor::Ref<Project> NewProject; /** New Project to potentially be created */
+		bool bIsOpen = false;
+		char name[512]; /** New Project to potentially be created */
+		Razor::FilePath location;
+		FileSelectorPopupWindow _mFileSelector;
+		bool _mbIsFileSelectorOpen = false;
+		Razor::Ref<EditorStorage> _mStorage;
 	};
 }
 

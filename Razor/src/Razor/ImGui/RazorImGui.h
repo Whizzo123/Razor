@@ -62,6 +62,14 @@ namespace Razor
 		RazorGuiWindowFlags_DockNodeHost = 1 << 29,  // Don't use! For internal use by Begin()/NewFrame()
 	};
 
+	enum RazorImGuiMouseButton_
+	{
+		MouseButton_Left = 0,
+		MouseButton_Right = 1,
+		MouseButton_Middle = 2,
+		MouseButton_COUNT = 5
+	};
+
 	inline RazorGuiWindowFlags_ operator|(RazorGuiWindowFlags_ a, RazorGuiWindowFlags_ b)
 	{
 		return static_cast<RazorGuiWindowFlags_>(static_cast<int>(a) | static_cast<int>(b));
@@ -128,6 +136,8 @@ namespace Razor
 		static bool CheckBox(const char* label, bool* value);
 		static bool IsWindowHovered();
 		static bool ColorPicker(const std::string& label, Ref<float[]> color);
+		static bool IsMouseClicked(RazorImGuiMouseButton_ button);
+		static bool IsAnyItemHovered();
 		
 	private:
 		static ImGuiViewport& GetViewport(unsigned int ID);

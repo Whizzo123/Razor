@@ -146,7 +146,7 @@ void Edge::CreateDockspace(const std::string& Title)
 		{
 			if (Razor::RazorImGui::MenuItem("Create Project"))
 			{
-				CurrentPopup = new EdgeEditor::NewProjectPopupWindow();
+				CurrentPopup = new EdgeEditor::NewProjectPopupWindow(Storage);
 			}
 			if (Razor::RazorImGui::MenuItem("Open Project"))
 			{
@@ -187,7 +187,8 @@ void Edge::CreateDockspace(const std::string& Title)
 void Edge::OnNewProjectSet()
 {
 	Razor::Engine& Engine = Razor::Engine::Get();
-	if (Engine.LoadProject(Storage->GetProjectPath()))
+	Razor::FilePath projectFilePath(Storage->GetProjectPath()); 
+	if (Engine.LoadProject(projectFilePath))
 	{
 		if (_mLayout->Contains(EdgeEditor::EditorWindowName::PROJECTEXPLORER))
 		{
