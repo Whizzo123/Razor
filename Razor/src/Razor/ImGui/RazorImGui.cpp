@@ -377,4 +377,5 @@ ImGuiViewport& RazorImGui::GetViewport(unsigned int ID)
 	bool RazorImGui::IsAnyItemHovered() {
 		return ImGui::IsAnyItemHovered();
 	}
+
 }

@@ -53,4 +53,8 @@ namespace Razor
 		}
 		return "";
 	}
+
+	bool FilePath::Empty() const {
+		return _mPath.empty();
+	}
 }

@@ -227,7 +227,7 @@ namespace Razor
 
 	bool Engine::LoadProject(FilePath& projectFilePath)
 	{
-		if (static_cast<std::string>(projectFilePath).empty())
+		if (projectFilePath.Empty())
 		{
 			RZ_CORE_ERROR("Project path is empty");
 			return false;

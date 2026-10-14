@@ -146,7 +146,7 @@ void Edge::CreateDockspace(const std::string& Title)
 		{
 			if (Razor::RazorImGui::MenuItem("Create Project"))
 			{
-				CurrentPopup = new EdgeEditor::NewProjectPopupWindow();
+				CurrentPopup = new EdgeEditor::NewProjectPopupWindow(Storage);
 			}
 			if (Razor::RazorImGui::MenuItem("Open Project"))
 			{

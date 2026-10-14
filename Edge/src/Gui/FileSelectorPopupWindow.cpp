@@ -87,7 +87,7 @@ namespace EdgeEditor {
 				const std::filesystem::path& filePath = DirectoryEntry.path();
 				bool bIsDirectory = DirectoryEntry.is_directory();
 
-				if (bIsDirectory || (filePath.extension() == ".proj"))
+				if (bIsDirectory)
 				{
 					fileNames.push_back({ Razor::FilePath(filePath.string()), bIsDirectory });
 				}

@@ -37,6 +37,8 @@ namespace Razor
 		std::string GetName() const;
 
 		bool IsDir() const;
+
+		bool Empty() const;
 	private:
 		std::string _mPath;
 		bool mbIsDirectory;

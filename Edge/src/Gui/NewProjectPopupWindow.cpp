@@ -1,11 +1,12 @@
 #include "NewProjectPopupWindow.h"
 #include "../Project/ProjectCreator.h"
+#include "../EditorStorage.h"
 
 namespace EdgeEditor
 {
 	static constexpr const char* POPUP_NAME = "New Project Window";
 
-	NewProjectPopupWindow::NewProjectPopupWindow() : fileSelector([this](Razor::FilePath path) { location = path; }){
+	NewProjectPopupWindow::NewProjectPopupWindow(Razor::Ref<EditorStorage> storage) : _mFileSelector([this](Razor::FilePath path) { location = path; }), _mStorage(storage) {
 
 	}
 
@@ -18,22 +19,24 @@ namespace EdgeEditor
 
 		if (Razor::RazorImGui::BeginPopupModal(POPUP_NAME, nullptr))
 		{
-			// Replace with folder selector
+
 			Razor::RazorImGui::Text(static_cast<std::string>(location).c_str());
+			Razor::RazorImGui::SameLine();
 			if (Razor::RazorImGui::Button("Select folder")) {
 				_mbIsFileSelectorOpen = true;
 			}
 
 			if (_mbIsFileSelectorOpen) {
-				_mbIsFileSelectorOpen = fileSelector.Draw();
+				_mbIsFileSelectorOpen = _mFileSelector.Draw();
 			}
 
 			Razor::RazorImGui::InputText("Project Name", name, sizeof(name));
 			if (Razor::RazorImGui::Button("Create"))
 			{
-				Razor::FilePath projectPath(name, true);
-				ProjectCreator::Create(location + Razor::FilePath(std::string(name)));
-				/*TODO actually load project up*/
+				Razor::FilePath projectPath = location + Razor::FilePath(name);
+				ProjectCreator::Create(projectPath);
+				
+				_mStorage->SetProjectPath(projectPath + Razor::FilePath(name));
 				Razor::RazorImGui::CloseCurrentPopup();
 			}
 			Razor::RazorImGui::SameLine();
