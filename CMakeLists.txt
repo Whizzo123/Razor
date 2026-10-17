@@ -157,7 +157,6 @@ endif()
 add_subdirectory(Razor)
 add_subdirectory(Edge)
 add_subdirectory(Razor-ScriptBridge)
-add_subdirectory(Sandbox)
 
 # ---- Clean targets --------------------------------------------------------
 

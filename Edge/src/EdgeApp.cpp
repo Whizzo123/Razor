@@ -18,6 +18,7 @@
 #include "Gui/IEditorWindow.h"
 #include <Razor/Systems/RSCameraPass.h>
 #include <unordered_map>
+#include "Project/ProjectBuilder.h"
 
 
 
@@ -155,6 +156,18 @@ void Edge::CreateDockspace(const std::string& Title)
 			if (Razor::RazorImGui::MenuItem("Save Project"))
 			{
 				Razor::Engine::Get().SaveProject();
+			}
+			if (Razor::RazorImGui::MenuItem("Build Project"))
+			{
+				Razor::FilePath projectFilePath(Storage->GetProjectPath());
+				std::optional<Razor::FilePath> projectDirPath = projectFilePath.GetParent();
+				if (!projectDirPath) {
+					RZ_ERROR("Failed to get project directory to build project");
+				}
+
+				if (!EdgeEditor::ProjectBuilder::BuildProject(projectDirPath.value())) {
+					RZ_ERROR("Failed to build project");
+				}
 			}
 			Razor::RazorImGui::EndMenu();
 		}

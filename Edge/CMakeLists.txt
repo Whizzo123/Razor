@@ -17,7 +17,6 @@ set_target_properties(Edge PROPERTIES
 )
 
 target_compile_definitions(Edge PRIVATE
-    YAML_CPP_STATIC_DEFINE
     $<$<PLATFORM_ID:Windows>:RZ_PLATFORM_WINDOWS>
     $<$<PLATFORM_ID:Linux>:RZ_PLATFORM_LINUX>
     $<$<CONFIG:Debug>:RZ_DEBUG>
@@ -27,12 +26,7 @@ target_compile_definitions(Edge PRIVATE
 
 target_include_directories(Edge PRIVATE
     "${CMAKE_SOURCE_DIR}/Razor/vendor/spdlog/include"
-    "${CMAKE_SOURCE_DIR}/Razor/vendor/GLFW/include"
-    "${CMAKE_SOURCE_DIR}/Razor/vendor/Glad/include"
-    "${CMAKE_SOURCE_DIR}/Razor/vendor/stb_image/include"
     "${CMAKE_SOURCE_DIR}/Razor/vendor/glm"
-    "${CMAKE_SOURCE_DIR}/Razor/vendor/ImGui"
-    "${CMAKE_SOURCE_DIR}/Razor/vendor/yaml-cpp/include"
     "${CMAKE_SOURCE_DIR}/Razor/vendor/entt/src"
 )
 
