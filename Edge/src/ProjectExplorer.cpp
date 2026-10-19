@@ -6,6 +6,7 @@
 #define getcwd _getcwd
 #elif defined(RZ_PLATFORM_LINUX)
 #include <unistd.h>
+#include <sys/stat.h>
 #endif
 #ifdef RZ_PLATFORM_WINDOWS
 #include "Utils/Windows/CDialogEventHandler.h"

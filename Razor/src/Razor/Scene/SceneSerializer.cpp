@@ -1,5 +1,6 @@
 #include "SceneSerializer.h"
 #include <fstream>
+#include <sys/stat.h>
 #include "../Coordinator.h"
 #include "../Component.h"
 #include "../IO/YamlWrapper.h"

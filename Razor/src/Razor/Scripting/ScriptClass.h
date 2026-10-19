@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include <optional>
+#include <cstring>
 #include "../Log.h"
 
 namespace Razor

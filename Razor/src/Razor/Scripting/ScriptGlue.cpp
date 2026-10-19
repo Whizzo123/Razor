@@ -28,7 +28,7 @@ extern "C"
 {
 	static void RAZOR_CALL Print_Message(const char* message)
 	{
-		RZ_INFO(message);
+		RZ_INFO("{0}", message);
 	}
 }
 	static void* Scene_GetEntitiesWithTransforms(int* count)
