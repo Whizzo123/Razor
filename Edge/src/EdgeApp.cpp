@@ -69,23 +69,7 @@ void Edge::Run()
 
 	Engine.InitSystems();
 
-	// Remove this should be better way of grabbing default models
-	const char* path = "resources/models/Cube.obj";
-	Razor::Model defaultModel;
-	// TODO: The problem here is actually that there is no AssetDirectory until a project has been loaded so maybe we need to think about how we handle the untitled project?
-	if (fopen(path, "r")) {
-		defaultModel.LoadMesh(path);
-		Engine.GetRenderer()->SetupMesh(defaultModel.GetModelMeshData());
-	}
-	
-
-	if (std::shared_ptr<Razor::Shader> DefaultShader = Engine.GetShaderForType(typeid(Razor::DefaultMeshShader).name()))
-	{
-		defaultModel.SetModelShader(DefaultShader->ID);
-	}
-
 	Storage = std::make_shared<EdgeEditor::EditorStorage>();
-	Storage->DefaultModel = defaultModel;
 	Storage->OnProjectSet().AddRaw(this, &Edge::OnNewProjectSet);
 
 	_mLayout = Razor::CreateScope<EdgeEditor::EditorLayout>("Edge/config/layout.yaml", Storage);
