@@ -1,6 +1,6 @@
 #pragma once
-#include <entt/entt.hpp>
 #include "../Core.h"
+#include <entt/entt.hpp>
 #include "../Component.h"
 #include <vector>
 #include <unordered_map>
@@ -46,15 +46,15 @@ namespace Razor
 		}
 
 		template<typename T>
-		T& GetComponent(entt::entity Entity)
+		T& GetComponent(entt::entity entity)
 		{
-			return registry.get<T>(Entity);
+			return registry.get<T>(entity);
 		}
 
 		template<typename T>
-		T* TryGetComponent(entt::entity Entity)
+		T* TryGetComponent(entt::entity entity)
 		{
-			return registry.try_get<T>(Entity);
+			return registry.try_get<T>(entity);
 		}
 
 		void RunSystems(float DeltaTime);

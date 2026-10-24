@@ -3,7 +3,7 @@
 #include <vector>
 #include <glm/ext/vector_float3.hpp>
 #include <glm/ext/vector_float2.hpp>
-#include <assimp/material.h>
+#include "Textures/Texture.h"
 // TODO replace front glm with Razor Vec2 and Vec3 like ImGui
 
 
@@ -85,7 +85,7 @@ namespace Razor
 		void LoadMesh(std::string Path);
 		void ProcessNode(aiNode* Node, const aiScene* Scene, std::vector<MeshData>& Parts);
 		MeshData ProcessMesh(aiMesh* Mesh, const aiScene* Scene);
-		std::vector<MeshData::Texture> LoadMaterialTextures(aiMaterial* Mat, aiTextureType Type, std::string TypeName);
+		std::vector<MeshData::Texture> LoadMaterialTextures(aiMaterial* Mat, TextureType Type, std::string TypeName);
 		unsigned int LoadMaterialParam(aiMaterial* Mat);
 		unsigned int TextureFromFile(const char* Path);
 		std::vector<MaterialData> GetMaterialsForModel() { return Materials_Loaded; };

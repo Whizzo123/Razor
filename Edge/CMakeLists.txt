@@ -25,7 +25,6 @@ target_compile_definitions(Edge PRIVATE
 )
 
 target_include_directories(Edge PRIVATE
-    "${CMAKE_SOURCE_DIR}/Razor/vendor/spdlog/include"
     "${CMAKE_SOURCE_DIR}/Razor/vendor/glm"
     "${CMAKE_SOURCE_DIR}/Razor/vendor/entt/src"
 )

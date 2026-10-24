@@ -3,6 +3,7 @@
 #include <assimp/mesh.h>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <assimp/material.h>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -193,16 +194,16 @@ namespace Razor
 		// normal: texture_normalN
 
 		// 1. diffuse maps
-		std::vector<MeshData::Texture> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+		std::vector<MeshData::Texture> diffuseMaps = LoadMaterialTextures(material, DIFFUSE, "texture_diffuse");
 		Textures.insert(Textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 		// 2. specular maps
-		std::vector<MeshData::Texture> specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+		std::vector<MeshData::Texture> specularMaps = LoadMaterialTextures(material, SPECULAR, "texture_specular");
 		Textures.insert(Textures.end(), specularMaps.begin(), specularMaps.end());
 		// 3. normal maps
-		std::vector<MeshData::Texture> normalMaps = LoadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+		std::vector<MeshData::Texture> normalMaps = LoadMaterialTextures(material, HEIGHT, "texture_normal");
 		Textures.insert(Textures.end(), normalMaps.begin(), normalMaps.end());
 		// 4. height maps
-		std::vector<MeshData::Texture> heightMaps = LoadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
+		std::vector<MeshData::Texture> heightMaps = LoadMaterialTextures(material, AMBIENT, "texture_height");
 		Textures.insert(Textures.end(), heightMaps.begin(), heightMaps.end());
 
 		unsigned int MaterialID = LoadMaterialParam(material);
@@ -211,13 +212,13 @@ namespace Razor
 		return MeshData(Vertices, Indices, Textures, MaterialID);
 	}
 
-	std::vector<MeshData::Texture> Model::LoadMaterialTextures(aiMaterial* Mat, aiTextureType Type, std::string TypeName)
+	std::vector<MeshData::Texture> Model::LoadMaterialTextures(aiMaterial* Mat, TextureType Type, std::string TypeName)
 	{
 		std::vector<MeshData::Texture> textures;
-		for (unsigned int i = 0; i < Mat->GetTextureCount(Type); i++)
+		for (unsigned int i = 0; i < Mat->GetTextureCount(static_cast<aiTextureType>(Type)); i++)
 		{
 			aiString str;
-			Mat->GetTexture(Type, i, &str);
+			Mat->GetTexture(static_cast<aiTextureType>(Type), i, &str);
 			// check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
 			bool skip = false;
 			for (unsigned int j = 0; j < Textures_Loaded.size(); j++)

@@ -78,6 +78,10 @@ target_compile_definitions(Sandbox PRIVATE
     $<$<CONFIG:Dist>:RZ_DIST>
 )
 
+target_include_directories(Sandbox PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/vendor"
+)
+
 target_link_libraries(Sandbox PRIVATE
     Razor
 )
