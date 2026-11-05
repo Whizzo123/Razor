@@ -40,17 +40,18 @@ void Sandbox::Run()
 
 	Razor::FilePath projPath("/home/joescobbie/Projects/Razor/Sandbox/Sandbox");
 	Engine.LoadProject(projPath);
-
+	Engine.RuntimeStart();
 	while (!Engine.ShouldEngineClose())
 	{
 		Engine.ProcessInput();
-
+		Engine.GetGUI().BeginNewFrame();
 		Engine.GetRenderer()->SetViewport(0, 0, 800, 600);
 		Engine.SetGameCameraViewportSize(800, 600);
 		Engine.Render(0, _mGamePipelineConfig);
 
 		Engine.mRenderer->PollForEvents();
 
+		Engine.GetGUI().EndFrame(Engine.GetWindow(), Engine.mRenderer);
 		Engine.mRenderer->SwapBuffer(Engine.GetWindow());
 	}
 	Engine.mRenderer->TerminateRendererAPI();

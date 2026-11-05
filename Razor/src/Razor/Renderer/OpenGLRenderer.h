@@ -183,6 +183,8 @@ namespace Razor
 		void SetVertexAttribArray(unsigned int vao, unsigned int arrayIndex, size_t size, EDataType type, bool bNormalized, size_t stride, void* dataOffset) override;
 		void FreeVertexArray() override;
 		void SetupMesh(std::vector<MeshData>& meshes) override;
+
+		bool LogContext(const std::string& location) override;
 	private:
 		GLenum Translate(EStencilAction StencilAction);
 		GLenum Translate(EStencilFunc StencilFunction);

@@ -12,6 +12,9 @@
 #include "Textures/Bitmap.h"
 #include "Font/Text.h"
 #include "Font/Font.h"
+#include <spdlog/fmt/fmt.h>
+#include <thread>
+#include <sstream>
 
 namespace Razor
 {
@@ -132,7 +135,15 @@ namespace Razor
 
     void OpenGLRenderer::UseShader(uint32_t ShaderProgramId)
     {
+        if (!glIsProgram(ShaderProgramId)) {
+            RZ_CORE_ERROR("Passed id: {0} is not a shader program", ShaderProgramId);
+        }
+
         glUseProgram(ShaderProgramId);
+        GLenum err;
+        while ((err = glGetError()) != GL_NO_ERROR) {
+            RZ_CORE_ERROR("UseShader OpenGL error {0}", err);
+        }
     }
 
     GLenum OpenGLRenderer::Translate(EStencilAction Action)
@@ -447,6 +458,11 @@ namespace Razor
 	void OpenGLRenderer::SetBufferData(unsigned int buffer, EBufferType type, size_t bufferSize, void* data, EUsage usage)
     {
         glBindBuffer(_mBufferTypeTranslation[type], buffer);
+        if (type != EBufferType::ELEMENT_ARRAY) {
+            GLint boundBuffer = 0;
+            glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &boundBuffer);
+            RZ_CORE_WARN("Bound buffer is {0} and is it valid: {1}", boundBuffer, glIsBuffer(boundBuffer));
+        }
         glBufferData(_mBufferTypeTranslation[type], bufferSize, data, _mUsageTypeTranslation[usage]);
     }
 	void OpenGLRenderer::SetVertexAttribArray(unsigned int vao, unsigned int arrayIndex, size_t size, EDataType type, bool bNormalized, size_t stride, void* dataOffset)
@@ -484,5 +500,15 @@ namespace Razor
                 SetupMesh(Mesh.Meshes);
             }
         }
+    }
+
+    bool OpenGLRenderer::LogContext(const std::string& location)
+    {
+        GLFWwindow* context = glfwGetCurrentContext();
+
+        std::ostringstream threadStream;
+        threadStream << std::this_thread::get_id();
+        RZ_CORE_INFO("[{0}] Context: {1:p} | Thread: {2}", location, fmt::ptr(context), threadStream.str());
+        return true;
     }
 }

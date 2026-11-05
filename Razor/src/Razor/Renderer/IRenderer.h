@@ -274,6 +274,8 @@ namespace Razor
 		virtual void RenderText(Text& text, Font& font) = 0;
 
 		virtual void SetTextureParameterInt(ETextureType TextureType, ETextureOption TextureOption, ETextureValue TextureValue) = 0;
+
+		virtual bool LogContext(const std::string& location) = 0;
 		//TODO remove this
 		Camera RendererCamera;
 	};

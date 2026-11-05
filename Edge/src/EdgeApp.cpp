@@ -1,24 +1,14 @@
 #include <Razor.h>
 #include <Razor/EntryPoint.h>
 #include <algorithm>
-
-#include "Gui/EditorLayout.h"
 #include "Gui/IEditorWindow.h"
-#include "Gui/SceneWindow.h"
-#include "Gui/GameWindow.h"
-#include "Inspector.h"
-#include "SceneView.h"
-#include "EditorStorage.h"
 #include "ProjectExplorer.h"
-#include "Systems/RSEditorCamera.h"
-#include "EditorCamera.h"
-#include "Gui/NewProjectPopupWindow.h"
-#include "Gui/OpenProjectPopupWindow.h"
-#include "SystemView.h"
 #include "Gui/IEditorWindow.h"
 #include <Razor/Systems/RSCameraPass.h>
-#include <unordered_map>
 #include "Project/ProjectBuilder.h"
+#include "Gui/NewProjectPopupWindow.h"
+#include "Gui/OpenProjectPopupWindow.h"
+#include "Gui/EditorLayout.h"
 
 
 
