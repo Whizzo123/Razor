@@ -60,7 +60,7 @@ namespace Razor
 			
 			HandleProperties(Slot, CreateRef<Shader>(EntityText.mShader));
 
-			EntityText.mPosition = {EntityTransform.Position.x, EntityTransform.Position.y};
+			EntityText.mPosition = {EntityTransform.Position.X, EntityTransform.Position.Y};
 			Renderer->RenderText(EntityText, Font->asset);
 			
 			data.mEntityRenderProperties.Properties[EntityToRender].Clear();
@@ -95,8 +95,8 @@ namespace Razor
 		}
 
 		static const std::string floatTypeName = std::string(typeid(float).name());
-		static const std::string vec3TypeName = std::string(typeid(glm::vec3).name());
-		static const std::string mat4TypeName = std::string(typeid(glm::mat4).name());
+		static const std::string vec3TypeName = std::string(typeid(Vector3).name());
+		static const std::string mat4TypeName = std::string(typeid(Matrix4).name());
 		static const std::string boolTypeName = std::string(typeid(bool).name());
 		static const std::string intTypeName = std::string(typeid(int).name());
 
@@ -117,7 +117,7 @@ namespace Razor
 
 			if (Prop->GetType() == vec3TypeName)
 			{
-				if (Property<glm::vec3>* Vec3Property = dynamic_cast<Property<glm::vec3>*>(Prop.get()))
+				if (Property<Vector3>* Vec3Property = dynamic_cast<Property<Vector3>*>(Prop.get()))
 				{
 					shader->SetVec3(Vec3Property->Name, Vec3Property->Value);
 				}
@@ -125,7 +125,7 @@ namespace Razor
 
 			if (Prop->GetType() == mat4TypeName)
 			{
-				if (Property<glm::mat4>* Mat4Property = dynamic_cast<Property<glm::mat4>*>(Prop.get()))
+				if (Property<Matrix4>* Mat4Property = dynamic_cast<Property<Matrix4>*>(Prop.get()))
 				{
 					shader->SetMat4Float(Mat4Property->Name, Mat4Property->Value);
 				}

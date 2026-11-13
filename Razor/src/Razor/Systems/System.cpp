@@ -1,5 +1,4 @@
 #include "System.h"
-#include <glm/glm.hpp>
 
 namespace Razor
 {

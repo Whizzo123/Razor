@@ -28,10 +28,10 @@ namespace Razor
 				ShaderPropertySlot& Slot = Property.GetPropertySlot(i);
 				//Red, Green, Blue
 				std::uint32_t Id = (std::uint32_t)RenderingEntity;
-				glm::vec3 EntityColor = glm::vec3((Id & 0x000000FF) / 255.0f,
+				Vector3 EntityColor = Vector3((Id & 0x000000FF) / 255.0f,
 					((Id & 0x0000FF00) >> 8) / 255.0f,
 					((Id & 0x00FF0000) >> 16) / 255.0f);
-				Slot.AddProperty<glm::vec3>("entitycolor", EntityColor);
+				Slot.AddProperty<Vector3>("entitycolor", EntityColor);
 			}
 		}
 	}

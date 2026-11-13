@@ -46,16 +46,16 @@ namespace Razor
 		Shader(){};
 		virtual ~Shader() {};
 
-		virtual void Setup(CameraInfo* CamInfo, glm::mat4 model, MaterialData Mat, std::shared_ptr<std::vector<Light*>> Light);
+		virtual void Setup(CameraInfo* CamInfo, Matrix4 model, MaterialData Mat, std::shared_ptr<std::vector<Light*>> Light);
 
 		unsigned int ID;
 
 		unsigned int GetUniformLocation(std::string Name);
 
 		void SetInt(std::string Name, int Value);
-		void SetMat4Float(std::string Name, glm::mat4 Value);
+		void SetMat4Float(std::string Name, Matrix4 Value);
 
-		void SetVec3(std::string Name, glm::vec3 Value);
+		void SetVec3(std::string Name, Vector3 Value);
 
 		void SetFloat(std::string Name, float Value);
 

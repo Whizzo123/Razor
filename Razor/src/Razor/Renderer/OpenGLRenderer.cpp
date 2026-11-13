@@ -175,10 +175,10 @@ namespace Razor
         const int SCREEN_HEIGHT = 600;
 
         CameraInfo Info;
-        glm::mat4 View = glm::mat4(1.0f);
-        glm::mat4 Projection = glm::mat4(1.0f);
-        Projection = glm::perspective(glm::radians(45.0f), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
-        View = glm::lookAt(RendererCamera.CameraPos, RendererCamera.CameraPos + RendererCamera.CameraFront, RendererCamera.CameraUp);
+        Matrix4 View = Matrix4(1.0f);
+        Matrix4 Projection = Matrix4(1.0f);
+        Projection = Matrix4::Perspective(RazorMaths::Radians(45.0f), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
+        View = Matrix4::LookAt(RendererCamera.CameraPos, RendererCamera.CameraPos + RendererCamera.CameraFront, RendererCamera.CameraUp);
         Info.CameraView = View;
         Info.CameraProjection = Projection;
         Info.CameraPosition = RendererCamera.CameraPos;
@@ -386,7 +386,7 @@ namespace Razor
     {
         // activate corresponding render state	
         UseShader(text.mShader.ID);
-        text.mShader.SetVec3("textColor", glm::vec3 {text.mColor.X, text.mColor.Y, text.mColor.Z});
+        text.mShader.SetVec3("textColor", Vector3 {text.mColor.X, text.mColor.Y, text.mColor.Z});
         glActiveTexture(GL_TEXTURE0);
         glBindVertexArray(text.mVao);
         glEnable(GL_BLEND);

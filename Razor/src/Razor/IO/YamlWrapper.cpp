@@ -5,36 +5,13 @@
 #include <vector>
 #include <sstream>
 #include <exception>
-#include "../Utils/Vector.h"
+#include "../Utils/Vector4.h"
+#include "../Utils/Vector3.h"
+#include "../Utils/Vector2.h"
 #include "../Renderer/Model.h"
 
 namespace YAML
 {
-    template<>
-    struct convert<glm::vec3>
-    {
-        static Node encode(const glm::vec3& rhs)
-        {
-            Node node;
-            node.push_back(rhs.x);
-            node.push_back(rhs.y);
-            node.push_back(rhs.z);
-            node.SetStyle(EmitterStyle::Flow);
-            return node;
-        }
-
-        static bool decode(const Node& node, glm::vec3& rhs)
-        {
-            if (!node.IsSequence() || node.size() != 3)
-                return false;
-
-            rhs.x = node[0].as<float>();
-            rhs.y = node[1].as<float>();
-            rhs.z = node[2].as<float>();
-            return true;
-        }
-    };
-
     template<>
     struct convert<Razor::Vector3>
     {
@@ -84,31 +61,6 @@ namespace YAML
     };
 
     template<>
-    struct convert<glm::vec2>
-    {
-        static Node encode(const glm::vec2& rhs)
-        {
-            Node node;
-            node.push_back(rhs.x);
-            node.push_back(rhs.y);
-            node.SetStyle(EmitterStyle::Flow);
-            return node;
-        }
-
-        static bool decode(const Node& node, glm::vec2& rhs)
-        {
-            if (!node.IsSequence() || node.size() != 2)
-                return false;
-
-            rhs.x = node[0].as<float>();
-            rhs.y = node[1].as<float>();
-            return true;
-        }
-    };
-
-
-
-    template<>
     struct convert<Razor::MeshData::Vertex>
     {
         static Node encode(const Razor::MeshData::Vertex& rhs)
@@ -128,11 +80,11 @@ namespace YAML
             if (!node.IsSequence() || node.size() != 5)
                 return false;
 
-            rhs.Position = node[0].as<glm::vec3>();
-            rhs.Normal = node[1].as<glm::vec3>();
-            rhs.TexCoords = node[2].as<glm::vec2>();
-            rhs.Tangent = node[3].as<glm::vec3>();
-            rhs.Bitangent = node[4].as<glm::vec3>();
+            rhs.Position = node[0].as<Razor::Vector3>();
+            rhs.Normal = node[1].as<Razor::Vector3>();
+            rhs.TexCoords = node[2].as<Razor::Vector2>();
+            rhs.Tangent = node[3].as<Razor::Vector3>();
+            rhs.Bitangent = node[4].as<Razor::Vector3>();
             return true;
         }
     };
@@ -220,9 +172,9 @@ namespace YAML
                 return false;
 
             rhs.MaterialName = node[0].as<std::string>();
-            rhs.Ambient = node[1].as<glm::vec3>();
-            rhs.Diffuse = node[2].as<glm::vec3>();
-            rhs.Specular = node[3].as<glm::vec3>();
+            rhs.Ambient = node[1].as<Razor::Vector3>();
+            rhs.Diffuse = node[2].as<Razor::Vector3>();
+            rhs.Specular = node[3].as<Razor::Vector3>();
             rhs.Shininess = node[4].as<float>();
             return true;
         }

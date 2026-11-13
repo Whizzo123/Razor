@@ -1,22 +1,39 @@
 #include "RazorMaths.h"
+#include "Vector4.h"
+#include <glm/glm.hpp>
 
+namespace Razor {
 
-glm::vec2 RazorMaths::ScreenToView(glm::vec2 ScreenPos, int ScreenWidth, int ScreenHeight)
-{
-	return glm::vec2((2.0f / ScreenPos.x) / ScreenWidth - 1.0f, 1.0f - (2.0f * ScreenPos.y) / ScreenHeight);
-}
+	Vector2 RazorMaths::ScreenToView(Vector2 ScreenPos, int ScreenWidth, int ScreenHeight)
+	{
+		return Vector2((2.0f / ScreenPos.X) / ScreenWidth - 1.0f, 1.0f - (2.0f * ScreenPos.Y) / ScreenHeight);
+	}
 
-glm::vec3 RazorMaths::ViewToWorld(glm::vec2 ViewPos, glm::mat4 ViewMatrix)
-{
-	glm::mat4 InvViewMatrix = glm::inverse(ViewMatrix);
-	glm::vec4 WorldPos = InvViewMatrix * glm::vec4(ViewPos.x, ViewPos.y, 0.0f, 1.0f);
-	return WorldPos /= WorldPos.w;
-}
+	/*Vector3 RazorMaths::ViewToWorld(Vector2 ViewPos, Matrix4 ViewMatrix)
+	{
+		//Matrix4 InvViewMatrix = Matrix4::Inverse(ViewMatrix);
+		//Vector4 WorldPos = InvViewMatrix * Vector4(ViewPos.X, ViewPos.Y, 0.0f, 1.0f);
+		return Vector3();
+	}*/
 
-Ray RazorMaths::CreateRay(glm::vec3 RayStart, float Distance)
-{
-	Ray NewRay;
-	NewRay.Start = RayStart;
-	NewRay.End = glm::vec3(RayStart.x, RayStart.y, RayStart.z * Distance);
-	return NewRay;
+	Ray RazorMaths::CreateRay(Vector3 RayStart, float Distance)
+	{
+		Ray NewRay;
+		NewRay.Start = RayStart;
+		NewRay.End = Vector3(RayStart.X, RayStart.Y, RayStart.Z * Distance);
+		return NewRay;
+	}
+
+	Vector3 RazorMaths::Radians(Vector3 eulerAngles)
+	{
+		glm::vec3 vec = glm::vec3(eulerAngles.X, eulerAngles.Y, eulerAngles.Z);
+		glm::vec3 rad = glm::radians(vec);
+		return Vector3(rad.x, rad.y, rad.z);
+	}
+
+	float RazorMaths::Radians(float degrees)
+	{
+		return glm::radians(degrees);
+	}
+
 }

@@ -5,24 +5,24 @@ namespace EdgeEditor
 	void EditorCamera::ProcessInput(float dt)
 	{
 		const float CameraSpeed = 5.0f * dt; // adjust accordingly
-		const glm::vec3 CameraFront = Camera.CameraFront;
-		const glm::vec3 CameraUp = Camera.CameraUp;
+		const Razor::Vector3 CameraFront = Camera.CameraFront;
+		const Razor::Vector3 CameraUp = Camera.CameraUp;
 
 		if (Razor::RazorIO::Get().GetStateForKey(Razor::RazorKey::W) == Razor::KEY_PRESSED || Razor::RazorIO::Get().GetStateForKey(Razor::RazorKey::W) == Razor::KEY_HELD)
 		{
-			Camera.CameraPos += CameraSpeed * CameraFront;
+			Camera.CameraPos += CameraFront * CameraSpeed;
 		}
 		if (Razor::RazorIO::Get().GetStateForKey(Razor::RazorKey::S) == Razor::KEY_PRESSED || Razor::RazorIO::Get().GetStateForKey(Razor::RazorKey::S) == Razor::KEY_HELD)
 		{
-			Camera.CameraPos -= CameraSpeed * CameraFront;
+			Camera.CameraPos -= CameraFront * CameraSpeed;
 		}
 		if (Razor::RazorIO::Get().GetStateForKey(Razor::RazorKey::A) == Razor::KEY_PRESSED || Razor::RazorIO::Get().GetStateForKey(Razor::RazorKey::A) == Razor::KEY_HELD)
 		{
-			Camera.CameraPos -= glm::normalize(glm::cross(CameraFront, CameraUp)) * CameraSpeed;
+			Camera.CameraPos -= Razor::Vector3::Normalise(Razor::Vector3::Cross(CameraFront, CameraUp)) * CameraSpeed;
 		}
 		if (Razor::RazorIO::Get().GetStateForKey(Razor::RazorKey::D) == Razor::KEY_PRESSED || Razor::RazorIO::Get().GetStateForKey(Razor::RazorKey::D) == Razor::KEY_HELD)
 		{
-			Camera.CameraPos += glm::normalize(glm::cross(CameraFront, CameraUp)) * CameraSpeed;
+			Camera.CameraPos += Razor::Vector3::Normalise(Razor::Vector3::Cross(CameraFront, CameraUp)) * CameraSpeed;
 		}
 
 		const Razor::Vector2D CurrentMouseCoords = Razor::RazorIO::Get().CurrentMousePos;
@@ -52,9 +52,9 @@ namespace EdgeEditor
 
 				Pitch = Pitch > 89.0f ? 89.0f : ((Pitch < -89.0f) ? -89.0f : Pitch);
 
-				Camera.CameraDirection.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-				Camera.CameraDirection.y = sin(glm::radians(Pitch));
-				Camera.CameraDirection.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+				Camera.CameraDirection.X = cos(Razor::RazorMaths::Radians(Yaw)) * cos(Razor::RazorMaths::Radians(Pitch));
+				Camera.CameraDirection.Y = sin(Razor::RazorMaths::Radians(Pitch));
+				Camera.CameraDirection.Z = sin(Razor::RazorMaths::Radians(Yaw)) * cos(Razor::RazorMaths::Radians(Pitch));
 
 				MouseLastX = Razor::RazorIO::Get().CurrentMousePos.X;
 				MouseLastY = Razor::RazorIO::Get().CurrentMousePos.Y;

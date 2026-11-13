@@ -2,7 +2,6 @@
 
 #include <Jolt/Jolt.h>
 #include <Jolt/Renderer/DebugRenderer.h>
-#include "../../Utils/Vector.h"
 #include "../IPhysicsDebugRenderer.h"
 #include <mutex>
 #include "../../Renderer/Debug/DebugLine.h"

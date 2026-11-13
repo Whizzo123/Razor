@@ -114,14 +114,14 @@ extern "C"
 		Ref<Entity> entity = Engine::Get().mCurrentScene->GetEntity(static_cast<entt::entity>(entityId));
 		if (!entity) return;
 		Transform& t = entity->GetComponent<Transform>();
-		*x = t.Position.x; *y = t.Position.y; *z = t.Position.z;
+		*x = t.Position.X; *y = t.Position.Y; *z = t.Position.Z;
 	}
 
 	static void RAZOR_CALL Transform_SetPosition(uint32_t entityId, float x, float y, float z)
 	{
 		Ref<Entity> entity = Engine::Get().mCurrentScene->GetEntity(static_cast<entt::entity>(entityId));
 		if (!entity) return;
-		entity->GetComponent<Transform>().Position = glm::vec3(x, y, z);
+		entity->GetComponent<Transform>().Position = Vector3(x, y, z);
 	}
 
 	static int RAZOR_CALL Collision_GetEventCount(uint32_t entityId)

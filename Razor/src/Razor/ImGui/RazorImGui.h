@@ -2,7 +2,8 @@
 
 #include <memory>
 #include "../Core.h"
-#include "../Utils/Vector.h"
+#include "../Utils/Vector2.h"
+#include "../Utils/Vector4.h"
 #include "../IO/RazorIO.h"
 
 typedef int ImGuiWindowFlags;

@@ -4,14 +4,14 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/ext/matrix_float4x4.hpp>
+#include "../../Utils/Vector3.h"
+#include "../../Utils/Matrix4.h"
 #include <string>
 
 namespace Razor
 {
 
-    void Shader::Setup(CameraInfo* CamInfo, glm::mat4 model, [[maybe_unused]]MaterialData Mat, [[maybe_unused]]std::shared_ptr<std::vector<Light*>> Light)
+    void Shader::Setup(CameraInfo* CamInfo, Matrix4 model, [[maybe_unused]]MaterialData Mat, [[maybe_unused]]std::shared_ptr<std::vector<Light*>> Light)
     {
         SetMat4Float("projection", CamInfo->CameraProjection);
         SetMat4Float("view", CamInfo->CameraView);
@@ -29,16 +29,16 @@ namespace Razor
         glUniform1i(Loc, Value);
     }
 
-    void Shader::SetMat4Float(std::string Name, glm::mat4 Value)
+    void Shader::SetMat4Float(std::string Name, Matrix4 Value)
     {
         unsigned int Loc = GetUniformLocation(Name);
-        glUniformMatrix4fv(Loc, 1, false, glm::value_ptr(Value));
+        glUniformMatrix4fv(Loc, 1, false, Value.GetValuePtr());
     }
 
-    void Shader::SetVec3(std::string Name, glm::vec3 Value)
+    void Shader::SetVec3(std::string Name, Vector3 Value)
     {
         unsigned int Loc = GetUniformLocation(Name);
-        glUniform3f(Loc, Value.x, Value.y, Value.z);
+        glUniform3f(Loc, Value.X, Value.Y, Value.Z);
     }
 
     void Shader::SetFloat(std::string Name, float Value)

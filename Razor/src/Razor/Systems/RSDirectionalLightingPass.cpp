@@ -17,11 +17,11 @@ namespace Razor
 				{
 					ShaderPropertySlot& Slot = Property.GetPropertySlot(i);
 
-					Slot.AddProperty<glm::vec3>("light.position", transform.Position);
-					Slot.AddProperty<glm::vec3>("light.ambient", Light.Ambient);
-					Slot.AddProperty<glm::vec3>("light.diffuse", Light.Diffuse);
-					Slot.AddProperty<glm::vec3>("light.specular", Light.Specular);
-					Slot.AddProperty<glm::vec3>("light.direction", Light.Direction);
+					Slot.AddProperty<Vector3>("light.position", transform.Position);
+					Slot.AddProperty<Vector3>("light.ambient", Light.Ambient);
+					Slot.AddProperty<Vector3>("light.diffuse", Light.Diffuse);
+					Slot.AddProperty<Vector3>("light.specular", Light.Specular);
+					Slot.AddProperty<Vector3>("light.direction", Light.Direction);
 					Slot.AddProperty<int>("light.lightType", 0);
 				}
 			}

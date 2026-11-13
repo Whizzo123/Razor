@@ -43,21 +43,21 @@ namespace EdgeEditor
 			{
 				if (Razor::RazorImGui::CollapsingHeader("Position"))
 				{
-					Razor::RazorImGui::InputFloat("Pos X", &transform.Position.x);
-					Razor::RazorImGui::InputFloat("Pos Y", &transform.Position.y);
-					Razor::RazorImGui::InputFloat("Pos Z", &transform.Position.z);
+					Razor::RazorImGui::InputFloat("Pos X", &transform.Position.X);
+					Razor::RazorImGui::InputFloat("Pos Y", &transform.Position.Y);
+					Razor::RazorImGui::InputFloat("Pos Z", &transform.Position.Z);
 				}
 				if (Razor::RazorImGui::CollapsingHeader("Scale"))
 				{
-					Razor::RazorImGui::InputFloat("Sca X", &transform.Scale.x);
-					Razor::RazorImGui::InputFloat("Sca Y", &transform.Scale.y);
-					Razor::RazorImGui::InputFloat("Sca Z", &transform.Scale.z);
+					Razor::RazorImGui::InputFloat("Sca X", &transform.Scale.X);
+					Razor::RazorImGui::InputFloat("Sca Y", &transform.Scale.Y);
+					Razor::RazorImGui::InputFloat("Sca Z", &transform.Scale.Z);
 				}
 				if (Razor::RazorImGui::CollapsingHeader("Rotation"))
 				{
-					Razor::RazorImGui::InputFloat("Rot X", &transform.Rotation.x);
-					Razor::RazorImGui::InputFloat("Rot Y", &transform.Rotation.y);
-					Razor::RazorImGui::InputFloat("Rot Z", &transform.Rotation.z);
+					Razor::RazorImGui::InputFloat("Rot X", &transform.Rotation.X);
+					Razor::RazorImGui::InputFloat("Rot Y", &transform.Rotation.Y);
+					Razor::RazorImGui::InputFloat("Rot Z", &transform.Rotation.Z);
 				}
 			}
 		}

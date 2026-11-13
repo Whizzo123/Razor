@@ -1,21 +1,26 @@
 #pragma once
-#include <glm/ext/vector_float2.hpp>
-#include <glm/ext/vector_float3.hpp>
-#include <glm/ext/vector_float4.hpp>
-#include <glm/ext/matrix_float4x4.hpp>
+#include "Matrix4.h"
+#include "Vector3.h"
+#include "Vector2.h"
+
+namespace Razor {
 
 struct Ray
 {
-	glm::vec3 Start;
-	glm::vec3 End;
+	Vector3 Start;
+	Vector3 End;
 };
 
 class RazorMaths
 {
-	static glm::vec2 ScreenToView(glm::vec2 ScreenPos, int ScreenWidth, int ScreenHeight);
-	static glm::vec3 ViewToWorld(glm::vec2 ViewPos, glm::mat4 ViewMatrix);
-	static Ray CreateRay(glm::vec3 RayStart, float Distance);
+public:
+	static Vector2 ScreenToView(Vector2 ScreenPos, int ScreenWidth, int ScreenHeight);
+	//static Vector3 ViewToWorld(Vector2 ViewPos, Matrix4 ViewMatrix);
+	static Ray CreateRay(Vector3 RayStart, float Distance);
+    static Vector3 Radians(Vector3 eulerAngles);
+    static float Radians(float degrees);
 };
+}
 
 // TODO create functionality for a ray-object intersection test
 /*bool intersect(const Ray& ray, float& t) const {

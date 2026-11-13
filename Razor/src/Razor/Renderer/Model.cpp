@@ -136,28 +136,28 @@ namespace Razor
 		for (unsigned int i = 0; i < MeshToProcess->mNumVertices; i++)
 		{
 			MeshData::Vertex Vertex;
-			glm::vec3 Vector; // we declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.
+			Vector3 Vector; // RZ-39 TODO: allow conversion between assimp vector and our vector to make this code simpler
 			// positions
-			Vector.x = MeshToProcess->mVertices[i].x;
-			Vector.y = MeshToProcess->mVertices[i].y;
-			Vector.z = MeshToProcess->mVertices[i].z;
+			Vector.X = MeshToProcess->mVertices[i].x;
+			Vector.Y = MeshToProcess->mVertices[i].y;
+			Vector.Z = MeshToProcess->mVertices[i].z;
 			Vertex.Position = Vector;
 			// normals
 			if (MeshToProcess->HasNormals())
 			{
-				Vector.x = MeshToProcess->mNormals[i].x;
-				Vector.y = MeshToProcess->mNormals[i].y;
-				Vector.z = MeshToProcess->mNormals[i].z;
+				Vector.X = MeshToProcess->mNormals[i].x;
+				Vector.Y = MeshToProcess->mNormals[i].y;
+				Vector.Z = MeshToProcess->mNormals[i].z;
 				Vertex.Normal = Vector;
 			}
 			// texture coordinates
 			if (MeshToProcess->mTextureCoords[0]) // does the mesh contain texture coordinates?
 			{
-				glm::vec2 Vec;
+				Vector2 Vec;
 				// a vertex can contain up to 8 different texture coordinates. We thus make the assumption that we won't 
 				// use models where a vertex can have multiple texture coordinates so we always take the first set (0).
-				Vec.x = MeshToProcess->mTextureCoords[0][i].x;
-				Vec.y = MeshToProcess->mTextureCoords[0][i].y;
+				Vec.X = MeshToProcess->mTextureCoords[0][i].x;
+				Vec.Y = MeshToProcess->mTextureCoords[0][i].y;
 				Vertex.TexCoords = Vec;
 
 				//// tangent
@@ -172,7 +172,7 @@ namespace Razor
 				//Vertex.Bitangent = Vector;
 			}
 			else
-				Vertex.TexCoords = glm::vec2(0.0f, 0.0f);
+				Vertex.TexCoords = Vector2(0.0f, 0.0f);
 
 			Vertices.push_back(Vertex);
 		}
@@ -262,7 +262,7 @@ namespace Razor
 		Mat->Get(AI_MATKEY_COLOR_SPECULAR, Specular);
 		float Shininess = 0.0f;
 		Mat->Get(AI_MATKEY_SHININESS, Shininess);
-		MaterialData Data(glm::vec3(Ambient.r, Ambient.g, Ambient.b), glm::vec3(Diffuse.r, Diffuse.g, Diffuse.b), glm::vec3(Specular.r, Specular.g, Specular.b), Shininess);
+		MaterialData Data(Vector3(Ambient.r, Ambient.g, Ambient.b), Vector3(Diffuse.r, Diffuse.g, Diffuse.b), Vector3(Specular.r, Specular.g, Specular.b), Shininess);
 		Data.MaterialName = std::string(Name.C_Str());
 		Materials_Loaded.push_back(Data);
 		return Materials_Loaded.size() - 1;

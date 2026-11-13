@@ -1,4 +1,6 @@
 #include "RSCameraPass.h"
+#include "../Utils/Vector3.h"
+#include "../Utils/Matrix4.h"
 #include "../Renderer/Font/Text.h"
 
 namespace Razor
@@ -9,18 +11,18 @@ namespace Razor
 
 		auto View = _mCurrentScene->GetEntitiesWithComponents<Camera>();
 
-		glm::mat4 CameraProjection = glm::mat4(1.0f);
-		glm::mat4 CameraProjectionOrtho = glm::mat4(1.0f);
-		glm::mat4 CameraView = glm::mat4(1.0f);
-		glm::vec3 CameraPos = glm::vec3(0.0f);
+		Matrix4 CameraProjection = Matrix4(1.0f);
+		Matrix4 CameraProjectionOrtho = Matrix4(1.0f);
+		Matrix4 CameraView = Matrix4(1.0f);
+		Vector3 CameraPos = Vector3(0.0f);
 
 		for(auto CameraEntity : View)
 		{
 			Camera& GameCamera = _mCurrentScene->GetComponent<Camera>(CameraEntity);
 			Transform& CameraTransform = _mCurrentScene->GetComponent<Transform>(CameraEntity);
-			CameraProjection = glm::perspective(glm::radians(45.0f), AspectRatio, 0.1f, 100.0f);
-			CameraProjectionOrtho = glm::ortho(0.0f, static_cast<float>(ViewportWidth), 0.0f, static_cast<float>(ViewportHeight));
-			CameraView = glm::lookAt(CameraTransform.Position, CameraTransform.Position + GameCamera.CameraFront, GameCamera.CameraUp);
+			CameraProjection = Matrix4::Perspective(RazorMaths::Radians(45.0f), AspectRatio, 0.1f, 100.0f);
+			CameraProjectionOrtho = Matrix4::Ortho(0.0f, static_cast<float>(ViewportWidth), 0.0f, static_cast<float>(ViewportHeight));
+			CameraView = Matrix4::LookAt(CameraTransform.Position, CameraTransform.Position + GameCamera.CameraFront, GameCamera.CameraUp);
 			CameraPos = CameraTransform.Position;
 
 			for (auto& Pair : data.mEntityRenderProperties.Properties)
@@ -30,9 +32,9 @@ namespace Razor
 				{
 					ShaderPropertySlot& Slot = Property.GetPropertySlot(j);
 
-					Slot.AddProperty<glm::mat4>("projection", CameraProjection);
-					Slot.AddProperty<glm::mat4>("view", CameraView);
-					Slot.AddProperty<glm::vec3>("viewPos", CameraTransform.Position);
+					Slot.AddProperty<Matrix4>("projection", CameraProjection);
+					Slot.AddProperty<Matrix4>("view", CameraView);
+					Slot.AddProperty<Vector3>("viewPos", CameraTransform.Position);
 				}
 			}
 		}
@@ -49,7 +51,7 @@ namespace Razor
 			for (int i = 0; i < 1; i++)
 			{
 				ShaderPropertySlot& Slot = Property.GetPropertySlot(i);
-				Slot.AddProperty<glm::mat4>("projection", CameraProjectionOrtho);
+				Slot.AddProperty<Matrix4>("projection", CameraProjectionOrtho);
 			}
 		}
 
@@ -59,9 +61,9 @@ namespace Razor
 			{
 				ShaderPropertySlot& slot = property.GetPropertySlot(j);
 
-				slot.AddProperty<glm::mat4>("projection", CameraProjection);
-				slot.AddProperty<glm::mat4>("view", CameraView);
-				slot.AddProperty<glm::vec3>("viewPos", CameraPos);
+				slot.AddProperty<Matrix4>("projection", CameraProjection);
+				slot.AddProperty<Matrix4>("view", CameraView);
+				slot.AddProperty<Vector3>("viewPos", CameraPos);
 			}
 		}
 
