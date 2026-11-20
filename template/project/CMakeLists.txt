@@ -89,6 +89,13 @@ endif()
 
 add_executable(@ProjectName ${@ProjectName_SOURCES})
 
+add_custom_command(TARGET @ProjectName POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${DEPS_DIR}"
+        "$<TARGET_FILE_DIR:@ProjectName>/SDK"
+    COMMENT "Copying Razor SDK to @ProjectName output directory"
+)
+
 set_target_properties(@ProjectName PROPERTIES
     CXX_STANDARD 20
     CXX_STANDARD_REQUIRED ON

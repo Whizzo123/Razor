@@ -89,6 +89,13 @@ endif()
 
 add_executable(Sandbox ${SANDBOX_SOURCES})
 
+add_custom_command(TARGET Sandbox POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${DEPS_DIR}"
+        "$<TARGET_FILE_DIR:Sandbox>/SDK"
+    COMMENT "Copying Razor SDK to Sandbox output directory"
+)
+
 set_target_properties(Sandbox PROPERTIES
     CXX_STANDARD 20
     CXX_STANDARD_REQUIRED ON

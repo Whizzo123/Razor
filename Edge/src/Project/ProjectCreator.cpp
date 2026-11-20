@@ -55,7 +55,7 @@ bool ProjectCreator::Create(const Razor::FilePath& projectDir) {
     ret |= Replace(cmakeListsFilePath, "@ProjectName", projectName);
     ret |= Replace(premakeFilePath, "@ProjectName", projectName);
     ret |= Replace(srcFilePath, "@ProjectName", projectName);
-    ret |= Replace(srcFilePath, "@FilePath", projectFilePath);
+    ret |= Replace(srcFilePath, "@FilePath", projectDir + projectName);
 
     return ret;
 }
