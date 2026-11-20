@@ -34,7 +34,7 @@ namespace Razor
 #elif defined(RZ_PLATFORM_LINUX)
 		std::string coralDir = std::filesystem::canonical("/proc/self/exe").parent_path().string();
 #endif
-		HostSettings.CoralDirectory = coralDir;
+		HostSettings.CoralDirectory = coralDir + "/SDK/lib";
 		HostSettings.MessageCallback = CoralMessageCallback;
 		HostSettings.ExceptionCallback = ExceptionCallback;
 
