@@ -3,6 +3,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 namespace Razor {
 
@@ -50,7 +51,8 @@ namespace Razor {
     }
 
     Matrix4 Matrix4::ToMat4(Quaternion quat) {
-        glm::mat4 mat = glm::toMat4(quat.W(), quat.X(), quat.Y(), quat.Z());
+        glm::quat quaternion = glm::quat(quat.W(), quat.X(), quat.Y(), quat.Z());
+        glm::mat4 mat = glm::toMat4(quaternion);
 
         Matrix4 out;
         std::copy(glm::value_ptr(mat),
@@ -77,8 +79,11 @@ namespace Razor {
         return out;
     }
 
-    static Matrix4 LookAt(Vector3 eye, Vector3 center, Vector3 up) {
-        glm::mat4 mat = glm::lookAt(eye, center, up);
+    Matrix4 Matrix4::LookAt(Vector3 eye, Vector3 center, Vector3 up) {
+        glm::vec3 eye_vec = glm::vec3(eye.X, eye.Y, eye.Z);
+        glm::vec3 center_vec = glm::vec3(center.X, center.Y, center.Z);
+        glm::vec3 up_vec = glm::vec3(up.X, up.Y, up.Z);
+        glm::mat4 mat = glm::lookAt(eye_vec, center_vec, up_vec);
         Matrix4 out;
         std::copy(glm::value_ptr(mat),
                   glm::value_ptr(mat) + 16,
@@ -86,7 +91,7 @@ namespace Razor {
         return out;
     }
 
-    Matrix4 operator*(const Matrix4& rhs) {
+    Matrix4 Matrix4::operator*(const Matrix4& rhs) {
         glm::mat4 matLhs = glm::make_mat4(_mElements);
         glm::mat4 matRhs = glm::make_mat4(rhs._mElements);
         glm::mat4 result = matLhs * matRhs;
@@ -97,18 +102,15 @@ namespace Razor {
         return out;
     }
 
-    Matrix4 operator*(const Vector4& rhs) {
+    Vector4 Matrix4::operator*(const Vector4& rhs) {
         glm::mat4 mat = glm::make_mat4(_mElements);
-        glm::vec3 vec = glm::vec4(rhs.X, rhs.Y, rhs.Z, rhs.W);
-        glm::mat4 result = mat * vec;
-        Matrix4 out;
-        std::copy(glm::value_ptr(result),
-                  glm::value_ptr(result) + 16,
-                  out._mElements);
-        return out;
+        glm::vec4 vec = glm::vec4(rhs.X, rhs.Y, rhs.Z, rhs.W);
+        glm::vec4 result = mat * vec;
+
+        return Vector4{result.x, result.y, result.z, result.w};
     }
 
-    static Matrix4 Matrix4::Inverse(Matrix4 mat) {
+    Matrix4 Matrix4::Inverse(Matrix4 mat) {
         glm::mat4 toInv = glm::make_mat4(mat._mElements);
         glm::mat4 inv = glm::inverse(toInv);
         Matrix4 out;

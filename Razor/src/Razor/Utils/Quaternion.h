@@ -4,7 +4,6 @@
 namespace Razor {
     class Quaternion {
     public:
-        Quaternion(float radians);
         Quaternion(float w, float x, float y, float z);
         Quaternion(Vector3 vec);
 

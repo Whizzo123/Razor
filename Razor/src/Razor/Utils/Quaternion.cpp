@@ -2,14 +2,6 @@
 #include <glm/glm.hpp>
 
 namespace Razor {
-    Quaternion::Quaternion(float radians) {
-        glm::quat q = glm::quat(radians);
-        _mW = q.w;
-        _mX = q.x;
-        _mY = q.y;
-        _mZ = q.z;
-    }
-
     Quaternion::Quaternion(float w, float x, float y, float z) {
         _mW = w;
         _mX = x;

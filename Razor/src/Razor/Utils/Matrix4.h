@@ -18,7 +18,7 @@ namespace Razor {
         static Matrix4 LookAt(Vector3 eye, Vector3 center, Vector3 up);
         static Matrix4 Inverse(Matrix4 mat);
         Matrix4 operator*(const Matrix4& rhs);
-        Matrix4 operator*(const Vector4& rhs);
+        Vector4 operator*(const Vector4& rhs);
     private:
         float _mElements[16];
     };

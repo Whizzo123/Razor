@@ -13,6 +13,7 @@ namespace Razor {
 		Vector3 operator-(const Vector3& vec);
 		void operator-=(const Vector3& vec);
 		Vector3 operator*(const float rhs) const;
+		void operator*=(const float rhs);
 
 	};
 }
