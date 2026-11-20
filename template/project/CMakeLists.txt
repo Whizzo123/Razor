@@ -42,17 +42,40 @@ set_target_properties(Razor PROPERTIES
 # C# scripts
 # --------------------------------------------------
 
+set(CSPROJ
+    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/@ProjectName.csproj"
+)
+
+# Create project if it doesn't exist
+if(NOT EXISTS "${CSPROJ}")
+    file(WRITE "${CSPROJ}"
+[=[
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <OutputType>Library</OutputType>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Reference Include="ScriptBridge">
+            <HintPath>../SDK/lib/Razor-ScriptBridge.dll</HintPath>
+            <Private>true</Private>
+        </Reference>
+    </ItemGroup>
+</Project>
+]=]
+    )
+endif()
+
 add_custom_target(@ProjectNameScripts ALL
     COMMAND ${DOTNET} build
         "${CMAKE_CURRENT_SOURCE_DIR}/scripts/@ProjectName.csproj"
-        -o "${CMAKE_CURRENT_SOURCE_DIR}/scripts/Binaries/net9.0"
+        -o "${CMAKE_CURRENT_SOURCE_DIR}/scripts/binaries/net9.0"
         -c $<CONFIG>
         --nologo
     COMMENT "Building @ProjectName C# scripts"
     VERBATIM
 )
-
-add_dependencies(@ProjectNameScripts Razor-ScriptBridge)
 
 file(GLOB_RECURSE @ProjectName_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"

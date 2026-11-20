@@ -183,6 +183,12 @@ install(DIRECTORY vendor/entt/single_include/entt/
     COMPONENT SDK
 )
 
+install(FILES
+    "${CMAKE_SOURCE_DIR}/Razor-ScriptBridge/bin/$<CONFIG>/net9.0/Razor-ScriptBridge.dll"
+    DESTINATION SDK/lib
+    COMPONENT SDK
+)
+
 add_custom_target(GameSDK ALL
     COMMAND ${CMAKE_COMMAND}
         --install ${CMAKE_BINARY_DIR}
