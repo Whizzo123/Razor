@@ -54,6 +54,7 @@ void Sandbox::Run()
 		Engine.GetGUI().EndFrame(Engine.GetWindow(), Engine.mRenderer);
 		Engine.mRenderer->SwapBuffer(Engine.GetWindow());
 	}
+	Engine.RuntimeStop();
 	Engine.mRenderer->TerminateRendererAPI();
 	
 }

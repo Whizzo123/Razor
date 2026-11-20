@@ -5,10 +5,10 @@ find_program(DOTNET dotnet REQUIRED)
 # Dependency paths
 # --------------------------------------------------
 
-set(DEPS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../bin/Debug-linux-x86_64")
+set(DEPS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/SDK")
 
-set(RAZOR_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../Razor/src")
-set(RAZOR_LIB_DIR "${DEPS_DIR}/Razor")
+set(RAZOR_INCLUDE_DIR "${DEPS_DIR}/include/Razor")
+set(RAZOR_LIB_DIR "${DEPS_DIR}/lib")
 
 # Set this to the actual library filename for your platform.
 if(WIN32)
@@ -79,7 +79,7 @@ target_compile_definitions(Sandbox PRIVATE
 )
 
 target_include_directories(Sandbox PRIVATE
-    "${CMAKE_CURRENT_SOURCE_DIR}/vendor"
+    "${DEPS_DIR}/include"
 )
 
 target_link_libraries(Sandbox PRIVATE

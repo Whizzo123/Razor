@@ -26,7 +26,8 @@ bool ProjectCreator::Create(const Razor::FilePath& projectDir) {
     if (!CreateDirectory(projectDir + Razor::FilePath("scripts", true))) {
         return false;
     }
-
+    // TODO all paths should resolve to executable directory i.e all folders we access template, SDK, config should all live within the executable directory we can still have them in source just
+    // make it part of the build pipeline that they get copied into the bin/<type>/Edge folder future thing but soon future thing can just absolute path SDK for now
     Razor::FilePath projectFilePath = projectDir + Razor::FilePath(projectName + ".proj");
     Razor::FilePath cmakeListsFilePath = projectDir + Razor::FilePath("CMakeLists.txt");
     Razor::FilePath premakeFilePath = projectDir + Razor::FilePath("scripts/premake5.lua");
@@ -46,6 +47,9 @@ bool ProjectCreator::Create(const Razor::FilePath& projectDir) {
     ret |= Replace(projectFilePath, "@ProjectName", projectName);
     ret |= Replace(cmakeListsFilePath, "@ProjectName", projectName);
     ret |= Replace(premakeFilePath, "@ProjectName", projectName);
+
+    //SDK - Fix this path once we have fixed up how we deal with file paths
+    ret |= CopyFolder(Razor::FilePath("bin/Debug-linux-x86_64/Edge/SDK"), projectDir + Razor::FilePath("SDK"), std::filesystem::copy_options::recursive);
 
     return ret;
 }

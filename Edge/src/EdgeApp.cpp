@@ -91,6 +91,7 @@ void Edge::Run()
 		Engine.GetGUI().EndFrame(Razor::Engine::Get().GetWindow(), Razor::Engine::Get().mRenderer);
 		Engine.mRenderer->SwapBuffer(Razor::Engine::Get().GetWindow());
 	}
+	Razor::Engine::Get().RuntimeStop();
 	Razor::Engine::Get().mRenderer->TerminateRendererAPI();
 }
 

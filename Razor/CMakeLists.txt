@@ -158,3 +158,36 @@ add_custom_command(TARGET Razor POST_BUILD
         "${EDGE_OUTPUT_DIR}/Coral.Managed.runtimeconfig.json"
     COMMENT "Copying Razor and Coral managed DLL to Edge output"
 )
+
+install(TARGETS Razor
+    ARCHIVE
+        DESTINATION SDK/lib
+        COMPONENT SDK
+    LIBRARY
+        DESTINATION SDK/lib
+        COMPONENT SDK
+    RUNTIME DESTINATION SDK/bin
+        COMPONENT SDK
+)
+
+install(DIRECTORY src/
+    DESTINATION SDK/include/Razor
+    COMPONENT SDK
+    FILES_MATCHING
+    PATTERN "*.h"
+    PATTERN "*.hpp"
+)
+
+install(DIRECTORY vendor/entt/single_include/entt/
+    DESTINATION SDK/include/entt
+    COMPONENT SDK
+)
+
+add_custom_target(GameSDK ALL
+    COMMAND ${CMAKE_COMMAND}
+        --install ${CMAKE_BINARY_DIR}
+        --prefix ${EDGE_OUTPUT_DIR}
+        --component SDK
+    COMMENT "Building Game SDK..."
+    DEPENDS Razor
+)

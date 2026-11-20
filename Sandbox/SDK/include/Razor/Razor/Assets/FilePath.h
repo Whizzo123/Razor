@@ -1,0 +1,47 @@
+#pragma once
+
+#include <string>
+#include <filesystem>
+#include <optional>
+#include "../Core.h"
+
+namespace Razor
+{
+	class RAZOR_API FilePath
+	{
+
+	public:
+		FilePath();
+		FilePath(const std::string& path, bool bIsDirectory = false);
+		~FilePath();
+
+		FilePath RemoveFromPath(FilePath path) const;
+
+		FilePath operator+(const FilePath& other) const
+		{
+			bool bIsDirectory = IsDir() && other.IsDir();
+			return FilePath(_mPath + "/" + other._mPath, bIsDirectory);
+		}
+
+		std::optional<FilePath> GetParent() const;
+
+		operator std::string() const
+		{
+			return _mPath;
+		}
+
+		operator std::filesystem::path() const{
+			return _mPath;
+		}
+
+		std::string GetName() const;
+
+		bool IsDir() const;
+
+		bool Empty() const;
+	private:
+		std::string _mPath;
+		bool mbIsDirectory;
+	};
+}
+

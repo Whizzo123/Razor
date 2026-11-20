@@ -11,9 +11,26 @@ namespace EdgeEditor
         try {
             ret = std::filesystem::copy_file(source, dest);
         } catch (std::filesystem::filesystem_error& e) {
-            RZ_ERROR("ProjectCreator::CopyFile -> Failed to copy file from: {0}, to: {1}, error: {2}", static_cast<std::string>(source), static_cast<std::string>(dest), e.what());
+            RZ_ERROR("CopyFile -> Failed to copy file from: {0}, to: {1}, error: {2}", static_cast<std::string>(source), static_cast<std::string>(dest), e.what());
             ret = false;
         }
+        return ret;
+    }
+
+    bool CopyFolder(const Razor::FilePath& source, const Razor::FilePath& dest, std::filesystem::copy_options options) {
+        bool ret = true;
+        std::error_code err;
+        try {
+            std::filesystem::copy(source, dest, options, err);
+        } catch (std::filesystem::filesystem_error& e) {
+            RZ_ERROR("CopyFolder -> Failed to copy folder from: {0}, to: {1}, error: {2}", static_cast<std::string>(source), static_cast<std::string>(dest), e.what());
+            ret = false;
+        }
+        if (err) {
+            RZ_ERROR("CopyFolder -> Copying folder from: {0}, to {1}, resulted in error: {2}", static_cast<std::string>(source), static_cast<std::string>(dest), err.message());
+            ret = false;
+        }
+
         return ret;
     }
 
@@ -23,7 +40,7 @@ namespace EdgeEditor
         try {
             ret = std::filesystem::create_directory(dir);
         } catch (std::filesystem::filesystem_error& e) {
-            RZ_ERROR("ProjectCreator::CreateDirectory -> Failed to create directory: {0}, error: {1}", static_cast<std::string>(dir), e.what());
+            RZ_ERROR("CreateDirectory -> Failed to create directory: {0}, error: {1}", static_cast<std::string>(dir), e.what());
             ret = false;
         }
         return ret;
