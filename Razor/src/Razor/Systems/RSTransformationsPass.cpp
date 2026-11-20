@@ -17,7 +17,7 @@ namespace Razor
 			for (int i = 0; i < EntityProperty.GetNumberOfSlots(); i++)
 			{
 				// TODO for some reason mat4 properties we add get immediately lost :) 
-				EntityProperty.GetPropertySlot(i).AddProperty<glm::mat4>("model", EntityTransform.Get());
+				EntityProperty.GetPropertySlot(i).AddProperty<Matrix4>("model", EntityTransform.Get());
 			}
 		}
 	}

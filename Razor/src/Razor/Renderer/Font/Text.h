@@ -1,7 +1,8 @@
 #pragma once
 
 #include <string>
-#include "../../Utils/Vector.h"
+#include "../../Utils/Vector2.h"
+#include "../../Utils/Vector3.h"
 #include "../Shaders/Shader.h"
 #include <map>
 namespace Razor

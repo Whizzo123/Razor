@@ -28,6 +28,14 @@
       "cwd": "${workspaceFolder}",
       "preLaunchTask": "Build Debug (CMake)",
       "program": "${workspaceFolder}/bin/Debug-windows-x86_64/Edge/Edge.exe"
+    },
+    {
+      "name": "Run Sandbox Project",
+      "type": "cppdbg",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "program" : "${workspaceFolder}/Sandbox/build/cmake/bin/Sandbox/Sandbox",
+      "MIMode": "gdb"
     }
   ]
 }

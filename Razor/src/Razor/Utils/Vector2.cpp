@@ -1,0 +1,21 @@
+#include "Vector2.h"
+#include <glm/glm.hpp>
+
+namespace Razor{
+
+    Vector2 Vector2::operator-(const Vector2& vec)
+    {
+        Vector2 ret{this->X, this->Y};
+        ret.X -= vec.X;
+        ret.Y -= vec.Y;
+        return ret;
+    }
+
+    Vector2 Vector2::Normalise(Vector2 vec)
+    {
+        glm::vec2 norm = glm::normalize(glm::vec2(vec.X, vec.Y));
+        Vector2 ret {norm.x, norm.y};
+        return ret;
+    }
+
+}

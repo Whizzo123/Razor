@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../../Utils/Vector.h"
+#include "../../Utils/Vector2u.h"
+#include "../../Utils/Vector2i.h"
 
 namespace Razor
 {

@@ -16,24 +16,24 @@ namespace Razor
 			Camera& EntityCamera = _mCurrentScene->GetComponent<Camera>(Entity);
 			
 			const float CameraSpeed = 5.0f * dt; // adjust accordingly
-			const glm::vec3 CameraFront = EntityCamera.CameraFront;
-			const glm::vec3 CameraUp = EntityCamera.CameraUp;
+			const Vector3 CameraFront = EntityCamera.CameraFront;
+			const Vector3 CameraUp = EntityCamera.CameraUp;
 
 			if (RazorIO::Get().GetStateForKey(RazorKey::W) == KEY_PRESSED)
 			{
-				EntityCamera.CameraPos += CameraSpeed * CameraFront;
+				EntityCamera.CameraPos += CameraFront * CameraSpeed;
 			}
 			if (RazorIO::Get().GetStateForKey(RazorKey::S) == KEY_PRESSED)
 			{
-				EntityCamera.CameraPos -= CameraSpeed * CameraFront;
+				EntityCamera.CameraPos -= CameraFront * CameraSpeed;
 			}
 			if (RazorIO::Get().GetStateForKey(RazorKey::A) == KEY_PRESSED)
 			{
-				EntityCamera.CameraPos -= glm::normalize(glm::cross(CameraFront, CameraUp)) * CameraSpeed;
+				EntityCamera.CameraPos -= Vector3::Normalise(Vector3::Cross(CameraFront, CameraUp)) * CameraSpeed;
 			}
 			if (RazorIO::Get().GetStateForKey(RazorKey::D) == KEY_PRESSED)
 			{
-				EntityCamera.CameraPos += glm::normalize(glm::cross(CameraFront, CameraUp)) * CameraSpeed;
+				EntityCamera.CameraPos += Vector3::Normalise(Vector3::Cross(CameraFront, CameraUp)) * CameraSpeed;
 			}
 
 			const Vector2D CurrentMouseCoords = RazorIO::Get().CurrentMousePos;
@@ -65,9 +65,9 @@ namespace Razor
 
 					Pitch = Pitch > 89.0f ? 89.0f : ((Pitch < -89.0f) ? -89.0f : Pitch);
 
-					EntityCamera.CameraDirection.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-					EntityCamera.CameraDirection.y = sin(glm::radians(Pitch));
-					EntityCamera.CameraDirection.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+					EntityCamera.CameraDirection.X = cos(RazorMaths::Radians(Yaw)) * cos(RazorMaths::Radians(Pitch));
+					EntityCamera.CameraDirection.Y = sin(RazorMaths::Radians(Pitch));
+					EntityCamera.CameraDirection.Z = sin(RazorMaths::Radians(Yaw)) * cos(RazorMaths::Radians(Pitch));
 
 					MouseLastX = RazorIO::Get().CurrentMousePos.X;
 					MouseLastY = RazorIO::Get().CurrentMousePos.Y;

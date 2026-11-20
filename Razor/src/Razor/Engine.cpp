@@ -167,11 +167,15 @@ namespace Razor
 
 	void Engine::Render(int32_t targetId, const RenderPipelineConfig& config) 
 	{
-		mRenderer->BindFrameBuffer(targetId);
-		mRenderer->ClearBuffer();
-		_mCoordinator->RunRenderSystems(config); 
-		mRenderer->BindFrameBuffer();
-		mRenderer->ClearBuffer();
+		if (targetId == 0) {
+			mRenderer->ClearBuffer();
+			_mCoordinator->RunRenderSystems(config);
+		} else {
+			mRenderer->BindFrameBuffer(targetId);
+			mRenderer->ClearBuffer();
+			_mCoordinator->RunRenderSystems(config); 
+			mRenderer->BindFrameBuffer();
+		}
 	}
 
 	void Engine::RunSystems() 

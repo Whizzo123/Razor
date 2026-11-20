@@ -3,6 +3,7 @@
 #include <iterator>
 #include <string>
 #include <fstream>
+#include "../Utils/IO/FileUtils.h"
 
 
 namespace EdgeEditor {
@@ -25,7 +26,8 @@ bool ProjectCreator::Create(const Razor::FilePath& projectDir) {
     if (!CreateDirectory(projectDir + Razor::FilePath("scripts", true))) {
         return false;
     }
-
+    // TODO all paths should resolve to executable directory i.e all folders we access template, SDK, config should all live within the executable directory we can still have them in source just
+    // make it part of the build pipeline that they get copied into the bin/<type>/Edge folder future thing but soon future thing can just absolute path SDK for now
     Razor::FilePath projectFilePath = projectDir + Razor::FilePath(projectName + ".proj");
     Razor::FilePath cmakeListsFilePath = projectDir + Razor::FilePath("CMakeLists.txt");
     Razor::FilePath premakeFilePath = projectDir + Razor::FilePath("scripts/premake5.lua");
@@ -46,30 +48,6 @@ bool ProjectCreator::Create(const Razor::FilePath& projectDir) {
     ret |= Replace(cmakeListsFilePath, "@ProjectName", projectName);
     ret |= Replace(premakeFilePath, "@ProjectName", projectName);
 
-    return ret;
-}
-
-bool ProjectCreator::CopyFile(const Razor::FilePath& source, const Razor::FilePath& dest) {
-    bool ret = false;
-
-    try {
-        ret = std::filesystem::copy_file(source, dest);
-    } catch (std::filesystem::filesystem_error& e) {
-        RZ_ERROR("ProjectCreator::CopyFile -> Failed to copy file from: {0}, to: {1}, error: {2}", static_cast<std::string>(source), static_cast<std::string>(dest), e.what());
-        ret = false;
-    }
-    return ret;
-}
-
-bool ProjectCreator::CreateDirectory(const Razor::FilePath& dir) {
-    bool ret = false;
-
-    try {
-        ret = std::filesystem::create_directory(dir);
-    } catch (std::filesystem::filesystem_error& e) {
-        RZ_ERROR("ProjectCreator::CreateDirectory -> Failed to create directory: {0}, error: {1}", static_cast<std::string>(dir), e.what());
-        ret = false;
-    }
     return ret;
 }
 

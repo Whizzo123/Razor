@@ -19,7 +19,7 @@ namespace Razor
 			for (int i = 0; i < 1; i++)
 			{
 				ShaderPropertySlot& Slot = Property.GetPropertySlot(i);
-				Slot.AddProperty<glm::vec3>("text_color", glm::vec3 {EntityText.mColor.X, EntityText.mColor.Y, EntityText.mColor.Z});
+				Slot.AddProperty<Vector3>("text_color", Vector3 {EntityText.mColor.X, EntityText.mColor.Y, EntityText.mColor.Z});
 			}
 		}
     }

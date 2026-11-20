@@ -8,7 +8,7 @@ namespace Razor
 	{
 	public:
 		DebugLightShader();
-		void Setup(CameraInfo* CameraInfo, glm::mat4 Model, MaterialData Mat, std::shared_ptr<std::vector<Light*>> Lights) override;
+		void Setup(CameraInfo* CameraInfo, Matrix4 Model, MaterialData Mat, std::shared_ptr<std::vector<Light*>> Lights) override;
 	};
 
 }

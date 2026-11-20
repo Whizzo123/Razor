@@ -1,5 +1,6 @@
 #include "AssetPickerPopupWindow.h"
 #include <filesystem>
+#include <sys/stat.h>
 #include "Razor.h"
 
 
@@ -58,7 +59,7 @@ namespace EdgeEditor
 	std::vector<Razor::FilePath> AssetPickerPopupWindow::GrabFiles(const std::string& Path)
 	{
 		std::vector<Razor::FilePath> fileNames;
-
+		// TODO don't believe this would work on windows?
 		struct stat sb;
 
 		for (const std::filesystem::directory_entry& DirectoryEntry : std::filesystem::directory_iterator(Path))

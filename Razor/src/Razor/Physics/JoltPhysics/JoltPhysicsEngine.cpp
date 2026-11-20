@@ -19,7 +19,7 @@ JPH_SUPPRESS_WARNINGS
 
 using namespace JPH::literals;
 
-#include "../../Utils/Vector.h"
+#include "../../Utils/Vector3.h"
 
 namespace Razor
 {

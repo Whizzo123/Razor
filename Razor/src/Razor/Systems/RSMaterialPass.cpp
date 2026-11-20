@@ -32,18 +32,18 @@ namespace Razor
 				Slot.AddProperty<int>("material.texture_normal", 0);
 				Slot.AddProperty<int>("material.texture_specular", 0);
 				Slot.AddProperty<int>("material.texture_height", 0);
-				Slot.AddProperty<glm::vec3>("material.diffuse", EntityMat.Materials[i].Diffuse);
-				Slot.AddProperty<glm::vec3>("material.ambient", EntityMat.Materials[i].Ambient);
-				Slot.AddProperty<glm::vec3>("material.specular", EntityMat.Materials[i].Specular);
+				Slot.AddProperty<Vector3>("material.diffuse", EntityMat.Materials[i].Diffuse);
+				Slot.AddProperty<Vector3>("material.ambient", EntityMat.Materials[i].Ambient);
+				Slot.AddProperty<Vector3>("material.specular", EntityMat.Materials[i].Specular);
 				Slot.AddProperty<float>("material.shininess", EntityMat.Materials[i].Shininess);
 				Slot.AddProperty<int>("material.bUseTextures", 0);
 			}
 		}
-		glm::vec3 zero = glm::vec3(0.0f, 0.0f, 0.0f);
+		Vector3 zero = Vector3(0.0f, 0.0f, 0.0f);
 
 		for (const auto& line : data.mDebugLines)
 		{
-			glm::vec3 color = glm::vec3(line.color.X, line.color.Y, line.color.Z);
+			Vector3 color = Vector3(line.color.X, line.color.Y, line.color.Z);
 			
 			ShaderProperty debugLineProperty;
 			debugLineProperty.GeneratePropertySlots(1);
@@ -52,9 +52,9 @@ namespace Razor
 			slot.AddProperty<int>("material.texture_normal", 0);
 			slot.AddProperty<int>("material.texture_specular", 0);
 			slot.AddProperty<int>("material.texture_height", 0);
-			slot.AddProperty<glm::vec3>("material.diffuse", color);
-			slot.AddProperty<glm::vec3>("material.ambient", zero);
-			slot.AddProperty<glm::vec3>("material.specular", zero);
+			slot.AddProperty<Vector3>("material.diffuse", color);
+			slot.AddProperty<Vector3>("material.ambient", zero);
+			slot.AddProperty<Vector3>("material.specular", zero);
 			slot.AddProperty<float>("material.shininess", 0.0f);
 			slot.AddProperty<int>("material.bUseTextures", 0);
 			data.mDebugLineProperties.push_back(std::move(debugLineProperty));
@@ -62,7 +62,7 @@ namespace Razor
 
 		for (const auto& triangle : data.mDebugTriangles)
 		{
-			glm::vec3 color = glm::vec3(triangle.color.X, triangle.color.Y, triangle.color.Z);
+			Vector3 color = Vector3(triangle.color.X, triangle.color.Y, triangle.color.Z);
 			ShaderProperty property;
 			property.GeneratePropertySlots(1);
 			ShaderPropertySlot& slot = property.GetPropertySlot(0);
@@ -70,9 +70,9 @@ namespace Razor
 			slot.AddProperty<int>("material.texture_normal", 0);
 			slot.AddProperty<int>("material.texture_specular", 0);
 			slot.AddProperty<int>("material.texture_height", 0);
-			slot.AddProperty<glm::vec3>("material.diffuse", color);
-			slot.AddProperty<glm::vec3>("material.ambient", zero);
-			slot.AddProperty<glm::vec3>("material.specular", zero);
+			slot.AddProperty<Vector3>("material.diffuse", color);
+			slot.AddProperty<Vector3>("material.ambient", zero);
+			slot.AddProperty<Vector3>("material.specular", zero);
 			slot.AddProperty<float>("material.shininess", 0.0f);
 			slot.AddProperty<int>("material.bUseTextures", 0);
 			data.mDebugTriangleProperties.push_back(std::move(property));

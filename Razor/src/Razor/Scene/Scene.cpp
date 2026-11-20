@@ -6,7 +6,7 @@
 #include "../Scripting/ScriptInterface.h"
 #include "../Scripting/ScriptEngine.h"
 #include "../Log.h"
-#include "../Utils/Vector.h"
+#include "../Utils/Vector3.h"
 #include "../Physics/Components/BoxBody.h"
 #include "../Physics/IPhysicsEngine.h"
 #include "../Renderer/Font/Text.h"
@@ -118,8 +118,8 @@ namespace Razor
 		for (auto entity : GetEntitiesWithComponents<BoxBody>())
 		{
 			Transform& transform = GetEntity(entity)->GetComponent<Transform>();
-			Vector3 pos = { transform.Position.x, transform.Position.y, transform.Position.z };
-			Vector3 scale = { transform.Scale.x, transform.Scale.y, transform.Scale.z };
+			Vector3 pos = { transform.Position.X, transform.Position.Y, transform.Position.Z };
+			Vector3 scale = { transform.Scale.X, transform.Scale.Y, transform.Scale.Z };
 			BoxBody& body = GetEntity(entity)->GetComponent<BoxBody>();
 			body.OnCollisionStarted = []() { RZ_CORE_INFO("Collision started"); };
 			bool bIsTrigger = false;

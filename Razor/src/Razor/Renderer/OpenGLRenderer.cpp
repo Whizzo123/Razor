@@ -12,6 +12,9 @@
 #include "Textures/Bitmap.h"
 #include "Font/Text.h"
 #include "Font/Font.h"
+#include <spdlog/fmt/fmt.h>
+#include <thread>
+#include <sstream>
 
 namespace Razor
 {
@@ -132,7 +135,15 @@ namespace Razor
 
     void OpenGLRenderer::UseShader(uint32_t ShaderProgramId)
     {
+        if (!glIsProgram(ShaderProgramId)) {
+            RZ_CORE_ERROR("Passed id: {0} is not a shader program", ShaderProgramId);
+        }
+
         glUseProgram(ShaderProgramId);
+        GLenum err;
+        while ((err = glGetError()) != GL_NO_ERROR) {
+            RZ_CORE_ERROR("UseShader OpenGL error {0}", err);
+        }
     }
 
     GLenum OpenGLRenderer::Translate(EStencilAction Action)
@@ -164,10 +175,10 @@ namespace Razor
         const int SCREEN_HEIGHT = 600;
 
         CameraInfo Info;
-        glm::mat4 View = glm::mat4(1.0f);
-        glm::mat4 Projection = glm::mat4(1.0f);
-        Projection = glm::perspective(glm::radians(45.0f), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
-        View = glm::lookAt(RendererCamera.CameraPos, RendererCamera.CameraPos + RendererCamera.CameraFront, RendererCamera.CameraUp);
+        Matrix4 View = Matrix4(1.0f);
+        Matrix4 Projection = Matrix4(1.0f);
+        Projection = Matrix4::Perspective(RazorMaths::Radians(45.0f), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
+        View = Matrix4::LookAt(RendererCamera.CameraPos, RendererCamera.CameraPos + RendererCamera.CameraFront, RendererCamera.CameraUp);
         Info.CameraView = View;
         Info.CameraProjection = Projection;
         Info.CameraPosition = RendererCamera.CameraPos;
@@ -375,7 +386,7 @@ namespace Razor
     {
         // activate corresponding render state	
         UseShader(text.mShader.ID);
-        text.mShader.SetVec3("textColor", glm::vec3 {text.mColor.X, text.mColor.Y, text.mColor.Z});
+        text.mShader.SetVec3("textColor", Vector3 {text.mColor.X, text.mColor.Y, text.mColor.Z});
         glActiveTexture(GL_TEXTURE0);
         glBindVertexArray(text.mVao);
         glEnable(GL_BLEND);
@@ -484,5 +495,15 @@ namespace Razor
                 SetupMesh(Mesh.Meshes);
             }
         }
+    }
+
+    bool OpenGLRenderer::LogContext(const std::string& location)
+    {
+        GLFWwindow* context = glfwGetCurrentContext();
+
+        std::ostringstream threadStream;
+        threadStream << std::this_thread::get_id();
+        RZ_CORE_INFO("[{0}] Context: {1:p} | Thread: {2}", location, fmt::ptr(context), threadStream.str());
+        return true;
     }
 }

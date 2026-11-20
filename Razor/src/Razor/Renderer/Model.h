@@ -1,11 +1,9 @@
 #pragma once
 #include "../Core.h"
 #include <vector>
-#include <glm/ext/vector_float3.hpp>
-#include <glm/ext/vector_float2.hpp>
-#include <assimp/material.h>
-// TODO replace front glm with Razor Vec2 and Vec3 like ImGui
-
+#include "Textures/Texture.h"
+#include "../Utils/Vector3.h"
+#include "../Utils/Vector2.h"
 
 struct aiScene;
 struct aiNode;
@@ -19,11 +17,11 @@ namespace Razor
 	{
 		struct Vertex
 		{
-			glm::vec3 Position;
-			glm::vec3 Normal;
-			glm::vec2 TexCoords;
-			glm::vec3 Tangent;
-			glm::vec3 Bitangent;
+			Vector3 Position;
+			Vector3 Normal;
+			Vector2 TexCoords;
+			Vector3 Tangent;
+			Vector3 Bitangent;
 		};
 		struct Texture
 		{
@@ -57,12 +55,12 @@ namespace Razor
 	struct MaterialData
 	{
 		std::string MaterialName;
-		glm::vec3 Ambient;
-		glm::vec3 Diffuse;
-		glm::vec3 Specular;
+		Vector3 Ambient;
+		Vector3 Diffuse;
+		Vector3 Specular;
 		float Shininess;
-		MaterialData() : MaterialName ("Untitled"), Ambient(glm::vec3(1.0f, 1.0f, 1.0f)), Diffuse(glm::vec3(1.0f, 1.0f, 1.0f)), Specular(glm::vec3(1.0f, 1.0f, 1.0f)), Shininess(1.0f) {}
-		MaterialData(glm::vec3 A, glm::vec3 D, glm::vec3 S, float SH) : Ambient(A), Diffuse(D), Specular(S), Shininess(SH) {}
+		MaterialData() : MaterialName ("Untitled"), Ambient(1.0f, 1.0f, 1.0f), Diffuse(1.0f, 1.0f, 1.0f), Specular(1.0f, 1.0f, 1.0f), Shininess(1.0f) {}
+		MaterialData(Vector3 A, Vector3 D, Vector3 S, float SH) : Ambient(A), Diffuse(D), Specular(S), Shininess(SH) {}
 	};
 
 	struct Material
@@ -85,7 +83,7 @@ namespace Razor
 		void LoadMesh(std::string Path);
 		void ProcessNode(aiNode* Node, const aiScene* Scene, std::vector<MeshData>& Parts);
 		MeshData ProcessMesh(aiMesh* Mesh, const aiScene* Scene);
-		std::vector<MeshData::Texture> LoadMaterialTextures(aiMaterial* Mat, aiTextureType Type, std::string TypeName);
+		std::vector<MeshData::Texture> LoadMaterialTextures(aiMaterial* Mat, TextureType Type, std::string TypeName);
 		unsigned int LoadMaterialParam(aiMaterial* Mat);
 		unsigned int TextureFromFile(const char* Path);
 		std::vector<MaterialData> GetMaterialsForModel() { return Materials_Loaded; };

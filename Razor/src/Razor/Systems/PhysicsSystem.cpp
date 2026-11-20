@@ -2,7 +2,7 @@
 #include "../Physics/Components/BoxBody.h"
 #include "../Engine.h"
 #include "../Physics/IPhysicsEngine.h"
-#include "../Utils/Vector.h"
+#include "../Utils/Vector3.h"
 
 namespace Razor
 {
@@ -23,7 +23,7 @@ namespace Razor
 			else
 			{
 				const float fixedStep = 1.0f / 60.0f;
-				Engine::Get().GetPhysicsEngine().MoveKinematic(body.bodyId, {transform.Position.x, transform.Position.y, transform.Position.z}, fixedStep);
+				Engine::Get().GetPhysicsEngine().MoveKinematic(body.bodyId, {transform.Position.X, transform.Position.Y, transform.Position.Z}, fixedStep);
 			}
 		}
 	}

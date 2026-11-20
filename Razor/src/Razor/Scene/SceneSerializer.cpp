@@ -1,9 +1,10 @@
 #include "SceneSerializer.h"
 #include <fstream>
+#include <sys/stat.h>
 #include "../Coordinator.h"
 #include "../Component.h"
 #include "../IO/YamlWrapper.h"
-#include "../Utils/Vector.h"
+#include "../Utils/Vector3.h"
 #include "../Core/Entity.h"
 #include "Scene.h"
 #include "../Scripting/ScriptEngine.h"
@@ -16,17 +17,6 @@
 
 namespace Razor
 {
-
-	Vector3 ToVec3(const glm::vec3& Vec)
-	{
-		return Vector3(Vec.x, Vec.y, Vec.z);
-	}
-
-	glm::vec3 ToGVec3(const Vector3& Vec)
-	{
-		return glm::vec3(Vec.X, Vec.Y, Vec.Z);
-	}
-
 	void SceneSerializer::SerializeEntity(YamlEmitter* Out, Entity InEntity)
 	{
 		yaml_emitter_begin_map(Out);
@@ -39,11 +29,11 @@ namespace Razor
 
 			Transform& EntityTransform = InEntity.GetComponent<Transform>();
 			yaml_emitter_key(Out, "Position");
-			yaml_emitter_value_vec3(Out, ToVec3(EntityTransform.Position));
+			yaml_emitter_value_vec3(Out, EntityTransform.Position);
 			yaml_emitter_key(Out, "Rotation");
-			yaml_emitter_value_vec3(Out, ToVec3(EntityTransform.Rotation));
+			yaml_emitter_value_vec3(Out, EntityTransform.Rotation);
 			yaml_emitter_key(Out, "Scale");
-			yaml_emitter_value_vec3(Out, ToVec3(EntityTransform.Scale));
+			yaml_emitter_value_vec3(Out, EntityTransform.Scale);
 			yaml_emitter_end_map(Out);
 			
 		}
@@ -65,13 +55,13 @@ namespace Razor
 
 			DirectionalLight& DirLight = InEntity.GetComponent<DirectionalLight>();
 			yaml_emitter_key(Out, "Diffuse");
-			yaml_emitter_value_vec3(Out, ToVec3(DirLight.Diffuse));
+			yaml_emitter_value_vec3(Out, DirLight.Diffuse);
 			yaml_emitter_key(Out, "Ambient");
-			yaml_emitter_value_vec3(Out, ToVec3(DirLight.Ambient));
+			yaml_emitter_value_vec3(Out, DirLight.Ambient);
 			yaml_emitter_key(Out, "Specular");
-			yaml_emitter_value_vec3(Out, ToVec3(DirLight.Specular));
+			yaml_emitter_value_vec3(Out, DirLight.Specular);
 			yaml_emitter_key(Out, "Direction");
-			yaml_emitter_value_vec3(Out, ToVec3(DirLight.Direction));
+			yaml_emitter_value_vec3(Out, DirLight.Direction);
 
 			yaml_emitter_end_map(Out);
 		}
@@ -330,9 +320,9 @@ namespace Razor
 		if (TransformComponent)
 		{
 			Transform& comp = DeserializedEntity->GetComponent<Transform>();
-			comp.Position = ToGVec3(yaml_as_vec3(yaml_get_child(TransformComponent, "Position")));
-			comp.Rotation = ToGVec3(yaml_as_vec3(yaml_get_child(TransformComponent, "Rotation")));
-			comp.Scale = ToGVec3(yaml_as_vec3(yaml_get_child(TransformComponent, "Scale")));
+			comp.Position = yaml_as_vec3(yaml_get_child(TransformComponent, "Position"));
+			comp.Rotation = yaml_as_vec3(yaml_get_child(TransformComponent, "Rotation"));
+			comp.Scale = yaml_as_vec3(yaml_get_child(TransformComponent, "Scale"));
 		}
 		auto ScriptComponent = yaml_get_child(EntityNode, "ScriptComponent");
 		if (ScriptComponent)
@@ -437,10 +427,10 @@ namespace Razor
 		if(DirectionalLightComponent)
 		{
 			DirectionalLight dirLight;
-			dirLight.Diffuse = ToGVec3(yaml_as_vec3(yaml_get_child(DirectionalLightComponent, "Diffuse")));
-			dirLight.Ambient = ToGVec3(yaml_as_vec3(yaml_get_child(DirectionalLightComponent, "Ambient")));
-			dirLight.Specular = ToGVec3(yaml_as_vec3(yaml_get_child(DirectionalLightComponent, "Specular")));
-			dirLight.Direction = ToGVec3(yaml_as_vec3(yaml_get_child(DirectionalLightComponent, "Direction")));
+			dirLight.Diffuse = yaml_as_vec3(yaml_get_child(DirectionalLightComponent, "Diffuse"));
+			dirLight.Ambient = yaml_as_vec3(yaml_get_child(DirectionalLightComponent, "Ambient"));
+			dirLight.Specular = yaml_as_vec3(yaml_get_child(DirectionalLightComponent, "Specular"));
+			dirLight.Direction = yaml_as_vec3(yaml_get_child(DirectionalLightComponent, "Direction"));
 			DeserializedEntity->AddComponent<DirectionalLight>(dirLight);
 		}
 		auto BoxBodyComponent = yaml_get_child(EntityNode, "BoxBody");
