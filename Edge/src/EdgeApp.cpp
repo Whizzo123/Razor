@@ -175,7 +175,14 @@ void Edge::CreateDockspace(const std::string& Title)
 void Edge::OnNewProjectSet()
 {
 	Razor::Engine& Engine = Razor::Engine::Get();
-	Razor::FilePath projectFilePath(Storage->GetProjectPath()); 
+	Razor::FilePath projectFilePath(Storage->GetProjectPath());
+
+	std::optional<Razor::FilePath> projectDirPath = projectFilePath.GetParent();
+
+	if (!EdgeEditor::ProjectBuilder::BuildProject(projectDirPath.value())) {
+		RZ_ERROR("Failed to build project on load");
+	}
+
 	if (Engine.LoadProject(projectFilePath))
 	{
 		if (_mLayout->Contains(EdgeEditor::EditorWindowName::PROJECTEXPLORER))

@@ -1,4 +1,4 @@
 ProjectName: @ProjectName
 AssetDirectory: assets
-DllDirectory: Scripts/Binaries
+DllDirectory: scripts/binaries
 MainScenePath: assets/scenes/Main.rzscn

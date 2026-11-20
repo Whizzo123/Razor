@@ -150,13 +150,7 @@ add_custom_command(TARGET Razor POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "$<TARGET_FILE:Razor>"
         "${EDGE_OUTPUT_DIR}/$<TARGET_FILE_NAME:Razor>"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${CORAL_BUILD_DIR}/Coral.Managed.dll"
-        "${EDGE_OUTPUT_DIR}/Coral.Managed.dll"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${CORAL_BUILD_DIR}/Coral.Managed.runtimeconfig.json"
-        "${EDGE_OUTPUT_DIR}/Coral.Managed.runtimeconfig.json"
-    COMMENT "Copying Razor and Coral managed DLL to Edge output"
+    COMMENT "Copying Razor to Edge output"
 )
 
 install(TARGETS Razor
@@ -180,6 +174,24 @@ install(DIRECTORY src/
 
 install(DIRECTORY vendor/entt/single_include/entt/
     DESTINATION SDK/include/entt
+    COMPONENT SDK
+)
+
+install(FILES
+    "${CMAKE_SOURCE_DIR}/Razor-ScriptBridge/bin/$<CONFIG>/net9.0/Razor-ScriptBridge.dll"
+    DESTINATION SDK/lib
+    COMPONENT SDK
+)
+
+install(FILES
+    "${CORAL_BUILD_DIR}/Coral.Managed.dll"
+    DESTINATION SDK/lib
+    COMPONENT SDK
+)
+
+install(FILES
+    "${CORAL_BUILD_DIR}/Coral.Managed.runtimeconfig.json"
+    DESTINATION SDK/lib
     COMPONENT SDK
 )
 

@@ -26,6 +26,10 @@ bool ProjectCreator::Create(const Razor::FilePath& projectDir) {
     if (!CreateDirectory(projectDir + Razor::FilePath("scripts", true))) {
         return false;
     }
+    // src folder
+    if (!CreateDirectory(projectDir + Razor::FilePath("src", true))) {
+        return false;
+    }
     // TODO all paths should resolve to executable directory i.e all folders we access template, SDK, config should all live within the executable directory we can still have them in source just
     // make it part of the build pipeline that they get copied into the bin/<type>/Edge folder future thing but soon future thing can just absolute path SDK for now
     Razor::FilePath projectFilePath = projectDir + Razor::FilePath(projectName + ".proj");
@@ -33,6 +37,7 @@ bool ProjectCreator::Create(const Razor::FilePath& projectDir) {
     Razor::FilePath premakeFilePath = projectDir + Razor::FilePath("scripts/premake5.lua");
     Razor::FilePath generateBatFilePath = projectDir + Razor::FilePath("scripts/GenerateProjects.bat");
     Razor::FilePath generateShFilePath = projectDir + Razor::FilePath("scripts/GenerateProjects.sh");
+    Razor::FilePath srcFilePath = projectDir + Razor::FilePath("src/" + projectName + ".cpp");
 
     // .proj
     ret |= CopyFile(templateDir + Razor::FilePath("project/Template.proj"), projectFilePath);
@@ -43,10 +48,14 @@ bool ProjectCreator::Create(const Razor::FilePath& projectDir) {
     ret |= CopyFile(templateDir + Razor::FilePath("project/scripts/GenerateProjects.bat"), generateBatFilePath);
     ret |= CopyFile(templateDir + Razor::FilePath("project/scripts/GenerateProjects.sh"), generateShFilePath);
 
+    ret |= CopyFile(templateDir + Razor::FilePath("project/src/TemplateApp.cpp"), srcFilePath);
+
     //Replacement part
     ret |= Replace(projectFilePath, "@ProjectName", projectName);
     ret |= Replace(cmakeListsFilePath, "@ProjectName", projectName);
     ret |= Replace(premakeFilePath, "@ProjectName", projectName);
+    ret |= Replace(srcFilePath, "@ProjectName", projectName);
+    ret |= Replace(srcFilePath, "@FilePath", projectDir + projectName);
 
     return ret;
 }

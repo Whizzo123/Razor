@@ -7,6 +7,7 @@
 namespace EdgeEditor 
 {
     bool ProjectBuilder::BuildProject(const Razor::FilePath &projectDir) {
+        std::string name = projectDir.GetName();
         //SDK - Fix this path once we have fixed up how we deal with file paths
         if (CopyFolder(Razor::FilePath("bin/Debug-linux-x86_64/Edge/SDK"), projectDir + Razor::FilePath("SDK"), std::filesystem::copy_options::recursive | std::filesystem::copy_options::update_existing)) {
             RZ_WARN("ProjectBuilder::BuildProject -> Failed to copy SDK to game directory may fail to build/or be out of date");
@@ -22,7 +23,7 @@ namespace EdgeEditor
             return false;
         }
         // Execute the build
-        std::string build_command = std::format("cmake --build {} --target Sandbox", static_cast<std::string>(projectDir) + ("/build/cmake"));
+        std::string build_command = std::format("cmake --build {} --target {}", static_cast<std::string>(projectDir) + ("/build/cmake"), name);
         const int build_result = std::system(
             build_command.c_str()
         );
@@ -30,6 +31,17 @@ namespace EdgeEditor
             RZ_ERROR("Failed to build project CMake");
             return false;
         }
+
+        // Build C# Scripts
+        std::string build_scripts_command = std::format("cmake --build {} --target {}", static_cast<std::string>(projectDir) + ("/build/cmake"), name + "Scripts");
+         const int build_scripts_result = std::system(
+            build_scripts_command.c_str()
+        );
+        if (build_scripts_result != 0) {
+            RZ_ERROR("Failed to build project C# scripts");
+            return false;
+        }
+
         return true;
     }
 }

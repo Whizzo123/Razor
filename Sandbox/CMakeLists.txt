@@ -42,10 +42,35 @@ set_target_properties(Razor PROPERTIES
 # C# scripts
 # --------------------------------------------------
 
+set(CSPROJ
+    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/Sandbox.csproj"
+)
+
+# Create project if it doesn't exist
+if(NOT EXISTS "${CSPROJ}")
+    file(WRITE "${CSPROJ}"
+[=[
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <OutputType>Library</OutputType>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Reference Include="ScriptBridge">
+            <HintPath>../SDK/lib/Razor-ScriptBridge.dll</HintPath>
+            <Private>true</Private>
+        </Reference>
+    </ItemGroup>
+</Project>
+]=]
+    )
+endif()
+
 add_custom_target(SandboxScripts ALL
     COMMAND ${DOTNET} build
-        "${CMAKE_CURRENT_SOURCE_DIR}/Scripts/Sandbox.csproj"
-        -o "${CMAKE_CURRENT_SOURCE_DIR}/Scripts/Binaries/net9.0"
+        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/Sandbox.csproj"
+        -o "${CMAKE_CURRENT_SOURCE_DIR}/scripts/binaries/net9.0"
         -c $<CONFIG>
         --nologo
     COMMENT "Building Sandbox C# scripts"
@@ -63,6 +88,13 @@ if(UNIX)
 endif()
 
 add_executable(Sandbox ${SANDBOX_SOURCES})
+
+add_custom_command(TARGET Sandbox POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${DEPS_DIR}"
+        "$<TARGET_FILE_DIR:Sandbox>/SDK"
+    COMMENT "Copying Razor SDK to Sandbox output directory"
+)
 
 set_target_properties(Sandbox PROPERTIES
     CXX_STANDARD 20
