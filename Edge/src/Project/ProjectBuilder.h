@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Razor.h"
 
 namespace EdgeEditor

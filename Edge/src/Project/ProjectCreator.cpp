@@ -48,9 +48,6 @@ bool ProjectCreator::Create(const Razor::FilePath& projectDir) {
     ret |= Replace(cmakeListsFilePath, "@ProjectName", projectName);
     ret |= Replace(premakeFilePath, "@ProjectName", projectName);
 
-    //SDK - Fix this path once we have fixed up how we deal with file paths
-    ret |= CopyFolder(Razor::FilePath("bin/Debug-linux-x86_64/Edge/SDK"), projectDir + Razor::FilePath("SDK"), std::filesystem::copy_options::recursive);
-
     return ret;
 }
 

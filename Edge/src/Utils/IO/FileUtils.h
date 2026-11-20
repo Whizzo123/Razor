@@ -5,7 +5,7 @@
 
 namespace EdgeEditor
 {
-    bool CopyFile(const Razor::FilePath& source, const Razor::FilePath& dest) {
+    static bool CopyFile(const Razor::FilePath& source, const Razor::FilePath& dest) {
         bool ret = false;
 
         try {
@@ -17,7 +17,7 @@ namespace EdgeEditor
         return ret;
     }
 
-    bool CopyFolder(const Razor::FilePath& source, const Razor::FilePath& dest, std::filesystem::copy_options options) {
+    static bool CopyFolder(const Razor::FilePath& source, const Razor::FilePath& dest, std::filesystem::copy_options options) {
         bool ret = true;
         std::error_code err;
         try {
@@ -34,7 +34,7 @@ namespace EdgeEditor
         return ret;
     }
 
-    bool CreateDirectory(const Razor::FilePath& dir) {
+    static bool CreateDirectory(const Razor::FilePath& dir) {
         bool ret = false;
 
         try {
