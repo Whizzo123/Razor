@@ -9,13 +9,6 @@ namespace Razor {
 		return Vector2((2.0f / ScreenPos.X) / ScreenWidth - 1.0f, 1.0f - (2.0f * ScreenPos.Y) / ScreenHeight);
 	}
 
-	/*Vector3 RazorMaths::ViewToWorld(Vector2 ViewPos, Matrix4 ViewMatrix)
-	{
-		//Matrix4 InvViewMatrix = Matrix4::Inverse(ViewMatrix);
-		//Vector4 WorldPos = InvViewMatrix * Vector4(ViewPos.X, ViewPos.Y, 0.0f, 1.0f);
-		return Vector3();
-	}*/
-
 	Ray RazorMaths::CreateRay(Vector3 RayStart, float Distance)
 	{
 		Ray NewRay;

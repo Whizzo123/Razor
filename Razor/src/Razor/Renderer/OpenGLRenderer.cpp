@@ -458,11 +458,6 @@ namespace Razor
 	void OpenGLRenderer::SetBufferData(unsigned int buffer, EBufferType type, size_t bufferSize, void* data, EUsage usage)
     {
         glBindBuffer(_mBufferTypeTranslation[type], buffer);
-        if (type != EBufferType::ELEMENT_ARRAY) {
-            GLint boundBuffer = 0;
-            glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &boundBuffer);
-            RZ_CORE_WARN("Bound buffer is {0} and is it valid: {1}", boundBuffer, glIsBuffer(boundBuffer));
-        }
         glBufferData(_mBufferTypeTranslation[type], bufferSize, data, _mUsageTypeTranslation[usage]);
     }
 	void OpenGLRenderer::SetVertexAttribArray(unsigned int vao, unsigned int arrayIndex, size_t size, EDataType type, bool bNormalized, size_t stride, void* dataOffset)
